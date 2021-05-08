@@ -54,6 +54,8 @@ import random from "../util/rnd";
 import {checkSvg, alertCircleSvg} from "../img/svg";
 
 import {PageProps, pageMapDispatchToProps, pageMapStateToProps} from "./common";
+import config from "../../config";
+import {HIVE_SIGNER_APP} from '../../client_config';
 
 interface State {
     list: Community[];
@@ -315,7 +317,7 @@ class CommunityCreatePage extends BaseComponent<PageProps, CreateState> {
             activeAuthority: Authority.from(activeKey.createPublic()),
             postingAuthority: {
                 ...Authority.from(postingKey.createPublic()),
-                account_auths: [['ecency.app', 1]]
+                account_auths: [[HIVE_SIGNER_APP, 1]]
             } as Authority
         }
     }
@@ -383,7 +385,7 @@ class CommunityCreatePage extends BaseComponent<PageProps, CreateState> {
             new_account_name: username,
             owner: {weight_threshold: 1, account_auths: [], key_auths: [[keys.ownerKey.createPublic().toString(), 1]]},
             active: {weight_threshold: 1, account_auths: [], key_auths: [[keys.activeKey.createPublic().toString(), 1]]},
-            posting: {weight_threshold: 1, account_auths: [['ecency.app', 1]], key_auths: [[keys.postingKey.createPublic().toString(), 1]]},
+            posting: {weight_threshold: 1, account_auths: [[HIVE_SIGNER_APP, 1]], key_auths: [[keys.postingKey.createPublic().toString(), 1]]},
             memo_key: keys.memoKey.createPublic().toString(),
             json_metadata: ""
         }];

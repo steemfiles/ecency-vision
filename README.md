@@ -38,7 +38,7 @@ Feel free to test it out and submit improvements and pull requests.
 ##### Install dependencies
 `$ yarn`
 
-##### Edit config file or define environment variables
+##### Edit backend config file or define environment variables
 `$ nano src/config.ts`
 
 ##### Environment variables
@@ -47,8 +47,14 @@ Feel free to test it out and submit improvements and pull requests.
 * `PRIVATE_API_ADDR` - private api endpoint
 * `PRIVATE_API_AUTH` - private api auth
 * `HIVESIGNER_CLIENT_SECRET` -  hivesigner client secret
+* `HIVESIGNER_CLIENT_ID` - hivesigner client account id
 * `SEARCH_API_ADDR` - hivesearcher api endpoint
 * `SEARCH_API_SECRET` - hivesearcher api auth token
+
+##### Create Common config file 
+`$ cp src/client_config_default.js src/client_config.ts`
+`$ nano src/client_config.ts`
+
 
 ##### Start website in dev
 `$ yarn start`

@@ -47,6 +47,7 @@ declare var window: AppWindow;
 const logo = require('../../img/logo-circle.svg');
 const hsLogo = require("../../img/hive-signer.svg");
 const keyChainLogo = require("../../img/keychain.png");
+import {HIVE_SIGNER_APP} from "../../../client_config";
 
 interface LoginKcProps {
     toggleUIProp: (what: ToggleType) => void;
@@ -104,14 +105,14 @@ export class LoginKc extends BaseComponent<LoginKcProps, LoginKcState> {
             return;
         }
 
-        const hasPostingPerm = account?.posting!.account_auths.filter(x => x[0] === "ecency.app").length > 0;
+        const hasPostingPerm = account?.posting!.account_auths.filter(x => x[0] === HIVE_SIGNER_APP).length > 0;
 
         if (!hasPostingPerm) {
             const weight = account.posting!.weight_threshold;
 
             this.stateSet({inProgress: true});
             try {
-                await addAccountAuthority(username, "ecency.app", "Posting", weight)
+                await addAccountAuthority(username, HIVE_SIGNER_APP, "Posting", weight)
             } catch (err) {
                 error(_t('login.error-permission'));
                 return;
@@ -394,12 +395,12 @@ export class Login extends BaseComponent<LoginProps, State> {
                 return;
             }
 
-            const hasPostingPerm = account?.posting!.account_auths.filter(x => x[0] === "ecency.app").length > 0;
+            const hasPostingPerm = account?.posting!.account_auths.filter(x => x[0] === HIVE_SIGNER_APP).length > 0;
 
             if (!hasPostingPerm) {
                 this.stateSet({inProgress: true});
                 try {
-                    await grantPostingPermission(thePrivateKey, account, "ecency.app")
+                    await grantPostingPermission(thePrivateKey, account, HIVE_SIGNER_APP)
                 } catch (err) {
                     error(_t('login.error-permission'));
                     return;
