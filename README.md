@@ -47,7 +47,6 @@ Feel free to test it out and submit improvements and pull requests.
 * `PRIVATE_API_ADDR` - private api endpoint
 * `PRIVATE_API_AUTH` - private api auth
 * `HIVESIGNER_CLIENT_SECRET` -  hivesigner client secret
-* `HIVESIGNER_CLIENT_ID` - hivesigner client account id
 * `SEARCH_API_ADDR` - hivesearcher api endpoint
 * `SEARCH_API_SECRET` - hivesearcher api auth token
 
@@ -55,14 +54,21 @@ Feel free to test it out and submit improvements and pull requests.
 `$ cp src/client_config_default.js src/client_config.ts`
 `$ nano src/client_config.ts`
 
-
 ##### Start website in dev
 `$ yarn start`
+
+For website development Change ```HIVE_SIGNER_APP``` in ```src/client_config.ts``` to an account that you control and
+has an APP_SECRET with Hive Signer. This secret is what the environment variable needs to be set to when running in
+developer mode.
+
 
 ##### Start desktop in dev
 `$ cd src/desktop`
 `$ yarn`
 `$ yarn dev`
+
+For *desktop* development you should set the ```HIVE_SIGNER_APP``` to ```'ecency.app'``` if you wish that it uses Hive,
+and Ecency points.
 
 ##### Pushing new code / Pull requests
 
