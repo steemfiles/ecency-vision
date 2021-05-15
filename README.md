@@ -57,9 +57,7 @@ Feel free to test it out and submit improvements and pull requests.
 ##### Start website in dev
 `$ yarn start`
 
-For website development Change ```HIVE_SIGNER_APP``` in ```src/client_config.ts``` to an account that you control and
-has an APP_SECRET with Hive Signer. This secret is what the environment variable needs to be set to when running in
-developer mode.
+For website development Change ```HIVE_SIGNER_APP``` in ```src/client_config.ts``` to an account that you control.  This account must have it's APP_SECRET with Hive Signer. This environment variable ```HIVESIGNER_CLIENT_SECRET``` must be set  to this secret.  Additionally, @hivesigner must be given posting authority for said account.  If that HIVE_SIGNER_APP happens to be 'ecency.app', then you'll need the APP_SECRET that corresponds to that app.
 
 
 ##### Start desktop in dev
