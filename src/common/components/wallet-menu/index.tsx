@@ -9,7 +9,7 @@ const logo = require('../../img/logo-small-transparent.png');
 import _c from "../../util/fix-class-names";
 
 import {hiveSvg} from "../../img/svg";
-
+import {LIQUID_TOKEN, LIQUID_TOKEN_UPPERCASE} from "../../../client_config";
 
 interface Props {
     global: Global;
@@ -23,7 +23,12 @@ export default class WalletMenu extends Component<Props> {
 
         return (
             <div className="wallet-menu">
-                <Link className={_c(`menu-item hive ${active === "hive" ? "active" : ""}`)} to={`/@${username}/wallet`}>
+                <Link className={_c(`menu-item hive ${active === "hiveEngine" ? "active" : ""}`)} to={`/@${username}/wallet`}>
+                    <span className="title">{LIQUID_TOKEN}</span>
+                    <span className="sub-title">Wallet</span>
+                    <span className="platform-logo"><img alt={LIQUID_TOKEN_UPPERCASE} src={logo} /></span>
+                </Link>
+                <Link className={_c(`menu-item hive ${active === "hive" ? "active" : ""}`)} to={`/@${username}/hive`}>
                     <span className="title">Hive</span>
                     <span className="sub-title">Wallet</span>
                     <span className="platform-logo">{hiveSvg}</span>

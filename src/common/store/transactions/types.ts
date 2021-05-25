@@ -48,6 +48,53 @@ export interface Transfer extends BaseTransaction {
     to: string;
 }
 
+export interface HEFineTransaction {
+    account    : string;
+    author    : string;
+    id    : number;
+    // in satoshis
+    int_amount    : number;
+    permlink    : string;
+    // For POB always 8
+    precision    : number;
+    // Iso string date
+    timestamp    : string;
+    // POB
+    token    : string;
+    trx    :  string| null;
+    type    : string;
+}
+
+
+export interface HEAuthorReward extends HEFineTransaction {
+    trx    : null;
+    type    : "author_reward";
+}
+
+export interface HECurationReward extends HEFineTransaction {
+    curator : string;
+    trx: null;
+    type: "curation_reward";
+}
+
+
+export interface HECoarseTransaction {
+    _id: string;
+    blockNumber: number;
+    "transactionId":string;
+    // seconds since 1970
+    "timestamp":number;
+    "account":string;
+    "operation":string;
+    "from":string;
+    "to":string;
+    // POB for Proof of Brain
+    "symbol":string;
+    // quantity is NOT in satoshis.
+    "quantity":string;
+    "memo": null|string;
+}
+
 export interface TransferToVesting extends BaseTransaction {
     type: "transfer_to_vesting";
     amount: string;

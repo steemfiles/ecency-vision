@@ -27,22 +27,25 @@ import ProfileCommunities from "../components/profile-communities";
 import ProfileSettings from "../components/profile-settings";
 import WalletHive from "../components/wallet-hive";
 import WalletEcency from "../components/wallet-ecency";
+import WalletHiveEngine from "../components/wallet-hive-engine";
 import ScrollToTop from "../components/scroll-to-top";
 
-import {getAccountFull} from "../api/hive";
+import {getAccountHEFull} from "../api/hive-engine";
+import {LIQUID_TOKEN, LIQUID_TOKEN_UPPERCASE} from "../../client_config";
 
 import defaults from "../constants/defaults.json";
 
 import _c from "../util/fix-class-names";
 
 import {PageProps, pageMapDispatchToProps, pageMapStateToProps} from "./common";
-
+import {getAccountFull} from "../api/hive";
 interface MatchParams {
     username: string;
     section?: string;
 }
 
 interface Props extends PageProps {
+
     match: match<MatchParams>;
 }
 
@@ -121,16 +124,17 @@ class ProfilePage extends BaseComponent<Props, State> {
             // The account isn't in reducer. Fetch it and add to reducer.
             this.stateSet({loading: true});
 
-            return getAccountFull(username).then(data => {
+            return getAccountHEFull(username, true).then(data => {
                 if (data.name === username) {
                     addAccount(data);
+                    console.log(data);
                 }
             }).finally(() => {
                 this.stateSet({loading: false});
             });
         } else {
             // The account is in reducer. Update it.
-            return getAccountFull(username).then(data => {
+            return getAccountHEFull(username, true).then(data => {
                 if (data.name === username) {
                     addAccount(data);
                 }
@@ -241,6 +245,15 @@ class ProfilePage extends BaseComponent<Props, State> {
                         {(() => {
 
                             if (section === "wallet") {
+                                return WalletHiveEngine({
+                                	coinName:LIQUID_TOKEN,
+                                	shortCoinName:LIQUID_TOKEN_UPPERCASE,
+                                    ...this.props,
+                                    account
+                                });
+                            }
+
+                            if (section === "hive") {
                                 return WalletHive({
                                     ...this.props,
                                     account

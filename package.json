@@ -60,6 +60,7 @@
     "rss": "^1.2.2",
     "serialize-javascript": "^3.1.0",
     "speakingurl": "^14.0.1",
+    "sscjs": "^0.0.8",
     "xss": "^1.0.8"
   },
   "devDependencies": {

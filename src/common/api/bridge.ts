@@ -1,6 +1,7 @@
 import {Entry} from "../store/entries/types";
 import {Community} from "../store/communities/types";
 import {Subscription} from "../store/subscriptions/types";
+import {AccountProfile} from "../store/accounts/types";
 
 import {client as hiveClient} from "./hive";
 
@@ -173,4 +174,10 @@ export const getRelationshipBetweenAccounts = (follower: string, following: stri
     bridgeApiCall<AccountRelationship | null>("get_relationship_between_accounts", [follower, following]);
 
 
+export const getProfile = (
+    account: string
+): Promise<AccountProfile[] | null> =>
+    bridgeApiCall<AccountProfile[] | null>("get_profile", {
+        account
+    });
 

@@ -15,6 +15,7 @@ import * as bridgeApi from "../../common/api/bridge";
 import {makePreloadedState} from "../state";
 
 import {render} from "../template";
+import {getAccountHEFull} from "../../common/api/hive-engine";
 
 export default async (req: express.Request, res: express.Response) => {
     const {username, section = "blog"} = req.params;
@@ -45,7 +46,7 @@ export default async (req: express.Request, res: express.Response) => {
     let accounts = [];
 
     try {
-        let account = await hiveApi.getAccountFull(username);
+        let account = await getAccountHEFull(username, true);
         if (account) {
             accounts.push(account);
         }

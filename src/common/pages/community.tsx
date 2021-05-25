@@ -38,6 +38,7 @@ import _c from "../util/fix-class-names";
 import capitalize from "../util/capitalize";
 
 import defaults from "../constants/defaults.json";
+import {getAccountHEFull} from "../api/hive-engine";
 
 interface MatchParams {
     filter: string;
@@ -120,7 +121,7 @@ class CommunityPage extends BaseComponent<Props, State> {
             if (data) {
                 addCommunity(data);
             }
-            return getAccountFull(name);
+            return getAccountHEFull(name, true);
         }).then((data) => {
             if (data.name === name) {
                 addAccount(data);

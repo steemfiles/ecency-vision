@@ -1,3 +1,8 @@
+// Directions on Hive Engine tokens are here.
+// https://github.com/hive-engine/steemsmartcontracts-wiki/blob/master/Tokens-Contract.md
+/*Saboin — Today at 8:07 PM
+They are custom_json operations with the id ssc-mainnet-hive, and signed with the active key, so you put your account name in required_auths.
+*/
 import React, {Component} from "react";
 
 import {PrivateKey} from "@hiveio/dhive";
@@ -29,10 +34,9 @@ import HiveWallet from "../../helper/hive-wallet";
 import amountFormatCheck from '../../helper/amount-format-check';
 import parseAsset from "../../helper/parse-asset";
 import {vestsToHp, hpToVests} from "../../helper/vesting";
+import { LIQUID_TOKEN_UPPERCASE } from "../../../client_config";
 
-
-import {getAccount, getAccountFull} from "../../api/hive";
-
+import {getAccount} from "../../api/hive";
 import {
     transfer,
     transferHot,
@@ -65,9 +69,11 @@ import {_t} from "../../i18n";
 import {Tsx} from "../../i18n/helper";
 
 import {arrowRightSvg} from "../../img/svg";
+import {getAccountHEFull, TokenBalance} from "../../api/hive-engine";
+import HiveEngineWallet from "../../helper/hive-engine-wallet";
 
 export type TransferMode = "transfer" | "transfer-saving" | "withdraw-saving" | "convert" | "power-up" | "power-down" | "delegate";
-export type TransferAsset = "HIVE" | "HBD" | "HP" | "POINT";
+export type TransferAsset = string;// "HIVE" | "HBD" | "HP" | "POINT" | "POB" | ...
 
 interface AssetSwitchProps {
     options: TransferAsset[];
@@ -123,11 +129,14 @@ interface Props {
     updateActiveUser: (data?: Account) => void;
     setSigningKey: (key: string) => void;
     onHide: () => void;
+    LIQUID_TOKEN_balances?: TokenBalance;
+    LIQUID_TOKEN_precision?: number;
 }
 
 interface State {
     step: 1 | 2 | 3 | 4;
     asset: TransferAsset;
+    precision: number;
     to: string,
     toData: Account | null,
     toError: string,
@@ -141,7 +150,11 @@ interface State {
 const pureState = (props: Props): State => {
     let _to: string = "";
     let _toData: Account | null = null;
-
+    const bare_liquid_token_precision: number =
+        (LIQUID_TOKEN_UPPERCASE && props.LIQUID_TOKEN_precision) || 0;
+    const liquid_token_precision = (bare_liquid_token_precision < 6) ? bare_liquid_token_precision : 6;
+    const precision = props.asset === LIQUID_TOKEN_UPPERCASE ? liquid_token_precision : 3;
+    const satoshi = precision ? ("0." + "0".repeat(precision-1) + "1") : "1";
     if (["transfer-saving", "withdraw-saving", "convert", "power-up", "power-down"].includes(props.mode)) {
         _to = props.activeUser.username;
         _toData = props.activeUser.data
@@ -150,11 +163,12 @@ const pureState = (props: Props): State => {
     return {
         step: 1,
         asset: props.asset,
+        precision,
         to: props.to || _to,
         toData: props.to ? {name: props.to} : _toData,
         toError: "",
         toWarning: "",
-        amount: props.amount || "0.001",
+        amount: props.amount || satoshi,
         amountError: "",
         memo: props.memo || "",
         inProgress: false
@@ -255,7 +269,8 @@ export class Transfer extends BaseComponent<Props, State> {
     }
 
     checkAmount = () => {
-        const {amount} = this.state;
+        const {amount, asset} = this.state;
+
 
         if (amount === '') {
             this.stateSet({amountError: ''});
@@ -270,8 +285,9 @@ export class Transfer extends BaseComponent<Props, State> {
         const dotParts = amount.split('.');
         if (dotParts.length > 1) {
             const precision = dotParts[1];
-            if (precision.length > 3) {
-                this.stateSet({amountError: _t("transfer.amount-precision-error")});
+            const maxAllowedPrecision = (asset === LIQUID_TOKEN_UPPERCASE ? (this.props.LIQUID_TOKEN_precision || 3) : 3);
+            if ((precision.length > maxAllowedPrecision)) {
+                this.stateSet({amountError: _t("transfer.amount-precision-error", {p: maxAllowedPrecision})});
                 return;
             }
         }
@@ -293,16 +309,15 @@ export class Transfer extends BaseComponent<Props, State> {
 
     getBalance = (): number => {
         const {mode, activeUser, dynamicProps} = this.props;
+        const {LIQUID_TOKEN_balances} = this.props;
         const {asset} = this.state;
 
         if (asset === 'POINT') {
             return parseAsset(activeUser.points.points).amount;
         }
 
-        const {data: account} = activeUser;
-
-        const w = new HiveWallet(account, dynamicProps);
-
+        const w = new HiveEngineWallet(activeUser.data, dynamicProps, 0, LIQUID_TOKEN_UPPERCASE);
+        console.log(w);
         if (mode === "withdraw-saving") {
             return asset === "HIVE" ? w.savingBalance : w.savingBalanceHbd;
         }
@@ -321,11 +336,25 @@ export class Transfer extends BaseComponent<Props, State> {
             return vestsToHp(vestingShares, hivePerMVests);
         }
 
+
+        if (asset === LIQUID_TOKEN_UPPERCASE) {
+            if (!!LIQUID_TOKEN_balances) {
+                return LIQUID_TOKEN_balances.balance;
+            }
+        }
+
         return 0;
     };
 
+    // This craps out for 0.000,000,1 and less.  What to do?
     formatBalance = (balance: number): string => {
-        return this.formatNumber(balance, 3);
+        const {asset} = this.state;
+        let try_this = this.formatNumber(balance,
+            (asset === LIQUID_TOKEN_UPPERCASE ? (this.props.LIQUID_TOKEN_precision || 3) : 3));
+        if (isNaN(parseFloat(try_this))) {
+            try_this = (balance + 1 - 1) + "";
+        }
+        return try_this;
     };
 
     hpToVests = (hp: number): string => {
@@ -343,8 +372,8 @@ export class Transfer extends BaseComponent<Props, State> {
 
     next = () => {
         // make sure 3 decimals in amount
-        const {amount} = this.state;
-        const fixedAmount = this.formatNumber(amount, 3);
+        const {amount, asset} = this.state;
+        const fixedAmount = this.formatNumber(amount, (asset === LIQUID_TOKEN_UPPERCASE ? (this.props.LIQUID_TOKEN_precision || 3) : 3));
 
         this.stateSet({step: 2, amount: fixedAmount});
     };
@@ -409,7 +438,7 @@ export class Transfer extends BaseComponent<Props, State> {
 
         this.stateSet({inProgress: true});
 
-        promise.then(() => getAccountFull(activeUser.username))
+        promise.then(() => getAccountHEFull(activeUser.username, true))
             .then((a) => {
                 const {addAccount, updateActiveUser} = this.props;
                 // refresh
@@ -481,10 +510,24 @@ export class Transfer extends BaseComponent<Props, State> {
         let promise: Promise<any>;
         switch (mode) {
             case "transfer": {
+                // To Do for HE tokens:
+
+
+                /*{
+                    "contractName": "tokens",
+                    "contractAction": "transfer",
+                    "contractPayload": {
+                    "symbol": "TKN",
+                        "to": "harpagon",
+                        "quantity": "15.21548745"
+                }
+                }*/
+
                 if (asset === "POINT") {
                     promise = transferPointKc(username, to, fullAmount, memo);
                 } else {
                     promise = transferKc(username, to, fullAmount, memo);
+
                 }
                 break;
             }
@@ -519,7 +562,7 @@ export class Transfer extends BaseComponent<Props, State> {
         }
 
         this.stateSet({inProgress: true});
-        promise.then(() => getAccountFull(activeUser.username))
+        promise.then(() => getAccountHEFull(activeUser.username, true))
             .then((a) => {
                 const {addAccount, updateActiveUser} = this.props;
                 // refresh
@@ -574,9 +617,9 @@ export class Transfer extends BaseComponent<Props, State> {
         switch (mode) {
             case "transfer":
                 if (global.usePrivate) {
-                    assets = ["HIVE", "HBD", "POINT"];
+                    assets = ["HIVE", "HBD", "POINT", LIQUID_TOKEN_UPPERCASE];
                 } else {
-                    assets = ["HIVE", "HBD"];
+                    assets = ["HIVE", "HBD", LIQUID_TOKEN_UPPERCASE];
                 }
                 break;
             case "transfer-saving":
@@ -587,11 +630,11 @@ export class Transfer extends BaseComponent<Props, State> {
                 assets = ["HBD"];
                 break;
             case "power-up":
-                assets = ["HIVE"];
+                assets = ["HIVE", LIQUID_TOKEN_UPPERCASE];
                 break;
             case "power-down":
             case "delegate":
-                assets = ["HP"];
+                assets = ["HP", LIQUID_TOKEN_UPPERCASE + ' Power'];
                 break;
 
         }
@@ -660,7 +703,7 @@ export class Transfer extends BaseComponent<Props, State> {
                             <p>{_t("transfer.powering-down")}</p>
                             <p> {_t("wallet.next-power-down", {
                                 time: moment(w.nextVestingWithdrawalDate).fromNow(),
-                                amount: `${this.formatNumber(w.nextVestingSharesWithdrawalHive, 3)} HIVE`,
+                                amount: `${this.formatNumber(w.nextVestingSharesWithdrawalHive, (asset === LIQUID_TOKEN_UPPERCASE ? (this.props.LIQUID_TOKEN_precision || 3) : 3))} HIVE`,
                             })}</p>
                             <p>
                                 <Button onClick={this.nextPowerDown} variant="danger">{_t("transfer.stop-power-down")}</Button>
@@ -766,7 +809,7 @@ export class Transfer extends BaseComponent<Props, State> {
                                         const hive = Math.round((Number(amount) / 13) * 1000) / 1000;
                                         if (!isNaN(hive) && hive > 0) {
                                             return <div className="power-down-estimation">
-                                                {_t("transfer.power-down-estimated", {n: `${this.formatNumber(hive, 3)} HIVE`})}
+                                                {_t("transfer.power-down-estimated", {n: `${this.formatNumber(hive, (asset === LIQUID_TOKEN_UPPERCASE ? (this.props.LIQUID_TOKEN_precision || 3) : 3))} HIVE`})}
                                             </div>;
                                         }
                                     }

@@ -29,7 +29,7 @@ const server = express()
 ['SIGINT', 'SIGTERM'].forEach((signal: any) => {
     process.on(signal, () => {
         console.info(`Shutting down because of ${signal}`);
-        server.close(() => {
+        server.close((err) => {
             console.error('Server closed gracefully')
         });
     })

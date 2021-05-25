@@ -2,7 +2,7 @@ import {Dispatch} from "redux";
 
 import {Account, Accounts, Actions, ActionTypes, AddAction} from "./types";
 
-import {getAccountFull} from "../../api/hive";
+import {getAccountHEFull} from "../../api/hive-engine";
 
 export const initialState: Accounts = [];
 
@@ -27,7 +27,7 @@ export const addAccount = (data: Account) => (dispatch: Dispatch) => {
         return;
     }
 
-    getAccountFull(data.name).then((a) => {
+    getAccountHEFull(data.name, true).then((a) => {
         dispatch(addAct(a));
     });
 };

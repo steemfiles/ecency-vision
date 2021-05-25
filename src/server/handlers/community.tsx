@@ -15,6 +15,7 @@ import {optimizeEntries} from "../helper";
 
 import {render} from "../template";
 import {EntryFilter} from "../../common/store/global/types";
+import {getAccountHEFull} from "../../common/api/hive-engine";
 
 export default async (req: express.Request, res: express.Response) => {
     const {filter, name, section} = req.params;
@@ -31,7 +32,7 @@ export default async (req: express.Request, res: express.Response) => {
     let accounts = [];
 
     try {
-        let account = await hiveApi.getAccountFull(name);
+        let account = await getAccountHEFull(name, true);
         if (account) {
             accounts.push(account);
         }
