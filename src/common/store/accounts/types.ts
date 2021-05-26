@@ -1,4 +1,5 @@
 import {Authority} from "@hiveio/dhive";
+import {FullHiveEngineAccount} from "../../api/hive-engine";
 
 export interface AccountProfile {
     about?: string;
@@ -65,7 +66,7 @@ export interface FullAccount {
     __loaded?: true;
 }
 
-export type Account = FullAccount | BaseAccount;
+export type Account = FullHiveEngineAccount | FullAccount | BaseAccount;
 
 export type Accounts = Account[];
 
