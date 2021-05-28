@@ -36,6 +36,7 @@ import {fetchNotifications, fetchUnreadNotificationCount, setNotificationsFilter
 import {fetchPoints, resetPoints} from "../store/points";
 import {setSigningKey} from "../store/signing-key";
 import {trackEntryPin, setEntryPin} from "../store/entry-pin-tracker";
+import {PriceHash} from "../store/prices/types";
 
 
 export interface PageProps {
@@ -43,6 +44,8 @@ export interface PageProps {
     location: Location;
 
     global: Global;
+    prices: PriceHash;
+
     toggleTheme: () => void;
     hideIntro: () => void;
     toggleListStyle: () => void;

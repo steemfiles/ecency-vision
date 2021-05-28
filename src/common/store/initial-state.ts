@@ -23,6 +23,7 @@ const initialState: AppState = {
     dynamicProps: dynamicPropsInitialState,
     trendingTags: trendingTagsInitialState,
     accounts: accountsInitialState,
+    prices: {},
     communities: communitiesInitialState,
     transactions: transactionsInitialState,
     users: usersInitialState,

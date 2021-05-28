@@ -12,6 +12,7 @@ import {getAccount} from "../../api/hive";
 import {getPoints} from "../../api/private-api";
 
 import {activeUserMaker} from "../helper";
+import {getAccountHEFull, TokenBalance} from "../../api/hive-engine";
 
 const load = (): ActiveUser | null => {
     const name = ls.get("active_user");
@@ -59,9 +60,13 @@ export const updateActiveUser = (data?: Account) => async (dispatch: Dispatch, g
     }
 
     let uData: Account | undefined = data;
-    if (!uData) {
+    if (!uData || !uData.token_balances) {
         try {
-            uData = await getAccount(activeUser.username);
+            try {
+                uData = await getAccountHEFull(activeUser.username, true);
+            } catch (e) {
+                uData = await getAccount(activeUser.username);
+            }
         } catch (e) {
             uData = {
                 name: activeUser.username
@@ -82,6 +87,9 @@ export const updateActiveUser = (data?: Account) => async (dispatch: Dispatch, g
             uPoints: "0.000"
         }
     }
+
+    let tokens: Array<TokenBalance>;
+    tokens = (await getAccountHEFull(activeUser.username, true)).token_balances;
 
     dispatch(updateAct(uData, points));
 };

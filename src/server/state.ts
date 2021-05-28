@@ -15,6 +15,7 @@ import config from "../config";
 import {getSearchIndexCount, getDynamicProps} from "./helper";
 
 import {getOperatingSystem} from "../common/util/platform";
+import {getPrices} from "../common/api/hive-engine";
 
 export const makePreloadedState = async (req: express.Request): Promise<AppState> => {
     const _c = (k: string): any => req.cookies[k];
@@ -24,7 +25,7 @@ export const makePreloadedState = async (req: express.Request): Promise<AppState
     const theme = _c("theme") && Object.values(Theme).includes(_c("theme")) ? _c("theme") : defaults.theme;
     const listStyle = _c("list-style") && Object.values(ListStyle).includes(_c("list-style")) ? _c("list-style") : defaults.listStyle;
     const intro = !_c("hide-intro");
-
+    const prices = await getPrices(undefined);
     const globalState: Global = {
         ...initialState.global,
         theme: Theme[theme],
@@ -40,6 +41,7 @@ export const makePreloadedState = async (req: express.Request): Promise<AppState
 
     return {
         ...initialState,
+        prices: prices,
         global: globalState,
         dynamicProps,
         activeUser: activeUser ? activeUserMaker(activeUser) : initialState.activeUser,

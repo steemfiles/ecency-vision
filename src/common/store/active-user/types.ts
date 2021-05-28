@@ -1,4 +1,5 @@
 import {Account} from "../accounts/types";
+import {TokenBalance} from "../../api/hive-engine";
 
 export interface UserPoints {
     points: string;
@@ -9,6 +10,7 @@ export interface ActiveUser {
     username: string;
     data: Account;
     points: UserPoints;
+    hiveEngineBalances: Array<TokenBalance>;
 }
 
 export enum ActionTypes {
@@ -28,7 +30,8 @@ export interface LogoutAction {
 export interface UpdateAction {
     type: ActionTypes.UPDATE;
     data: Account;
-    points: UserPoints
+    points: UserPoints;
+    hiveEngineBalances: Array<TokenBalance>;
 }
 
 export type Actions = LoginAction | LogoutAction | UpdateAction;

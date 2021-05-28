@@ -54,6 +54,7 @@ import {commentSvg, pencilOutlineSvg, deleteForeverSvg} from "../../img/svg";
 
 import {version} from "../../../../package.json";
 import accountReputation from '../../helper/account-reputation';
+import {PriceHash} from "../../store/prices/types";
 
 
 interface ItemBodyProps {
@@ -83,6 +84,7 @@ interface ItemProps {
     dynamicProps: DynamicProps;
     users: User[];
     activeUser: ActiveUser | null;
+    prices: PriceHash;
     discussion: DiscussionType;
     entry: Entry;
     community: Community | null;

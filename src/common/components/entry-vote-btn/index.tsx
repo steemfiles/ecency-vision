@@ -9,7 +9,7 @@ import {User} from "../../store/users/types";
 import {ActiveUser} from "../../store/active-user/types";
 import {DynamicProps} from "../../store/dynamic-props/types";
 import {UI, ToggleType} from "../../store/ui/types";
-
+import {PriceHash} from "../../store/prices/types";
 import BaseComponent from "../base";
 import FormattedCurrency from "../formatted-currency";
 import LoginRequired from "../login-required";
@@ -25,6 +25,9 @@ import * as ls from "../../util/local-storage";
 import _c from "../../util/fix-class-names";
 
 import {chevronUpSvg} from "../../img/svg";
+import {FullHiveEngineAccount, getAccountHEFull} from "../../api/hive-engine";
+import {addAccount} from "../../store/accounts";
+import {updateActiveUser} from "../../store/active-user";
 
 const setVoteValue = (type: "up" | "down", username: string, value: number) => {
     ls.set(`vote-value-${type}-${username}`, value);
@@ -40,6 +43,7 @@ interface VoteDialogProps {
     global: Global;
     activeUser: ActiveUser;
     dynamicProps: DynamicProps;
+    prices: PriceHash;
     entry: Entry;
     onClick: (percent: number, estimated: number) => void;
 }
@@ -49,6 +53,7 @@ interface VoteDialogState {
     downSliderVal: number;
     estimated: number;
     mode: Mode;
+    tokenStakes: {[id:string]:number};
 }
 
 export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
@@ -57,10 +62,11 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
         downSliderVal: getVoteValue("down", this.props.activeUser?.username!, -100),
         estimated: 0,
         mode: "up",
+        tokenStakes: {}
     };
 
     estimate = (percent: number): number => {
-        const {entry, activeUser, dynamicProps} = this.props;
+        const {entry, activeUser, dynamicProps, prices} = this.props;
         if (!activeUser) {
             return 0;
         }
@@ -72,13 +78,27 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
             return 0;
         }
 
+        let heA : FullHiveEngineAccount;
+        let tokenVests : number = 0;
+        if (this.state.tokenStakes) {
+           for (const shortCoinName in this.state.tokenStakes) {
+               if (this.state.tokenStakes[shortCoinName] && prices[shortCoinName]) {
+                   //tokenVests += 90000 * this.state.tokenStakes[shortCoinName] * prices[shortCoinName];
+               }
+            }
+        } else {
+            updateActiveUser(activeUser.data);
+        }
+        console.log('token dot product:',tokenVests);
+
         const sign = percent < 0 ? -1 : 1;
         const postRshares = entry.net_rshares;
 
-        const totalVests =
-            parseAsset(account.vesting_shares).amount +
+        const totalVests = 4000000 * tokenVests +
+
+            (parseAsset(account.vesting_shares).amount +
             parseAsset(account.received_vesting_shares).amount -
-            parseAsset(account.delegated_vesting_shares).amount;
+            parseAsset(account.delegated_vesting_shares).amount);
 
         const userVestingShares = totalVests * 1e6;
 
@@ -143,6 +163,22 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
         const estimated = Number(this.estimate(downSliderVal).toFixed(3));
         onClick(downSliderVal, estimated);
     };
+
+    componentDidMount() {
+        const {activeUser} = this.props;
+        const setState = this.setState.bind(this);
+        const promise = getAccountHEFull(activeUser.username, true).then(function(value) {
+                const SA = value.token_balances.map(tb => ({symbol:tb.symbol, stake: tb.stake+tb.delegationsIn}));
+                let SH = {};
+                for (const s of SA) {
+                    SH[s.symbol] = s.stake;
+                }
+                setState({tokenStakes: SH});
+            }
+        );
+
+
+    }
 
     render() {
         const {upSliderVal, downSliderVal, mode} = this.state;
@@ -215,6 +251,7 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
 }
 
 interface Props {
+    prices: PriceHash;
     global: Global;
     dynamicProps: DynamicProps;
     entry: Entry;
@@ -231,12 +268,15 @@ interface Props {
 interface State {
     dialog: boolean;
     inProgress: boolean;
+    priceHash: PriceHash;
+
 }
 
 export class EntryVoteBtn extends BaseComponent<Props, State> {
     state: State = {
         dialog: false,
         inProgress: false,
+        priceHash: this.props.prices
     };
 
     vote = (percent: number, estimated: number) => {
@@ -333,6 +373,7 @@ export default (p: Props) => {
         deleteUser: p.deleteUser,
         toggleUIProp: p.toggleUIProp,
         afterVote: p.afterVote,
+        prices: p.prices
     }
 
     return <EntryVoteBtn {...props} />

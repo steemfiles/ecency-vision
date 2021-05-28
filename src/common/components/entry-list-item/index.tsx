@@ -46,6 +46,7 @@ const noImage = require("../../img/noimage.png");
 const nsfwImage = require("../../img/nsfw.png");
 
 import defaults from "../../constants/defaults.json";
+import {PriceHash} from "../../store/prices/types";
 
 setProxyBase(defaults.imageServer);
 
@@ -56,6 +57,7 @@ interface Props {
     global: Global;
     dynamicProps: DynamicProps;
     communities: Communities;
+    prices: PriceHash;
     community?: Community | null;
     users: User[];
     activeUser: ActiveUser | null;
