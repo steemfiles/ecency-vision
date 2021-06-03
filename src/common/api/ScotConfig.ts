@@ -1,4 +1,3 @@
-import * as config from '../config';
 import NodeCache from 'node-cache';
 
 import {
@@ -6,8 +5,8 @@ import {
     SCOT_DENOM,
     TOKEN_STATS_EXCLUDE_ACCOUNTS,
     HIVE_ENGINE,
-} from '../client_config';
-import { getScotDataAsync } from '../common/api/hive-engine';
+} from '../../client_config';
+import { getScotDataAsync } from './hive-engine';
 // @ts-ignore
 import SSC from 'sscjs';
 const ssc = new SSC('https://api.steem-engine.net/rpc');

@@ -19,7 +19,7 @@ import {AccountFollowStats, FullAccount} from "../store/accounts/types";
 const ssc = new SSC('https://api.hive-engine.net/rpc');
 const hiveSsc = new SSC('https://api.hive-engine.com/rpc');
 
-interface TokenStatusMap {
+export  interface TokenStatus {
     "downvote_weight_multiplier":number;
     "downvoting_power":number;
     "earned_mining_token":number;
@@ -161,10 +161,11 @@ export interface FullHiveEngineAccount extends FullAccount {
     follow_stats: AccountFollowStats |undefined;
     token_balances: Array<TokenBalance>;
     token_unstakes: Array<unknown>;
-    token_statuses: {data: TokenStatusMap, hiveData: TokenStatusMap | null};
+    token_statuses: {data: {[id: string]:TokenStatus}, hiveData: {[id: string]:TokenStatus} | null};
     transfer_history: undefined|null|Array<HEFineTransaction>;
     token_delegations: any; /* seems to be undefined sometimes */
     prices: any;
+    __loaded?: true;
 }
 
 async function callApi(url : string, params: any) {
@@ -226,7 +227,7 @@ export async function getScotAccountDataAsync(account: string) {
 
 export async function getAccountHEFull(account : string, useHive: boolean) : Promise<FullHiveEngineAccount> {
     let hiveAccount: FullAccount, tokenBalances: Array<object>, tokenUnstakes: Array<object>,
-        tokenStatuses: { data: TokenStatusMap; hiveData: TokenStatusMap| null }, transferHistory: any, tokenDelegations: any;
+        tokenStatuses: { data: {[id:string]:TokenStatus}; hiveData: {[id:string]:TokenStatus}| null }, transferHistory: any, tokenDelegations: any;
     [
         hiveAccount,
         tokenBalances,
@@ -297,7 +298,130 @@ export async function getAccountHEFull(account : string, useHive: boolean) : Pro
     }
 
     return {...hiveAccount, follow_stats, token_balances: modifiedTokenBalances, token_unstakes: tokenUnstakes,
-            token_statuses: tokenStatuses, transfer_history: transferHistory, token_delegations: tokenDelegations, prices  };
+            token_statuses: tokenStatuses, transfer_history: transferHistory, token_delegations: tokenDelegations, prices, __loaded: true };
+}
+
+export interface HiveEngineTokenInfo {
+    "claimed_token": number;
+    "comment_pending_rshares": number;
+    "comment_reward_pool": number;
+    "enable_automatic_account_claim": boolean;
+    "enable_comment_reward_pool": boolean;
+    "enabled": boolean;
+    "enabled_services": undefined | any;
+    "hive": boolean;
+    "inflation_tools": number;
+    "issued_token": undefined | any;
+    "issuer": string;
+    "last_compute_post_reward_block_num": number;
+    "last_mining_claim_block_num": undefined | any;
+    "last_mining_claim_trx": undefined | any;
+    "last_other_accounts_transfer_block_num": number;
+    "last_processed_mining_claim_block_num": number;
+    "last_processed_staking_claim_block_num": number;
+    "last_reduction_block_num": number;
+    "last_reward_block_num": number;
+    "last_rshares2_decay_time": string; // date
+    "last_staking_claim_block_num": undefined | any;
+    "last_staking_claim_trx": undefined | any;
+    "last_staking_mining_update_block_num": undefined | any;
+    "mining_enabled": boolean;
+    "mining_reward_pool": number;
+    "next_mining_claim_number": number;
+    "next_staking_claim_number": number;
+    "other_reward_pool": number;
+    "pending_rshares": number;
+    "pending_token": number;
+    "precision": number;
+    "reward_pool": undefined | number;
+    "rewards_token": undefined | number;
+    "setup_complete": number;
+    "staked_mining_power": number;
+    "staked_token": number;
+    "staking_enabled": boolean;
+    "staking_reward_pool": number;
+    "start_block_num": number;
+    "start_date": string; // date
+    "symbol": string;
+    "total_generated_token": number;
+    "voting_enabled": boolean;
+}
+
+export interface HiveEngineTokenConfig {
+    allowlist_account: null;
+    author_curve_exponent: number;
+    author_reward_percentage: number;
+    badge_fee: number;
+    beneficiaries_account: string;
+    beneficiaries_reward_percentage: number;
+    cashout_window_days: number;
+    curation_curve_exponent: number;
+    disable_downvoting: boolean;
+    downvote_power_consumption: number;
+    downvote_regeneration_seconds: number;
+    downvote_window_days: number;
+    enable_account_allowlist: null;
+    enable_account_muting: boolean;
+    enable_comment_beneficiaries: boolean;
+    exclude_apps: null;
+    exclude_apps_from_token_beneficiary: null | string;
+    exclude_beneficiaries_accounts: null | string;
+    exclude_tags: null | string;
+    fee_post_account: null | number;
+    fee_post_amount: number;
+    fee_post_exempt_beneficiary_account: string | null;
+    fee_post_exempt_beneficiary_weight: number;
+    hive_community: null | string;
+    hive_enabled: null | boolean;
+    hive_engine_enabled: boolean;
+    issue_token: boolean;
+    json_metadata_app_value: null;
+    json_metadata_key: string;
+    json_metadata_value: string;
+    max_auto_claim_amount: number;
+    miner_tokens: string;
+    mining_pool_claim_number: number;
+    mining_pool_claims_per_year: number;
+    muting_account: null | string;
+    n_daily_posts_muted_accounts: number;
+    other_pool_accounts: string;
+    other_pool_percentage: number;
+    other_pool_send_token_per_year: number;
+    pob_comment_pool_percentage: number;
+    pob_pool_percentage: number;
+    posm_pool_percentage: number;
+    post_reward_curve: string;
+    post_reward_curve_parameter: null | number;
+    promoted_post_account: string;
+    reduction_every_n_block: number;
+    reduction_percentage: number;
+    rewards_token: number;
+    rewards_token_every_n_block: number;
+    staked_reward_percentage: number;
+    staking_pool_claim_number: number;
+    staking_pool_claims_per_year: number;
+    staking_pool_percentage: number;
+    steem_enabled: boolean;
+    steem_engine_enabled: boolean;
+    tag_adding_window_hours: number;
+    token: string;
+    token_account: string;
+    use_staking_circulating_quotent: boolean;
+    vote_power_consumption: number;
+    vote_regeneration_seconds: number;
+    vote_window_days: number;
+}
+
+export interface ScotVoteShare {
+    "authorperm": "",
+    "block_num": number;
+    "percent": number;
+    "revoted": any;
+    "rshares": number;
+    "timestamp": string;
+    "token": string;
+    "voter": string;
+    "weight": number;
 }
 
 /*
@@ -1028,3 +1152,39 @@ export async function fetchSnaxBalanceAsync(account : string) {
         });
 }
 */
+export interface ScotPost {
+    "active_votes": Array<ScotVoteShare>,
+    "app": string;
+    "author": string;
+    "author_curve_exponent": number;
+    "author_payout_beneficiaries": string;
+    "authorperm": string;
+    "beneficiaries_payout_value": number;
+    "block": number;
+    "cashout_time": string;
+    "children": number;
+    "created": string;
+    "curator_payout_value": number;
+    "decline_payout": boolean;
+    "desc": string;
+    "hive": boolean;
+    "json_metadata": string;
+    "last_payout": string;
+    "last_update": string;
+    "main_post": boolean;
+    "muted": boolean;
+    "parent_author": "",
+    "parent_permlink": string;
+    "pending_token": number;
+    "precision": number;
+    "promoted": number;
+    "score_hot": number;
+    "score_promoted": number;
+    "score_trend": number;
+    "tags": string;
+    "title": string;
+    "token": string;
+    "total_payout_value": number;
+    "total_vote_weight": number;
+    "vote_rshares": number;
+}

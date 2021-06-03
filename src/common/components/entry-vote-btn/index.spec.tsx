@@ -30,6 +30,7 @@ describe('(1) Dialog', () => {
 
     const props = {
         activeUser: {...activeUserMaker("user1"), ...{data}},
+        prices: {},
         dynamicProps: dynamicPropsIntance1,
         global: globalInstance,
         entry: entryInstance1,
@@ -70,7 +71,8 @@ describe('(2) Btn - No active user', () => {
         },
         toggleUIProp: () => {
 
-        }
+        },
+        prices: {}
     };
 
     const component = renderer.create(<EntryVoteBtn {...props} />);
@@ -99,7 +101,11 @@ describe('(3) Btn - Up voted', () => {
         },
         toggleUIProp: () => {
 
+        },
+        prices: {
+            'POB': 3,
         }
+
     };
 
     const component = renderer.create(<EntryVoteBtn {...props} />);

@@ -31,7 +31,8 @@ const defProps = {
         points: {
             points: "0.000",
             uPoints: "0.000"
-        }
+        },
+        hiveEngineBalances: []
     },
     transactions: transactionsInitialState,
     signingKey: '',

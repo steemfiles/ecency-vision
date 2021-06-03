@@ -17,13 +17,14 @@ import {initialState as entriesInitialState} from "./entries";
 import {initialState as pointsInitialState} from "./points";
 import {initialState as signingKeyInitialState} from "./signing-key";
 import {initialState as entryPinTrackerInitialState} from "./entry-pin-tracker";
-
+import {initialState as hiveEngineTokensPropertiesInitialState} from "./hive-engine-tokens";
 const initialState: AppState = {
     global: globalInitialState,
     dynamicProps: dynamicPropsInitialState,
     trendingTags: trendingTagsInitialState,
     accounts: accountsInitialState,
     prices: {},
+    hiveEngineTokensProperties: hiveEngineTokensPropertiesInitialState,
     communities: communitiesInitialState,
     transactions: transactionsInitialState,
     users: usersInitialState,

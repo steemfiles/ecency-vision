@@ -19,7 +19,8 @@ const defProps = {
         points: {
             points: "200.000",
             uPoints: "0.000"
-        }
+        },
+        hiveEngineBalances: [],
     },
     entry: entryInstance1,
     signingKey: "",

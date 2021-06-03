@@ -13,12 +13,14 @@ import {UI, ToggleType} from "../../store/ui/types";
 
 import EntryListItem from "../entry-list-item/index";
 import {EntryPinTracker} from "../../store/entry-pin-tracker/types";
+import {PriceHash} from "../../store/prices/types";
 
 interface Props {
     history: History;
     location: Location;
     global: Global;
     dynamicProps: DynamicProps;
+    prices: PriceHash;
     entries: Entry[];
     promotedEntries: Entry[];
     communities: Communities;
@@ -84,6 +86,7 @@ export default (p: Props) => {
         history: p.history,
         location: p.location,
         global: p.global,
+        prices: p.prices,
         dynamicProps: p.dynamicProps,
         entries: p.entries,
         promotedEntries: p.promotedEntries,

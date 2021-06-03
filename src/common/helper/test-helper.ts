@@ -20,6 +20,8 @@ import {
 import {ActiveUser} from "../store/active-user/types";
 import {FullAccount} from "../store/accounts/types";
 import {SearchResponse, AccountSearchResult} from "../api/search-api";
+import {HEFineTransaction} from "../store/transactions/types";
+import {FullHiveEngineAccount, TokenBalance} from "../api/hive-engine";
 
 export const allOver = () => new Promise((resolve) => setImmediate(resolve));
 
@@ -27,16 +29,18 @@ export const activeUserMaker = (name: string): ActiveUser => {
     return {
         username: name,
         data: {
-            name: name
+            name: name,
+            __loaded: false,
         },
         points: {
             points: "1.000",
             uPoints: "0.500"
-        }
+        },
+        hiveEngineBalances: [],
     }
 }
 
-export const fullAccountInstance: FullAccount = {
+export const fullAccountInstance: FullHiveEngineAccount = {
     "name": "talhasch",
     "owner": {"weight_threshold": 1, "account_auths": [], "key_auths": [["STM7F7zfd6ieangxz6uxQkYifUS5H841x5E41SYZaVc9F9cGPJ9jN", 1]]},
     "active": {"weight_threshold": 1, "account_auths": [], "key_auths": [["STM71z4rmzGHdp7pmePZyS1G2GrbuBqg9PPHRgiK6uYqjzUTRNCRR", 1]]},
@@ -83,8 +87,17 @@ export const fullAccountInstance: FullAccount = {
         "website": "https://github.com/talhasch",
         "location": "Istanbul"
     },
-    "follow_stats": {"account": "talhasch", "following_count": 27, "follower_count": 232}
+    "follow_stats": {"account": "talhasch", "following_count": 27, "follower_count": 232},
+    token_balances: [],
+    token_unstakes: [],
+    token_statuses: {data: {}, hiveData: {}},
+    transfer_history: null,
+    token_delegations: undefined,
+    prices: [],
+
 }
+
+
 
 export const RcAccountInstance = {
     "account": "foo",

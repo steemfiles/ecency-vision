@@ -62,6 +62,7 @@ const defProps = {
     },
     setEntryPin: () => {
     },
+    prices: {},
 }
 
 it("(1) Default render", () => {

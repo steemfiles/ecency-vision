@@ -24,7 +24,7 @@ import signingKey from "./signing-key";
 import entryPinTracker from "./entry-pin-tracker";
 import prices from "./prices";
 import filterTagExtract from "../helper/filter-tag-extract";
-
+import hiveEngineTokensProperties from "./hive-engine-tokens";
 let reducers = {
     global,
     dynamicProps,
@@ -43,7 +43,8 @@ let reducers = {
     points,
     signingKey,
     entryPinTracker,
-    prices
+    prices,
+    hiveEngineTokensProperties,
 };
 
 export let history: History | undefined;

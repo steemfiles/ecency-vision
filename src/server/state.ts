@@ -15,7 +15,9 @@ import config from "../config";
 import {getSearchIndexCount, getDynamicProps} from "./helper";
 
 import {getOperatingSystem} from "../common/util/platform";
-import {getPrices} from "../common/api/hive-engine";
+import {getPrices, getScotDataAsync, HiveEngineTokenConfig, HiveEngineTokenInfo} from "../common/api/hive-engine";
+import {LIQUID_TOKEN_UPPERCASE} from "../client_config";
+import {TokenToInfoConfigPairMap} from "../common/store/hive-engine-tokens/types";
 
 export const makePreloadedState = async (req: express.Request): Promise<AppState> => {
     const _c = (k: string): any => req.cookies[k];
@@ -26,6 +28,10 @@ export const makePreloadedState = async (req: express.Request): Promise<AppState
     const listStyle = _c("list-style") && Object.values(ListStyle).includes(_c("list-style")) ? _c("list-style") : defaults.listStyle;
     const intro = !_c("hide-intro");
     const prices = await getPrices(undefined);
+    const tokenInfo = await getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,});
+    const tokenConfig = await getScotDataAsync<{[coinname:string]:HiveEngineTokenConfig}>('config', {token: LIQUID_TOKEN_UPPERCASE,});
+    const hiveEngineTokensProperties : TokenToInfoConfigPairMap = !!tokenConfig[LIQUID_TOKEN_UPPERCASE] ? { LIQUID_TOKEN_UPPERCASE : {config: tokenConfig, info: tokenInfo} } : {};
+
     const globalState: Global = {
         ...initialState.global,
         theme: Theme[theme],
@@ -41,7 +47,9 @@ export const makePreloadedState = async (req: express.Request): Promise<AppState
 
     return {
         ...initialState,
+        // Hive Engine Prices (not that of HBD or Hive)
         prices: prices,
+        hiveEngineTokensProperties,
         global: globalState,
         dynamicProps,
         activeUser: activeUser ? activeUserMaker(activeUser) : initialState.activeUser,

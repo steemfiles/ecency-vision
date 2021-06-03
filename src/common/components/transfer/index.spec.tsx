@@ -26,7 +26,8 @@ const defProps = {
         points: {
             points: "10.000",
             uPoints: "0.000"
-        }
+        },
+        hiveEngineBalances: [],
     },
     transactions: transactionsInitialState,
     signingKey: '',
@@ -323,7 +324,8 @@ describe('(10) Powering down', () => {
             points: {
                 points: "10.000",
                 uPoints: "0.000"
-            }
+            },
+            hiveEngineBalances: [],
         },
     };
 

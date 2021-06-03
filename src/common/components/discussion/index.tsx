@@ -417,6 +417,7 @@ interface ListProps {
     addReply: (reply: Entry) => void;
     deleteReply: (reply: Entry) => void;
     toggleUIProp: (what: ToggleType) => void;
+    prices: PriceHash;
 }
 
 export class List extends Component<ListProps> {
@@ -581,7 +582,7 @@ export class Discussion extends Component<Props, State> {
                         </Form.Control>
                     </div>
                 </div>
-                <List {...this.props} parent={parent}/>
+                <List {...this.props} prices={{}} parent={parent}/>
             </div>
         );
     }

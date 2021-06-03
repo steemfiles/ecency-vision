@@ -22,6 +22,7 @@ import * as ls from "../../common/util/local-storage";
 import currencySymbol from "../../common/helper/currency-symbol";
 
 import {AppWindow} from "../../client/window";
+import {getAccountHEFull} from "../api/hive-engine";
 
 declare var window: AppWindow;
 
@@ -32,7 +33,8 @@ export const activeUserMaker = (name: string, points: string = "0.000", uPoints:
         points: {
             points,
             uPoints
-        }
+        },
+        hiveEngineBalances: []
     }
 }
 
@@ -43,7 +45,7 @@ export const activeUserUpdater = async (store: Store<AppState>) => {
 
         let account;
         try {
-            account = await getAccount(username);
+            account = await getAccountHEFull(state.activeUser.username, true);
         } catch (e) {
             return;
         }
@@ -58,6 +60,7 @@ export const activeUserUpdater = async (store: Store<AppState>) => {
                 uPoints: "0.000"
             };
         }
+
 
         store.dispatch(updateActiveUserAct(account, points));
     }

@@ -36,7 +36,8 @@ it("(1) Default render", async () => {
             points: {
                 points: "500.000",
                 uPoints: "0.000"
-            }
+            },
+            hiveEngineBalances: []
         },
         signingKey: '',
         updateActiveUser: () => {
@@ -67,7 +68,8 @@ it("(2) Insufficient Funds", async () => {
             points: {
                 points: "10.000",
                 uPoints: "0.000"
-            }
+            },
+            hiveEngineBalances: [],
         },
         signingKey: '',
         updateActiveUser: () => {
@@ -97,7 +99,8 @@ it("(3) With entry", async () => {
             points: {
                 points: "500.000",
                 uPoints: "0.000"
-            }
+            },
+            hiveEngineBalances: [],
         },
         signingKey: '',
         entry: entryInstance1,

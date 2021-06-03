@@ -23,7 +23,8 @@ const defProps = {
         points: {
             points: "0.000",
             uPoints: "0.000"
-        }
+        },
+        hiveEngineBalances: [],
     },
     notifications: notificationsInstance1,
     setActiveUser: () => {
@@ -74,7 +75,8 @@ it("(2) Has rewards ", () => {
                 points: {
                     points: "0.000",
                     uPoints: "1.500"
-                }
+                },
+                hiveEngineBalances: []
             }
         }
     }

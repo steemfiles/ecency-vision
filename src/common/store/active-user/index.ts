@@ -12,7 +12,7 @@ import {getAccount} from "../../api/hive";
 import {getPoints} from "../../api/private-api";
 
 import {activeUserMaker} from "../helper";
-import {getAccountHEFull, TokenBalance} from "../../api/hive-engine";
+import {FullHiveEngineAccount, getAccountHEFull, TokenBalance} from "../../api/hive-engine";
 
 const load = (): ActiveUser | null => {
     const name = ls.get("active_user");
@@ -59,11 +59,14 @@ export const updateActiveUser = (data?: Account) => async (dispatch: Dispatch, g
         return;
     }
 
-    let uData: Account | undefined = data;
-    if (!uData || !uData.token_balances) {
+    let uData: FullHiveEngineAccount | Account | undefined = data;
+    let tokens: Array<TokenBalance> | null = null;
+    if (!uData || !uData['token_balances']) {
         try {
             try {
-                uData = await getAccountHEFull(activeUser.username, true);
+                let HEFA = await getAccountHEFull(activeUser.username, true);
+                uData =  HEFA;
+                tokens = HEFA.token_balances;
             } catch (e) {
                 uData = await getAccount(activeUser.username);
             }
@@ -88,10 +91,10 @@ export const updateActiveUser = (data?: Account) => async (dispatch: Dispatch, g
         }
     }
 
-    let tokens: Array<TokenBalance>;
-    tokens = (await getAccountHEFull(activeUser.username, true)).token_balances;
+    if (!tokens)
+        tokens = (await getAccountHEFull(activeUser.username, true)).token_balances;
 
-    dispatch(updateAct(uData, points));
+    dispatch(updateAct(uData, points, tokens));
 };
 
 /* Action Creators */
@@ -107,10 +110,11 @@ export const logoutAct = (): LogoutAction => {
     };
 };
 
-export const updateAct = (data: Account, points: UserPoints): UpdateAction => {
+export const updateAct = (data: Account, points: UserPoints, tokens: null | Array<TokenBalance> = null): UpdateAction => {
     return {
         type: ActionTypes.UPDATE,
         data,
-        points
+        points,
+        hiveEngineBalances: tokens || [],
     };
 };
