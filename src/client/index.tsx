@@ -43,6 +43,20 @@ window.addEventListener("load", () => {
     }
 });
 
+const hive_keychain_interval_id = setInterval(() => {
+    if (window.hive_keychain) {
+        window.hive_keychain.requestHandshake(() => {
+            store.dispatch(hasKeyChainAct());
+            clearInterval(hive_keychain_interval_id);
+        });
+    }
+}, 400);
+
+setTimeout(() => {
+    clearInterval(hive_keychain_interval_id);
+}, 25000);
+
+
 if (module.hot) {
     module.hot.accept("../common/app", () => {
         hydrate(
