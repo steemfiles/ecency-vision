@@ -28,7 +28,7 @@ export const optimizeEntries = (entries: Entry[]): Entry[] => {
 
 const makeApiAuth = () => {
     try {
-        const auth = new Buffer(config.privateApiAuth, "base64").toString("utf-8");
+        const auth = Buffer.from(config.privateApiAuth, "base64").toString("utf-8");
         return JSON.parse(auth);
     } catch (e) {
         return null;
@@ -39,8 +39,8 @@ export const apiRequest = (endpoint: string, method: Method, extraHeaders: any =
     const apiAuth = makeApiAuth();
     if (!apiAuth) {
         return new Promise((resolve, reject) => {
-            console.error("Api auth couldn't be create!");
-            reject("Api auth couldn't be create!");
+            console.error("Api auth couldn't be created!");
+            reject("Api auth couldn't be created!");
         })
     }
 
