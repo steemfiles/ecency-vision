@@ -50,9 +50,44 @@ Feel free to test it out and submit improvements and pull requests.
 * `SEARCH_API_ADDR` - hivesearcher api endpoint
 * `SEARCH_API_SECRET` - hivesearcher api auth token
 
-##### Create Common config file 
+###### USE_PRIVATE
+
+If you are keeping the same "server" part, then set this to 0.  You can modify the client and continue with the same server of ecency.app.  You'll wont be able to use the special Hive-Engine tokens though.
+
+###### PRIVATE_API_ADDR
+Should be a full address with protocol and port
+
+###### PRIVATE_API_AUTH
+This is generated with the following steps.  Take a string and
+make it a JSON object.
+Example:
+````
+> s=JSON.stringify("foo");
+'"foo"'
+> Buffer.from(s, 'utf-8').toString('base64')
+'ImZvbyI='
+````
+Now 'ImZvbyI=' should work.  I recommend you don't start with "foo" however.
+
+###### SEARCH_API_ADDR and SEARCH_API_SECRET
+
+You need to sign up at HiveSearcher and get a secret there.  The Hive Searcher URL is https://api.hivesearcher.com/. 
+
+
+###### HIVE_SIGNER_CLIENT_SECRET
+You need to sign up with a Hive account at Hive Signer. 
+You'll get an APP_SECRET there for that account and you'll
+need to add the account name to the common config file.
+
+
+##### Create Common Config File 
 `$ cp src/client_config_default.js src/client_config.ts`
 `$ nano src/client_config.ts`
+
+###### HIVE_SIGNER_APP
+
+As the corresponding constant to HIVE_SIGNER_CLIENT_SECRET,
+this should be set to the account username you have at Hive Signer.  Do not use the '@' sign in the username.
 
 ##### Start website in dev
 `$ yarn start`

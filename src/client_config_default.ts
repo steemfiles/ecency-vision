@@ -1,5 +1,6 @@
 // sometimes it's impossible to use html tags to style coin name, hence usage of _UPPERCASE modifier
 export const APP_NAME = 'WeedCash';
+
 // sometimes APP_NAME is written in non-latin characters, but they are needed for technical purposes
 // ie. "Голос" > "Golos"
 export const APP_NAME_LATIN = 'WeedCash';
@@ -20,15 +21,21 @@ export const TAG_LIST = [
     'weedcash',
 ];
 export const LIQUID_TOKEN = 'Weed';
-// sometimes it's impossible to use html tags to style coin name, hence usage of _UPPERCASE modifier
+
+// This symbol is used for identifying the currency to the *API* at hive-engine.com back
+// in Nitrous and now here in Ecency.
+// All such identifiers are all uppercase and latin.  It should not necessarily be used for displaying.
 export const LIQUID_TOKEN_UPPERCASE = 'FOODIE';
+
 // used as backup
-export const SCOT_DENOM = 100000000;
+export const SCOT_DENOM = 100*1000*1000;
 export const VOTE_WEIGHT_DROPDOWN_THRESHOLD = 1;
 export const VESTING_TOKEN = 'WEED POWER';
 export const INTERLEAVE_PROMOTED = true;
 
-export const HIVE_SIGNER_APP = 'ewd';
+
+// this should be set to the account username you have at Hive Signer.  Do not use the '@' sign in the username.
+export const HIVE_SIGNER_APP = 'ecency';
 
 export const CURRENCY_SIGN = '$';
 export const WIKI_URL = ''; // https://wiki.golos.io/
@@ -38,8 +45,13 @@ export const PRIVACY_POLICY_URL = 'https://' + APP_DOMAIN + '/privacy.html';
 export const WHITEPAPER_URL = 'https://hive.io/hive-whitepaper.pdf';
 
 // these are dealing with asset types, not displaying to client, rather sending data over websocket
+//           Base layer liquid token
 export const LIQUID_TICKER = 'HIVE';
+//           Base layer non liquid value
 export const VEST_TICKER = 'VESTS';
+
+//           Hive-Engine Layer token (for API use)
+export const HIVE_ENGINE_TOKEN    = '';
 
 // application settings
 export const DEFAULT_LANGUAGE = 'en'; // used on application internationalization bootstrap
