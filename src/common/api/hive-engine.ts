@@ -13,10 +13,10 @@ import axios from 'axios';
 // @ts-ignore
 import SSC from "sscjs";
 import {HECoarseTransaction, HEFineTransaction} from "../store/transactions/types";
-import {getAccount, getFollowCount} from "./hive";
+import {getAccount, getAccounts, getFollowCount} from "./hive";
 import {AccountFollowStats, FullAccount} from "../store/accounts/types";
+import {Entry} from "../store/entries/types";
 
-const ssc = new SSC('https://api.hive-engine.net/rpc');
 const hiveSsc = new SSC('https://api.hive-engine.com/rpc');
 
 export  interface TokenStatus {
@@ -273,8 +273,7 @@ export async function getAccountHEFull(account : string, useHive: boolean) : Pro
        // pass by reference semantics modifies the array.
        // This is on purpose.
        try {
-           // @ts-ignore
-           const b1: TokenBalance = Object.assign(b, {
+           const b1: TokenBalance = Object.assign(b2, {
                "delegationsIn": parseFloat(b2.delegationsIn),
                "balance": parseFloat(b2.balance),
                "stake": parseFloat(b2.stake),
@@ -424,15 +423,15 @@ export interface ScotVoteShare {
     "weight": number;
 }
 
-/*
-async function getAuthorRep(feedData : Array<Comment>, useHive : boolean) {
+
+async function getAuthorRep(feedData : Array<Entry>, useHive : boolean) {
     // Disable for now.
     const authors = Array.from(new Set(feedData.map(d => d.author)));
     const authorRep : {[username: string] : unknown} = {};
     if (authors.length === 0) {
         return authorRep;
     }
-    (await (useHive ? hive.api : hive.api).getAccountsAsync(authors)).forEach(
+    (await getAccounts(authors)).forEach(
         a => {
             authorRep[a.name] = a.reputation;
         }
@@ -440,8 +439,8 @@ async function getAuthorRep(feedData : Array<Comment>, useHive : boolean) {
     return authorRep;
     
 }
-
-function mergeContent(content, scotData) {
+/*
+function mergeContent(content : Entry, scotData : ScotPost) {
     const parentAuthor = content.parent_author;
     const parentPermlink = content.parent_permlink;
     const voted = content.active_votes;
