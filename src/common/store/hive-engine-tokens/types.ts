@@ -1,24 +1,28 @@
 import {HiveEngineTokenConfig, HiveEngineTokenInfo} from "../../api/hive-engine"
 
-
 export interface TokenInfoConfigPair {
-    config: HiveEngineTokenConfig;
-    info: HiveEngineTokenInfo;
+    config?: HiveEngineTokenConfig;
+    info?: HiveEngineTokenInfo;
+    hivePrice?: number;
 }
 
-export interface TokenToInfoConfigPairMap {
+export interface TokenPropertiesMap {
     [coinName: string]:TokenInfoConfigPair
 }
 
 export enum ActionTypes {
-    INCLUDE = "@tokens/INCLUDE",
+    FETCH = "@tokens/FETCH",
+    INCLUDE = "@tokens/INCLUDE"
 }
 
-
+export interface FetchedAction {
+    type: ActionTypes.FETCH;
+    data: TokenPropertiesMap;
+}
 
 export interface IncludeAction {
     type: ActionTypes.INCLUDE;
-    data: TokenToInfoConfigPairMap;
+    data: TokenPropertiesMap;
 }
 
-export type Actions = IncludeAction; // | .. | ..
+export type Actions = IncludeAction | FetchedAction;

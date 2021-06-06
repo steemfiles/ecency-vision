@@ -64,6 +64,7 @@ export interface Entry {
     updated: string;
     url: string;
     original_entry?: Entry;
+    scotData?: {[id:string]: any};
 }
 
 export interface EntryGroup {

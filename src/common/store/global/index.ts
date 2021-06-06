@@ -22,7 +22,8 @@ import {
     LangSetAction,
     NsfwSetAction,
     Theme,
-    ThemeChangeAction
+    ThemeChangeAction,
+    HiveEngineAction
 } from "./types";
 
 import {CommonActionTypes} from "../common";
@@ -30,6 +31,7 @@ import {CommonActionTypes} from "../common";
 import * as ls from "../../util/local-storage";
 
 import filterTagExtract from "../../helper/filter-tag-extract";
+import {TokenPropertiesMap} from "../hive-engine-tokens/types";
 
 export const initialState: Global = {
     filter: AllFilter[defaults.filter],
@@ -49,7 +51,8 @@ export const initialState: Global = {
     notifications: true,
     nsfw: false,
     isMobile: false,
-    usePrivate: true
+    usePrivate: true,
+    hiveEngineTokensProperties: {}
 };
 
 export default (state: Global = initialState, action: Actions): Global => {
@@ -101,6 +104,12 @@ export default (state: Global = initialState, action: Actions): Global => {
         }
         case ActionTypes.HAS_KEYCHAIN: {
             return {...state, hasKeyChain: true};
+        }
+        case ActionTypes.HIVE_ENGINE_CHANGE: {
+        	const {hiveEngineTokensProperties} = action;
+        	console.log("Returning Hive Engine data");
+        	console.log(hiveEngineTokensProperties);
+        	return {...state, hiveEngineTokensProperties}; 
         }
         default:
             return state;
@@ -173,6 +182,11 @@ export const setNsfw = (value: boolean) => (dispatch: Dispatch) => {
     dispatch(setNsfwAct(value));
 };
 
+export const setHiveEngineTokensProperties = (hiveEngineTokensProperties: TokenPropertiesMap) => (dispatch: Dispatch) => {
+    dispatch(setHiveEngineTokensPropertiesAct(hiveEngineTokensProperties));
+}
+
+
 
 /* Action Creators */
 export const themeChangeAct = (theme: Theme): ThemeChangeAction => {
@@ -242,3 +256,11 @@ export const hasKeyChainAct = (): HasKeyChainAction => {
         type: ActionTypes.HAS_KEYCHAIN
     };
 };
+
+
+export const setHiveEngineTokensPropertiesAct = (hiveEngineTokensProperties: TokenPropertiesMap): HiveEngineAction => {
+    return {
+        type: ActionTypes.HIVE_ENGINE_CHANGE,
+        hiveEngineTokensProperties
+    };
+}

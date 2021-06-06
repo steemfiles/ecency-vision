@@ -1,4 +1,5 @@
 import {LocationChangeAction} from "../common";
+import {TokenPropertiesMap} from "../hive-engine-tokens/types";
 
 export enum ListStyle {
     row = "row",
@@ -57,7 +58,8 @@ export interface Global {
     notifications: boolean;
     nsfw: boolean;
     isMobile: boolean;
-    usePrivate: boolean
+    usePrivate: boolean;
+    hiveEngineTokensProperties?: TokenPropertiesMap;
 }
 
 export enum ActionTypes {
@@ -71,6 +73,12 @@ export enum ActionTypes {
     LANG_SET = "@global/LANG_SET",
     NEW_VERSION_CHANGE = "@global/NEW_VERSION_CHANGE",
     NSFW_SET = "@global/NSFW_SET",
+    HIVE_ENGINE_CHANGE = "@global/HIVE_ENGINE_SET",
+}
+
+export interface HiveEngineAction {
+	type: ActionTypes.HIVE_ENGINE_CHANGE;
+	hiveEngineTokensProperties: TokenPropertiesMap;
 }
 
 export interface ThemeChangeAction {
@@ -132,4 +140,5 @@ export type Actions =
     | CurrencySetAction
     | LangSetAction
     | NsfwSetAction
-    | HasKeyChainAction;
+    | HasKeyChainAction
+    | HiveEngineAction;

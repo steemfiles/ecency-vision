@@ -37,6 +37,8 @@ import {fetchPoints, resetPoints} from "../store/points";
 import {setSigningKey} from "../store/signing-key";
 import {trackEntryPin, setEntryPin} from "../store/entry-pin-tracker";
 import {PriceHash} from "../store/prices/types";
+import {IncludeAction, TokenPropertiesMap} from "../store/hive-engine-tokens/types";
+import {fetchInfoConfigsProps, includeInfoConfigsAction} from "../store/hive-engine-tokens";
 
 
 export interface PageProps {
@@ -45,6 +47,8 @@ export interface PageProps {
 
     global: Global;
     prices: PriceHash;
+    hiveEngineTokensProperties: TokenPropertiesMap;
+
 
     toggleTheme: () => void;
     hideIntro: () => void;
@@ -170,7 +174,9 @@ export const pageMapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
             resetPoints,
             setSigningKey,
             trackEntryPin,
-            setEntryPin
+            setEntryPin,
+            includeInfoConfigsAction,
+            fetchInfoConfigsProps,
         },
         dispatch
     );

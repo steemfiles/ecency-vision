@@ -69,6 +69,10 @@ import {version} from "../../../package.json";
 import {PageProps, pageMapDispatchToProps, pageMapStateToProps} from "./common";
 
 import defaults from "../constants/defaults.json";
+import {TokenPropertiesMap} from "../store/hive-engine-tokens/types";
+import {getPrices, getScotDataAsync, HiveEngineTokenConfig, HiveEngineTokenInfo} from "../api/hive-engine";
+import {LIQUID_TOKEN_UPPERCASE} from "../../client_config";
+import {setHiveEngineTokensProperties} from "../store/global";
 
 setProxyBase(defaults.imageServer);
 
@@ -88,6 +92,7 @@ interface State {
     showIfHidden: boolean;
     showIfNsfw: boolean;
     editHistory: boolean;
+    hiveEngineTokensProperties: TokenPropertiesMap;
 }
 
 class EntryPage extends BaseComponent<Props, State> {
@@ -96,16 +101,41 @@ class EntryPage extends BaseComponent<Props, State> {
         replying: false,
         showIfHidden: false,
         showIfNsfw: false,
-        editHistory: false
+        editHistory: false,
+        hiveEngineTokensProperties: {},
     };
 
     componentDidMount() {
         this.ensureEntry();
-
+        const setState = this.setState.bind(this);
         const {location, global} = this.props;
         if (global.usePrivate && location.search === "?history") {
             this.toggleEditHistory();
         }
+
+        Promise.all([
+            getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,}),
+            getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE,}),
+            getPrices(undefined)]).then(function (values: [HiveEngineTokenInfo,
+            HiveEngineTokenConfig,
+            { [id: string]: number }
+        ]) {
+            const info = values[0];
+            const config = values[1];
+            const prices = values[2];
+            if (!info || !config || !prices) {
+                console.log("Not setting Hive Engine parameters:")
+                return;
+            }
+            const hivePrice : number = prices[LIQUID_TOKEN_UPPERCASE] || 0;
+            if (hivePrice) {
+                const m = {[LIQUID_TOKEN_UPPERCASE]: {config, info,
+                        hivePrice}};
+                setState({hiveEngineTokensProperties: m});
+                setHiveEngineTokensProperties(m);
+            }
+        });
+
     }
 
     componentDidUpdate(prevProps: Readonly<Props>): void {
@@ -613,6 +643,7 @@ class EntryPage extends BaseComponent<Props, State> {
                                         </div>
                                         <div className="entry-controls">
                                             {EntryVoteBtn({
+
                                                 ...this.props,
                                                 entry,
                                                 afterVote: this.afterVote

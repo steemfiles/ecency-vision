@@ -5,7 +5,7 @@ import {ConnectedRouter} from "connected-react-router";
 
 import configureStore from "../common/store/configure";
 
-import {hasKeyChainAct} from "../common/store/global";
+import {hasKeyChainAct, setHiveEngineTokensProperties} from "../common/store/global";
 import {clientStoreTasks} from "../common/store/helper";
 
 import {history} from "../common/store";
@@ -18,6 +18,9 @@ import "../style/theme-day.scss";
 import "../style/theme-night.scss";
 
 import './base-handlers';
+import {getPrices, getScotDataAsync, HiveEngineTokenConfig, HiveEngineTokenInfo} from "../common/api/hive-engine";
+import {includeInfoConfigsAction} from "../common/store/hive-engine-tokens";
+import {LIQUID_TOKEN_UPPERCASE} from "../client_config";
 
 declare var window: AppWindow;
 
@@ -34,27 +37,60 @@ hydrate(
 
 clientStoreTasks(store);
 
-// Check & activate keychain support
 window.addEventListener("load", () => {
+	// Check & activate keychain support
     if (window.hive_keychain) {
         window.hive_keychain.requestHandshake(() => {
             store.dispatch(hasKeyChainAct());
         });
+    } else {
+		const hive_keychain_interval_id = setInterval(() => {
+			if (window.hive_keychain) {
+				window.hive_keychain.requestHandshake(() => {
+					store.dispatch(hasKeyChainAct());
+					clearInterval(hive_keychain_interval_id);
+				});
+			}
+		}, 400);
+		
+		setTimeout(() => {
+			clearInterval(hive_keychain_interval_id);
+		}, 25000);    	
     }
+    
+    console.log("Getting HE data...");
+    
+	Promise.all([
+		getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,}),
+		getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE,}),
+		getPrices(undefined)]).then(function (values: [HiveEngineTokenInfo,
+						HiveEngineTokenConfig,
+						{ [id: string]: number }
+		]) {
+		const info = values[0];
+		const config = values[1];
+		const prices = values[2];
+		if (!info || !config || !prices) {
+			console.log("Not setting Hive Engine parameters:")
+			return;
+		}
+		const price : number = prices[LIQUID_TOKEN_UPPERCASE] || 0;
+		if (!price) {
+			console.log("Not setting Hive Engine parameters:")
+			return;
+		}
+	
+		console.log("Setting HE data");
+		includeInfoConfigsAction({[LIQUID_TOKEN_UPPERCASE]: {config, info,
+		hivePrice: price},});
+	
+		});
+    
 });
 
-const hive_keychain_interval_id = setInterval(() => {
-    if (window.hive_keychain) {
-        window.hive_keychain.requestHandshake(() => {
-            store.dispatch(hasKeyChainAct());
-            clearInterval(hive_keychain_interval_id);
-        });
-    }
-}, 400);
 
-setTimeout(() => {
-    clearInterval(hive_keychain_interval_id);
-}, 25000);
+
+
 
 
 if (module.hot) {

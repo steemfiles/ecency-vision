@@ -36,6 +36,7 @@ const defProps = {
     asAuthor: "",
     promoted: false,
     order: 0,
+    hiveEngineTokensProperties: {},
     addAccount: () => {
     },
     updateEntry: () => {
@@ -61,8 +62,7 @@ const defProps = {
     setSigningKey: () => {
     },
     setEntryPin: () => {
-    },
-    prices: {},
+    }
 }
 
 it("(1) Default render", () => {

@@ -7,6 +7,7 @@ import renderer from "react-test-renderer";
 import {globalInstance, dynamicPropsIntance1, entryInstance1, UiInstance, activeUserMaker, fullAccountInstance} from "../../helper/test-helper";
 
 import {Account} from "../../store/accounts/types";
+import {historicalPOBConfig, historicalPOBInfo} from "../../api/hive-engine";
 
 
 jest.mock("../../api/hive", () => ({
@@ -38,7 +39,10 @@ describe('(1) Dialog', () => {
         },
     };
 
-    const component = renderer.create(<VoteDialog {...props} />);
+    const component = renderer.create(<VoteDialog {...props}
+                                                  tokenConfig={historicalPOBConfig}
+                                                  tokenInfo={historicalPOBInfo}
+                                                  tokenPriceInHive={10}   />);
     const instance: any = component.getInstance();
 
     it("(1) Up vote", () => {
@@ -72,7 +76,8 @@ describe('(2) Btn - No active user', () => {
         toggleUIProp: () => {
 
         },
-        prices: {}
+        prices: {},
+        hiveEngineTokensProperties: {},
     };
 
     const component = renderer.create(<EntryVoteBtn {...props} />);
@@ -104,8 +109,8 @@ describe('(3) Btn - Up voted', () => {
         },
         prices: {
             'POB': 3,
-        }
-
+        },
+        hiveEngineTokensProperties: {"POB": {info: historicalPOBInfo, config: historicalPOBConfig, hivePrice: 3}},
     };
 
     const component = renderer.create(<EntryVoteBtn {...props} />);

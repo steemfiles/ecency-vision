@@ -65,6 +65,11 @@ export class BookmarkBtn extends BaseComponent<Props> {
 
         this.stateSet({inProgress: true});
         getBookmarks(activeUser.username).then(r => {
+            if (!r.find) {
+                console.log(JSON.stringify(r));
+                this.setState({bookmarkId:null});
+                return;
+            }
             const bookmark = r.find(x => x.author === entry.author && x.permlink == entry.permlink);
             if (bookmark) {
                 this.stateSet({bookmarkId: bookmark._id});

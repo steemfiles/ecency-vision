@@ -17,7 +17,7 @@ import {getSearchIndexCount, getDynamicProps} from "./helper";
 import {getOperatingSystem} from "../common/util/platform";
 import {getPrices, getScotDataAsync, HiveEngineTokenConfig, HiveEngineTokenInfo} from "../common/api/hive-engine";
 import {LIQUID_TOKEN_UPPERCASE} from "../client_config";
-import {TokenToInfoConfigPairMap} from "../common/store/hive-engine-tokens/types";
+import {TokenPropertiesMap} from "../common/store/hive-engine-tokens/types";
 
 export const makePreloadedState = async (req: express.Request): Promise<AppState> => {
     const _c = (k: string): any => req.cookies[k];
@@ -30,10 +30,10 @@ export const makePreloadedState = async (req: express.Request): Promise<AppState
     const prices = await getPrices(undefined);
     const tokenInfo = await getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,});
     const tokenConfig = await getScotDataAsync<{[coinname:string]:HiveEngineTokenConfig}>('config', {token: LIQUID_TOKEN_UPPERCASE,});
-    const hiveEngineTokensProperties : TokenToInfoConfigPairMap = !!tokenConfig[LIQUID_TOKEN_UPPERCASE] ? { LIQUID_TOKEN_UPPERCASE : {config: tokenConfig, info: tokenInfo} } : {};
+    const hiveEngineTokensProperties : TokenPropertiesMap = !!tokenConfig[LIQUID_TOKEN_UPPERCASE] ? { LIQUID_TOKEN_UPPERCASE : {config: tokenConfig, info: tokenInfo, hivePrice: prices[LIQUID_TOKEN_UPPERCASE]} } : {};
 
     const globalState: Global = {
-        ...initialState.global,
+        ...Object.assign(initialState.global, {hiveEngineTokensProperties}),
         theme: Theme[theme],
         listStyle: ListStyle[listStyle],
         intro,
@@ -47,9 +47,6 @@ export const makePreloadedState = async (req: express.Request): Promise<AppState
 
     return {
         ...initialState,
-        // Hive Engine Prices (not that of HBD or Hive)
-        prices: prices,
-        hiveEngineTokensProperties,
         global: globalState,
         dynamicProps,
         activeUser: activeUser ? activeUserMaker(activeUser) : initialState.activeUser,

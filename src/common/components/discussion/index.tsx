@@ -54,7 +54,7 @@ import {commentSvg, pencilOutlineSvg, deleteForeverSvg} from "../../img/svg";
 
 import {version} from "../../../../package.json";
 import accountReputation from '../../helper/account-reputation';
-import {PriceHash} from "../../store/prices/types";
+import {TokenPropertiesMap} from "../../store/hive-engine-tokens/types";
 
 
 interface ItemBodyProps {
@@ -84,7 +84,6 @@ interface ItemProps {
     dynamicProps: DynamicProps;
     users: User[];
     activeUser: ActiveUser | null;
-    prices: PriceHash;
     discussion: DiscussionType;
     entry: Entry;
     community: Community | null;
@@ -97,6 +96,7 @@ interface ItemProps {
     addReply: (reply: Entry) => void;
     deleteReply: (reply: Entry) => void;
     toggleUIProp: (what: ToggleType) => void;
+    hiveEngineTokensProperties: TokenPropertiesMap;
 }
 
 interface ItemState {
@@ -417,7 +417,7 @@ interface ListProps {
     addReply: (reply: Entry) => void;
     deleteReply: (reply: Entry) => void;
     toggleUIProp: (what: ToggleType) => void;
-    prices: PriceHash;
+    hiveEngineTokensProperties: TokenPropertiesMap;
 }
 
 export class List extends Component<ListProps> {
@@ -446,6 +446,7 @@ export class List extends Component<ListProps> {
 
 
 interface Props {
+    hiveEngineTokensProperties: TokenPropertiesMap;
     history: History;
     location: Location
     global: Global;
@@ -582,7 +583,7 @@ export class Discussion extends Component<Props, State> {
                         </Form.Control>
                     </div>
                 </div>
-                <List {...this.props} prices={{}} parent={parent}/>
+                <List {...this.props} parent={parent}/>
             </div>
         );
     }
@@ -610,7 +611,8 @@ export default (p: Props) => {
         updateReply: p.updateReply,
         addReply: p.addReply,
         deleteReply: p.deleteReply,
-        toggleUIProp: p.toggleUIProp
+        toggleUIProp: p.toggleUIProp,
+        hiveEngineTokensProperties: p.hiveEngineTokensProperties
     }
 
     return <Discussion {...props} />;

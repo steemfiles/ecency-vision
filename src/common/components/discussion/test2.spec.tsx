@@ -25,6 +25,7 @@ const defProps = {
     location: createLocation({}),
     global: globalInstance,
     dynamicProps: dynamicPropsIntance1,
+    hiveEngineTokensProperties: {},
     users: [],
     activeUser: null,
     parent: {...parent, children: 0},

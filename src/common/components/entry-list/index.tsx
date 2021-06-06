@@ -13,14 +13,13 @@ import {UI, ToggleType} from "../../store/ui/types";
 
 import EntryListItem from "../entry-list-item/index";
 import {EntryPinTracker} from "../../store/entry-pin-tracker/types";
-import {PriceHash} from "../../store/prices/types";
+import {TokenPropertiesMap} from "../../store/hive-engine-tokens/types";
 
 interface Props {
     history: History;
     location: Location;
     global: Global;
     dynamicProps: DynamicProps;
-    prices: PriceHash;
     entries: Entry[];
     promotedEntries: Entry[];
     communities: Communities;
@@ -44,6 +43,7 @@ interface Props {
     trackEntryPin: (entry: Entry) => void;
     setSigningKey: (key: string) => void;
     setEntryPin: (entry: Entry, pin: boolean) => void;
+    hiveEngineTokensProperties: TokenPropertiesMap;
 }
 
 export class EntryListContent extends Component<Props> {
@@ -86,7 +86,6 @@ export default (p: Props) => {
         history: p.history,
         location: p.location,
         global: p.global,
-        prices: p.prices,
         dynamicProps: p.dynamicProps,
         entries: p.entries,
         promotedEntries: p.promotedEntries,
@@ -111,6 +110,7 @@ export default (p: Props) => {
         trackEntryPin: p.trackEntryPin,
         setSigningKey: p.setSigningKey,
         setEntryPin: p.setEntryPin,
+        hiveEngineTokensProperties: p.hiveEngineTokensProperties,
     }
 
     return <EntryListContent {...props} />;

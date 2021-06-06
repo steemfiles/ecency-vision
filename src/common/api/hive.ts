@@ -11,6 +11,7 @@ import {vestsToRshares} from "../helper/vesting";
 import isCommunity from "../helper/is-community";
 
 import SERVERS from "../constants/servers.json";
+import {getAccountHEFull} from "./hive-engine";
 
 export const client = new Client(SERVERS, {
     timeout: 4000,
@@ -154,7 +155,7 @@ export const getAccounts = (usernames: string[]): Promise<FullAccount[]> => {
 export const getAccount = (username: string): Promise<FullAccount> => getAccounts([username]).then((resp) => resp[0]);
 
 export const getAccountFull = (username: string): Promise<FullAccount> =>
-    getAccount(username).then(async (account) => {
+    getAccountHEFull(username, true).then(async (account) => {
         let follow_stats: AccountFollowStats | undefined;
         try {
             follow_stats = await getFollowCount(username);

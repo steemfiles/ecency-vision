@@ -36,6 +36,7 @@ const defProps = {
     parent,
     community: null,
     discussion,
+    hiveEngineTokensProperties: {},
     addAccount: () => {
     },
     setActiveUser: () => {
