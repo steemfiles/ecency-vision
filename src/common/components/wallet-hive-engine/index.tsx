@@ -210,7 +210,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                         
 
 
-                        <div className="balance-row estimated alternative">
+                        {isMyPage && <div className="balance-row estimated alternative">
                             <div className="balance-info">
                                 <div className="title">{_t("wallet.estimated")}</div>
                                 <div className="description">{_t("wallet.estimated-description")}</div>
@@ -220,7 +220,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                     <FormattedCurrency {...this.props} value={w.estimatedValue} fixAt={3}/>
                                 </div>
                             </div>
-                        </div>
+                        </div>}
 
                         {w.engineBalanceTable && w.engineBalanceTable[this.props.shortCoinName] && <div className="balance-row">
                             <div className="balance-info">
@@ -235,6 +235,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                                 history: this.props.history,
                                                 label: '',
                                                 items: [
+                                                /*
 
                                                     {
                                                         label: _t('wallet.transfer'),
@@ -249,6 +250,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                                             this.openTransferDialog('power-up', this.props.shortCoinName);
                                                         }
                                                     },
+                                                    */
 
                                                 ],
                                             };
