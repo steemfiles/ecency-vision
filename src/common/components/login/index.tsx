@@ -105,14 +105,18 @@ export class LoginKc extends BaseComponent<LoginKcProps, LoginKcState> {
             return;
         }
 
-        const hasPostingPerm = account?.posting!.account_auths.filter(x => x[0] === HIVE_SIGNER_APP).length > 0;
+        const hivesignerapp = process.env.HIVE_SIGNER_APP ?? HIVE_SIGNER_APP;
+        const hasPostingPerm = account?.posting!.account_auths.filter(x => {
+
+            return x[0] === hivesignerapp;
+        }).length > 0;
 
         if (!hasPostingPerm) {
             const weight = account.posting!.weight_threshold;
 
             this.stateSet({inProgress: true});
             try {
-                await addAccountAuthority(username, HIVE_SIGNER_APP, "Posting", weight)
+                await addAccountAuthority(username, hivesignerapp, "Posting", weight)
             } catch (err) {
                 error(_t('login.error-permission'));
                 return;
