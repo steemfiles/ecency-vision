@@ -46,6 +46,7 @@ import {
     starOutlineSvg,
     ticketSvg
 } from "../../img/svg";
+import {LIQUID_TOKEN, LIQUID_TOKEN_UPPERCASE} from "../../../client_config";
 
 
 export const formatMemo = (memo: string, history: History) => {
@@ -249,6 +250,11 @@ export class WalletEcency extends BaseComponent<Props, State> {
         const {claiming, transfer, purchase, promote, boost} = this.state;
         const {global, activeUser, account, points} = this.props;
 
+        if (process.env.LIQUID_TOKEN_UPPERCASE !== "POINTS") {
+            return <div>We don't do points here.  Try {LIQUID_TOKEN}!</div>;
+        }
+
+
         if (!global.usePrivate) {
             return null;
         }
@@ -395,6 +401,10 @@ export class WalletEcency extends BaseComponent<Props, State> {
                                 </div>
 
                                 {(() => {
+                                    if (!points || !points.transactions || !points.transactions.map) {
+                                        return <div/>;
+                                    }
+
                                     if (points.loading) {
                                         return <LinearProgress/>
                                     }
