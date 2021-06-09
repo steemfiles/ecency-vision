@@ -73,7 +73,9 @@ const defProps = {
     },
     fetchTransactions: () => {
 
-    }
+    },
+    shortCoinName: "POB",
+    coinName: "Proof of Brain",
 }
 
 it("(1) Default Render", () => {
