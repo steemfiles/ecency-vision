@@ -2,32 +2,31 @@ import {Entry} from "../store/entries/types";
 import {Community} from "../store/communities/types";
 import {Subscription} from "../store/subscriptions/types";
 import {AccountProfile} from "../store/accounts/types";
-
+import {enginifyPost} from "./hive-engine";
 import {client as hiveClient} from "./hive";
 
 const bridgeApiCall = <T>(endpoint: string, params: {}): Promise<T> => hiveClient.call("bridge", endpoint, params);
 
 const resolvePost = (post: Entry, observer: string): Promise<Entry> => {
-    const {json_metadata: json} = post;
+    const {json_metadata: json, author, permlink} = post;
+
 
     if (json.original_author && json.original_permlink && json.tags && json.tags[0] === "cross-post") {
         return getPost(json.original_author, json.original_permlink, observer).then(resp => {
             if (resp) {
-                return {
+                return enginifyPost({
                     ...post,
                     original_entry: resp
-                }
+                }, observer);
             }
 
-            return post;
+            return enginifyPost(post, observer);
         }).catch(() => {
-            return post;
+            return enginifyPost(post, observer);
         })
     }
 
-    return new Promise((resolve) => {
-        resolve(post);
-    });
+    return enginifyPost(post, observer);
 }
 
 const resolvePosts = (posts: Entry[], observer: string): Promise<Entry[]> => {

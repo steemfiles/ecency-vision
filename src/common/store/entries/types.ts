@@ -1,4 +1,5 @@
 import {LocationChangeAction} from "../common";
+import {ScotPost} from "../../api/hive-engine";
 
 export interface EntryBeneficiaryRoute {
     account: string;
@@ -64,7 +65,7 @@ export interface Entry {
     updated: string;
     url: string;
     original_entry?: Entry;
-    scotData?: {[id:string]: any};
+    he?: {[id:string]:ScotPost};
 }
 
 export interface EntryGroup {

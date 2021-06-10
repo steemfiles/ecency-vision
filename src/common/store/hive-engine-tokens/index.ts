@@ -10,6 +10,7 @@ import {
     HiveEngineTokenInfo,
 } from "../../api/hive-engine";
 import {LIQUID_TOKEN_UPPERCASE} from "../../../client_config";
+
 export const initialState: TokenPropertiesMap = {};
 
 export default (state: TokenPropertiesMap = initialState, action: Actions): TokenPropertiesMap => {
