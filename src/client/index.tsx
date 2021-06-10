@@ -81,8 +81,8 @@ window.addEventListener("load", () => {
 		}
 	
 		console.log("Setting HE data");
-		includeInfoConfigsAction({[LIQUID_TOKEN_UPPERCASE]: {config, info,
-		hivePrice: price},});
+		store.dispatch(includeInfoConfigsAction({[LIQUID_TOKEN_UPPERCASE]: {config, info,
+		hivePrice: price},}));
 	
 		});
     

@@ -298,21 +298,12 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
             this.state.tokenEntryMap && this.state.voteInfo
         ) {
             const currentVp = this.state.voteInfo.voting_power / 100;
-            let k;
-            if ((k=global.hiveEngineTokensProperties) && Object.keys(k).length) {
-                console.log('HETP', k);
-            } else {
-                console.log('global.hiveEngineTokensProperties unset');
-            }
             console.log({userVotingPower, currentVp, "voteInfo.voting_power": this.state.voteInfo.voting_power});
             let pendingTokenPayoutBeforeVote = 0;
             let scot_total_author_payout = 0;
             let scot_total_curator_payout = 0;
             let scot_token_bene_payout = 0;
             let payout = 0;
-            //let promoted = 0;
-            //t decline_payout = parseFloat(entry.max_accepted_payout.split(' ')[0]) === 0.0;
-            //console.log(this.state.tokenEntryMap);
             const up = this.state.mode === 'up';
             const scotData = this.state.tokenEntryMap[LIQUID_TOKEN_UPPERCASE];
             const {tokenInfo, tokenConfig, tokenPriceInHive} = this.props;
@@ -643,14 +634,13 @@ export class EntryVoteBtn extends BaseComponent<Props, State> {
         const tokenConfig = this.props.hiveEngineTokenConfig;
         const tokenInfo = this.props.hiveEngineTokenInfo;
         {
-            let tokensProperties : object;
+            let tokensProperties : any;
             let properties;
-            if   ((Object.keys(tokensProperties=this.props.hiveEngineTokensProperties || {}).length &&
-                (properties = this.props.hiveEngineTokensProperties[LIQUID_TOKEN_UPPERCASE]))
-
-                    ||
-                (Object.keys(tokensProperties=this.props.global.hiveEngineTokensProperties || {}).length &&
-                (properties = tokensProperties[LIQUID_TOKEN_UPPERCASE]))
+            if (
+                ((tokensProperties=this.props.hiveEngineTokensProperties) ||
+                (tokensProperties=this.props.global.hiveEngineTokensProperties))
+                    &&
+                (properties = tokensProperties[LIQUID_TOKEN_UPPERCASE])
             )   {
                 // if my redux works use this:
 
