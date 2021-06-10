@@ -13,9 +13,9 @@ import axios from 'axios';
 // @ts-ignore
 import SSC from "sscjs";
 import {HECoarseTransaction, HEFineTransaction} from "../store/transactions/types";
-import {getAccount, getAccounts, getFollowCount} from "./hive";
+import {getAccount, getAccounts, getFollowCount, getPost} from "./hive";
 import {AccountFollowStats, FullAccount} from "../store/accounts/types";
-import {Entry} from "../store/entries/types";
+import {Entry, EntryBeneficiaryRoute, EntryStat, EntryVote} from "../store/entries/types";
 import {EntryVoteBtn} from "../components/entry-vote-btn";
 
 const hiveSsc = new SSC('https://api.hive-engine.com/rpc');
@@ -225,6 +225,25 @@ export async function getScotAccountDataAsync(account: string) {
 
 
 
+function mergeContent(content : Entry, tokenPostData : {[id:string]:ScotPost}) {
+    const {he} = content;
+    content.he = Object.assign(he ?? {}, tokenPostData);
+    return content;
+}
+
+export const enginifyPost = (post: Entry, observer: string): Promise<Entry> => {
+    const {author, permlink} = post;
+    const scot_data_promise = getScotDataAsync<ScotPost>(`@${post.author}/${post.permlink}?hive=1`, {});
+    return scot_data_promise.then(
+        (scotData) => {
+            mergeContent(post, scotData);
+            return post;
+        },
+        (value) => {
+            return post;
+        }
+    );
+}
 
 export async function getAccountHEFull(account : string, useHive: boolean) : Promise<FullHiveEngineAccount> {
     let hiveAccount: FullAccount, tokenBalances: Array<object>, tokenUnstakes: Array<object>,
@@ -440,45 +459,12 @@ async function getAuthorRep(feedData : Array<Entry>, useHive : boolean) {
     return authorRep;
     
 }
-/*
-function mergeContent(content : Entry, scotData : ScotPost) {
-    const parentAuthor = content.parent_author;
-    const parentPermlink = content.parent_permlink;
-    const voted = content.active_votes;
-    const lastUpdate = content.last_update;
-    const title = content.title;
-    Object.assign(content, scotData);
-    if (voted) {
-        const scotVoted = new Set(content.active_votes.map(v => v.voter));
-        voted.forEach(v => {
-            if (!scotVoted.has(v.voter)) {
-                content.active_votes.push({
-                    voter: v.voter,
-                    percent: Math.sign(v.rshares),
-                    rshares: 0,
-                });
-            }
-        });
-    }
-    // Restore currently buggy fields
-    if (lastUpdate) {
-        content.last_update = lastUpdate;
-    }
-    if (title) {
-        content.title = title;
-    }
-    // Prefer parent author / permlink of content
-    content.parent_author = parentAuthor;
-    content.parent_permlink = parentPermlink;
-
-    content.scotData = {};
-    content.scotData[LIQUID_TOKEN_UPPERCASE] = scotData;
-
-    content.json_metadata = o2j.ifStringParseJSON(content.json_metadata);
-}
 
 
-async function fetchMissingData(tag, feedType, state, feedData, useHive) {
+
+
+async function fetchMissingData(tag : string, feedType : string, state : any, feedData : Array<Entry>) {
+    /*
     if (!state.content) {
         state.content = {};
     }
@@ -490,7 +476,7 @@ async function fetchMissingData(tag, feedType, state, feedData, useHive) {
         missingKeys.map(k => {
             const authorPermlink = k.split('/');
             console.log('Unexpected missing: ' + authorPermlink);
-            return (useHive ? hive.api : hive.api).getContentAsync(
+            return getPost(
                 authorPermlink[0],
                 authorPermlink[1]
             );
@@ -504,7 +490,7 @@ async function fetchMissingData(tag, feedType, state, feedData, useHive) {
         state.discussion_idx = {};
     }
     const discussionIndex = [];
-    const filteredContent = {};
+    const filteredContent  : {[authorperm:string]: ScotPost} = {};
     const authorRep = await getAuthorRep(feedData, useHive);
     feedData.forEach(d => {
         const key = d.authorperm.substr(1);
@@ -529,8 +515,11 @@ async function fetchMissingData(tag, feedType, state, feedData, useHive) {
         state.discussion_idx[tag] = {};
     }
     state.discussion_idx[tag][feedType] = discussionIndex;
+
+     */
 }
 
+/*
 async function addAccountToState(state, account, useHive) {
     const profile = await callBridge('get_profile', { account }, useHive);
     if (profile && profile['name']) {
@@ -1133,6 +1122,7 @@ export async function fetchFeedDataAsync(useHive, call_name, args) {
     }
     return { feedData, endOfData, lastValue };
 }
+*/
 
 export async function fetchSnaxBalanceAsync(account : string) {
     const url = 'https://cdn.snax.one/v1/chain/get_currency_balance';
@@ -1151,7 +1141,7 @@ export async function fetchSnaxBalanceAsync(account : string) {
             return [];
         });
 }
-*/
+
 export interface ScotPost {
     "active_votes": Array<ScotVoteShare>,
     "app": string;
@@ -1187,6 +1177,132 @@ export interface ScotPost {
     "total_payout_value": number;
     "total_vote_weight": number;
     "vote_rshares": number;
+}
+
+export interface MergedEntry {
+    active_votes: {[tokenName:string]: Array<ScotVoteShare>};
+    "app"?: string;
+    author: string;
+    "author_curve_exponent": {[coinname:string]:number};
+    "author_payout_beneficiaries": string;
+    "authorperm"?: string;
+    author_payout_value: string;
+    author_reputation: number;
+    author_role?: string;
+    author_title?: string;
+    beneficiaries: EntryBeneficiaryRoute[];
+    "beneficiaries_payout_value"?: number;
+    "block"?: number;
+    "cashout_time"?: string;
+    blacklists: string[];
+    body: string;
+    category: string;
+    children: number; // the same for both HE and Hive, right?
+    community?: string;
+    community_title?: string;
+    created: string;
+    curator_payout_value: string;
+    "decline_payout"?: boolean;
+    "desc"?: string;
+    depth: number;
+    "hive": boolean;
+    is_paidout: boolean;
+    json_metadata: string;
+    "last_payout"?: string;
+    "last_update"?: string;
+    "main_post"?: boolean;
+    max_accepted_payout: string;
+    "muted": boolean;
+    net_rshares: number;
+    parent_author?: string;
+    original_entry?: Entry;
+    parent_permlink?: string;
+    payout: number;
+    payout_at: string;
+    pending_payout_value: string;
+    pending_token?: number;
+    percent_hbd: number,
+    permlink: string;
+    post_id: number;
+
+    "precision"?: number;
+    "score_hot"?: number;
+    "score_promoted"?: number;
+    "score_trend"?: number;
+    "tags"?: string;
+    "token"?: string;
+    "total_payout_value"?: number;
+    "total_vote_weight"?: number;
+    "vote_rshares"?: number;
+    promoted: number;
+    reblogged_by?: string[];
+    replies: any[];
+    stats?: EntryStat;
+    updated: string;
+    url: string;
+}
+
+export interface MergedEntry {
+    active_votes: {[tokenName:string]: Array<ScotVoteShare>};
+    "app"?: string;
+    author: string;
+    "author_curve_exponent": {[coinname:string]:number};
+    "author_payout_beneficiaries": string;
+    "authorperm"?: string;
+    author_payout_value: string;
+    author_reputation: number;
+    author_role?: string;
+    author_title?: string;
+    beneficiaries: EntryBeneficiaryRoute[];
+    "beneficiaries_payout_value"?: number;
+    "block"?: number;
+    "cashout_time"?: string;
+    blacklists: string[];
+    body: string;
+    category: string;
+    children: number; // the same for both HE and Hive, right?
+    community?: string;
+    community_title?: string;
+    created: string;
+    curator_payout_value: string;
+    "decline_payout"?: boolean;
+    "desc"?: string;
+    depth: number;
+    "hive": boolean;
+    is_paidout: boolean;
+    json_metadata: string;
+    "last_payout"?: string;
+    "last_update"?: string;
+    "main_post"?: boolean;
+    max_accepted_payout: string;
+    "muted": boolean;
+    net_rshares: number;
+    parent_author?: string;
+    original_entry?: Entry;
+    parent_permlink?: string;
+    payout: number;
+    payout_at: string;
+    pending_payout_value: string;
+    pending_token?: number;
+    percent_hbd: number,
+    permlink: string;
+    post_id: number;
+
+    "precision"?: number;
+    "score_hot"?: number;
+    "score_promoted"?: number;
+    "score_trend"?: number;
+    "tags"?: string;
+    "token"?: string;
+    "total_payout_value"?: number;
+    "total_vote_weight"?: number;
+    "vote_rshares"?: number;
+    promoted: number;
+    reblogged_by?: string[];
+    replies: any[];
+    stats?: EntryStat;
+    updated: string;
+    url: string;
 }
 
 export const historicalPOBInfo: HiveEngineTokenInfo = {

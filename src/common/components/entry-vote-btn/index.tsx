@@ -644,7 +644,8 @@ export class EntryVoteBtn extends BaseComponent<Props, State> {
             )   {
                 // if my redux works use this:
 
-                console.log("Properties set in global!");
+                if (this.props.global.hiveEngineTokensProperties)
+                    console.log("Properties set in global!");
                 this.setState({
                     tokenInfo: properties.info || EntryVoteBtn.tokenInfo,
                     tokenConfig: properties.config || EntryVoteBtn.tokenConfig,

@@ -16,6 +16,7 @@ import parseDate from "../../helper/parse-date";
 import formattedNumber from "../../util/formatted-number";
 
 import {_t} from "../../i18n";
+import {TokenInfoConfigPair} from "../../store/hive-engine-tokens/types";
 
 
 interface Props {
@@ -26,29 +27,46 @@ interface Props {
 
 export class EntryPayoutDetail extends Component<Props> {
     render() {
-        const {entry, dynamicProps} = this.props;
-
+        const {entry, dynamicProps, global} = this.props;
+        const {hiveEngineTokensProperties} = global;
         const {base, quote, hbdPrintRate} = dynamicProps;
-
+        const {he} = this.props.entry;
         const payoutDate = moment(parseDate(entry.payout_at));
 
         const beneficiary = entry.beneficiaries;
-        const pendingPayout = parseAsset(entry.pending_payout_value).amount;
+        const pendingHivePayout = parseAsset(entry.pending_payout_value).amount;
         const promotedPayout = parseAsset(entry.promoted).amount;
         const authorPayout = parseAsset(entry.author_payout_value).amount;
         const curatorPayout = parseAsset(entry.curator_payout_value).amount;
         const fullPower = entry.percent_hbd === 0;
+        let pendingPayout = pendingHivePayout;
+
+        const tokenAmounts : {[id:string]:number}= {};
+        if (he && hiveEngineTokensProperties) {
+            for (const token in he) {
+                let tokenInfo: TokenInfoConfigPair;
+                if (!(tokenInfo=hiveEngineTokensProperties[token]))
+                    continue;
+                const postTokenRewardInfo = he[token];
+                let hivePrice:number = tokenInfo.hivePrice || 0;
+                if (postTokenRewardInfo.pending_token > 0 && hivePrice) {
+                    const tokenAmount = tokenAmounts[token] = postTokenRewardInfo.pending_token * Math.pow(10,- postTokenRewardInfo.precision);
+                    pendingPayout += tokenAmount * hivePrice * base / quote;
+                }
+            }
+        }
 
         const HBD_PRINT_RATE_MAX = 10000;
         const percentHiveDollars = (entry.percent_hbd) / 20000;
-        const pendingPayoutHbd = pendingPayout * (percentHiveDollars);
+        const pendingPayoutHbd = pendingHivePayout * (percentHiveDollars);
         const pricePerHive = base / quote;
-        const pendingPayoutHp = (pendingPayout - pendingPayoutHbd) / pricePerHive;
+        const pendingPayoutHp = (pendingHivePayout - pendingPayoutHbd) / pricePerHive;
         const pendingPayoutPrintedHbd = pendingPayoutHbd * (hbdPrintRate / HBD_PRINT_RATE_MAX);
         const pendingPayoutPrintedHive = (pendingPayoutHbd - pendingPayoutPrintedHbd) / pricePerHive;
 
+
         let breakdownPayout: string[] = [];
-        if (pendingPayout > 0) {
+        if (pendingHivePayout > 0) {
             if (pendingPayoutPrintedHbd > 0) {
                 breakdownPayout.push(formattedNumber(pendingPayoutPrintedHbd, {fractionDigits: 3, suffix: 'HBD'}))
             }
@@ -59,6 +77,23 @@ export class EntryPayoutDetail extends Component<Props> {
 
             if (pendingPayoutHp > 0) {
                 breakdownPayout.push(formattedNumber(pendingPayoutHp, {fractionDigits: 3, suffix: 'HP'}))
+            }
+        }
+        if (he) {
+
+            console.log(hiveEngineTokensProperties);
+            const {he} = this.props.entry;
+            for (const token in this.props.entry.he) {
+                const postTokenRewardInfo = this.props.entry.he[token];
+                let tokenInfo: TokenInfoConfigPair;
+                let hivePrice:number;
+                if (postTokenRewardInfo.pending_token > 0) {
+                    const tokenAmount = (postTokenRewardInfo.pending_token + postTokenRewardInfo.total_payout_value) * Math.pow(10,- postTokenRewardInfo.precision);
+                    breakdownPayout.push(formattedNumber(tokenAmount, {fractionDigits: 8, suffix: token}));
+                    if (hiveEngineTokensProperties && (tokenInfo = hiveEngineTokensProperties[token]) && tokenInfo.hivePrice) {
+                        console.log("POB part is ", tokenAmount * tokenInfo.hivePrice);
+                    }
+                }
             }
         }
 
@@ -117,7 +152,10 @@ export class EntryPayoutDetail extends Component<Props> {
 
 export class EntryPayout extends Component<Props> {
     render() {
-        const {entry} = this.props;
+        const {entry, global, dynamicProps} = this.props;
+        const {hiveEngineTokensProperties} = global;
+        const {he} = entry;
+        const {base, quote} = dynamicProps;
 
         const isPayoutDeclined = parseAsset(entry.max_accepted_payout).amount === 0;
 
@@ -125,7 +163,20 @@ export class EntryPayout extends Component<Props> {
         const authorPayout = parseAsset(entry.author_payout_value).amount;
         const curatorPayout = parseAsset(entry.curator_payout_value).amount;
 
-        const totalPayout = pendingPayout + authorPayout + curatorPayout;
+        let totalPayout = pendingPayout + authorPayout + curatorPayout;
+        if (he && hiveEngineTokensProperties) {
+            for (const token in he) {
+                let tokenInfo: TokenInfoConfigPair;
+                if (!(tokenInfo=hiveEngineTokensProperties[token]))
+                    continue;
+                const postTokenRewardInfo = he[token];
+                let hivePrice:number = tokenInfo.hivePrice || 2;
+                if (postTokenRewardInfo.pending_token > 0 && hivePrice) {
+                    const tokenAmount = postTokenRewardInfo.pending_token * Math.pow(10,- postTokenRewardInfo.precision);
+                    totalPayout += tokenAmount * hivePrice * base / quote;
+                }
+            }
+        }
 
         const popover = (
             <Popover id={`payout-popover`} className="payout-popover">
@@ -150,7 +201,7 @@ export default (p: Props) => {
     const props = {
         global: p.global,
         dynamicProps: p.dynamicProps,
-        entry: p.entry
+        entry: p.entry,
     }
 
     return <EntryPayout {...props} />
