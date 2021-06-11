@@ -155,7 +155,7 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
         const setState = this.setState.bind(this);
         if (!tokenInfo || !tokenConfig) {
         	return;
-        }
+        }       
         
 		const scotDenominator = Math.pow(10, tokenInfo.precision);
 		try {
@@ -425,7 +425,7 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
             dollarValueFromPOB = valueEst * tokenPriceInHive * base / quote;
         }
 
-
+        console.log("global.HETP:", global.hiveEngineTokensProperties); 
         return dollarValueFromHive + dollarValueFromPOB;
     };
 

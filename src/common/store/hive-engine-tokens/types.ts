@@ -10,19 +10,18 @@ export interface TokenPropertiesMap {
     [coinName: string]:TokenInfoConfigPair
 }
 
-export enum ActionTypes {
+export enum HEActionTypes {
     FETCH = "@tokens/FETCH",
     INCLUDE = "@tokens/INCLUDE"
 }
 
-export interface FetchedAction {
-    type: ActionTypes.FETCH;
+export interface HEFetchAction {
+    type: HEActionTypes.FETCH;
+}
+
+export interface HEIncludeAction {
+    type: HEActionTypes.INCLUDE;
     data: TokenPropertiesMap;
 }
 
-export interface IncludeAction {
-    type: ActionTypes.INCLUDE;
-    data: TokenPropertiesMap;
-}
-
-export type Actions = IncludeAction | FetchedAction;
+export type HEActions = HEIncludeAction | HEFetchAction;

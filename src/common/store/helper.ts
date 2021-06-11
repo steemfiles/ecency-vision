@@ -22,8 +22,9 @@ import * as ls from "../../common/util/local-storage";
 import currencySymbol from "../../common/helper/currency-symbol";
 
 import {AppWindow} from "../../client/window";
-import {getAccountHEFull} from "../api/hive-engine";
-
+import {getAccountHEFull, getScotDataAsync, getPrices, HiveEngineTokenConfig, HiveEngineTokenInfo} from "../api/hive-engine";
+import {includeInfoConfigsAction} from "./hive-engine-tokens/index";
+import {LIQUID_TOKEN_UPPERCASE} from "../../client_config";
 declare var window: AppWindow;
 
 export const activeUserMaker = (name: string, points: string = "0.000", uPoints: string = "0.000"): ActiveUser => {
@@ -104,6 +105,26 @@ export const clientStoreTasks = (store: Store<AppState>) => {
     // Load dynamic props
     getDynamicProps().then((resp) => {
         store.dispatch(loadDynamicProps(resp));
+    });
+
+	Promise.all(
+	[
+		getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,}),
+		getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE,}),
+		getPrices([LIQUID_TOKEN_UPPERCASE])]
+    ).then((r) => {
+        let info = r[0];
+        let config = r[1];
+        console.log({info, config});
+        const prices = r[2];
+        if (info["POB"]) {
+            info = info["POB"];
+        }
+        if (config["POB"]) {
+            config = config["POB"];
+        }
+        const hivePrice = prices["POB"];
+        store.dispatch(includeInfoConfigsAction({[LIQUID_TOKEN_UPPERCASE]: {info, config, hivePrice}}));
     });
 
     // Update active user in interval

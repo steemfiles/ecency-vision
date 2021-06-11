@@ -50,10 +50,10 @@ export  interface TokenStatus {
 
 // Hopefully we can make this dynamic some soon
 const defaultPrices = {
-	'POB': 0.83,
-	'LEO': 0.32,
-	'SWAP.BTC': 40345,
-	'SWAP.HIVE': 0.4 
+	'POB': 0.1,
+	'LEO': 0.1,
+	'SWAP.BTC': 100123,
+	'SWAP.HIVE': 1 
 };
 
 export async function getPrices(token_list: undefined|Array<string>) : Promise<{[shortCoinName: string]: number /* in Hive */}> {

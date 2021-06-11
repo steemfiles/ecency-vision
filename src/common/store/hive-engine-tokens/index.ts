@@ -1,5 +1,5 @@
 import {Dispatch} from "redux";
-import {Actions, ActionTypes, FetchedAction, IncludeAction, TokenPropertiesMap} from "./types";
+import {HEActions, HEActionTypes, HEFetchAction, HEIncludeAction, TokenPropertiesMap} from "./types";
 import {AppState} from "../index";
 import {getDynamicProps, getTrendingTags} from "../../api/hive";
 import {fetchAct, fetchErrorAct} from "../trending-tags";
@@ -13,35 +13,35 @@ import {LIQUID_TOKEN_UPPERCASE} from "../../../client_config";
 
 export const initialState: TokenPropertiesMap = {};
 
-export default (state: TokenPropertiesMap = initialState, action: Actions): TokenPropertiesMap => {
+export default (state: TokenPropertiesMap = initialState, action: HEActions): TokenPropertiesMap => {
     switch (action.type) {
-        case ActionTypes.INCLUDE: {
+        case HEActionTypes.INCLUDE: {
             const {data} = action;
             return Object.assign(state,data);
         }
-        case ActionTypes.FETCH: {
-            const {data} = action;
-            return Object.assign(state,data);
+        case HEActionTypes.FETCH: {
+        	// should call a fetch routine here.
+			return state;
         }
         default:
-            return state;
+        	return state;
     }
 };
 
-/* Actions */
+/* HEActions */
 export const includeInfoConfigs = (data: TokenPropertiesMap) => (dispatch: Dispatch) => {
     dispatch(includeInfoConfigsAction(data));
 };
 
 /* Action Creators */
-export const includeInfoConfigsAction = (data: TokenPropertiesMap): IncludeAction => {
+export const includeInfoConfigsAction = (data: TokenPropertiesMap): HEIncludeAction => {
     return {
-        type: ActionTypes.INCLUDE,
+        type: HEActionTypes.INCLUDE,
         data,
     };
 };
 
-/* Actions */
+/* HEActions */
 export const fetchInfoConfigsProps = () => (dispatch: Dispatch) => {
     Promise.all(
         [
@@ -64,9 +64,8 @@ export const fetchInfoConfigsProps = () => (dispatch: Dispatch) => {
 };
 
 /* Action Creators */
-export const fetchedAct = (_map: TokenPropertiesMap): FetchedAction => {
+export const fetchedAct = (_map: TokenPropertiesMap): HEFetchAction => {
     return {
-        type: ActionTypes.FETCH,
-        data: _map,
+        type: HEActionTypes.FETCH
     };
 };
