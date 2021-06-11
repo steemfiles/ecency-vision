@@ -706,12 +706,30 @@ export class EntryVoteBtn extends BaseComponent<Props, State> {
         const {activeUser} = this.props;
         const {dialog, inProgress} = this.state;
         const {upVoted, downVoted} = this.isVoted();
-
+        let tokensProperties, properties;
+        let tokenPriceInHive : number = 0;
         let cls = _c(`btn-vote btn-up-vote ${inProgress ? "in-progress" : ""}`);
 
         if (upVoted || downVoted) {
             cls = _c(`btn-vote ${upVoted ? "btn-up-vote" : "btn-down-vote"} ${inProgress ? "in-progress" : ""} voted`);
         }
+        
+        let {tokenInfo, tokenConfig} = this.state;
+        tokenPriceInHive = this.state.tokenPriceInHive || 0;
+		if (
+			((tokensProperties=this.props.hiveEngineTokensProperties) ||
+			(tokensProperties=this.props.global.hiveEngineTokensProperties))
+				&&
+			(properties = tokensProperties[LIQUID_TOKEN_UPPERCASE])
+		)   {
+			// if my redux works use this:
+			
+			if (properties.info && properties.config && properties.hivePrice) {
+				tokenInfo = properties.info;
+				tokenConfig = properties.config;
+				tokenPriceInHive = properties.hivePrice || 0;
+			}
+		}
 
         return (
             <>
@@ -727,8 +745,8 @@ export class EntryVoteBtn extends BaseComponent<Props, State> {
                 {(dialog && activeUser) && (
                     <Modal className="vote-modal" onHide={this.toggleDialog} show={true} centered={true}
                            animation={false}>
-                        <VoteDialog {...this.props} tokenPriceInHive={this.state.tokenPriceInHive}
-                                    tokenInfo={this.state.tokenInfo} tokenConfig={this.state.tokenConfig}
+                        <VoteDialog {...this.props} tokenPriceInHive={tokenPriceInHive}
+                                    tokenInfo={tokenInfo} tokenConfig={tokenConfig}
                                     activeUser={activeUser} onClick={this.vote}/>
                     </Modal>
                 )}

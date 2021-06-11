@@ -50,9 +50,9 @@ export  interface TokenStatus {
 
 // Hopefully we can make this dynamic some soon
 const defaultPrices = {
-	'POB': 0.1,
-	'LEO': 0.1,
-	'SWAP.BTC': 100123,
+	'POB': 0,
+	'LEO': 0,
+	'SWAP.BTC': 1,
 	'SWAP.HIVE': 1 
 };
 
