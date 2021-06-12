@@ -92,7 +92,6 @@ interface State {
     showIfHidden: boolean;
     showIfNsfw: boolean;
     editHistory: boolean;
-    hiveEngineTokensProperties: TokenPropertiesMap;
 }
 
 class EntryPage extends BaseComponent<Props, State> {
@@ -102,7 +101,6 @@ class EntryPage extends BaseComponent<Props, State> {
         showIfHidden: false,
         showIfNsfw: false,
         editHistory: false,
-        hiveEngineTokensProperties: {},
     };
 
     componentDidMount() {
@@ -112,30 +110,6 @@ class EntryPage extends BaseComponent<Props, State> {
         if (global.usePrivate && location.search === "?history") {
             this.toggleEditHistory();
         }
-
-        Promise.all([
-            getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,}),
-            getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE,}),
-            getPrices(undefined)]).then(function (values: [HiveEngineTokenInfo,
-            HiveEngineTokenConfig,
-            { [id: string]: number }
-        ]) {
-            const info = values[0];
-            const config = values[1];
-            const prices = values[2];
-            if (!info || !config || !prices) {
-                console.log("Not setting Hive Engine parameters:")
-                return;
-            }
-            const hivePrice : number = prices[LIQUID_TOKEN_UPPERCASE] || 0;
-            if (hivePrice) {
-                const m = {[LIQUID_TOKEN_UPPERCASE]: {config, info,
-                        hivePrice}};
-                setState({hiveEngineTokensProperties: m});
-                setHiveEngineTokensProperties(m);
-            }
-        });
-
     }
 
     componentDidUpdate(prevProps: Readonly<Props>): void {

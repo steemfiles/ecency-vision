@@ -37,7 +37,7 @@ import {
 
 import {LIQUID_TOKEN_UPPERCASE} from "../../../client_config";
 import {PriceHash} from "../../store/prices/types";
-import hiveEngineTokensProperties, {includeInfoConfigs} from "../../store/hive-engine-tokens";
+import {includeInfoConfigs} from "../../store/hive-engine-tokens";
 import {TokenPropertiesMap} from "../../store/hive-engine-tokens/types";
 import {setHiveEngineTokensProperties} from "../../store/global";
 
