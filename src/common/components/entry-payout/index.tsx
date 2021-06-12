@@ -86,24 +86,27 @@ export class EntryPayoutDetail extends Component<Props> {
             }
         }
         if (he) {
-
-            console.log(hiveEngineTokensProperties);
-            const {he} = this.props.entry;
-            for (const token in this.props.entry.he) {
-                const postTokenRewardInfo = this.props.entry.he[token];
-                let tokenProperties: TokenInfoConfigPair;
-                let hivePrice:number;
-                const complete_payout_value = postTokenRewardInfo.pending_token || postTokenRewardInfo.total_payout_value;
-                if (complete_payout_value > 0 && hiveEngineTokensProperties 
-                	&& (tokenProperties = hiveEngineTokensProperties[token]) 
-                	&& tokenProperties.hivePrice && tokenProperties.info) {
-                		if (tokenProperties.info.precision !== undefined) {
-                			const tokenAmount : number = complete_payout_value * Math.pow(10,- postTokenRewardInfo.precision);
-							breakdownPayout.push(formattedNumber(tokenAmount, {fractionDigits: postTokenRewardInfo.precision, suffix: token}));
-							console.log("POB part is ", tokenAmount * tokenProperties.hivePrice, " Hive");
-						}
-                }
-            }
+        	try {
+	
+				console.log(hiveEngineTokensProperties);
+				for (const token in this.props.entry.he) {
+					const postTokenRewardInfo = this.props.entry.he[token];
+					let tokenProperties: TokenInfoConfigPair;
+					let hivePrice:number;
+					const complete_payout_value = postTokenRewardInfo.pending_token || postTokenRewardInfo.total_payout_value;
+					if (complete_payout_value > 0 && hiveEngineTokensProperties 
+						&& (tokenProperties = hiveEngineTokensProperties[token]) 
+						&& tokenProperties.hivePrice && tokenProperties.info) {
+							if (tokenProperties.info.precision !== undefined) {
+								const tokenAmount : number = complete_payout_value * Math.pow(10,- postTokenRewardInfo.precision);
+								breakdownPayout.push(formattedNumber(tokenAmount, {fractionDigits: postTokenRewardInfo.precision, suffix: token}));
+								console.log("POB part is ", tokenAmount * tokenProperties.hivePrice, " Hive");
+							}
+					}
+				}
+			} catch (e) {
+				console.log("HE Stuff threw an exception: entry-payout/index");
+			}
         }
 
         return (
@@ -173,7 +176,7 @@ export class EntryPayout extends Component<Props> {
         const curatorPayout = parseAsset(entry.curator_payout_value).amount;
 
         let totalPayout = pendingPayout + authorPayout + curatorPayout;
-        console.log({he, hiveEngineTokensProperties});
+        console.log({he, hiveEngineTokensProperties}, "in entry-payout/index");
         if (he && hiveEngineTokensProperties) {
             for (const token in he) {
 	        	//console.log({token});

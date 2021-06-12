@@ -10,21 +10,24 @@ const bridgeApiCall = <T>(endpoint: string, params: {}): Promise<T> => hiveClien
 const resolvePost = (post: Entry, observer: string): Promise<Entry> => {
     const {json_metadata: json, author, permlink} = post;
 
-
-    if (json.original_author && json.original_permlink && json.tags && json.tags[0] === "cross-post") {
-        return getPost(json.original_author, json.original_permlink, observer).then(resp => {
-            if (resp) {
-                return enginifyPost({
-                    ...post,
-                    original_entry: resp
-                }, observer);
-            }
-
-            return enginifyPost(post, observer);
-        }).catch(() => {
-            return enginifyPost(post, observer);
-        })
-    }
+    try {
+		if (json.original_author && json.original_permlink && json.tags && json.tags[0] === "cross-post") {
+			return getPost(json.original_author, json.original_permlink, observer).then(resp => {
+				if (resp) {
+					return enginifyPost({
+						...post,
+						original_entry: resp
+					}, observer);
+				}
+	
+				return enginifyPost(post, observer);
+			}).catch(() => {
+				return enginifyPost(post, observer);
+			})
+		}
+	} catch (e) {
+		console.log(`Error resolving cross-post ${post.author}/${post.permlink} in bridge.tsx`);		
+	}
 
     return enginifyPost(post, observer);
 }

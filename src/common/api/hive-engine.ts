@@ -100,7 +100,7 @@ export async function getPrices(token_list: undefined|Array<string>) : Promise<{
 			
 		return obj;
 	} catch (e) {
-		console.log(e.message);
+		console.log("getPrices are failing:", e.message);
 	}
 	
 	return defaultPrices;

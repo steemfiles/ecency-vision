@@ -44,48 +44,23 @@ window.addEventListener("load", () => {
             store.dispatch(hasKeyChainAct());
         });
     } else {
-		const hive_keychain_interval_id = setInterval(() => {
-			if (window.hive_keychain) {
-				window.hive_keychain.requestHandshake(() => {
-					store.dispatch(hasKeyChainAct());
-					clearInterval(hive_keychain_interval_id);
-				});
-			}
-		}, 400);
+    	try {
+			const hive_keychain_interval_id = setInterval(() => {
+				if (window.hive_keychain) {
+					window.hive_keychain.requestHandshake(() => {
+						store.dispatch(hasKeyChainAct());
+						clearInterval(hive_keychain_interval_id);
+					});
+				}
+			}, 400);
+			
+			setTimeout(() => {
+				clearInterval(hive_keychain_interval_id);
+			}, 25000);
+		} catch (e) {
 		
-		setTimeout(() => {
-			clearInterval(hive_keychain_interval_id);
-		}, 25000);    	
+		}
     }
-    
-    console.log("Getting HE data...");
-    
-	Promise.all([
-		getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,}),
-		getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE,}),
-		getPrices(undefined)]).then(function (values: [HiveEngineTokenInfo,
-						HiveEngineTokenConfig,
-						{ [id: string]: number }
-		]) {
-		const info = values[0];
-		const config = values[1];
-		const prices = values[2];
-		if (!info || !config || !prices) {
-			console.log("Not setting Hive Engine parameters:")
-			return;
-		}
-		const price : number = prices[LIQUID_TOKEN_UPPERCASE] || 0;
-		if (!price) {
-			console.log("Not setting Hive Engine parameters:")
-			return;
-		}
-	
-		console.log("Setting HE data");
-		store.dispatch(includeInfoConfigsAction({[LIQUID_TOKEN_UPPERCASE]: {config, info,
-		hivePrice: price},}));
-	
-		});
-    
 });
 
 

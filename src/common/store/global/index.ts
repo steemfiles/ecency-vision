@@ -106,10 +106,21 @@ export default (state: Global = initialState, action: Actions): Global => {
             return {...state, hasKeyChain: true};
         }
         case HEActionTypes.INCLUDE: {
-        	const {data} = action;
+        	let NewHETP = action.data;
+        	const OldHETP = state.hiveEngineTokensProperties;
+        	try {
+				if (!NewHETP) {
+					return state;
+				}
+				if (OldHETP) {
+					NewHETP = Object.assign(NewHETP, OldHETP);				
+				}
+			} catch (e) {
+				console.log("Error loading new HE");
+			}
         	console.log("Returning Hive Engine data");
-        	console.log({hiveEngineTokensProperties:data});
-        	return {...state, hiveEngineTokensProperties:data}; 
+        	console.log({hiveEngineTokensProperties:NewHETP});
+        	return {...state, hiveEngineTokensProperties:NewHETP}; 
         }
         default:
             return state;
