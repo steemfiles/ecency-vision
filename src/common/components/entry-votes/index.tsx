@@ -20,6 +20,7 @@ import Tooltip from "../tooltip";
 import Pagination from "../pagination";
 
 import {Vote, getActiveVotes} from "../../api/hive";
+import {PriceHash} from "../../store/prices/types";   
 
 import parseAsset from "../../helper/parse-asset";
 import parseDate from "../../helper/parse-date";
@@ -30,15 +31,34 @@ import formattedNumber from "../../util/formatted-number";
 import {_t} from "../../i18n";
 
 import {peopleSvg} from "../../img/svg";
+import {TokenPropertiesMap, TokenInfoConfigPair} from "../../store/hive-engine-tokens/types";
+export const prepareVotes = (entry: Entry, votes: Vote[], hiveEngineTokensProperties: TokenPropertiesMap|undefined): Vote[] => {
+    let totalHivePayout =
+	parseAsset(entry.pending_payout_value).amount +
+	parseAsset(entry.author_payout_value).amount +
+	parseAsset(entry.curator_payout_value).amount;
+	let totalPayout = totalHivePayout;
 
-export const prepareVotes = (entry: Entry, votes: Vote[]): Vote[] => {
-    const totalPayout =
-        parseAsset(entry.pending_payout_value).amount +
-        parseAsset(entry.author_payout_value).amount +
-        parseAsset(entry.curator_payout_value).amount;
+	const {he} = entry;
+	if (he && hiveEngineTokensProperties) {
+		for (const token in he) {
+			let tokenInfo: TokenInfoConfigPair;
+			if (!(tokenInfo=hiveEngineTokensProperties[token]))
+				continue;
+			const postTokenRewardInfo = he[token];
+			let hivePrice:number = tokenInfo.hivePrice || 0;
+			const complete_payout_value = postTokenRewardInfo.pending_token || postTokenRewardInfo.total_payout_value || 0; 
+			if (complete_payout_value > 0) {
+				const tokenAmount = complete_payout_value * Math.pow(10,- postTokenRewardInfo.precision);
+				const tokenProps = hiveEngineTokensProperties[token];
+				totalPayout += tokenAmount * hivePrice;
+			} // if
+		} // for
+	} // if
+        
 
-    const voteRshares = votes.reduce((a, b) => a + parseFloat(b.rshares), 0);
-    const ratio = totalPayout / voteRshares;
+    const voteHiveRshares = votes.reduce((a, b) => a + parseFloat(b.rshares), 0);
+    const ratio = totalPayout / voteHiveRshares;
 
     return votes.map((a) => {
         const rew = parseFloat(a.rshares) * ratio;
@@ -91,7 +111,7 @@ export class EntryVotesDetail extends BaseComponent<DetailProps, DetailState> {
     setVotes = (data: Vote[]) => {
         const {entry} = this.props;
 
-        this.stateSet({votes: prepareVotes(entry, data), loading: false});
+        this.stateSet({votes: prepareVotes(entry, data, this.props.global.hiveEngineTokensProperties), loading: false});
     };
 
     sortChanged = (e: React.ChangeEvent<FormControl & HTMLInputElement>) => {
