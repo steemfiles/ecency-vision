@@ -52,11 +52,7 @@ export class EntryPayoutDetail extends Component<Props> {
                 const complete_payout_value = postTokenRewardInfo.pending_token || postTokenRewardInfo.total_payout_value || 0; 
                 if (complete_payout_value > 0) {
                     const tokenAmount = complete_payout_value * Math.pow(10,- postTokenRewardInfo.precision);
-
                     const tokenProps = hiveEngineTokensProperties[token]; 
-                    if (hiveEngineTokensProperties && tokenProps && tokenProps.hivePrice) {
-                        console.log("POB part is ", tokenAmount * tokenProps.hivePrice);
-                    }
                     pendingPayout += tokenAmount * hivePrice * base / quote;
                 }
             } // for
@@ -93,12 +89,13 @@ export class EntryPayoutDetail extends Component<Props> {
 					const postTokenRewardInfo = this.props.entry.he[token];
 					let tokenProperties: TokenInfoConfigPair;
 					let hivePrice:number;
-					const complete_payout_value = postTokenRewardInfo.pending_token || postTokenRewardInfo.total_payout_value;
+					const complete_payout_value = postTokenRewardInfo.pending_token || postTokenRewardInfo.total_payout_value || 0;
 					if (complete_payout_value > 0 && hiveEngineTokensProperties 
 						&& (tokenProperties = hiveEngineTokensProperties[token]) 
-						&& tokenProperties.hivePrice && tokenProperties.info) {
+						&& tokenProperties.hivePrice && tokenProperties.info
+						&& postTokenRewardInfo) {
 							if (tokenProperties.info.precision !== undefined) {
-								const tokenAmount : number = complete_payout_value * Math.pow(10,- postTokenRewardInfo.precision);
+								const tokenAmount : number = complete_payout_value * Math.pow(10,- postTokenRewardInfo.precision || 0);
 								breakdownPayout.push(formattedNumber(tokenAmount, {fractionDigits: postTokenRewardInfo.precision, suffix: token}));
 								console.log("POB part is ", tokenAmount * tokenProperties.hivePrice, " Hive");
 							}
