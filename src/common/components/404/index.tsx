@@ -6,7 +6,7 @@ import {Link} from "react-router-dom";
 
 import Meta from "../meta";
 
-const logoCircle = require("../../img/logo-circle.svg");
+const logoCircle = require("../../img/bluebrain-logo-circle.webp");
 
 interface Props {
     history: History;

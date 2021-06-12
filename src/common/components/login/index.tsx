@@ -44,7 +44,7 @@ import {deleteForeverSvg} from "../../img/svg";
 
 declare var window: AppWindow;
 
-const logo = require('../../img/logo-circle.svg');
+const logo = require('../../img/bluebrain-logo-circle.webp');
 const hsLogo = require("../../img/hive-signer.svg");
 const keyChainLogo = require("../../img/keychain.png");
 import {HIVE_SIGNER_APP} from "../../../client_config";

@@ -23,7 +23,7 @@ import {Tsx} from "../i18n/helper";
 import {hiveSvg, checkSvg} from "../img/svg";
 
 const signupSvg = require("../img/signup.svg");
-const logoCircle = require("../img/logo-circle.svg");
+const logoCircle = require("../img/bluebrain-logo-circle.webp");
 
 interface State {
     username: string;

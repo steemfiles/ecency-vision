@@ -44,7 +44,7 @@ import {brightnessSvg, pencilOutlineSvg, arrowLeftSvg, arrowRightSvg, refreshSvg
 // why "require" instead "import" ? see: https://github.com/ReactTraining/react-router/issues/6203
 const pathToRegexp = require("path-to-regexp");
 
-const logo = require("../../../../common/img/logo-circle.svg");
+const logo = require("../../../../common/img/bluebrain-logo-circle.webp");
 
 interface AddressBarProps {
     history: History;

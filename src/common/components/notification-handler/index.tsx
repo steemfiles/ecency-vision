@@ -13,7 +13,7 @@ import {_t} from "../../i18n";
 
 const notificationSound = require("../../img/notification.mp3");
 
-const logo = require('../../img/logo-circle.svg');
+const logo = require('../../img/bluebrain-logo-circle.webp');
 
 declare var window: AppWindow;
 

@@ -32,7 +32,7 @@ import _c from "../../util/fix-class-names";
 
 import {brightnessSvg, pencilOutlineSvg, menuSvg, closeSvg} from "../../img/svg";
 
-const logo = require('../../img/logo-circle.svg');
+const logo = require('../../img/bluebrain-logo-circle.webp');
 
 interface Props {
     history: History;
