@@ -1165,7 +1165,7 @@ export interface ScotPost {
     "muted": boolean;
     "parent_author": "",
     "parent_permlink": string;
-    "pending_token": number;
+    "pending_token"?: number;
     "precision": number;
     "promoted": number;
     "score_hot": number;
@@ -1174,7 +1174,7 @@ export interface ScotPost {
     "tags": string;
     "title": string;
     "token": string;
-    "total_payout_value": number;
+    "total_payout_value"?: number;
     "total_vote_weight": number;
     "vote_rshares": number;
 }
