@@ -40,7 +40,7 @@ import {PriceHash} from "../../store/prices/types";
 import {includeInfoConfigs} from "../../store/hive-engine-tokens";
 import {TokenPropertiesMap} from "../../store/hive-engine-tokens/types";
 import {setHiveEngineTokensProperties} from "../../store/global";
-
+import {is_not_FullHiveEngineAccount} from "../../api/hive-engine";
 
 const setVoteValue = (type: "up" | "down", username: string, value: number) => {
     ls.set(`vote-value-${type}-${username}`, value);
@@ -186,24 +186,27 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
         
         
 		Promise.all([
-		getAccountHEFull(activeUser.username, true),
 		getScotDataAsync<ScotPost>(`@${entry.author}/${entry.permlink}?hive=1`, {}),
 		getScotDataAsync<{ [id: string]: VoteInfo }>(`@${activeUser.username}`, {
 			token :  LIQUID_TOKEN_UPPERCASE,      hive: 1
 
 		})]).
-		then(function (value1: [FullHiveEngineAccount, { [id: string]: ScotPost }, { [id: string]: VoteInfo }
+		then(function (value1: [{ [id: string]: ScotPost }, { [id: string]: VoteInfo }
 
 		]) {
 
-			const account = value1[0];
+			
 			const info = tokenInfo;
 			const config = tokenConfig;
-			const post = value1[1];
+			const post = value1[0];
 
-			const voteInfoHash = value1[2];
+			const voteInfoHash = value1[1];
 			let voteInfo: VoteInfo;
 
+			if (is_not_FullHiveEngineAccount(value1[0])) {
+				return;
+			}			
+			
 			if (!voteInfoHash || !(voteInfo = voteInfoHash[LIQUID_TOKEN_UPPERCASE])) {
 				console.log("Not setting Hive Engine parameters:", {voteInfoHash, account, info, config, post});
 
@@ -211,16 +214,16 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
 
 			}
 
-			console.log("AccountInfo:", account, "TokenInfo:", info, "config:", config, 'post:', post, {voteInfo});
+			console.log("AccountInfo:", activeUser.data, "TokenInfo:", info, "config:", config, 'post:', post, {voteInfo});
 
 
-			if (!account || !info || !config || !post) {
+			if (!post) {
 				console.log("Not setting Hive Engine parameters:")
 
 				return;
 
 			}                
-			setState({account, tokenEntryMap: post, voteInfo, scotDenominator});
+			setState({account: activeUser.data, tokenEntryMap: post, voteInfo, scotDenominator});
 
 		});
     }
