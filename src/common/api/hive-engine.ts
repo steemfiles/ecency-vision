@@ -13,7 +13,7 @@ import axios from 'axios';
 // @ts-ignore
 import SSC from "sscjs";
 import {HECoarseTransaction, HEFineTransaction} from "../store/transactions/types";
-import {getAccount, getAccounts, getFollowCount, getPost, FullAccount} from "./hive";
+import {getAccount, getAccounts, getFollowCount, getPost} from "./hive";
 import {AccountFollowStats, FullAccount} from "../store/accounts/types";
 import {Entry, EntryBeneficiaryRoute, EntryStat, EntryVote} from "../store/entries/types";
 import {EntryVoteBtn} from "../components/entry-vote-btn";
@@ -58,31 +58,9 @@ const defaultPrices = {
 
 export async function getPrices(token_list: undefined|Array<string>) : Promise<{[shortCoinName: string]: number /* in Hive */}> {
 	try {
-	    let obj : any = {};
-		const HIVEpPOB = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
-				'symbol': 'POB',
-				'type': 'buy',
-		}))[0].price);
-		const HIVEpLEO = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
-				'symbol': 'LEO',
-				'type': 'buy',
-		}))[0].price);
-
-		obj = {
-            'POB': HIVEpPOB,
-            'LEO': HIVEpLEO,
-            'SWAP.HIVE': 1,
-        };
-
-		try {
-            obj['SWAP.BTC'] = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
-                'symbol': 'SWAP.BTC',
-                'type': 'buy',
-            }))[0].price);
-        } catch (e) {
-		    // do nothing....
-        }
-
+	    let obj : any = {
+	    	'SWAP.HIVE': 1,
+	    };
         try {
 		    // others
             const others = await hiveSsc.find('market', 'tradesHistory', {
@@ -95,8 +73,32 @@ export async function getPrices(token_list: undefined|Array<string>) : Promise<{
 		    console.log(e);
 		    // do nothing...
         }
-
-
+        
+		try {
+			
+			if (!obj["POB"]) {        
+				const HIVEpPOB = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
+						'symbol': 'POB',
+						'type': 'buy',
+				}))[0].price);
+			}
+			if (!obj["LEO"]) {
+				const HIVEpLEO = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
+						'symbol': 'LEO',
+						'type': 'buy',
+				}))[0].price);
+			}
+			
+			if (!obj['SWAP.BTC']) {
+				obj['SWAP.BTC'] = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
+					'symbol': 'SWAP.BTC',
+					'type': 'buy',
+				}))[0].price);
+			}
+			
+		} catch (e) {
+			// do nothing....
+		}
 			
 		return obj;
 	} catch (e) {
@@ -169,15 +171,17 @@ export interface FullHiveEngineAccount extends FullAccount {
     __loaded?: true;
 }
 
-export function is_not_FullHiveEngineAccount(account : FullHiveEngineAccount | FullAccount | null | {__loaded: boolean}) {
-	if (!account)
-		return true;
-	if (!account["token_balances"])
+function is_not_FullAccount(account: any) {
+	return (!account);
+}
+
+export function is_not_FullHiveEngineAccount(account :  any) {
+	if (is_not_FullAccount(account) || !account["token_balances"] || !account["prices"] || !account["follow_stats"])
 		return true;
 	return false;
 }
 
-export function is_FullHiveEngineAccount(account : FullHiveEngineAccount | FullAccount | null | {__loaded: boolean}) {
+export function is_FullHiveEngineAccount(account : FullHiveEngineAccount | FullAccount | {__loaded: boolean}) {
 	return !is_not_FullHiveEngineAccount(account);
 }
 
@@ -259,6 +263,18 @@ export const enginifyPost = (post: Entry, observer: string): Promise<Entry> => {
     	console.log("enginify failed.");
     	return post;
     });
+}
+
+export const fetchedHiveEngineTokensProperties = async ( 
+	r : [HiveEngineTokenInfo, 
+		HiveEngineTokenConfig,  
+		{[shortCoinName: string]: number /* in Hive */}]) => {
+
+        const info = r[0] as HiveEngineTokenInfo;
+        const config = r[1] as HiveEngineTokenConfig;
+        const prices = r[2] as {[shortCoinName: string]: number /* in Hive */};
+        const hivePrice = prices["POB"];
+        return {[LIQUID_TOKEN_UPPERCASE]: {info, config, hivePrice}};
 }
 
 export async function getAccountHEFull(account : string, useHive: boolean) : Promise<FullHiveEngineAccount|never> {

@@ -195,35 +195,33 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
 
 		]) {
 
-			
+			let account : FullHiveEngineAccount;
 			const info = tokenInfo;
 			const config = tokenConfig;
 			const post = value1[0];
-
+			if (!post || is_not_FullHiveEngineAccount(activeUser.data)) {
+				console.log("Not setting Hive Engine parameters:")
+				return;
+			}
+			if (is_not_FullHiveEngineAccount(value1[0])) {
+				return;	
+			} else {
+				account = activeUser.data as FullHiveEngineAccount;
+			}			
 			const voteInfoHash = value1[1];
 			let voteInfo: VoteInfo;
 
-			if (is_not_FullHiveEngineAccount(value1[0])) {
-				return;
-			}			
 			
 			if (!voteInfoHash || !(voteInfo = voteInfoHash[LIQUID_TOKEN_UPPERCASE])) {
 				console.log("Not setting Hive Engine parameters:", {voteInfoHash, account, info, config, post});
-
 				return;
-
 			}
 
 			console.log("AccountInfo:", activeUser.data, "TokenInfo:", info, "config:", config, 'post:', post, {voteInfo});
 
 
-			if (!post) {
-				console.log("Not setting Hive Engine parameters:")
-
-				return;
-
-			}                
-			setState({account: activeUser.data, tokenEntryMap: post, voteInfo, scotDenominator});
+              
+			setState({account: activeUser.data as FullHiveEngineAccount, tokenEntryMap: post, voteInfo, scotDenominator});
 
 		});
     }

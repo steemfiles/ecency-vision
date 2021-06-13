@@ -84,7 +84,6 @@ export class EntryPayoutDetail extends Component<Props> {
         if (he) {
         	try {
 	
-				console.log(hiveEngineTokensProperties);
 				for (const token in this.props.entry.he) {
 					const postTokenRewardInfo = this.props.entry.he[token];
 					let tokenProperties: TokenInfoConfigPair;
@@ -97,7 +96,6 @@ export class EntryPayoutDetail extends Component<Props> {
 							if (tokenProperties.info.precision !== undefined) {
 								const tokenAmount : number = complete_payout_value * Math.pow(10,- postTokenRewardInfo.precision || 0);
 								breakdownPayout.push(formattedNumber(tokenAmount, {fractionDigits: postTokenRewardInfo.precision, suffix: token}));
-								console.log("POB part is ", tokenAmount * tokenProperties.hivePrice, " Hive");
 							}
 					}
 				}
@@ -173,7 +171,7 @@ export class EntryPayout extends Component<Props> {
         const curatorPayout = parseAsset(entry.curator_payout_value).amount;
 
         let totalPayout = pendingPayout + authorPayout + curatorPayout;
-        console.log({he, hiveEngineTokensProperties}, "in entry-payout/index");
+        //console.log({he, hiveEngineTokensProperties}, "in entry-payout/index");
         if (he && hiveEngineTokensProperties) {
             for (const token in he) {
 	        	//console.log({token});
@@ -185,12 +183,12 @@ export class EntryPayout extends Component<Props> {
                 const tokenConfig = tokenProperties.config;
                 let hivePrice:number = tokenProperties.hivePrice || 0;
                 if (token === "POB") {
-                	console.log({tokenInfo, tokenConfig, postTokenRewardInfo});
+                	//console.log({tokenInfo, tokenConfig, postTokenRewardInfo});
                 }
                 let complete_payout_value: number = postTokenRewardInfo.pending_token || postTokenRewardInfo.total_payout_value || 0;                
                 if (complete_payout_value > 0 && hivePrice) {
                     const tokenAmount = complete_payout_value * Math.pow(10,- postTokenRewardInfo.precision);
-                    console.log(tokenAmount,"POB");
+                    //console.log(tokenAmount,"POB");
                     totalPayout += tokenAmount * hivePrice * base / quote;
                 }
             }

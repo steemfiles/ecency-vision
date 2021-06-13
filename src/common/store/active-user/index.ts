@@ -64,8 +64,8 @@ export const updateActiveUser = (data?: Account) => async (dispatch: Dispatch, g
     if (!uData || is_not_FullHiveEngineAccount(uData)) {
         try {
 			let HEFA = await getAccountHEFull(activeUser.username, true);
-			uData =  HEFA;
 			if (is_FullHiveEngineAccount(HEFA)) {
+				uData =  HEFA;
 				tokens = HEFA.token_balances;
 			}
         } catch (e) {
@@ -89,8 +89,8 @@ export const updateActiveUser = (data?: Account) => async (dispatch: Dispatch, g
         }
     }
     
-    if (is_FullHiveEngineAccount(uData))
-    	dispatch(updateAct(uData, points, tokens));
+    if (is_FullHiveEngineAccount(uData as FullHiveEngineAccount))
+    	dispatch(updateAct(uData as FullHiveEngineAccount, points, tokens));
 };
 
 /* Action Creators */

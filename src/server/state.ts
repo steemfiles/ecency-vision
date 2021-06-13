@@ -19,6 +19,9 @@ import {getPrices, getScotDataAsync, HiveEngineTokenConfig, HiveEngineTokenInfo}
 import {LIQUID_TOKEN_UPPERCASE} from "../client_config";
 import {TokenPropertiesMap} from "../common/store/hive-engine-tokens/types";
 
+
+let storedHiveEngineTokensProperties;
+
 export const makePreloadedState = async (req: express.Request): Promise<AppState> => {
     const _c = (k: string): any => req.cookies[k];
 
@@ -27,13 +30,43 @@ export const makePreloadedState = async (req: express.Request): Promise<AppState
     const theme = _c("theme") && Object.values(Theme).includes(_c("theme")) ? _c("theme") : defaults.theme;
     const listStyle = _c("list-style") && Object.values(ListStyle).includes(_c("list-style")) ? _c("list-style") : defaults.listStyle;
     const intro = !_c("hide-intro");
-    const prices = await getPrices(undefined);
-    const tokenInfo = await getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,});
-    const tokenConfig = await getScotDataAsync<{[coinname:string]:HiveEngineTokenConfig}>('config', {token: LIQUID_TOKEN_UPPERCASE,});
-    const hiveEngineTokensProperties : TokenPropertiesMap = !!tokenConfig[LIQUID_TOKEN_UPPERCASE] ? { LIQUID_TOKEN_UPPERCASE : {config: tokenConfig, info: tokenInfo, hivePrice: prices[LIQUID_TOKEN_UPPERCASE]} } : {};
+    let hiveEngineTokensProperties: {[coinName:string]: any};
+    let tokensInfos,tokensConfigs, prices;
+    try {
+		if (!storedHiveEngineTokensProperties || !storedHiveEngineTokensProperties[LIQUID_TOKEN_UPPERCASE]) {
+			console.log("No tokens stored.  Loading for the first time.");
+			tokensInfos = await getScotDataAsync<{[coinname:string]:HiveEngineTokenInfo}>('info', {});
+			tokensConfigs = await getScotDataAsync<{Array<HiveEngineTokenConfig>}>('config', {});
+			prices = await getPrices(undefined);
+			let ret = storedHiveEngineTokensProperties || {};			
+			if (tokensInfos && tokensConfigs && prices) {
+				for (const config of tokensConfigs) {
+					const token = config.token;
+					if (!tokensInfos[token] || !prices[token]) {
+						//console.log("Cannot get info or price for ", token);
+						continue;
+					}
+					ret[token] = {info: tokensInfos[token], config, hivePrice: prices[token]};
+				}
+				console.log("Success loading HiveEngineTokensProperties from API");
+				storedHiveEngineTokensProperties = hiveEngineTokensProperties = ret;
+			} else {
+				console.log("Failure to get meaningful data");
+			}
+		} else {
+			console.log("reusing stored tokens");
+			hiveEngineTokensProperties = storedHiveEngineTokensProperties;
+		}
+	} catch (e) {
+		if (tokenInfos && tokenConfig && prices) {
+		}
+		console.log("Trying to get data resulted in this exception:", JSON.stringify(e), { hiveEngineTokensProperties: hiveEngineTokensProperties && Object.keys(hiveEngineTokensProperties)});
+		hiveEngineTokensProperties = {};
+	}
 
     const globalState: Global = {
-        ...Object.assign(initialState.global, {hiveEngineTokensProperties}),
+        ...initialState.global,
+        hiveEngineTokensProperties,
         theme: Theme[theme],
         listStyle: ListStyle[listStyle],
         intro,

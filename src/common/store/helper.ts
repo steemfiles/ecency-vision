@@ -93,6 +93,17 @@ export const syncActiveUser = (store: Store<AppState>) => {
     }
 }
 
+export const updateTokensProperties = async (store: Store<AppState>, 
+	r : [HiveEngineTokenInfo, 
+		HiveEngineTokenConfig,  
+		{[shortCoinName: string]: number /* in Hive */}]) => {
+        const info = r[0] as HiveEngineTokenInfo;
+        const config = r[1] as HiveEngineTokenConfig;
+        const prices = r[2] as {[shortCoinName: string]: number /* in Hive */};
+        const hivePrice = prices["POB"];
+        store.dispatch(includeInfoConfigsAction({[LIQUID_TOKEN_UPPERCASE]: {info, config, hivePrice}}));
+}
+
 export const clientStoreTasks = (store: Store<AppState>) => {
 
     // To use in places where we can't access to store
@@ -112,20 +123,7 @@ export const clientStoreTasks = (store: Store<AppState>) => {
 		getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,}),
 		getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE,}),
 		getPrices([LIQUID_TOKEN_UPPERCASE])]
-    ).then((r) => {
-        let info = r[0];
-        let config = r[1];
-        console.log({info, config});
-        const prices = r[2];
-        if (info["POB"]) {
-            info = info["POB"];
-        }
-        if (config["POB"]) {
-            config = config["POB"];
-        }
-        const hivePrice = prices["POB"];
-        store.dispatch(includeInfoConfigsAction({[LIQUID_TOKEN_UPPERCASE]: {info, config, hivePrice}}));
-    });
+    ).then(updateTokensProperties.bind(null, store));
 
     // Update active user in interval
     activeUserUpdater(store).then();

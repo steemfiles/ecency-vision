@@ -41,28 +41,6 @@ export const includeInfoConfigsAction = (data: TokenPropertiesMap): HEIncludeAct
     };
 };
 
-/* HEActions */
-export const fetchInfoConfigsProps = () => (dispatch: Dispatch) => {
-    Promise.all(
-        [
-            getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,}),
-            getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE,}),
-            getPrices([LIQUID_TOKEN_UPPERCASE])]
-    ).then((r) => {
-        let info = r[0];
-        let config = r[1];
-        const prices = r[2];
-        if (info["POB"]) {
-            info = info["POB"];
-        }
-        if (config["POB"]) {
-            config = config["POB"];
-        }
-        const hivePrice = prices["POB"];
-        dispatch(includeInfoConfigsAction({[LIQUID_TOKEN_UPPERCASE]: {info, config, hivePrice}}));
-    });
-};
-
 /* Action Creators */
 export const fetchedAct = (_map: TokenPropertiesMap): HEFetchAction => {
     return {
