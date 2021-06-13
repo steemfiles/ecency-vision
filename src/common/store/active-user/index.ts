@@ -12,7 +12,7 @@ import {getAccount} from "../../api/hive";
 import {getPoints} from "../../api/private-api";
 
 import {activeUserMaker} from "../helper";
-import {FullHiveEngineAccount, getAccountHEFull, TokenBalance} from "../../api/hive-engine";
+import {FullHiveEngineAccount, getAccountHEFull, TokenBalance, is_not_FullHiveEngineAccount, is_FullHiveEngineAccount} from "../../api/hive-engine";
 
 const load = (): ActiveUser | null => {
     const name = ls.get("active_user");
@@ -61,15 +61,13 @@ export const updateActiveUser = (data?: Account) => async (dispatch: Dispatch, g
 
     let uData: FullHiveEngineAccount | Account | undefined = data;
     let tokens: Array<TokenBalance> | null = null;
-    if (!uData || !uData['token_balances']) {
+    if (!uData || is_not_FullHiveEngineAccount(uData)) {
         try {
-            try {
-                let HEFA = await getAccountHEFull(activeUser.username, true);
-                uData =  HEFA;
-                tokens = HEFA.token_balances;
-            } catch (e) {
-                uData = await getAccount(activeUser.username);
-            }
+			let HEFA = await getAccountHEFull(activeUser.username, true);
+			uData =  HEFA;
+			if (is_FullHiveEngineAccount(HEFA)) {
+				tokens = HEFA.token_balances;
+			}
         } catch (e) {
             uData = {
                 name: activeUser.username
@@ -90,11 +88,9 @@ export const updateActiveUser = (data?: Account) => async (dispatch: Dispatch, g
             uPoints: "0.000"
         }
     }
-
-    if (!tokens)
-        tokens = (await getAccountHEFull(activeUser.username, true)).token_balances;
-
-    dispatch(updateAct(uData, points, tokens));
+    
+    if (is_FullHiveEngineAccount(uData))
+    	dispatch(updateAct(uData, points, tokens));
 };
 
 /* Action Creators */

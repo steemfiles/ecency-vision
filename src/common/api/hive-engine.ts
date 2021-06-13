@@ -13,7 +13,7 @@ import axios from 'axios';
 // @ts-ignore
 import SSC from "sscjs";
 import {HECoarseTransaction, HEFineTransaction} from "../store/transactions/types";
-import {getAccount, getAccounts, getFollowCount, getPost} from "./hive";
+import {getAccount, getAccounts, getFollowCount, getPost, FullAccount} from "./hive";
 import {AccountFollowStats, FullAccount} from "../store/accounts/types";
 import {Entry, EntryBeneficiaryRoute, EntryStat, EntryVote} from "../store/entries/types";
 import {EntryVoteBtn} from "../components/entry-vote-btn";
@@ -169,6 +169,19 @@ export interface FullHiveEngineAccount extends FullAccount {
     __loaded?: true;
 }
 
+export function is_not_FullHiveEngineAccount(account : FullHiveEngineAccount | FullAccount | null | {__loaded: boolean}) {
+	if (!account)
+		return true;
+	if (!account["token_balances"])
+		return true;
+	return false;
+}
+
+export function is_FullHiveEngineAccount(account : FullHiveEngineAccount | FullAccount | null | {__loaded: boolean}) {
+	return !is_not_FullHiveEngineAccount(account);
+}
+
+
 async function callApi(url : string, params: any) {
     return await axios({
         url,
@@ -242,57 +255,60 @@ export const enginifyPost = (post: Entry, observer: string): Promise<Entry> => {
         (value) => {
             return post;
         }
-    );
+    ).catch(e => {
+    	console.log("enginify failed.");
+    	return post;
+    });
 }
 
-export async function getAccountHEFull(account : string, useHive: boolean) : Promise<FullHiveEngineAccount> {
-    let hiveAccount: FullAccount, tokenBalances: Array<object>, tokenUnstakes: Array<object>,
-        tokenStatuses: { data: {[id:string]:TokenStatus}; hiveData: {[id:string]:TokenStatus}| null }, transferHistory: any, tokenDelegations: any;
-    [
-        hiveAccount,
-        tokenBalances,
-
-        tokenUnstakes,
-
-        tokenStatuses,
-        transferHistory,
-        tokenDelegations,
-    ] = await Promise.all([
-        getAccount(account),
-        // modified to get all tokens. - by anpigon
-        hiveSsc.find('tokens', 'balances', {
-            account,
-        }),
-        hiveSsc.find('tokens', 'pendingUnstakes', {
-            account,
-            symbol: LIQUID_TOKEN_UPPERCASE,
-        }),
-        getScotAccountDataAsync(account),
-        getFineTransactions(account, 100, 0),
-        hiveSsc.find('tokens', 'delegations', {
-            $or: [{from: account}, {to: account}],
-            symbol: LIQUID_TOKEN_UPPERCASE,
-        }),
-    ]);
-    let modifiedTokenBalances : Array<TokenBalance> = [];
-   // There is no typesafe way to modify the type of something
-   // in place.  You have to do a typecast eventually or participate in
-   // copying.
-   for (const tokenBalance of tokenBalances) {
-       const b = tokenBalance;
-       if (typeof(b['_id']) !== 'number'
-        ||
-           typeof(b['symbol']) !== 'string'
-           ||
-           typeof(b['balance']) !== 'string'
-           ||
-           typeof(b['stake']) !== 'string'
-       )
-           continue;
-       const b2: RawTokenBalance = b as RawTokenBalance;
-       // pass by reference semantics modifies the array.
-       // This is on purpose.
-       try {
+export async function getAccountHEFull(account : string, useHive: boolean) : Promise<FullHiveEngineAccount|never> {
+	try {
+		let hiveAccount: FullAccount, tokenBalances: Array<object>, tokenUnstakes: Array<object>,
+			tokenStatuses: { data: {[id:string]:TokenStatus}; hiveData: {[id:string]:TokenStatus}| null }, transferHistory: any, tokenDelegations: any;
+		[
+			hiveAccount,
+			tokenBalances,
+	
+			tokenUnstakes,
+	
+			tokenStatuses,
+			transferHistory,
+			tokenDelegations,
+		] = await Promise.all([
+			getAccount(account),
+			// modified to get all tokens. - by anpigon
+			hiveSsc.find('tokens', 'balances', {
+				account,
+			}),
+			hiveSsc.find('tokens', 'pendingUnstakes', {
+				account,
+				symbol: LIQUID_TOKEN_UPPERCASE,
+			}),
+			getScotAccountDataAsync(account),
+			getFineTransactions(account, 100, 0),
+			hiveSsc.find('tokens', 'delegations', {
+				$or: [{from: account}, {to: account}],
+				symbol: LIQUID_TOKEN_UPPERCASE,
+			}),
+		]);	
+		let modifiedTokenBalances : Array<TokenBalance> = [];
+	   // There is no typesafe way to modify the type of something
+	   // in place.  You have to do a typecast eventually or participate in
+	   // copying.
+	   for (const tokenBalance of tokenBalances) {
+		   const b = tokenBalance;
+		   if (typeof(b['_id']) !== 'number'
+			||
+			   typeof(b['symbol']) !== 'string'
+			   ||
+			   typeof(b['balance']) !== 'string'
+			   ||
+			   typeof(b['stake']) !== 'string'
+		   )
+			   continue;
+		   const b2: RawTokenBalance = b as RawTokenBalance;
+		   // pass by reference semantics modifies the array.
+		   // This is on purpose.
            const b1: TokenBalance = Object.assign(b2, {
                "delegationsIn": parseFloat(b2.delegationsIn),
                "balance": parseFloat(b2.balance),
@@ -302,22 +318,21 @@ export async function getAccountHEFull(account : string, useHive: boolean) : Pro
                "pendingUnstake": parseFloat(b2.pendingUndelegations)
            });
            modifiedTokenBalances.push(b1);
-       } catch (e) {
-
-       }
-
-   }
-   // Now tokenBalances is an Array<TokenBalance>.
-    const prices = await getPrices(Object.keys(tokenBalances));
-    let follow_stats: AccountFollowStats | undefined;
-    try {
-        follow_stats = await getFollowCount(account);
-    } catch (e) {
-
-    }
-
-    return {...hiveAccount, follow_stats, token_balances: modifiedTokenBalances, token_unstakes: tokenUnstakes,
+        }
+	   // Now tokenBalances is an Array<TokenBalance>.
+		const prices = await getPrices(Object.keys(tokenBalances));
+		let follow_stats: AccountFollowStats | undefined;
+		try {
+			follow_stats = await getFollowCount(account);
+		} catch (e) {
+	
+		}
+		return {...hiveAccount, follow_stats, token_balances: modifiedTokenBalances, token_unstakes: tokenUnstakes,
             token_statuses: tokenStatuses, transfer_history: transferHistory, token_delegations: tokenDelegations, prices, __loaded: true };
+	} catch (e) {
+		console.log("getAccountHEFull threw an exception");
+		throw e;
+	}
 }
 
 export interface HiveEngineTokenInfo {
