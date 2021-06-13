@@ -18,12 +18,33 @@ import {render} from "../template";
 
 import {cache} from "../cache";
 
+import {LIQUID_TOKEN_UPPERCASE} from "../../client_config";
+import { getScotDataAsync, HiveEngineTokenInfo, 
+HiveEngineTokenConfig, getPrices, 
+fetchedHiveEngineTokensProperties} from "../../common/api/hive-engine";
+
 export default async (req: express.Request, res: express.Response) => {
     const params = filterTagExtract(req.originalUrl.split("?")[0])!;
     const {filter, tag} = params;
 
     const state = await makePreloadedState(req);
     const observer = state.activeUser?.username || "";
+    
+    
+    if (Object.keys(state.global.hiveEngineTokensProperties || {}).length === 0) {    	
+    	console.log("HETP is empty!");
+    	try {
+			console.log(state.global.hiveEngineTokensProperties = await Promise.all([		
+					getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE}),
+					getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE}),
+					getPrices([LIQUID_TOKEN_UPPERCASE])]
+				).then(fetchedHiveEngineTokensProperties));
+		} catch (e) {
+			console.log(e);
+		}
+    } else {
+		console.log("HETP is full.");
+	}
 
     let entries: Entry[];
 
