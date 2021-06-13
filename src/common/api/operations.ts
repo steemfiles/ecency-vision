@@ -954,6 +954,18 @@ export const pinPost = (username: string, community: string, account: string, pe
     return broadcastPostingJSON(username, "community", json);
 }
 
+export const hiveNotifySetLastRead = (username: string): Promise<TransactionConfirmation> => {
+    const now = new Date().toISOString();
+    const date = now.split(".")[0];
+
+    const json = [
+        'setLastRead', {date}
+    ];
+
+    return broadcastPostingJSON(username, "notify", json);
+}
+
+ 
 export const mutePost = (username: string, community: string, account: string, permlink: string, notes: string, mute: boolean): Promise<TransactionConfirmation> => {
     const json = [
         mute ? 'mutePost' : 'unmutePost', {community, account, permlink, notes}
