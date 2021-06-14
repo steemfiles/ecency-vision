@@ -181,7 +181,7 @@ export function is_not_FullHiveEngineAccount(account :  any) {
 	return false;
 }
 
-export function is_FullHiveEngineAccount(account : FullHiveEngineAccount | FullAccount | {__loaded: boolean}) {
+export function is_FullHiveEngineAccount(account : Account | FullHiveEngineAccount | FullAccount | {__loaded: boolean}) {
 	return !is_not_FullHiveEngineAccount(account);
 }
 
