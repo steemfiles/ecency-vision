@@ -80,11 +80,13 @@ class HiveEngineBadge extends Component<{ activeUser: ActiveUser, coinName: stri
 		const {data} = activeUser;
 		
 		let hasUnclaimedToken = false;
+		let x : any;
 		if (is_FullHiveEngineAccount(data as any)) {
-			const fheAccount : FullHiveEngineAccount = data as FullHiveEngineAccount;
+			const fheAccount : FullHiveEngineAccount = data as FullHiveEngineAccount;			
 			try {
 				let {hiveData} = fheAccount.token_statuses;
-				hasUnclaimedToken = hiveData[coinName].pending_token !== 0;
+				if (hiveData && (x=hiveData[coinName]) && (x=x.pending_token))   
+					hasUnclaimedToken = x !== 0;
 			} catch (e) {
 				console.log(e);
 			}
@@ -247,7 +249,7 @@ export default class UserNav extends Component<Props, State> {
                 <div className="user-nav">
                     <WalletBadge activeUser={activeUser} dynamicProps={dynamicProps}/>
                     <HiveEngineBadge activeUser={activeUser} coinName={LIQUID_TOKEN_UPPERCASE}>
-                         <img width='15px' height='15px' src={logoCircle} />
+                         <img width='25px' height='25px' src={logoCircle} />
                     </HiveEngineBadge>
                     {global.usePrivate && (<ToolTip content={_t("user-nav.notifications")}>
                         <span className="notifications" onClick={this.toggleNotifications}>
