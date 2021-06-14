@@ -36,6 +36,6 @@ export const getCurrencyRate = (cur: string): Promise<number> => {
 }
 
 export const geLatestDesktopTag = (): Promise<string> =>
-    axios.get("https://api.github.com/repos/ecency/ecency-vision/releases/latest")
+    axios.get("https://api.github.com/repos/steemfiles/ecency-vision/releases/latest")
         .then(r => r.data)
         .then(r => r.tag_name);
