@@ -33,13 +33,6 @@ export default class WalletMenu extends Component<Props> {
                     <span className="sub-title">Wallet</span>
                     <span className="platform-logo">{hiveSvg}</span>
                 </Link>
-                {global.usePrivate && !LIQUID_TOKEN_UPPERCASE && (
-                    <Link className={_c(`menu-item ecency ${active === "ecency" ? "active" : ""}`)} to={`/@${username}/points`}>
-                        <span className="title">Ecency</span>
-                        <span className="sub-title">Points</span>
-                        <span className="platform-logo"><img alt="ecency" src={logo}/></span>
-                    </Link>
-                )}
             </div>
         );
     }

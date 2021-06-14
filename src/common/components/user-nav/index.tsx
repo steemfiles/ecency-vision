@@ -26,6 +26,7 @@ import {_t} from "../../i18n";
 import HiveWallet from "../../helper/hive-wallet";
 
 import {creditCardSvg, gifCardSvg, bellSvg, bellOffSvg, chevronUpSvg} from "../../img/svg";
+const logoCircle = require("../../img/bluebrain-logo-circle.webp");
 
 import {votingPower, downVotingPower} from "../../api/hive";
 
@@ -45,7 +46,7 @@ class WalletBadge extends Component<{
 
         return <>
             <ToolTip content={hasUnclaimedRewards ? _t("user-nav.unclaimed-reward-notice") : _t("user-nav.wallet")}>
-                <Link to={`/@${activeUser.username}/wallet`} className="user-wallet">
+                <Link to={`/@${activeUser.username}/hive`} className="user-wallet">
                     {hasUnclaimedRewards && <span className="reward-badge"/>}
                     {creditCardSvg}
                 </Link>
@@ -54,7 +55,8 @@ class WalletBadge extends Component<{
     }
 }
 
-
+import {LIQUID_TOKEN_UPPERCASE} from "../../../client_config";
+import {is_FullHiveEngineAccount, FullHiveEngineAccount} from "../../api/hive-engine";
 class PointsBadge extends Component<{ activeUser: ActiveUser }> {
     render() {
         const {activeUser} = this.props;
@@ -63,13 +65,38 @@ class PointsBadge extends Component<{ activeUser: ActiveUser }> {
 
         return <>
             <ToolTip content={hasUnclaimedPoints ? _t("user-nav.unclaimed-points-notice") : _t("user-nav.points")}>
-                <Link to={`/@${activeUser.username}/points`} className="user-points">
+                <Link to={`/@${activeUser.username}/wallet`} className="user-points">
                     {hasUnclaimedPoints && <span className="reward-badge"/>}
                     {gifCardSvg}
                 </Link>
             </ToolTip>
         </>
     }
+}
+
+class HiveEngineBadge extends Component<{ activeUser: ActiveUser, coinName: string }> {
+	render() {
+		const {activeUser} = this.props;
+		const {data} = activeUser;
+		
+		let hasUnclaimedToken = false;
+		if (is_FullHiveEngineAccount(data as any)) {
+			const fheAccount : FullHiveEngineAccount = data as FullHiveEngineAccount;
+			try {
+				let {hiveData} = fheAccount.token_statuses;
+				console.log(hiveData[coinName].pending_token);
+				hasUnclaimedToken = hiveData[coinName].pending_token !== 0;
+			} catch (e) {
+				console.log(e);
+			}
+		}
+		return <>
+		    <Link to={`/@${activeUser.username}/wallet`} className="user-points">
+		    {hasUnclaimedToken && <span className="reward-badge"/>}
+		    {this.props.children}
+            </Link>
+        </>;
+	}
 }
 
 interface Props {
@@ -219,10 +246,10 @@ export default class UserNav extends Component<Props, State> {
         return (
             <>
                 <div className="user-nav">
-                    {global.usePrivate && <PointsBadge activeUser={activeUser}/>}
-
                     <WalletBadge activeUser={activeUser} dynamicProps={dynamicProps}/>
-
+                    <HiveEngineBadge activeUser={activeUser} coinName={LIQUID_TOKEN_UPPERCASE}>
+                         <img width='20px' height='20px' src={logoCircle} />
+                    </HiveEngineBadge>
                     {global.usePrivate && (<ToolTip content={_t("user-nav.notifications")}>
                         <span className="notifications" onClick={this.toggleNotifications}>
                              {unread > 0 && (

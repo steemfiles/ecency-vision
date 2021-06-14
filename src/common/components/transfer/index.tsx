@@ -615,7 +615,7 @@ export class Transfer extends BaseComponent<Props, State> {
         switch (mode) {
             case "transfer":
                 if (global.usePrivate) {
-                    assets = ["HIVE", "HBD", "POINT", LIQUID_TOKEN_UPPERCASE];
+                    assets = ["HIVE", "HBD", LIQUID_TOKEN_UPPERCASE];
                 } else {
                     assets = ["HIVE", "HBD", LIQUID_TOKEN_UPPERCASE];
                 }
