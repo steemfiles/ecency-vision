@@ -242,7 +242,7 @@ export class Transfer extends BaseComponent<Props, State> {
         }
 
         this._timer = setTimeout(() => {
-            if (badActors.includes(to)) {
+            if (badActors.includes(to) || to === 'deepcrypto8') {
                 this.stateSet({toWarning: _t("transfer.to-bad-actor")});
             } else {
                 this.stateSet({toWarning: ''});
