@@ -169,6 +169,16 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
             return null;
         }
 
+        const {hiveEngineTokensProperties} = global;
+        const tokenProperties = hiveEngineTokensProperties && hiveEngineTokensProperties[LIQUID_TOKEN_UPPERCASE];
+        const precision = (() => {
+        		const p1 = tokenProperties && tokenProperties.info && tokenProperties.info.precision;
+        		if (p1 === null || p1 == undefined)
+        			return 0;
+        		else
+        			return p1;
+        })();
+        
         const {hivePerMVests} = dynamicProps;
         const isMyPage = activeUser && activeUser.username === account.name;
         const w = new HiveEngineWallet(account, dynamicProps, converting, shortCoinName);
@@ -258,7 +268,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                         return null;
                                     })()}
 
-                                    <span>{formattedNumber(w.engineBalanceTable[this.props.shortCoinName].balance, {fractionDigits: 8, suffix: this.props.shortCoinName})}</span>
+                                    <span>{formattedNumber(w.engineBalanceTable[this.props.shortCoinName].balance, {fractionDigits: precision, suffix: this.props.shortCoinName})}</span>
                                 </div>
                             </div>
 
@@ -307,14 +317,14 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                         }
                                         return null;
                                     })()}
-                                    {formattedNumber(balances.stake, {suffix: this.props.shortCoinName})}
+                                    {formattedNumber(balances.stake, {suffix: this.props.shortCoinName, fractionDigits: precision})}
                                 </div>
 
                                 {balances.delegationsOut > 0 && (
                                     <div className="amount amount-passive delegated-shares">
                                         <Tooltip content={_t("wallet.hive-power-delegated")}>
                                       <span className="amount-btn" onClick={this.toggleDelegatedList}>
-                                        {formattedNumber(balances.delegationsOut, {suffix: this.props.shortCoinName})}
+                                        {formattedNumber(balances.delegationsOut, {suffix: this.props.shortCoinName, fractionDigits: precision})}
                                       </span>
                                         </Tooltip>
                                     </div>
@@ -376,7 +386,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                 {transfer && <Transfer {...this.props} activeUser={activeUser!}
                                        mode={transferMode!} asset={transferAsset!}
                                        LIQUID_TOKEN_balances={balances}
-                                       LIQUID_TOKEN_precision={8}
+                                       LIQUID_TOKEN_precision={precision}
                                        onHide={this.closeTransferDialog}/>}
 
                 {this.state.delegatedList && (

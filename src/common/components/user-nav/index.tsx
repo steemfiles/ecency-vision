@@ -60,7 +60,7 @@ import {is_FullHiveEngineAccount, FullHiveEngineAccount} from "../../api/hive-en
 class PointsBadge extends Component<{ activeUser: ActiveUser }> {
     render() {
         const {activeUser} = this.props;
-
+        
         let hasUnclaimedPoints = activeUser.points.uPoints !== "0.000";
 
         return <>
@@ -77,6 +77,8 @@ class PointsBadge extends Component<{ activeUser: ActiveUser }> {
 class HiveEngineBadge extends Component<{ activeUser: ActiveUser, coinName: string }> {
 	render() {
 		const {activeUser, coinName} = this.props;
+		if (!activeUser)
+			return null;
 		const {data} = activeUser;
 		
 		let hasUnclaimedToken = false;
