@@ -44,6 +44,9 @@ import {
     transferPoint,
     transferPointHot,
     transferPointKc,
+    transferHiveEngineAsset,
+    transferHiveEngineAssetKc,
+    transferHiveEngineAssetHot,
     transferToSavings,
     transferToSavingsHot,
     transferToSavingsKc,
@@ -352,7 +355,7 @@ export class Transfer extends BaseComponent<Props, State> {
         let try_this = this.formatNumber(balance,
             (asset === LIQUID_TOKEN_UPPERCASE ? (this.props.LIQUID_TOKEN_precision || 3) : 3));
         if (isNaN(parseFloat(try_this))) {
-            try_this = (balance + 1 - 1) + "";
+            try_this = "0.000&numsp;000&numsp;01";
         }
         return try_this;
     };
@@ -401,8 +404,10 @@ export class Transfer extends BaseComponent<Props, State> {
             case "transfer": {
                 if (asset === "POINT") {
                     promise = transferPoint(username, key, to, fullAmount, memo);
-                } else {
+                } else if (["HBD","HIVE"].includes(asset)) {
                     promise = transfer(username, key, to, fullAmount, memo);
+                } else {
+                	promise = transferHiveEngineAsset(username, key, to, fullAmount, memo);
                 }
                 break;
             }
@@ -463,8 +468,10 @@ export class Transfer extends BaseComponent<Props, State> {
             case "transfer": {
                 if (asset === "POINT") {
                     transferPointHot(username, to, fullAmount, memo);
-                } else {
+                } else if (["HBD","HIVE"].includes(asset)) {
                     transferHot(username, to, fullAmount, memo);
+                } else {
+                	transferHiveEngineAssetHot(username, to, fullAmount, memo);
                 }
                 break;
             }
@@ -510,24 +517,12 @@ export class Transfer extends BaseComponent<Props, State> {
         let promise: Promise<any>;
         switch (mode) {
             case "transfer": {
-                // To Do for HE tokens:
-
-
-                /*{
-                    "contractName": "tokens",
-                    "contractAction": "transfer",
-                    "contractPayload": {
-                    "symbol": "TKN",
-                        "to": "harpagon",
-                        "quantity": "15.21548745"
-                }
-                }*/
-
                 if (asset === "POINT") {
                     promise = transferPointKc(username, to, fullAmount, memo);
-                } else {
+                } else if (["HBD","HIVE"].includes(asset)) {
                     promise = transferKc(username, to, fullAmount, memo);
-
+                } else {
+                	promise = transferHiveEngineAssetKc(username, to, fullAmount, memo);
                 }
                 break;
             }

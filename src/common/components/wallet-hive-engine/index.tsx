@@ -234,23 +234,20 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                             const dropDownConfig = {
                                                 history: this.props.history,
                                                 label: '',
-                                                items: [
-                                                /*
-
+                                                items: [                                                
                                                     {
                                                         label: _t('wallet.transfer'),
                                                         onClick: () => {
                                                             this.openTransferDialog('transfer', this.props.shortCoinName);
                                                         }
-                                                    },
+                                                    },/*
 
                                                     {
                                                         label: _t('wallet.power-up'),
                                                         onClick: () => {
                                                             this.openTransferDialog('power-up', this.props.shortCoinName);
                                                         }
-                                                    },
-                                                    */
+                                                    },  */                                                  
 
                                                 ],
                                             };
@@ -261,7 +258,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                         return null;
                                     })()}
 
-                                    <span>{formattedNumber(w.engineBalanceTable[this.props.shortCoinName].balance, {suffix: this.props.shortCoinName})}</span>
+                                    <span>{formattedNumber(w.engineBalanceTable[this.props.shortCoinName].balance, {fractionDigits: 8, suffix: this.props.shortCoinName})}</span>
                                 </div>
                             </div>
 
@@ -281,8 +278,8 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                             const dropDownConfig = {
                                                 history: this.props.history,
                                                 label: '',
-                                                items: [
-                                                    /*
+                                                items: [   
+                                                	/*
                                                     {
                                                         label: _t('wallet.delegate'),
                                                         onClick: () => {
@@ -294,15 +291,14 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                                         onClick: () => {
                                                             this.openTransferDialog('power-down', this.props.shortCoinName);
                                                         },
-                                                    },
+                                                    },                                                    
                                                     {
                                                         label: _t('wallet.withdraw-routes'),
                                                         onClick: () => {
                                                             this.toggleWithdrawRoutes();
                                                         },
                                                     },
-
-                                                     */
+                                                    */
                                                 ],
                                             };
                                             return <div className="amount-actions">
