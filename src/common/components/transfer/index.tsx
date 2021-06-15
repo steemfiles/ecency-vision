@@ -16,6 +16,7 @@ import isEqual from "react-fast-compare";
 import {Modal, Form, Row, Col, InputGroup, FormControl, Button} from "react-bootstrap";
 
 import badActors from '@hiveio/hivescript/bad-actors.json';
+import formattedNumber from "../../util/formatted-number";
 
 import {Global} from "../../store/global/types";
 import {DynamicProps} from "../../store/dynamic-props/types";
@@ -197,9 +198,9 @@ export class Transfer extends BaseComponent<Props, State> {
     }
 
     formatNumber = (num: number | string, precision: number) => {
-        const format = `0.${"0".repeat(precision)}`;
-
-        return numeral(num).format(format, Math.floor) // round to floor
+    	if (typeof num === 'string')
+    		return parseFloat(num.replace(',','')).toFixed(precision);
+    	return num.toFixed(precision);
     }
 
     assetChanged = (asset: TransferAsset) => {
@@ -352,14 +353,9 @@ export class Transfer extends BaseComponent<Props, State> {
         return 0;
     };
 
-    // This craps out for 0.000,000,1 and less.  What to do?
     formatBalance = (balance: number): string => {
         const {asset} = this.state;
-        let try_this = this.formatNumber(balance,
-            (asset === LIQUID_TOKEN_UPPERCASE ? (this.props.LIQUID_TOKEN_precision || 3) : 3));
-        if (isNaN(parseFloat(try_this))) {
-            try_this = "0.000&numsp;000&numsp;01";
-        }
+        let try_this = this.formatNumber(balance, this.props.LIQUID_TOKEN_precision) || 0;
         return try_this;
     };
 
@@ -701,7 +697,7 @@ export class Transfer extends BaseComponent<Props, State> {
                             <p>{_t("transfer.powering-down")}</p>
                             <p> {_t("wallet.next-power-down", {
                                 time: moment(w.nextVestingWithdrawalDate).fromNow(),
-                                amount: `${this.formatNumber(w.nextVestingSharesWithdrawalHive, (asset === LIQUID_TOKEN_UPPERCASE ? (this.props.LIQUID_TOKEN_precision || 3) : 3))} HIVE`,
+                                amount: `${formattedNumber(w.nextVestingSharesWithdrawalHive, {fractionDigits: (asset === LIQUID_TOKEN_UPPERCASE ? (this.props.LIQUID_TOKEN_precision || 3) : 3)}) } ))} HIVE`,
                             })}</p>
                             <p>
                                 <Button onClick={this.nextPowerDown} variant="danger">{_t("transfer.stop-power-down")}</Button>
@@ -863,7 +859,16 @@ export class Transfer extends BaseComponent<Props, State> {
                                 )}
                             </div>
                             <div className="amount">
-                                {amount} {asset}
+                                {(()=> {
+                                	try {
+                                		let o = FormattedNumber(amount, {fractionDigits: (asset === LIQUID_TOKEN_UPPERCASE) ? LIQUID_TOKEN_precision : 3, suffix:asset});
+                                		console.log(o)
+                                		return o;
+                                	} catch (e) {
+                                		console.log(e);
+                                		return amount.toString() + ' ' + asset;
+                                	}
+                                })()}
                             </div>
                             {asset === "HP" && <div className="amount-vests">{this.hpToVests(Number(amount))}</div>}
                             {memo && <div className="memo">{memo}</div>}
