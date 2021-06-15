@@ -5,6 +5,7 @@ import {
     BrowserWindow,
     MenuItemConstructorOptions,
 } from 'electron';
+import {APP_URL} from "../../client_config";
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
     selector?: string;
@@ -64,7 +65,7 @@ export default class MenuBuilder {
                 }, {
                     label: 'About Ecency',
                     click: () => {
-                        shell.openExternal('https://ecency.com');
+                        shell.openExternal(APP_URL);
                     }
                 },
                 {type: 'separator'},

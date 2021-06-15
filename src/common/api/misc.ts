@@ -3,7 +3,7 @@ import axios from 'axios';
 import defaults from "../constants/defaults.json";
 
 import {apiBase} from "./helper";
-
+import {APP_URL} from "../../client_config";
 export const getEmojiData = () => fetch(apiBase("/emoji.json")).then((response) => response.json());
 
 export const uploadImage = async (file: File, token: string): Promise<{
