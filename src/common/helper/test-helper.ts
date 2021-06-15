@@ -93,7 +93,7 @@ export const fullAccountInstance: FullHiveEngineAccount = {
     token_statuses: {data: {}, hiveData: {}},
     transfer_history: null,
     token_delegations: undefined,
-    prices: [],
+    prices: {},
 
 }
 

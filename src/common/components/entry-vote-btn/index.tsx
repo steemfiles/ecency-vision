@@ -203,11 +203,7 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
 				console.log("Not setting Hive Engine parameters:")
 				return;
 			}
-			if (is_not_FullHiveEngineAccount(value1[0])) {
-				return;	
-			} else {
-				account = activeUser.data as FullHiveEngineAccount;
-			}			
+			account = activeUser.data as FullHiveEngineAccount;
 			const voteInfoHash = value1[1];
 			let voteInfo: VoteInfo;
 

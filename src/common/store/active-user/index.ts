@@ -3,7 +3,7 @@ import {Dispatch} from "redux";
 import Cookies from "js-cookie";
 
 import {AppState} from "../index";
-import {Account} from "../accounts/types";
+import {BaseAccount, Account} from "../accounts/types";
 import {Actions, ActionTypes, ActiveUser, UserPoints, LoginAction, LogoutAction, UpdateAction} from "./types";
 
 import * as ls from "../../util/local-storage";
@@ -59,21 +59,28 @@ export const updateActiveUser = (data?: Account) => async (dispatch: Dispatch, g
         return;
     }
 
-    let uData: FullHiveEngineAccount | Account | undefined = data;
+    let uData: Account | undefined = data;
     let tokens: Array<TokenBalance> | null = null;
+    let cuData : FullHiveEngineAccount|BaseAccount;
     if (!uData || is_not_FullHiveEngineAccount(uData)) {
-        try {
+    	const d = {
+					name: activeUser.username,
+				};
+		try {
 			let HEFA = await getAccountHEFull(activeUser.username, true);
 			if (is_FullHiveEngineAccount(HEFA)) {
-				uData =  HEFA;
 				tokens = HEFA.token_balances;
+				cuData = HEFA;
+			} else {
+				cuData = d;
 			}
-        } catch (e) {
-            uData = {
-                name: activeUser.username
-            }
-        }
-    }
+		} catch (e) {
+			cuData = d;
+		}
+	} else {
+		cuData = uData as FullHiveEngineAccount;
+		tokens = cuData.token_balances;
+	}
 
     let points: UserPoints;
     try {
@@ -88,9 +95,9 @@ export const updateActiveUser = (data?: Account) => async (dispatch: Dispatch, g
             uPoints: "0.000"
         }
     }
-    
-    if (is_FullHiveEngineAccount(uData as FullHiveEngineAccount))
-    	dispatch(updateAct(uData as FullHiveEngineAccount, points, tokens));
+        
+    if (is_FullHiveEngineAccount(cuData))
+    	dispatch(updateAct(cuData as FullHiveEngineAccount, points, tokens));
 };
 
 /* Action Creators */

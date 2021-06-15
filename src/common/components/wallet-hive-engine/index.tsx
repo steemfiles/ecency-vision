@@ -28,12 +28,13 @@ import Transfer, {TransferMode, TransferAsset} from "../transfer";
 import {error, success} from "../feedback";
 import WalletMenu from "../wallet-menu";
 import WithdrawRoutes from "../withdraw-routes";
-
+import {is_not_FullHiveEngineAccount, FullHiveEngineAccount} from "../../api/hive-engine";
 import HiveEngineWallet from "../../helper/hive-engine-wallet";
 
 import {getAccount, getConversionRequests} from "../../api/hive";
 
-import {claimRewardBalance, formatError} from "../../api/operations";
+import {claimHiveEngineRewardBalance, claimRewardBalance, 
+	formatError} from "../../api/operations";
 
 import formattedNumber from "../../util/formatted-number";
 
@@ -127,22 +128,15 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         const {activeUser, updateActiveUser} = this.props;
         const {claiming} = this.state;
 
-        if (claiming || !activeUser) {
+        if (claiming || !activeUser || is_not_FullHiveEngineAccount(activeUser.data)) {
             return;
         }
 
         this.stateSet({claiming: true});
-
-        return getAccount(activeUser?.username!)
-            .then(account => {
-                const {
-                    reward_hive_balance: hiveBalance = account.reward_hive_balance,
-                    reward_hbd_balance: hbdBalance = account.reward_hbd_balance,
-                    reward_vesting_balance: vestingBalance
-                } = account;
-
-                return claimRewardBalance(activeUser?.username!, hiveBalance!, hbdBalance!, vestingBalance!)
-            }).then(() => getAccount(activeUser.username))
+        
+        
+        return claimHiveEngineRewardBalance(activeUser.username, activeUser.username, '1 POB')
+        	.then(() => getAccount(activeUser.username))
             .then(account => {
                 success(_t('wallet.claim-reward-balance-ok'));
                 this.stateSet({claiming: false, claimed: true});
@@ -181,28 +175,37 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         
         const {hivePerMVests} = dynamicProps;
         const isMyPage = activeUser && activeUser.username === account.name;
+        const pending_token = (()=> {
+        		try {
+        			if (is_not_FullHiveEngineAccount(account)) {
+        				return 0;
+        			}
+        			let x;
+        			const tokenStatuses = (account as FullHiveEngineAccount)	.token_statuses;
+        			if ((x=tokenStatuses.hiveData) && (x=x[LIQUID_TOKEN_UPPERCASE])) {
+        				const {precision, pending_token} = x 
+        				return pending_token * Math.pow(10,-precision);
+        			}
+        		} catch (e) {
+        		}
+        		return 0;
+        })();
         const w = new HiveEngineWallet(account, dynamicProps, converting, shortCoinName);
-
         const balances = w.engineBalanceTable[this.props.shortCoinName];
         return (
             <div className="wallet-hive">
 
                 <div className="wallet-main">
                     <div className="wallet-info">
-                        {(false && w.hasUnclaimedRewards && !claimed) && (
+                        {(pending_token && !claimed) && (
                             <div className="unclaimed-rewards">
                                 <div className="title">
                                     {_t('wallet.unclaimed-rewards')}
                                 </div>
                                 <div className="rewards">
-                                    {w.rewardHiveBalance > 0 && (
-                                        <span className="reward-type">{`${w.rewardHiveBalance} HIVE`}</span>
-                                    )}
-                                    {w.rewardHbdBalance > 0 && (
-                                        <span className="reward-type">{`${w.rewardHbdBalance} HBD`}</span>
-                                    )}
-                                    {w.rewardVestingHive > 0 && (
-                                        <span className="reward-type">{`${w.rewardVestingHive} HP`}</span>
+                                	 
+                                    {pending_token > 0 && (
+                                        <span className="reward-type">{`${pending_token} ${LIQUID_TOKEN_UPPERCASE}`}</span>
                                     )}
                                     {isMyPage && (
                                         <Tooltip content={_t('wallet.claim-reward-balance')}>

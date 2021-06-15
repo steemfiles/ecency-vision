@@ -207,6 +207,52 @@ export const claimRewardBalance = (username: string, rewardHive: string, rewardH
     const opArray: Operation[] = [['claim_reward_balance', params]];
     return broadcastPostingOperations(username, opArray);
 }
+export const claimRewardBalanceHiveEngineAssetJSON =(from: string, to: string, amount: string) : string => {
+		const [quantity, token_name] = (amount.replace("&numsp;","")).split(/ /);
+		const json = JSON.stringify({
+			"contractName": "tokens",
+			"contractAction": "stake",
+			"contractPayload": {
+				"symbol": token_name,
+				"to": to,
+				quantity                     
+			}
+		});
+		return json;				
+}
+export const claimHiveEngineRewardBalance = (from:string, to:string, amount: string) => {
+	const params = {
+		id: 'ssc-mainnet-hive',
+		json: claimRewardBalanceHiveEngineAssetJSON(from, to, amount),
+		required_auths: [],
+		required_posting_auths: [from]
+	};
+	const opArray: Operation[] = [["custom_json", params]];
+	return broadcastPostingOperations(from, opArray);
+}
+/*
+export const HECustomJSONWithPostingKey = (key: PrivateKey, from:string, json: string): Promise<TransactionConfirmation> => {
+	const op = {
+		id: 'ssc-mainnet-hive',
+		json,
+		required_auths: [],
+		required_posting_auths: [from]
+	};
+	return hiveClient.broadcast.json(op, key);	
+}
+export const HECustomJSONPostingKc = (from:string, json: string, description: string): Promise<TxResponse> => {
+	return keychain.customJson(from, 'ssc-mainnet-hive', "Posting", json, description);	
+}
+export const HECustomJSONPostingHot = (from:string, json: string, destination: string) => { 
+    const params = {
+        authority: "posting",
+        required_auths: `[]`,
+        required_posting_auths: `["${from}"]`,
+        id: 'ssc-mainnet-hive',
+        json,
+    }
+    hotSign("custom-json", params, destination);
+}*/
 export const transfer = (from: string, key: PrivateKey, to: string, amount: string, memo: string): Promise<TransactionConfirmation> => {
     const args = {
         from,

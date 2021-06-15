@@ -14,7 +14,7 @@ import axios from 'axios';
 import SSC from "sscjs";
 import {HECoarseTransaction, HEFineTransaction} from "../store/transactions/types";
 import {getAccount, getAccounts, getFollowCount, getPost} from "./hive";
-import {AccountFollowStats, FullAccount} from "../store/accounts/types";
+import {AccountFollowStats, BaseAccount, Account, FullAccount} from "../store/accounts/types";
 import {Entry, EntryBeneficiaryRoute, EntryStat, EntryVote} from "../store/entries/types";
 import {EntryVoteBtn} from "../components/entry-vote-btn";
 
@@ -166,22 +166,21 @@ export interface FullHiveEngineAccount extends FullAccount {
     token_unstakes: Array<unknown>;
     token_statuses: {data: {[id: string]:TokenStatus}, hiveData: {[id: string]:TokenStatus} | null};
     transfer_history: undefined|null|Array<HEFineTransaction>;
-    token_delegations: any; /* seems to be undefined sometimes */
-    prices: any;
-    __loaded?: true;
+    token_delegations?: any; /* seems to be undefined sometimes */
+    prices: {[id:string]:number};
 }
 
-function is_not_FullAccount(account: any) {
+function is_not_FullAccount(account: Account) {
 	return (!account);
 }
 
-export function is_not_FullHiveEngineAccount(account :  any) {
+export function is_not_FullHiveEngineAccount(account :  FullHiveEngineAccount | FullAccount | BaseAccount) {
 	if (is_not_FullAccount(account) || !account["token_balances"] || !account["prices"] || !account["follow_stats"])
 		return true;
 	return false;
 }
 
-export function is_FullHiveEngineAccount(account : Account | FullHiveEngineAccount | FullAccount | {__loaded: boolean}) {
+export function is_FullHiveEngineAccount(account : FullHiveEngineAccount | FullAccount | BaseAccount) {
 	return !is_not_FullHiveEngineAccount(account);
 }
 
@@ -277,7 +276,7 @@ export const fetchedHiveEngineTokensProperties = async (
         return {[LIQUID_TOKEN_UPPERCASE]: {info, config, hivePrice}};
 }
 
-export async function getAccountHEFull(account : string, useHive: boolean) : Promise<FullHiveEngineAccount|never> {
+export async function getAccountHEFull(account : string, useHive: boolean) : Promise<FullHiveEngineAccount> {
 	try {
 		let hiveAccount: FullAccount, tokenBalances: Array<object>, tokenUnstakes: Array<object>,
 			tokenStatuses: { data: {[id:string]:TokenStatus}; hiveData: {[id:string]:TokenStatus}| null }, transferHistory: any, tokenDelegations: any;
