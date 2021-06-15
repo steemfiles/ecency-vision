@@ -35,8 +35,8 @@ import HiveWallet from "../../helper/hive-wallet";
 import amountFormatCheck from '../../helper/amount-format-check';
 import parseAsset from "../../helper/parse-asset";
 import {vestsToHp, hpToVests} from "../../helper/vesting";
-import { LIQUID_TOKEN_UPPERCASE } from "../../../client_config";
-
+import {LIQUID_TOKEN_UPPERCASE } from "../../../client_config";
+import FormattedNumber from "../../util/formatted-number";
 import {getAccount} from "../../api/hive";
 import {
     transfer,
@@ -355,7 +355,7 @@ export class Transfer extends BaseComponent<Props, State> {
 
     formatBalance = (balance: number): string => {
         const {asset} = this.state;
-        let try_this = this.formatNumber(balance, this.props.LIQUID_TOKEN_precision) || 0;
+        let try_this = this.formatNumber(balance, this.props.LIQUID_TOKEN_precision || 0) || '0';
         return try_this;
     };
 
@@ -861,7 +861,13 @@ export class Transfer extends BaseComponent<Props, State> {
                             <div className="amount">
                                 {(()=> {
                                 	try {
-                                		let o = FormattedNumber(amount, {fractionDigits: (asset === LIQUID_TOKEN_UPPERCASE) ? LIQUID_TOKEN_precision : 3, suffix:asset});
+                                		const {hiveEngineTokensProperties} = global;
+                                		const tokenProperties = hiveEngineTokensProperties && hiveEngineTokensProperties[LIQUID_TOKEN_UPPERCASE];
+                                		const tokenInfo = tokenProperties && tokenProperties.info;             
+                                		const tokenFractionDigits = tokenInfo && tokenInfo.precision;
+                                		const fractionDigits = (asset === LIQUID_TOKEN_UPPERCASE) ? tokenFractionDigits : 3;
+                                		console.log(fractionDigits);
+                                		let o = FormattedNumber(amount, {fractionDigits, suffix:asset});
                                 		console.log(o)
                                 		return o;
                                 	} catch (e) {
