@@ -9,7 +9,6 @@ import * as keychain from "../helper/keychain";
 import parseAsset from "../helper/parse-asset";
 import {hotSign} from "../helper/hive-signer";
 import {_t} from "../i18n";
-import {APP_URL} from "../../client_config";
 export interface MetaData {
     links?: string[];
     image?: string[];
@@ -224,7 +223,7 @@ export const transferHot = (from: string, to: string, amount: string, memo: stri
         amount,
         memo
     }];
-    const params: Parameters = {callback: `${APP_URL}/@${from}/wallet`};
+    const params: Parameters = {callback: `https://ecency.com/@${from}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
@@ -337,7 +336,7 @@ export const transferToSavingsHot = (from: string, to: string, amount: string, m
         amount,
         memo
     }];
-    const params: Parameters = {callback: `${APP_URL}/@${from}/wallet`};
+    const params: Parameters = {callback: `https://ecency.com/@${from}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
@@ -370,7 +369,7 @@ export const convertHot = (owner: string, amount: string) => {
         amount,
         requestid: new Date().getTime() >>> 0
     }];
-    const params: Parameters = {callback: `${APP_URL}/@${owner}/wallet`};
+    const params: Parameters = {callback: `https://ecency.com/@${owner}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
@@ -406,7 +405,7 @@ export const transferFromSavingsHot = (from: string, to: string, amount: string,
         memo,
         request_id: new Date().getTime() >>> 0
     }];
-    const params: Parameters = {callback: `${APP_URL}/@${from}/wallet`};
+    const params: Parameters = {callback: `https://ecency.com/@${from}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
@@ -440,7 +439,7 @@ export const transferToVestingHot = (from: string, to: string, amount: string) =
         to,
         amount
     }];
-    const params: Parameters = {callback: `${APP_URL}/@${from}/wallet`};
+    const params: Parameters = {callback: `https://ecency.com/@${from}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
@@ -472,7 +471,7 @@ export const delegateVestingSharesHot = (delegator: string, delegatee: string, v
         delegatee,
         vesting_shares: vestingShares
     }];
-    const params: Parameters = {callback: `${APP_URL}/@${delegator}/wallet`};
+    const params: Parameters = {callback: `https://ecency.com/@${delegator}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
@@ -502,7 +501,7 @@ export const withdrawVestingHot = (account: string, vestingShares: string) => {
         account,
         vesting_shares: vestingShares
     }];
-    const params: Parameters = {callback: `${APP_URL}/@${account}/wallet`};
+    const params: Parameters = {callback: `https://ecency.com/@${account}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
@@ -535,7 +534,7 @@ export const setWithdrawVestingRouteHot = (from: string, to: string, percent: nu
         percent,
         auto_vest: autoVest
     }];
-    const params: Parameters = {callback: `${APP_URL}/@${from}/wallet`};
+    const params: Parameters = {callback: `https://ecency.com/@${from}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }

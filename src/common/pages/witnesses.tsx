@@ -30,7 +30,7 @@ import {Tsx} from "../i18n/helper";
 import {linkSvg, openInNewSvg} from "../img/svg";
 
 import {PageProps, pageMapDispatchToProps, pageMapStateToProps} from "./common";
-import {APP_URL} from "../../client_config";
+
 interface WitnessTransformed {
     rank: number;
     name: string;

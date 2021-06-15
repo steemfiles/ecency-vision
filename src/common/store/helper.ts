@@ -104,16 +104,6 @@ export const updateTokensProperties = async (store: Store<AppState>,
         store.dispatch(includeInfoConfigsAction({[LIQUID_TOKEN_UPPERCASE]: {info, config, hivePrice}}));
 }
 
-export const askForTokensProperties = (store: Store<AppState>) => {
-	Promise.all(
-	[
-		getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,}),
-		getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE,}),
-		getPrices([LIQUID_TOKEN_UPPERCASE])]
-    ).then(updateTokensProperties.bind(null, store))
-    .catch(askForTokensProperties.bind(null, store));
-}
-
 export const clientStoreTasks = (store: Store<AppState>) => {
 
     // To use in places where we can't access to store
@@ -128,7 +118,12 @@ export const clientStoreTasks = (store: Store<AppState>) => {
         store.dispatch(loadDynamicProps(resp));
     });
 
-	askForTokensProperties(store);
+	Promise.all(
+	[
+		getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,}),
+		getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE,}),
+		getPrices([LIQUID_TOKEN_UPPERCASE])]
+    ).then(updateTokensProperties.bind(null, store));
 
     // Update active user in interval
     activeUserUpdater(store).then();
@@ -145,7 +140,7 @@ export const clientStoreTasks = (store: Store<AppState>) => {
     const checkIn = () => {
         const state = store.getState();
         if (state.activeUser) {
-            usrActivity(state.activeUser?.username!, 10).then().catch(() => {});
+            usrActivity(state.activeUser?.username!, 10).then();
         }
     }
 

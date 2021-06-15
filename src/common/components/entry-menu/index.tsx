@@ -40,7 +40,6 @@ import {
     volumeOffSvg, redditSvg, twitterSvg, facebookSvg, bullHornSvg, rocketLaunchSvg,
     shuffleVariantSvg
 } from "../../img/svg";
-import {APP_URL} from "../../../client_config";
 
 interface Props {
     history: History;
@@ -151,7 +150,7 @@ export class EntryMenu extends BaseComponent<Props, State> {
     copyAddress = () => {
         const {entry} = this.props;
 
-        const u = `${APP_URL}/${entry.category}/@${entry.author}/${entry.permlink}`
+        const u = `https://ecency.com/${entry.category}/@${entry.author}/${entry.permlink}`
         clipboard(u);
         success(_t("entry.address-copied"));
     };
