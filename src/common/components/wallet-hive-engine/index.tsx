@@ -28,7 +28,7 @@ import Transfer, {TransferMode, TransferAsset} from "../transfer";
 import {error, success} from "../feedback";
 import WalletMenu from "../wallet-menu";
 import WithdrawRoutes from "../withdraw-routes";
-import {is_not_FullHiveEngineAccount, FullHiveEngineAccount} from "../../api/hive-engine";
+import {is_not_FullHiveEngineAccount, FullHiveEngineAccount, getAccountHEFull, TokenStatus} from "../../api/hive-engine";
 import HiveEngineWallet from "../../helper/hive-engine-wallet";
 
 import {getAccount, getConversionRequests} from "../../api/hive";
@@ -44,6 +44,7 @@ import {_t} from "../../i18n";
 
 import {plusCircle} from "../../img/svg";
 import {resolveAny} from "dns";
+import {getScotAccountDataAsync} from "../../api/hive-engine";
 import HiveWallet from "../../helper/hive-wallet";
 import {LIQUID_TOKEN, LIQUID_TOKEN_UPPERCASE} from "../../../client_config";
 
@@ -74,6 +75,26 @@ interface State {
     transferAsset: null | TransferAsset;
     converting: number;
 }
+
+function resolveAfter2Seconds(x) {
+ return new Promise<string>(resolve => {
+ 		 
+ 		 setTimeout(() => {
+ 		 		 console.log("simulating a network event");
+ 		 		 resolve(x);
+ 		 }, 2000);
+ 	});
+}
+
+function resolveImediately(x) {
+ return new Promise<string>(resolve => {
+ 		 resolve(x);
+ 	});
+}
+
+interface TxInfo {block_num: number; expired: boolean; id:string; trx_num:number
+}
+
 
 export class WalletHiveEngine extends BaseComponent<Props, State> {
     state: State = {
@@ -125,26 +146,73 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     }
 
     claimRewardBalance = () => {
-        const {activeUser, updateActiveUser} = this.props;
+        const {activeUser, dynamicProps, global, updateActiveUser} = this.props;
         const {claiming} = this.state;
 
         if (claiming || !activeUser || is_not_FullHiveEngineAccount(activeUser.data)) {
             return;
         }
-
+        let tokenStatus : TokenStatus | null  = null;
+        const pending_token_100millionths : number = (()=> {
+        		try {
+        			const account = activeUser.data;
+        			if (is_not_FullHiveEngineAccount(account)) {
+        				getAccountHEFull(account.name, true).then(
+        					(HEFA) => {
+        						updateActiveUser(HEFA); 
+        					}).catch(() => false);
+        				return 0;
+        			}
+        			const isMyPage = activeUser && activeUser.username === account.name;
+        			let x;
+        			const tokenStatuses = (account as FullHiveEngineAccount).token_statuses;
+        			if ((x=tokenStatuses.hiveData) && (x=x[LIQUID_TOKEN_UPPERCASE])) {
+        				tokenStatus = x;
+        				return tokenStatus.pending_token || 0;
+        			}
+        		} catch (e) {
+        		}
+        		return 0;
+        })();
+        if (!tokenStatus || pending_token_100millionths === 0) {
+        	console.log("Exception getting pending token");
+        	return;
+        }
         this.stateSet({claiming: true});
-        
-        
-        return claimHiveEngineRewardBalance(activeUser.username, activeUser.username, '1 POB')
-        	.then(() => getAccount(activeUser.username))
-            .then(account => {
-                success(_t('wallet.claim-reward-balance-ok'));
-                this.stateSet({claiming: false, claimed: true});
-                updateActiveUser(account);
+        const {precision} = tokenStatus;
+        const normalized_amount : string = pending_token_100millionths * Math.pow(10,-precision) + ' ' + LIQUID_TOKEN_UPPERCASE;
+		let account = activeUser.data as FullHiveEngineAccount;
+        // pending_token_100millionths is in satoshis.  Claim function requires it to be a string with units.
+        const failed = this.stateSet.bind(this, {claiming: false});
+        const successful = this.stateSet.bind(this, {claiming: false, claimed: true}); 
+        return claimHiveEngineRewardBalance(activeUser.username, activeUser.username, normalized_amount)
+        	.then(txInfo  => {
+            		setTimeout( () => {
+            				try {
+								getAccountHEFull(account.name, true).then(account => {
+									const tokenStatuses = (account as FullHiveEngineAccount).token_statuses;
+									let x;
+									if ((x=tokenStatuses.hiveData) && (x=x[LIQUID_TOKEN_UPPERCASE])) {
+										const tokenStatus = x;
+										if (tokenStatus.pending_token === 0) {
+											success(_t('wallet.claim-reward-balance-ok'));
+											successful();
+											getAccountHEFull(activeUser.username, true).then( a => updateActiveUser(a)).catch(() => false);
+											return;
+										}
+									}
+									console.log("Could not make changes with the balance.");
+									error(formatError({message: "Could not claim any " + LIQUID_TOKEN}));
+									failed();
+								});
+							} catch (e) {						
+								console.log("Excpiton in the handler");						
+							}
+					}, 1000);
             }).catch(err => {
                 error(formatError(err));
-                this.stateSet({claiming: false});
-            })
+                failed();
+            });
     }
 
     openTransferDialog = (mode: TransferMode, asset: TransferAsset) => {
@@ -197,7 +265,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
 
                 <div className="wallet-main">
                     <div className="wallet-info">
-                        {(pending_token && !claimed) && (
+                        {(pending_token>0 && !claimed) && (
                             <div className="unclaimed-rewards">
                                 <div className="title">
                                     {_t('wallet.unclaimed-rewards')}

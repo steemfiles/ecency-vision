@@ -55,7 +55,7 @@ export const makePreloadedState = async (req: express.Request): Promise<AppState
 				console.log("Failure to get meaningful data");
 			}
 		} else {
-			console.log("reusing stored tokens");
+			console.log("reusing stored token information");
 			hiveEngineTokensProperties = storedHiveEngineTokensProperties;
 		}
 	} catch (e) {
