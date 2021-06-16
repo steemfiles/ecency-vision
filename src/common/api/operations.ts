@@ -207,22 +207,20 @@ export const claimRewardBalance = (username: string, rewardHive: string, rewardH
     const opArray: Operation[] = [['claim_reward_balance', params]];
     return broadcastPostingOperations(username, opArray);
 }
+[ [ "custom_json",  ] ]
+
 export const claimRewardBalanceHiveEngineAssetJSON =(from: string, to: string, amount: string) : string => {
-		const [quantity, token_name] = (amount.replace("&numsp;","")).split(/ /);
+		const [quantity, token_name] = (amount).split(/ /);
 		const json = JSON.stringify({
-			"contractName": "tokens",
-			"contractAction": "stake",
-			"contractPayload": {
-				"symbol": token_name,
-				"to": to,
-				quantity                     
-			}
+				"symbol": token_name
 		});
 		return json;				
 }
+interface ClaimTokenParams { "id": "scot_claim_token", "json": "{\"symbol\":\"POB\"}", "required_auths": [], "required_posting_auths": [ "leprechaun" ] };
+
 export const claimHiveEngineRewardBalance = (from:string, to:string, amount: string) => {
-	const params = {
-		id: 'ssc-mainnet-hive',
+	const params : ClaimTokenParams = {
+		id: "scot_claim_token",
 		json: claimRewardBalanceHiveEngineAssetJSON(from, to, amount),
 		required_auths: [],
 		required_posting_auths: [from]
