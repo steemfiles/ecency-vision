@@ -62,12 +62,12 @@ This is generated with the following steps.  Take a string and
 make it a JSON object.
 Example:
 ````
-> s=JSON.stringify("foo");
-'"foo"'
-> Buffer.from(s, 'utf-8').toString('base64')
-'ImZvbyI='
+> s=JSON.stringify(0xF00);
+'3840'
+> (Buffer.from('3840', 'utf-8')).toString('base64')
+'Mzg0MA=='
 ````
-Now 'ImZvbyI=' should work.  I recommend you don't start with "foo" however.
+Now 'Mzg0MA==' should work.  The object passed in should be a long hexadecimal number.
 
 ###### SEARCH_API_ADDR and SEARCH_API_SECRET
 
