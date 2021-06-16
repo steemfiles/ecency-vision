@@ -76,7 +76,7 @@ interface State {
     converting: number;
 }
 
-function resolveAfter2Seconds(x) {
+function resolveAfter2Seconds(x: string) : Promise<string> {
  return new Promise<string>(resolve => {
  		 
  		 setTimeout(() => {
@@ -86,7 +86,7 @@ function resolveAfter2Seconds(x) {
  	});
 }
 
-function resolveImediately(x) {
+function resolveImediately(x: string) : Promise<string>{
  return new Promise<string>(resolve => {
  		 resolve(x);
  	});
@@ -183,8 +183,8 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         const normalized_amount : string = pending_token_100millionths * Math.pow(10,-precision) + ' ' + LIQUID_TOKEN_UPPERCASE;
 		let account = activeUser.data as FullHiveEngineAccount;
         // pending_token_100millionths is in satoshis.  Claim function requires it to be a string with units.
-        const failed = this.stateSet.bind(this, {claiming: false});
-        const successful = this.stateSet.bind(this, {claiming: false, claimed: true}); 
+        const failed = () => this.stateSet({claiming: false});
+        const successful = () => this.stateSet({claiming: false, claimed: true}); 
         return claimHiveEngineRewardBalance(activeUser.username, activeUser.username, normalized_amount)
         	.then(txInfo  => {
             		setTimeout( () => {

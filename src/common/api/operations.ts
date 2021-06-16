@@ -216,7 +216,7 @@ export const claimRewardBalanceHiveEngineAssetJSON =(from: string, to: string, a
 		});
 		return json;				
 }
-interface ClaimTokenParams { "id": "scot_claim_token", "json": "{\"symbol\":\"POB\"}", "required_auths": [], "required_posting_auths": [ "leprechaun" ] };
+interface ClaimTokenParams { "id": "scot_claim_token", "json": string, "required_auths": [], "required_posting_auths": [string] };
 
 export const claimHiveEngineRewardBalance = (from:string, to:string, amount: string) => {
 	const params : ClaimTokenParams = {
