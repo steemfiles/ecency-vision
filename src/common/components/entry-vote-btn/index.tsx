@@ -169,7 +169,7 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
                 if (tokens_statuses.hiveData) {
                     const liquid_token_statuses = tokens_statuses.hiveData[LIQUID_TOKEN_UPPERCASE];
                     console.log({liquid_token_balances, liquid_token_statuses});
-                    getScotDataAsync<ScotPost>(`@${entry.author}/${entry.permlink}?hive=1`, {}).then(
+                    getScotDataAsync<{ [id: string]: ScotPost }>(`@${entry.author}/${entry.permlink}?hive=1`, {}).then(
                         tokenEntryMap => {
                             console.log({tokenEntryMap});
                             setState({tokenEntryMap: tokenEntryMap});
@@ -186,7 +186,7 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
         
         
 		Promise.all([
-		getScotDataAsync<ScotPost>(`@${entry.author}/${entry.permlink}?hive=1`, {}),
+		getScotDataAsync<{[id:string]:ScotPost}>(`@${entry.author}/${entry.permlink}?hive=1`, {}),
 		getScotDataAsync<{ [id: string]: VoteInfo }>(`@${activeUser.username}`, {
 			token :  LIQUID_TOKEN_UPPERCASE,      hive: 1
 
@@ -625,8 +625,6 @@ export class EntryVoteBtn extends BaseComponent<Props, State> {
 
 
     componentDidMount() {
-        console.log(this.props.hiveEngineTokensProperties);
-
         const setState = this.setState.bind(this);
         const tokenConfig = this.props.hiveEngineTokenConfig;
         const tokenInfo = this.props.hiveEngineTokenInfo;
@@ -641,8 +639,6 @@ export class EntryVoteBtn extends BaseComponent<Props, State> {
             )   {
                 // if my redux works use this:
 
-                if (this.props.global.hiveEngineTokensProperties)
-                    console.log("Properties set in global!");
                 this.setState({
                     tokenInfo: properties.info || EntryVoteBtn.tokenInfo,
                     tokenConfig: properties.config || EntryVoteBtn.tokenConfig,
@@ -693,8 +689,6 @@ export class EntryVoteBtn extends BaseComponent<Props, State> {
 				setHiveEngineTokensProperties({[LIQUID_TOKEN_UPPERCASE]: {config: tokenConfig, info: tokenInfo,
 						hivePrice: price}});
 			});
-        } else {
-            console.log("Not reloading HE parameters for another ", ((EntryVoteBtn.lastLoad+10000 - (new Date()).getTime())), "seconds.");
         }
     }
 

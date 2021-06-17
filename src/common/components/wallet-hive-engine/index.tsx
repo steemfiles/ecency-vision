@@ -44,7 +44,7 @@ import {_t} from "../../i18n";
 
 import {plusCircle} from "../../img/svg";
 import {resolveAny} from "dns";
-import {getScotAccountDataAsync} from "../../api/hive-engine";
+import {getScotDataAsync} from "../../api/hive-engine";
 import HiveWallet from "../../helper/hive-wallet";
 import {LIQUID_TOKEN, LIQUID_TOKEN_UPPERCASE} from "../../../client_config";
 
@@ -146,7 +146,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     }
 
     claimRewardBalance = () => {
-        const {activeUser, dynamicProps, global, updateActiveUser} = this.props;
+        const {activeUser, dynamicProps, global, updateActiveUser, shortCoinName} = this.props;
         const {claiming} = this.state;
 
         if (claiming || !activeUser || is_not_FullHiveEngineAccount(activeUser.data)) {
@@ -157,16 +157,12 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         		try {
         			const account = activeUser.data;
         			if (is_not_FullHiveEngineAccount(account)) {
-        				getAccountHEFull(account.name, true).then(
-        					(HEFA) => {
-        						updateActiveUser(HEFA); 
-        					}).catch(() => false);
+        				updateActiveUser(activeUser.data);
         				return 0;
         			}
-        			const isMyPage = activeUser && activeUser.username === account.name;
         			let x;
         			const tokenStatuses = (account as FullHiveEngineAccount).token_statuses;
-        			if ((x=tokenStatuses.hiveData) && (x=x[LIQUID_TOKEN_UPPERCASE])) {
+        			if ((x=tokenStatuses.hiveData) && (x=x[shortCoinName])) {
         				tokenStatus = x;
         				return tokenStatus.pending_token || 0;
         			}
@@ -175,40 +171,66 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         		return 0;
         })();
         if (!tokenStatus || pending_token_100millionths === 0) {
-        	console.log("Exception getting pending token");
+        	console.log("Exception getting pending token", {tokenStatus, pending_token_100millionths});
         	return;
         }
         this.stateSet({claiming: true});
         const {precision} = tokenStatus;
-        const normalized_amount : string = pending_token_100millionths * Math.pow(10,-precision) + ' ' + LIQUID_TOKEN_UPPERCASE;
+        const normalized_amount : string = pending_token_100millionths * Math.pow(10,-precision) + ' ' + shortCoinName;
 		let account = activeUser.data as FullHiveEngineAccount;
         // pending_token_100millionths is in satoshis.  Claim function requires it to be a string with units.
         const failed = () => this.stateSet({claiming: false});
         const successful = () => this.stateSet({claiming: false, claimed: true}); 
         return claimHiveEngineRewardBalance(activeUser.username, activeUser.username, normalized_amount)
+        //return resolveAfter2Seconds("testing: not claiming balance for real")
         	.then(txInfo  => {
-            		setTimeout( () => {
+        			/* In two tests of this routine, the round trip  time between sending out the transaction 
+        			* and seeing the new pending_token value set to zero from a query come back was six and seven iterations.        			
+        			* of 4.5s each.  This is 27~31.5 seconds. 
+        			
+        			I decided it would be best to simply wait 25 s and then start polling the scot API every 2.5s.  So it wouldn't be
+        			pulling in the old data over and over again until the data is likely to be ready.
+        			
+        			*/
+        			//if (txInfo.expired) {
+        			//	error("the transaction has expired");
+        			//}
+        			const time_interval_length = 2500;
+        			let counter = 0;
+        			let attempt_number = 0;
+            		const check_handle = setInterval( () => {
+            				
             				try {
-								getAccountHEFull(account.name, true).then(account => {
-									const tokenStatuses = (account as FullHiveEngineAccount).token_statuses;
-									let x;
-									if ((x=tokenStatuses.hiveData) && (x=x[LIQUID_TOKEN_UPPERCASE])) {
-										const tokenStatus = x;
+            					++counter;
+            					if (counter < 10) {
+            						// don't even try yet.
+            						return;
+            					}
+            					console.log("Trying to reload the pending_token amount for ",LIQUID_TOKEN,".  Attempt #" + (++attempt_number) + " @" + (time_interval_length/1000*counter) + "s");            					
+								getScotDataAsync<{[LIQUID_TOKEN_UPPERCASE]:TokenStatus}>(`@${account.name}`, {hive: 1, token: LIQUID_TOKEN_UPPERCASE}).then(tokenStatuses => {
+									if (tokenStatuses[LIQUID_TOKEN_UPPERCASE]) {
+										const tokenStatus = tokenStatuses[LIQUID_TOKEN_UPPERCASE];
 										if (tokenStatus.pending_token === 0) {
+											clearInterval(check_handle);
 											success(_t('wallet.claim-reward-balance-ok'));
 											successful();
-											getAccountHEFull(activeUser.username, true).then( a => updateActiveUser(a)).catch(() => false);
-											return;
-										}
-									}
-									console.log("Could not make changes with the balance.");
-									error(formatError({message: "Could not claim any " + LIQUID_TOKEN}));
-									failed();
-								});
+											updateActiveUser(account);																						
+										} else {
+											console.log("The loading of the account worked fine but the pending balance has not yet been updtaed.");
+										}// end if
+									} else {
+										console.log("The account data returned an unexpected data structure:", {account});
+									} // end if
+								}); // getAccountHEFull.then
 							} catch (e) {						
-								console.log("Excpiton in the handler");						
+								console.log("Exception was thrown in the handler");						
 							}
-					}, 1000);
+							if (counter > 20) {
+								clearInterval(check_handle);
+								error(formatError({message: "Could not claim any " + LIQUID_TOKEN}));
+								failed();
+							}								
+					}, time_interval_length);
             }).catch(err => {
                 error(formatError(err));
                 failed();
@@ -273,7 +295,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                 <div className="rewards">
                                 	 
                                     {pending_token > 0 && (
-                                        <span className="reward-type">{`${pending_token} ${LIQUID_TOKEN_UPPERCASE}`}</span>
+                                        <span className="reward-type">{formattedNumber(pending_token, {fractionDigits: 8, suffix: LIQUID_TOKEN_UPPERCASE})}</span>
                                     )}
                                     {isMyPage && (
                                         <Tooltip content={_t('wallet.claim-reward-balance')}>

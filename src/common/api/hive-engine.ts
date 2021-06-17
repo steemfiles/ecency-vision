@@ -226,16 +226,16 @@ async function getFineTransactions(account : string, limit: number, offset: numb
     return history;
 }
 
-export async function getScotDataAsync<T>(path : string, params : object) : Promise<any> {
-    const x : T= await callApi(`https://scot-api.hive-engine.com/${path}`, params);
+export async function getScotDataAsync<T>(path : string, params : object) : Promise<T> {
+    const x : T = await callApi(`https://scot-api.hive-engine.com/${path}`, params);
     return x;
 }
 
 export async function getScotAccountDataAsync(account: string) {
-    const data = await getScotDataAsync(`@${account}`, {});
+    const data = await getScotDataAsync<{ [id: string]: TokenStatus}>(`@${account}`, {});
     const hiveData = DISABLE_HIVE
         ? null
-        : await getScotDataAsync(`@${account}`, { hive: 1 });
+        : await getScotDataAsync<{[id: string]: TokenStatus} >(`@${account}`, { hive: 1 });
     return { data, hiveData };
 }
 
@@ -249,7 +249,7 @@ function mergeContent(content : Entry, tokenPostData : {[id:string]:ScotPost}) {
 
 export const enginifyPost = (post: Entry, observer: string): Promise<Entry> => {
     const {author, permlink} = post;
-    const scot_data_promise = getScotDataAsync<ScotPost>(`@${post.author}/${post.permlink}?hive=1`, {});
+    const scot_data_promise = getScotDataAsync<{[id: string]: ScotPost}>(`@${post.author}/${post.permlink}?hive=1`, {});
     return scot_data_promise.then(
         (scotData) => {
             mergeContent(post, scotData);
