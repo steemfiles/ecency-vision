@@ -19,6 +19,7 @@ import Drafts from "../drafts";
 import Bookmarks from "../bookmarks";
 import Schedules from "../schedules";
 import Fragments from "../fragments";
+import {hiveSvg} from "../../img/svg";
 
 
 import {_t} from "../../i18n";
@@ -48,7 +49,7 @@ class WalletBadge extends Component<{
             <ToolTip content={hasUnclaimedRewards ? _t("user-nav.unclaimed-reward-notice") : _t("user-nav.wallet")}>
                 <Link to={`/@${activeUser.username}/hive`} className="user-wallet">
                     {hasUnclaimedRewards && <span className="reward-badge"/>}
-                    {creditCardSvg}
+                    {hiveSvg}
                 </Link>
             </ToolTip>
         </>
