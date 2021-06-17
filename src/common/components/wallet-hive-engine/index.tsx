@@ -46,7 +46,7 @@ import {plusCircle} from "../../img/svg";
 import {resolveAny} from "dns";
 import {getScotDataAsync} from "../../api/hive-engine";
 import HiveWallet from "../../helper/hive-wallet";
-import {LIQUID_TOKEN, LIQUID_TOKEN_UPPERCASE} from "../../../client_config";
+import {LIQUID_TOKEN, aPICoinName} from "../../../client_config";
 
 interface Props {
     history: History;
@@ -61,7 +61,7 @@ interface Props {
     setSigningKey: (key: string) => void;
     fetchTransactions: (username: string, group?: OperationGroup | "") => void;
     coinName: string;
-    shortCoinName: string;
+    aPICoinName: string;
 }
 
 interface State {
@@ -146,7 +146,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     }
 
     claimRewardBalance = () => {
-        const {activeUser, dynamicProps, global, updateActiveUser, shortCoinName} = this.props;
+        const {activeUser, dynamicProps, global, updateActiveUser, aPICoinName} = this.props;
         const {claiming} = this.state;
 
         if (claiming || !activeUser || is_not_FullHiveEngineAccount(activeUser.data)) {
@@ -162,7 +162,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         			}
         			let x;
         			const tokenStatuses = (account as FullHiveEngineAccount).token_statuses;
-        			if ((x=tokenStatuses.hiveData) && (x=x[shortCoinName])) {
+        			if ((x=tokenStatuses.hiveData) && (x=x[aPICoinName])) {
         				tokenStatus = x;
         				return tokenStatus.pending_token || 0;
         			}
@@ -176,7 +176,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         }
         this.stateSet({claiming: true});
         const {precision} = tokenStatus;
-        const normalized_amount : string = pending_token_100millionths * Math.pow(10,-precision) + ' ' + shortCoinName;
+        const normalized_amount : string = pending_token_100millionths * Math.pow(10,-precision) + ' ' + aPICoinName;
 		let account = activeUser.data as FullHiveEngineAccount;
         // pending_token_100millionths is in satoshis.  Claim function requires it to be a string with units.
         const failed = () => this.stateSet({claiming: false});
@@ -207,9 +207,9 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
             						return;
             					}
             					console.log("Trying to reload the pending_token amount for ",LIQUID_TOKEN,".  Attempt #" + (++attempt_number) + " @" + (time_interval_length/1000*counter) + "s");            					
-								getScotDataAsync<{[LIQUID_TOKEN_UPPERCASE]:TokenStatus}>(`@${account.name}`, {hive: 1, token: LIQUID_TOKEN_UPPERCASE}).then(tokenStatuses => {
-									if (tokenStatuses[LIQUID_TOKEN_UPPERCASE]) {
-										const tokenStatus = tokenStatuses[LIQUID_TOKEN_UPPERCASE];
+								getScotDataAsync<{[aPICoinName]:TokenStatus}>(`@${account.name}`, {hive: 1, token: aPICoinName}).then(tokenStatuses => {
+									if (tokenStatuses[aPICoinName]) {
+										const tokenStatus = tokenStatuses[aPICoinName];
 										if (tokenStatus.pending_token === 0) {
 											clearInterval(check_handle);
 											success(_t('wallet.claim-reward-balance-ok'));
@@ -246,7 +246,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     }
 
     render() {
-        const {global, dynamicProps, account, activeUser, shortCoinName} = this.props;
+        const {global, dynamicProps, account, activeUser, aPICoinName} = this.props;
         const {claiming, claimed, transfer, transferAsset, transferMode, converting} = this.state;
 
         if (!account.__loaded) {
@@ -254,7 +254,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         }
 
         const {hiveEngineTokensProperties} = global;
-        const tokenProperties = hiveEngineTokensProperties && hiveEngineTokensProperties[LIQUID_TOKEN_UPPERCASE];
+        const tokenProperties = hiveEngineTokensProperties && hiveEngineTokensProperties[aPICoinName];
         const precision = (() => {
         		const p1 = tokenProperties && tokenProperties.info && tokenProperties.info.precision;
         		if (p1 === null || p1 == undefined)
@@ -272,7 +272,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         			}
         			let x;
         			const tokenStatuses = (account as FullHiveEngineAccount)	.token_statuses;
-        			if ((x=tokenStatuses.hiveData) && (x=x[LIQUID_TOKEN_UPPERCASE])) {
+        			if ((x=tokenStatuses.hiveData) && (x=x[aPICoinName])) {
         				const {precision, pending_token} = x 
         				return pending_token * Math.pow(10,-precision);
         			}
@@ -280,8 +280,8 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         		}
         		return 0;
         })();
-        const w = new HiveEngineWallet(account, dynamicProps, converting, shortCoinName);
-        const balances = w.engineBalanceTable[this.props.shortCoinName];
+        const w = new HiveEngineWallet(account, dynamicProps, converting, aPICoinName);
+        const balances = w.engineBalanceTable[this.props.aPICoinName];
         return (
             <div className="wallet-hive">
 
@@ -295,7 +295,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                 <div className="rewards">
                                 	 
                                     {pending_token > 0 && (
-                                        <span className="reward-type">{formattedNumber(pending_token, {fractionDigits: 8, suffix: LIQUID_TOKEN_UPPERCASE})}</span>
+                                        <span className="reward-type">{formattedNumber(pending_token, {fractionDigits: 8, suffix: aPICoinName})}</span>
                                     )}
                                     {isMyPage && (
                                         <Tooltip content={_t('wallet.claim-reward-balance')}>
@@ -325,10 +325,10 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                             </div>
                         </div>}
 
-                        {w.engineBalanceTable && w.engineBalanceTable[this.props.shortCoinName] && <div className="balance-row">
+                        {w.engineBalanceTable && w.engineBalanceTable[this.props.aPICoinName] && <div className="balance-row">
                             <div className="balance-info">
                                 <div className="title">{this.props.coinName}</div>
-                                <div className="description">{_t("wallet." + this.props.shortCoinName + "-description")}</div>
+                                <div className="description">{_t("wallet." + this.props.aPICoinName + "-description")}</div>
                             </div>
                             <div className="balance-values">
                                 <div className="amount">
@@ -341,14 +341,14 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                                     {
                                                         label: _t('wallet.transfer'),
                                                         onClick: () => {
-                                                            this.openTransferDialog('transfer', this.props.shortCoinName);
+                                                            this.openTransferDialog('transfer', this.props.aPICoinName);
                                                         }
                                                     },/*
 
                                                     {
                                                         label: _t('wallet.power-up'),
                                                         onClick: () => {
-                                                            this.openTransferDialog('power-up', this.props.shortCoinName);
+                                                            this.openTransferDialog('power-up', this.props.aPICoinName);
                                                         }
                                                     },  */                                                  
 
@@ -361,7 +361,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                         return null;
                                     })()}
 
-                                    <span>{formattedNumber(w.engineBalanceTable[this.props.shortCoinName].balance, {fractionDigits: precision, suffix: this.props.shortCoinName})}</span>
+                                    <span>{formattedNumber(w.engineBalanceTable[this.props.aPICoinName].balance, {fractionDigits: precision, suffix: this.props.aPICoinName})}</span>
                                 </div>
                             </div>
 
@@ -370,7 +370,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                         {w.engineBalanceTable && balances && <div className="balance-row hive-power alternative">
                             <div className="balance-info">
                                 <div className="title">{_t("wallet.staked", {c:this.props.coinName})}</div>
-                                <div className="description">{_t("wallet.staked-" + this.props.shortCoinName + "-description")}</div>
+                                <div className="description">{_t("wallet.staked-" + this.props.aPICoinName + "-description")}</div>
                             </div>
 
                             <div className="balance-values">
@@ -386,13 +386,13 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                                     {
                                                         label: _t('wallet.delegate'),
                                                         onClick: () => {
-                                                            this.openTransferDialog('delegate', this.props.shortCoinName);
+                                                            this.openTransferDialog('delegate', this.props.aPICoinName);
                                                         },
                                                     },
                                                     {
                                                         label: _t('wallet.power-down'),
                                                         onClick: () => {
-                                                            this.openTransferDialog('power-down', this.props.shortCoinName);
+                                                            this.openTransferDialog('power-down', this.props.aPICoinName);
                                                         },
                                                     },                                                    
                                                     {
@@ -410,14 +410,14 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                         }
                                         return null;
                                     })()}
-                                    {formattedNumber(balances.stake, {suffix: this.props.shortCoinName, fractionDigits: precision})}
+                                    {formattedNumber(balances.stake, {suffix: this.props.aPICoinName, fractionDigits: precision})}
                                 </div>
 
                                 {balances.delegationsOut > 0 && (
                                     <div className="amount amount-passive delegated-shares">
                                         <Tooltip content={_t("wallet.hive-power-delegated")}>
                                       <span className="amount-btn" onClick={this.toggleDelegatedList}>
-                                        {formattedNumber(balances.delegationsOut, {suffix: this.props.shortCoinName, fractionDigits: precision})}
+                                        {formattedNumber(balances.delegationsOut, {suffix: this.props.aPICoinName, fractionDigits: precision})}
                                       </span>
                                         </Tooltip>
                                     </div>
@@ -428,7 +428,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                         return null;
                                     }
 
-                                    const strReceived = formattedNumber(balances.delegationsIn, {prefix: "+", suffix: this.props.shortCoinName});
+                                    const strReceived = formattedNumber(balances.delegationsIn, {prefix: "+", suffix: this.props.aPICoinName});
 
                                     if (global.usePrivate) {
                                         return <div className="amount amount-passive received-shares">
@@ -449,7 +449,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                     <div className="amount amount-passive next-power-down-amount">
                                         <Tooltip content={_t("wallet.next-power-down-amount")}>
                                   <span>
-                                    {formattedNumber(balances.pendingUnstake, {prefix: "-", suffix: this.props.shortCoinName})}
+                                    {formattedNumber(balances.pendingUnstake, {prefix: "-", suffix: this.props.aPICoinName})}
                                   </span>
                                         </Tooltip>
                                     </div>
@@ -459,7 +459,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                     <div className="amount total-hive-power">
                                         <Tooltip content={_t("wallet.hive-power-total")}>
                                   <span>
-                                    {formattedNumber(balances.pendingUnstake, {prefix: "=", suffix: this.props.shortCoinName})}
+                                    {formattedNumber(balances.pendingUnstake, {prefix: "=", suffix: this.props.aPICoinName})}
                                   </span>
                                         </Tooltip>
                                     </div>
@@ -512,7 +512,9 @@ export default (p: Props) => {
         updateActiveUser: p.updateActiveUser,
         setSigningKey: p.setSigningKey,
         fetchTransactions: p.fetchTransactions,
+        aPICoinName: p.aPICoinName,
+        coinName: p.coinName,
     }
 
-    return <WalletHiveEngine {...props} coinName={LIQUID_TOKEN} shortCoinName={LIQUID_TOKEN_UPPERCASE} />;
+    return <WalletHiveEngine {...props}/>;
 }

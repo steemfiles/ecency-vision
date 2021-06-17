@@ -247,7 +247,7 @@ class ProfilePage extends BaseComponent<Props, State> {
                             if (section === "wallet") {
                                 return WalletHiveEngine({
                                 	coinName:LIQUID_TOKEN,
-                                	shortCoinName:LIQUID_TOKEN_UPPERCASE,
+                                	aPICoinName:LIQUID_TOKEN_UPPERCASE,
                                     ...this.props,
                                     account
                                 });
