@@ -50,9 +50,13 @@ export class Curation extends BaseComponent<Props, State> {
     fetch = () => {
         const {period} = this.state;
         this.stateSet({loading: true, data: []});
-
+        
         getCuration(period).then(data => {
-            this.stateSet({data});
+			if (data.map!) {
+				this.stateSet({data});
+			} else {
+				console.log("Error loading data invalid array:", JSON.stringify(data));
+			}        		
             this.stateSet({loading: false});
         });
     }
@@ -106,7 +110,7 @@ export class Curation extends BaseComponent<Props, State> {
                             </span>
                         </div>
 
-                        {data.map((r, i) => {
+                        {data.map && data.map((r, i) => {
 
                             return <div className="list-item" key={i}>
                                 <div className="index">{i + 1}</div>

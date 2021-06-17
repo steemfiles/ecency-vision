@@ -55,12 +55,17 @@ export class List extends BaseComponent<Props, State> {
         this.stateSet({loading: true});
 
         return getReceivedVestingShares(account.name)
-            .then((r) => {
+            .then((r) => {            		
+            	if (!r.map) {
+                	console.log("Error loading data:", JSON.stringify(r));
+                	return;
+            	}
+            		
                 const sorted = r.sort((a, b) => {
                     return parseAsset(b.vesting_shares).amount - parseAsset(a.vesting_shares).amount;
                 });
-
-                this.stateSet({data: sorted});
+                
+               	this.stateSet({data: sorted});
             })
             .finally(() => this.stateSet({loading: false}));
     }

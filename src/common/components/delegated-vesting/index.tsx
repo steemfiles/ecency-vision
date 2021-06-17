@@ -73,11 +73,15 @@ export class List extends BaseComponent<Props, State> {
 
         return getVestingDelegations(account.name, "", 250)
             .then((r) => {
+            	if (!r.map) {
+            		console.log("Error loading data invalid array:", JSON.stringify(r));
+            		return;
+            	}
                 const sorted = r.sort((a, b) => {
                     return parseAsset(b.vesting_shares).amount - parseAsset(a.vesting_shares).amount;
                 });
-
-                this.stateSet({data: sorted});
+                
+               	this.stateSet({data: sorted});                	
             })
             .finally(() => this.stateSet({loading: false}));
     }

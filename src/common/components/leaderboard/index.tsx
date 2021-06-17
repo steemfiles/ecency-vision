@@ -26,7 +26,7 @@ interface Props {
 }
 
 interface State {
-    data: LeaderBoardItem[],
+    data: LeaderBoardItem[] | any,
     period: LeaderBoardDuration,
     loading: boolean
 }
@@ -48,7 +48,12 @@ export class LeaderBoard extends BaseComponent<Props, State> {
         this.stateSet({loading: true, data: []});
 
         getLeaderboard(period).then(data => {
-            this.stateSet({data});
+        	// @ts-ignore
+			if (data.map) {
+				this.stateSet({data});
+			} else {
+				console.log("Error loading data invalid array in leaderboard:", JSON.stringify(data));
+			}
             this.stateSet({loading: false});
         });
     }
@@ -86,7 +91,7 @@ export class LeaderBoard extends BaseComponent<Props, State> {
                     </div>
                 </div>
                 {loading && <LinearProgress/>}
-                {data.length > 0 && (
+                {data.map && data.length > 0 && (
                     <div className="list-body">
                         <div className="list-body-header">
                             <span/>
@@ -100,7 +105,8 @@ export class LeaderBoard extends BaseComponent<Props, State> {
                             </span>
                         </div>
 
-                        {data.map((r, i) => {
+                        {data.map((r:{_id: string, count:number, points:string}, i:number) => {
+                        	
 
                             return <div className="list-item" key={i}>
                                 <div className="index">{i + 1}</div>
