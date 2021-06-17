@@ -196,7 +196,8 @@
     "curators-payout": "Curators Payout",
     "payout-date": "Payout",
     "beneficiary": "Beneficiary",
-    "breakdown": "Breakdown"
+    "breakdown": "Breakdown",
+    "max-accepted": "Max accepted"
   },
   "entry-index": {
     "feed": "Feed",
@@ -245,7 +246,7 @@
     "version": "Version {{n}}"
   },
   "similar-entries": {
-    "title": "More from @{{n}}"
+    "title": "Read next"
   },
   "comment": {
     "body-placeholder": "Write your reply here",
@@ -698,6 +699,7 @@
     "error-max": "Max {{n}} tags"
   },
   "community-selector": {
+    "choose": "Choose a community",
     "my-blog": "My Blog",
     "search-placeholder": "Search Communities"
   },
@@ -766,6 +768,18 @@
     "period-month": "Monthly",
     "header-score": "Activities",
     "header-score-tip": "Post + comments made by a user for selected period",
+    "header-reward": "Reward"
+  },
+  "curation": {
+    "title": "Leaderboard",
+    "title-day": "Daily top curators",
+    "title-week": "Weekly top curators",
+    "title-month": "Monthly top curators",
+    "period-day": "Daily",
+    "period-week": "Weekly",
+    "period-month": "Monthly",
+    "header-score": "Votes",
+    "header-score-tip": "Number of votes in this period",
     "header-reward": "Reward"
   },
   "popular-users": {

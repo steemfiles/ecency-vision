@@ -18,6 +18,8 @@ import formattedNumber from "../../util/formatted-number";
 import {_t} from "../../i18n";
 import {TokenInfoConfigPair} from "../../store/hive-engine-tokens/types";
 
+import _c from "../../util/fix-class-names";
+
 
 interface Props {
     global: Global;
@@ -38,6 +40,7 @@ export class EntryPayoutDetail extends Component<Props> {
         const promotedPayout = parseAsset(entry.promoted).amount;
         const authorPayout = parseAsset(entry.author_payout_value).amount;
         const curatorPayout = parseAsset(entry.curator_payout_value).amount;
+        const maxPayout = parseAsset(entry.max_accepted_payout).amount;
         const fullPower = entry.percent_hbd === 0;
         let pendingPayout = pendingHivePayout;
 
@@ -57,6 +60,9 @@ export class EntryPayoutDetail extends Component<Props> {
                 }
             } // for
         }
+
+        const totalPayout = pendingPayout + authorPayout + curatorPayout;
+        const payoutLimitHit = totalPayout >= maxPayout;
 
         const HBD_PRINT_RATE_MAX = 10000;
         const percentHiveDollars = (entry.percent_hbd) / 20000;
@@ -152,6 +158,12 @@ export class EntryPayoutDetail extends Component<Props> {
                     <span className="label">{_t("entry-payout.payout-date")}</span>
                     <span className="value">{payoutDate.fromNow()}</span>
                 </p>
+                {payoutLimitHit && (
+                    <p>
+                        <span className="label">{_t("entry-payout.max-accepted")}</span>
+                        <span className="value"><FormattedCurrency {...this.props} value={maxPayout} fixAt={3}/></span>
+                    </p>
+                )}
             </div>
         );
     }
@@ -169,6 +181,7 @@ export class EntryPayout extends Component<Props> {
         const pendingPayout = parseAsset(entry.pending_payout_value).amount;
         const authorPayout = parseAsset(entry.author_payout_value).amount;
         const curatorPayout = parseAsset(entry.curator_payout_value).amount;
+        const maxPayout = parseAsset(entry.max_accepted_payout).amount;
 
         let totalPayout = pendingPayout + authorPayout + curatorPayout;
         //console.log({he, hiveEngineTokensProperties}, "in entry-payout/index");
@@ -194,6 +207,9 @@ export class EntryPayout extends Component<Props> {
             }
         }
 
+        const payoutLimitHit = totalPayout >= maxPayout;
+        const shownPayout = payoutLimitHit && maxPayout > 0 ? maxPayout : totalPayout;
+
         const popover = (
             <Popover id={`payout-popover`} className="payout-popover">
                 <Popover.Content>
@@ -204,8 +220,8 @@ export class EntryPayout extends Component<Props> {
 
         return (
             <OverlayTrigger trigger={["hover", "focus"]} overlay={popover} delay={1000}>
-                <div className={`entry-payout ${isPayoutDeclined ? "payout-declined" : ""} notranslate`}>
-                    <FormattedCurrency {...this.props} value={totalPayout}/>
+                <div className={_c(`entry-payout ${isPayoutDeclined ? "payout-declined" : ""} ${payoutLimitHit ? "payout-limit-hit": ""} notranslate`)}>
+                    <FormattedCurrency {...this.props} value={shownPayout}/>
                 </div>
             </OverlayTrigger>
         );

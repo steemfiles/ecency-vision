@@ -59,8 +59,6 @@ import truncate from "../util/truncate";
 import * as ls from "../util/local-storage";
 import {crossPostMessage} from "../helper/cross-post";
 
-import {timeSvg} from "../img/svg";
-
 import {_t} from "../i18n";
 import {Tsx} from "../i18n/helper";
 
@@ -578,20 +576,35 @@ class EntryPage extends BaseComponent<Props, State> {
 
                                     <div className="entry-footer">
                                         <div className="entry-tags">
-                                            {tags.map((t) => (
-                                                <Fragment key={t}>
-                                                    {Tag({
-                                                        ...this.props,
-                                                        tag: t.trim(),
-                                                        type: "link",
-                                                        children: <div className="entry-tag">{t}</div>
-                                                    })}
-                                                </Fragment>
-                                            ))}
+                                            {tags.map((t) => {
+                                                if (entry.community && entry.community_title && t === entry.community) {
+                                                    return <Fragment key={t}>
+                                                        {Tag({
+                                                            ...this.props,
+                                                            tag: {
+                                                                name: entry.community,
+                                                                title: entry.community_title
+                                                            },
+                                                            type: "link",
+                                                            children: <div className="entry-tag">{t}</div>
+                                                        })}
+                                                    </Fragment>
+                                                }
+
+                                                return (
+                                                    <Fragment key={t}>
+                                                        {Tag({
+                                                            ...this.props,
+                                                            tag: t.trim(),
+                                                            type: "link",
+                                                            children: <div className="entry-tag">{t}</div>
+                                                        })}
+                                                    </Fragment>
+                                                )
+                                            })}
                                         </div>
                                         <div className="entry-info">
                                             <div className="date" title={published.format("LLLL")}>
-                                                {timeSvg}
                                                 {published.fromNow()}
                                             </div>
                                             <span className="separator"/>
@@ -664,7 +677,7 @@ class EntryPage extends BaseComponent<Props, State> {
                                         </div>
                                     )}
 
-                                    {!originalEntry && SimilarEntries({
+                                    {(!originalEntry && !isComment) && SimilarEntries({
                                         ...this.props,
                                         entry
                                     })}

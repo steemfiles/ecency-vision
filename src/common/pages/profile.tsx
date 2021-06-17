@@ -213,7 +213,6 @@ class ProfilePage extends BaseComponent<Props, State> {
             keywords: `${username}, ${username}'s blog`,
         } : {};
 
-        const promoted = entries['__promoted__'].entries;
         return (
             <>
                 <Meta {...metaProps} />
@@ -294,7 +293,7 @@ class ProfilePage extends BaseComponent<Props, State> {
                                         <div className={_c(`entry-list ${loading ? "loading" : ""}`)}>
                                             <div className={_c(`entry-list-body ${global.listStyle === ListStyle.grid ? "grid-view" : ""}`)}>
                                                 {loading && entryList.length === 0 && <EntryListLoadingItem/>}
-                                                {EntryListContent({...this.props, entries: entryList, promotedEntries: promoted})}
+                                                {EntryListContent({...this.props, entries: entryList, promotedEntries: []})}
                                             </div>
                                         </div>
                                         {loading && entryList.length > 0 ? <LinearProgress/> : ""}
