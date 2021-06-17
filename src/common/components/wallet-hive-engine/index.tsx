@@ -46,7 +46,6 @@ import {plusCircle} from "../../img/svg";
 import {resolveAny} from "dns";
 import {getScotDataAsync} from "../../api/hive-engine";
 import HiveWallet from "../../helper/hive-wallet";
-import {LIQUID_TOKEN, aPICoinName} from "../../../client_config";
 
 interface Props {
     history: History;
@@ -146,7 +145,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     }
 
     claimRewardBalance = () => {
-        const {activeUser, dynamicProps, global, updateActiveUser, aPICoinName} = this.props;
+        const {activeUser, dynamicProps, global, updateActiveUser, aPICoinName, coinName} = this.props;
         const {claiming} = this.state;
 
         if (claiming || !activeUser || is_not_FullHiveEngineAccount(activeUser.data)) {
@@ -206,7 +205,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
             						// don't even try yet.
             						return;
             					}
-            					console.log("Trying to reload the pending_token amount for ",LIQUID_TOKEN,".  Attempt #" + (++attempt_number) + " @" + (time_interval_length/1000*counter) + "s");            					
+            					console.log("Trying to reload the pending_token amount for ",coinName,".  Attempt #" + (++attempt_number) + " @" + (time_interval_length/1000*counter) + "s");            					
 								getScotDataAsync<{[aPICoinName]:TokenStatus}>(`@${account.name}`, {hive: 1, token: aPICoinName}).then(tokenStatuses => {
 									if (tokenStatuses[aPICoinName]) {
 										const tokenStatus = tokenStatuses[aPICoinName];
@@ -227,7 +226,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
 							}
 							if (counter > 20) {
 								clearInterval(check_handle);
-								error(formatError({message: "Could not claim any " + LIQUID_TOKEN}));
+								error(formatError({message: "Could not claim any " + coinName}));
 								failed();
 							}								
 					}, time_interval_length);

@@ -74,7 +74,7 @@ const defProps = {
     fetchTransactions: () => {
 
     },
-    shortCoinName: "POB",
+    aPICoinName: "POB",
     coinName: "Proof of Brain",
 }
 
