@@ -27,7 +27,7 @@ import {_t} from "../../i18n";
 import HiveWallet from "../../helper/hive-wallet";
 
 import {creditCardSvg, gifCardSvg, bellSvg, bellOffSvg, chevronUpSvg} from "../../img/svg";
-const logoCircle = require("../../img/bluebrain-logo-circle.webp");
+const logoCircle = require("../../img/logo-small-white-bluebrain-transparent.png");
 
 import {votingPower, downVotingPower} from "../../api/hive";
 
