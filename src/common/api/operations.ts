@@ -8,6 +8,8 @@ import {getAccessToken, getPostingKey} from "../helper/user-token";
 import * as keychain from "../helper/keychain";
 import parseAsset from "../helper/parse-asset";
 import {hotSign} from "../helper/hive-signer";
+// Base Layer 1 token name
+import {LIQUID_TICKER} from "../../client_config";
 import {_t} from "../i18n";
 export interface MetaData {
     links?: string[];
@@ -207,7 +209,6 @@ export const claimRewardBalance = (username: string, rewardHive: string, rewardH
     const opArray: Operation[] = [['claim_reward_balance', params]];
     return broadcastPostingOperations(username, opArray);
 }
-[ [ "custom_json",  ] ]
 
 export const claimRewardBalanceHiveEngineAssetJSON =(from: string, to: string, amount: string) : string => {
 		const [quantity, token_name] = (amount).split(/ /);
@@ -227,7 +228,7 @@ export const claimHiveEngineRewardBalance = (from:string, to:string, amount: str
 	};
 	const opArray: Operation[] = [["custom_json", params]];
 	return broadcastPostingOperations(from, opArray);
-}
+};
 /*
 export const HECustomJSONWithPostingKey = (key: PrivateKey, from:string, json: string): Promise<TransactionConfirmation> => {
 	const op = {
@@ -267,7 +268,7 @@ export const transferHot = (from: string, to: string, amount: string, memo: stri
         amount,
         memo
     }];
-    const params: Parameters = {callback: `https://ecency.com/@${from}/wallet`};
+    const params: Parameters = {callback: `${document.location.href}/@${from}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
@@ -380,7 +381,7 @@ export const transferToSavingsHot = (from: string, to: string, amount: string, m
         amount,
         memo
     }];
-    const params: Parameters = {callback: `https://ecency.com/@${from}/wallet`};
+    const params: Parameters = {callback: `${document.location.href}/@${from}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
@@ -413,7 +414,7 @@ export const convertHot = (owner: string, amount: string) => {
         amount,
         requestid: new Date().getTime() >>> 0
     }];
-    const params: Parameters = {callback: `https://ecency.com/@${owner}/wallet`};
+    const params: Parameters = {callback: `${document.location.href}/@${owner}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
@@ -449,7 +450,7 @@ export const transferFromSavingsHot = (from: string, to: string, amount: string,
         memo,
         request_id: new Date().getTime() >>> 0
     }];
-    const params: Parameters = {callback: `https://ecency.com/@${from}/wallet`};
+    const params: Parameters = {callback: `${document.location.href}/@${from}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
@@ -466,37 +467,55 @@ export const transferFromSavingsKc = (from: string, to: string, amount: string, 
     ]
     return keychain.broadcast(from, [op], "Active");
 }
-export const transferToVesting = (from: string, key: PrivateKey, to: string, amount: string): Promise<TransactionConfirmation> => {
-    const op: Operation = [
-        'transfer_to_vesting',
-        {
-            from,
-            to,
-            amount
-        }
-    ]
-    return hiveClient.broadcast.sendOperations([op], key);
+export const createTransferToVestingOp = (from: string, to: string, amount: string): Operation => {
+	const parts = amount.split(/ /);
+	const currency = parts[parts.length-1];
+	const quantity = parts[0];
+	if (currency === LIQUID_TICKER) { 			
+		return [
+			'transfer_to_vesting',
+			{
+				from,
+				to,
+				amount
+			}
+		];
+	} else {
+		return [
+			"custom_json",
+			{
+			  "id": "ssc-mainnet-hive",
+			  "required_auths": [ from ], 
+			  "required_posting_auths": [],
+			  "json": JSON.stringify({
+				  "contractName": "tokens",
+				  "contractAction": "stake",
+				  "contractPayload": {
+					"symbol": currency,
+					"to": to,
+					"quantity": quantity
+				  }
+				})
+			}
+		  
+		];
+	}
+	
+}
+export const transferToVesting = (from: string, key: PrivateKey, to: string, amount: string): Promise<TransactionConfirmation> => {    
+    return hiveClient.broadcast.sendOperations([createTransferToVestingOp(from, to, amount)], key);
 }
 export const transferToVestingHot = (from: string, to: string, amount: string) => {
-    const op: Operation = ['transfer_to_vesting', {
-        from,
-        to,
-        amount
-    }];
-    const params: Parameters = {callback: `https://ecency.com/@${from}/wallet`};
-    return hs.sendOperation(op, params, () => {
-    });
+    const params: Parameters = {callback: `${document.location.href}/@${from}/wallet`};
+    const op : Operation =  createTransferToVestingOp(from, to, amount);
+    if (op[0] === "custom_json") {
+    	Error("Hive Signer cannot be used for Staking Hive Engine Tokens");
+    	return
+    }
+    return hs.sendOperation(op, params, () => {});
 }
 export const transferToVestingKc = (from: string, to: string, amount: string) => {
-    const op: Operation = [
-        'transfer_to_vesting',
-        {
-            from,
-            to,
-            amount
-        }
-    ]
-    return keychain.broadcast(from, [op], "Active");
+    return keychain.broadcast(from, [createTransferToVestingOp(from, to, amount)], "Active");
 }
 export const delegateVestingShares = (delegator: string, key: PrivateKey, delegatee: string, vestingShares: string): Promise<TransactionConfirmation> => {
     const op: Operation = [
@@ -515,7 +534,7 @@ export const delegateVestingSharesHot = (delegator: string, delegatee: string, v
         delegatee,
         vesting_shares: vestingShares
     }];
-    const params: Parameters = {callback: `https://ecency.com/@${delegator}/wallet`};
+    const params: Parameters = {callback: `${document.location.href}/@${delegator}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
@@ -545,7 +564,7 @@ export const withdrawVestingHot = (account: string, vestingShares: string) => {
         account,
         vesting_shares: vestingShares
     }];
-    const params: Parameters = {callback: `https://ecency.com/@${account}/wallet`};
+    const params: Parameters = {callback: `${document.location.href}/@${account}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
@@ -578,7 +597,7 @@ export const setWithdrawVestingRouteHot = (from: string, to: string, percent: nu
         percent,
         auto_vest: autoVest
     }];
-    const params: Parameters = {callback: `https://ecency.com/@${from}/wallet`};
+    const params: Parameters = {callback: `${document.location.href}/@${from}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }

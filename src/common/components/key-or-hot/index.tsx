@@ -19,6 +19,7 @@ const keyChainLogo = require("../../img/keychain.png");
 
 interface Props {
     global: Global;
+    hSBroken?: boolean;
     activeUser: ActiveUser;
     signingKey: string;
     setSigningKey: (key: string) => void;
@@ -109,11 +110,11 @@ export class KeyOrHot extends Component<Props, State> {
                         </InputGroup>
                     </Form>
                     <OrDivider/>
-                    <div className="hs-sign">
+                    {this.props.hSBroken || <div className="hs-sign">
                         <Button variant="outline-primary" onClick={this.hotClicked}>
                             <img src={hsLogo} className="hs-logo" alt="hivesigner"/> {_t("key-or-hot.with-hivesigner")}
                         </Button>
-                    </div>
+                    </div>}
 
                     {global.hasKeyChain && (
                         <div className="kc-sign">
@@ -132,6 +133,7 @@ export class KeyOrHot extends Component<Props, State> {
 export default (p: Props) => {
     const props = {
         global: p.global,
+        hSBroken: p.hSBroken,
         activeUser: p.activeUser,
         signingKey: p.signingKey,
         setSigningKey: p.setSigningKey,

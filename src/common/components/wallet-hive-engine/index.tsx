@@ -342,14 +342,14 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                                         onClick: () => {
                                                             this.openTransferDialog('transfer', this.props.aPICoinName);
                                                         }
-                                                    },/*
+                                                    },
 
                                                     {
                                                         label: _t('wallet.power-up'),
                                                         onClick: () => {
                                                             this.openTransferDialog('power-up', this.props.aPICoinName);
                                                         }
-                                                    },  */                                                  
+                                                    },                                                  
 
                                                 ],
                                             };
