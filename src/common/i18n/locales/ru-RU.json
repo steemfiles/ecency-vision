@@ -544,7 +544,7 @@
     "amount": "Сумма",
     "amount-placeholder": "сумма",
     "wrong-amount": "Неверное значение количества",
-    "amount-precision-error": "Используйте только 3 цифры после запятой",
+    "amount-precision-error": "Используйте только {{p}} цифры после запятой",
     "balance": "Баланс",
     "power-down-estimated": "Предположительно + {{n}} в неделю",
     "memo": "Примечание",

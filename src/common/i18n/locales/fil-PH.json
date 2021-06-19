@@ -544,7 +544,7 @@
     "amount": "Halaga",
     "amount-placeholder": "halaga",
     "wrong-amount": "Maling halaga ng kabuluhan",
-    "amount-precision-error": "Gamitin lang ang 3 numero ng kawastuhan",
+    "amount-precision-error": "Gamitin lang ang {{p}} numero ng kawastuhan",
     "balance": "Balanse",
     "power-down-estimated": "+ {{n}} Lingguhang Tinataya",
     "memo": "Paunawa",

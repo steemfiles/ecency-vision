@@ -544,7 +544,7 @@
     "amount": "Összeg",
     "amount-placeholder": "összeg",
     "wrong-amount": "Nem megfelelő összeg",
-    "amount-precision-error": "Csak 3 tizedes pontosságot használj",
+    "amount-precision-error": "Csak {{p}} tizedes pontosságot használj",
     "balance": "Egyenleg",
     "power-down-estimated": "Heti becslés + {{n}}",
     "memo": "Üzenet",

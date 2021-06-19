@@ -544,7 +544,7 @@
     "amount": "Menge",
     "amount-placeholder": "Menge",
     "wrong-amount": "Falsche Menge",
-    "amount-precision-error": "Verwende nur 3 Zahlen nach dem Komma",
+    "amount-precision-error": "Verwende nur {{p}} Zahlen nach dem Komma",
     "balance": "Kontostand",
     "power-down-estimated": "+ {{n}} geschätzt wöchentlich",
     "memo": "Memo",

@@ -544,7 +544,7 @@
     "amount": "Cantidad",
     "amount-placeholder": "cantidad",
     "wrong-amount": "Cantidad incorrecta",
-    "amount-precision-error": "Usa solo 3 dígitos",
+    "amount-precision-error": "Usa solo {{p}} dígitos",
     "balance": "Balance",
     "power-down-estimated": "+ {{n}} Estimado semanal",
     "memo": "Memo",

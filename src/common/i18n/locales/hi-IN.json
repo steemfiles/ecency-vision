@@ -544,7 +544,7 @@
     "amount": "रकम",
     "amount-placeholder": "रकम",
     "wrong-amount": "गलत राशि मान",
-    "amount-precision-error": "परिशुद्धता के केवल 3 अंकों का उपयोग करें",
+    "amount-precision-error": "परिशुद्धता के केवल {{p}} अंकों का उपयोग करें",
     "balance": "शेष रकम",
     "power-down-estimated": "+ {{n}} अनुमानित साप्ताहिक",
     "memo": "ज्ञापन",

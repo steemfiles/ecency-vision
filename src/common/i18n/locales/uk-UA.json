@@ -544,7 +544,7 @@
     "amount": "Сума",
     "amount-placeholder": "сума",
     "wrong-amount": "Невірне значення суми",
-    "amount-precision-error": "Використовуйте лише 3 знаки після коми",
+    "amount-precision-error": "Використовуйте лише {{p}} знаки після коми",
     "balance": "Баланс",
     "power-down-estimated": "+ {{n}} Приблизно щотижня",
     "memo": "Примітка",

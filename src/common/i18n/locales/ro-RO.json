@@ -544,7 +544,7 @@
     "amount": "Sumă",
     "amount-placeholder": "sumă",
     "wrong-amount": "Valoare incorectă introdusă",
-    "amount-precision-error": "Folosește doar 3 cifre de precizie",
+    "amount-precision-error": "Folosește doar {{p}} cifre de precizie",
     "balance": "Sold",
     "power-down-estimated": "+ {{n}} Estimated Weekly",
     "memo": "Notă",

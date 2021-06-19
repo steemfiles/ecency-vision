@@ -544,7 +544,7 @@
     "amount": "Määrä",
     "amount-placeholder": "määrä",
     "wrong-amount": "Väärä arvo",
-    "amount-precision-error": "Käytä vain 3 desimaalia",
+    "amount-precision-error": "Käytä vain {{p}} desimaalia",
     "balance": "Saldo",
     "power-down-estimated": "+ {{n}} Arvioitu viikoittain",
     "memo": "Muistio",

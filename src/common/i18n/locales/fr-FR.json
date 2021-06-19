@@ -544,7 +544,7 @@
     "amount": "Montant",
     "amount-placeholder": "montant",
     "wrong-amount": "Mauvaise valeur de montant",
-    "amount-precision-error": "Utilisez maximum 3 décimales pour la précision",
+    "amount-precision-error": "Utilisez maximum {{p}} décimales pour la précision",
     "balance": "Solde",
     "power-down-estimated": "+ {{n}} Estimated Weekly",
     "memo": "Memo",

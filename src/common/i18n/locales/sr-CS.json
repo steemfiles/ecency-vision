@@ -544,7 +544,7 @@
     "amount": "Iznos",
     "amount-placeholder": "iznos",
     "wrong-amount": "Pogrešna vrednost iznosa",
-    "amount-precision-error": "Koristite samo 3 cifre preciznosti",
+    "amount-precision-error": "Koristite samo {{p}} cifre preciznosti",
     "balance": "Stanje",
     "power-down-estimated": "+ {{n}} Procenjeno nedeljno",
     "memo": "Beleška",

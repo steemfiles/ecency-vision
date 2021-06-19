@@ -544,7 +544,7 @@
     "amount": "Сума",
     "amount-placeholder": "сума",
     "wrong-amount": "Грешно количество сума",
-    "amount-precision-error": "Използвай само до 3 цифри точност",
+    "amount-precision-error": "Използвай само до {{p}} цифри точност",
     "balance": "Баланс",
     "power-down-estimated": "+ {{n}} Приблизително Седмично",
     "memo": "Бележка",

@@ -544,7 +544,7 @@
     "amount": "Ilość",
     "amount-placeholder": "ilość",
     "wrong-amount": "Nieprawidłowa wartość kwoty",
-    "amount-precision-error": "Używaj tylko 3 cyfr po przecinku",
+    "amount-precision-error": "Używaj tylko {{p}} cyfr po przecinku",
     "balance": "Saldo",
     "power-down-estimated": "+{{n}} Szacowany tygodniowo",
     "memo": "Memo",

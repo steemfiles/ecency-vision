@@ -544,7 +544,7 @@
     "amount": "Importo",
     "amount-placeholder": "importo",
     "wrong-amount": "Valore dell'importo errato",
-    "amount-precision-error": "Usa solo 3 numeri decimali",
+    "amount-precision-error": "Usa solo {{p}} numeri decimali",
     "balance": "Saldo",
     "power-down-estimated": "+ {{n}} stimati ogni settimana",
     "memo": "Promemoria",

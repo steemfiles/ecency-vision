@@ -544,7 +544,7 @@
     "amount": "Jumlah",
     "amount-placeholder": "jumlah",
     "wrong-amount": "Nilai jumlah dana yang salah",
-    "amount-precision-error": "Gunakan hanya 3 digit presisi",
+    "amount-precision-error": "Gunakan hanya {{p}} digit presisi",
     "balance": "Saldo",
     "power-down-estimated": "+ {{n}} Perkiraan Mingguan",
     "memo": "Memo",

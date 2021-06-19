@@ -452,7 +452,7 @@
     "amount": "Amount",
     "amount-placeholder": "amount",
     "wrong-amount": "Wrong amount value",
-    "amount-precision-error": "Use only 3 digits of precision",
+    "amount-precision-error": "Use only {{p}} digits of precision",
     "balance": "Balance",
     "power-down-estimated": "+ {{n}} Estimated Weekly",
     "memo": "Memo",

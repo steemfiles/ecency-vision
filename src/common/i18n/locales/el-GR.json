@@ -544,7 +544,7 @@
     "amount": "Ποσό",
     "amount-placeholder": "ποσό",
     "wrong-amount": "Λανθασμένη τιμή εγκυρότητας",
-    "amount-precision-error": "Χρησιμοποιήστε μόνο 3 ψηφία ακριβείας",
+    "amount-precision-error": "Χρησιμοποιήστε μόνο {{p}} ψηφία ακριβείας",
     "balance": "Υπόλοιπο",
     "power-down-estimated": "+{{n}} Υπολογίζεται εβδομαδιαίως",
     "memo": "Σημείωμα",
