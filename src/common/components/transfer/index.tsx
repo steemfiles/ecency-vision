@@ -866,7 +866,7 @@ export class Transfer extends BaseComponent<Props, State> {
                                 		const tokenInfo = tokenProperties && tokenProperties.info;             
                                 		const tokenFractionDigits = tokenInfo && tokenInfo.precision;
                                 		const fractionDigits = (asset === LIQUID_TOKEN_UPPERCASE) ? tokenFractionDigits : 3;
-                                		console.log(fractionDigits);
+                                		console.log({amount, fractionDigits});
                                 		let o = FormattedNumber(amount, {fractionDigits, suffix:asset});
                                 		console.log(o)
                                 		return o;

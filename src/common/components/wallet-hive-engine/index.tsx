@@ -349,7 +349,14 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                                         onClick: () => {
                                                             this.openTransferDialog('power-up', this.props.aPICoinName);
                                                         }
-                                                    },                                                  
+                                                    },
+                                                    
+                                                    {
+                                                    	label: `Market (HiveEngine)`,
+                                                    	onClick: () => {
+                                                    		 window.open(`https://hive-engine.com/?p=market&t=${this.props.aPICoinName}`, this.props.aPICoinName); 
+                                                    	}
+                                                    }
 
                                                 ],
                                             };
