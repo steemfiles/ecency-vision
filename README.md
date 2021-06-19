@@ -52,7 +52,7 @@ Feel free to test it out and submit improvements and pull requests.
 
 ###### USE_PRIVATE
 
-If you are keeping the same "server" part, then set this to 0.  You can modify the client and continue with the same server of ecency.app.  You'll wont be able to use the special Hive-Engine tokens though.
+You should set this to '0' unless you're part of the ecency team.
 
 ###### PRIVATE_API_ADDR
 Should be a full address with protocol and port
@@ -61,12 +61,12 @@ Should be a full address with protocol and port
 This is generated with the following steps.  Take a string and
 make it a JSON object.
 Example:
-````
+```
 > s=JSON.stringify(0xF00);
 '3840'
 > (Buffer.from('3840', 'utf-8')).toString('base64')
 'Mzg0MA=='
-````
+```
 Now 'Mzg0MA==' should work.  The object passed in should be a long hexadecimal number.
 
 ###### SEARCH_API_ADDR and SEARCH_API_SECRET
@@ -75,7 +75,8 @@ You need to sign up at HiveSearcher and get a secret there.  The Hive Searcher U
 
 
 ###### HIVE_SIGNER_CLIENT_SECRET
-You need to sign up with a Hive account at Hive Signer. 
+
+You need to sign up with a Hive account at [Hive Signer](https://hivesigner.com/developers). 
 You'll get an APP_SECRET there for that account and you'll
 need to add the account name to the common config file.
 
