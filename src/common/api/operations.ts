@@ -277,7 +277,7 @@ export const transferKc = (from: string, to: string, amount: string, memo: strin
     return keychain.transfer(from, to, asset.amount.toString(), memo, asset.symbol, true);
 }
 const transferHiveEngineAssetJSON =(from: string, to: string, amount: string, memo: string) : string => {
-		const [quantity, token_name] = (amount.replace("&numsp;","")).split(/ /);
+		const [quantity, token_name] = (amount.replace(/,/g,"")).split(/ /);
 		const json = JSON.stringify({
 			// is it always 'tokens'?
 			"contractName": "tokens",
@@ -302,7 +302,6 @@ export const transferHiveEngineAsset = (from: string, key: PrivateKey, to: strin
 	return hiveClient.broadcast.json(op, key);
 }
 export const transferHiveEngineAssetKc = (from: string, to: string, amount: string, memo: string) => {
-	const [quantity, token_name] = (amount.replace("&numsp;","")).split(/ /);
 	const json = transferHiveEngineAssetJSON(from, to, amount, memo);
 	const op = {
 		id: 'ssc-mainnet-hive',
@@ -470,7 +469,7 @@ export const transferFromSavingsKc = (from: string, to: string, amount: string, 
 export const createTransferToVestingOp = (from: string, to: string, amount: string): Operation => {
 	const parts = amount.split(/ /);
 	const currency = parts[parts.length-1];
-	const quantity = parts[0];
+	const quantity = parts[0].replace(/,/g,'');
 	if (currency === LIQUID_TICKER) { 			
 		return [
 			'transfer_to_vesting',

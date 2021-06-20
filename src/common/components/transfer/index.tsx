@@ -158,7 +158,6 @@ const pureState = (props: Props): State => {
         (LIQUID_TOKEN_UPPERCASE && props.LIQUID_TOKEN_precision) || 0;
     const liquid_token_precision = (bare_liquid_token_precision < 6) ? bare_liquid_token_precision : 6;
     const precision = props.asset === LIQUID_TOKEN_UPPERCASE ? liquid_token_precision : 3;
-    const satoshi = precision ? ("0." + "0".repeat(precision-1) + "1") : "1";
     if (["transfer-saving", "withdraw-saving", "convert", "power-up", "power-down"].includes(props.mode)) {
         _to = props.activeUser.username;
         _toData = props.activeUser.data
@@ -172,7 +171,7 @@ const pureState = (props: Props): State => {
         toData: props.to ? {name: props.to} : _toData,
         toError: "",
         toWarning: "",
-        amount: props.amount || satoshi,
+        amount: props.amount || "",
         amountError: "",
         memo: props.memo || "",
         inProgress: false
@@ -197,9 +196,10 @@ export class Transfer extends BaseComponent<Props, State> {
         }
     }
 
-    formatNumber = (num: number | string, precision: number) => {
+    // for sending to APIs and such
+    formatNumber = (num: number | string, precision: number) : string => {
     	if (typeof num === 'string')
-    		return parseFloat(num.replace(',','')).toFixed(precision);
+    		return this.parseFloat(num).toFixed(precision);
     	return num.toFixed(precision);
     }
 
@@ -276,8 +276,10 @@ export class Transfer extends BaseComponent<Props, State> {
     }
 
     checkAmount = () => {
-        const {amount, asset} = this.state;
-
+        const {asset} = this.state;
+        const raw_amount = this.state.amount;
+        const raw_length = raw_amount.length;
+        const amount = raw_amount.replace(/,/g, '');
 
         if (amount === '') {
             this.stateSet({amountError: ''});
@@ -288,7 +290,7 @@ export class Transfer extends BaseComponent<Props, State> {
             this.stateSet({amountError: _t("transfer.wrong-amount")});
             return;
         }
-
+        
         const dotParts = amount.split('.');
         if (dotParts.length > 1) {
             const precision = dotParts[1];
@@ -298,7 +300,21 @@ export class Transfer extends BaseComponent<Props, State> {
                 return;
             }
         }
-
+        
+        if (raw_amount.indexOf(',') != -1) {
+        	// dp is the position of the decimal point or the length of raw_length if there is no decimal point.
+        	const dp = (raw_amount.indexOf('.') + raw_length + 1) % (raw_length + 1);
+        	const dp_4 = dp % 4;
+        	for (let i = 0; i < raw_amount.length; ++i) {
+        		if (i == dp)
+        			continue;
+        		if ((i%4 == dp_4) != (raw_amount.charAt(i) == ',')) {
+        			this.stateSet({amountError: _t("transfer.wrong-amount")});
+        			return;       			        			
+        		}
+        	}
+        }
+        
         if (parseFloat(amount) > this.getBalance()) {
             this.stateSet({amountError: _t("trx-common.insufficient-funds")});
             return;
@@ -324,7 +340,6 @@ export class Transfer extends BaseComponent<Props, State> {
         }
 
         const w = new HiveEngineWallet(activeUser.data, dynamicProps, 0, LIQUID_TOKEN_UPPERCASE);
-        console.log(w);
         if (mode === "withdraw-saving") {
             return asset === "HIVE" ? w.savingBalance : w.savingBalanceHbd;
         }
@@ -355,7 +370,7 @@ export class Transfer extends BaseComponent<Props, State> {
 
     formatBalance = (balance: number): string => {
         const {asset} = this.state;
-        let try_this = this.formatNumber(balance, this.props.LIQUID_TOKEN_precision || 0) || '0';
+    	let try_this = formattedNumber(balance, {fractionDigits: asset == LIQUID_TOKEN_UPPERCASE ? this.props.LIQUID_TOKEN_precision : 3});
         return try_this;
     };
 
@@ -369,7 +384,7 @@ export class Transfer extends BaseComponent<Props, State> {
 
     canSubmit = () => {
         const {toData, toError, amountError, inProgress, amount} = this.state;
-        return toData && !toError && !amountError && !inProgress && parseFloat(amount) > 0;
+        return toData && !toError && !amountError && !inProgress && this.parseFloat(amount) > 0;
     };
 
     next = () => {
@@ -390,6 +405,10 @@ export class Transfer extends BaseComponent<Props, State> {
 
     confirm = () => {
         this.stateSet({step: 3});
+    }
+    
+    parseFloat = (s:string) => {
+    	return parseFloat(s.replace(/,/g,''));
     }
 
     sign = (key: PrivateKey) => {
@@ -873,7 +892,7 @@ export class Transfer extends BaseComponent<Props, State> {
                                 	}
                                 })()}
                             </div>
-                            {asset === "HP" && <div className="amount-vests">{this.hpToVests(Number(amount))}</div>}
+                            {asset === "HP" && <div className="amount-vests">{formattedNumber(amount, {fractionDigits: 6, suffix: 'VESTS'})}</div>}
                             {memo && <div className="memo">{memo}</div>}
 
                         </div>
