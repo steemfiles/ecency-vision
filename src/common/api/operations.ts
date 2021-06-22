@@ -516,15 +516,43 @@ export const transferToVestingHot = (from: string, to: string, amount: string) =
 export const transferToVestingKc = (from: string, to: string, amount: string) => {
     return keychain.broadcast(from, [createTransferToVestingOp(from, to, amount)], "Active");
 }
-export const delegateVestingShares = (delegator: string, key: PrivateKey, delegatee: string, vestingShares: string): Promise<TransactionConfirmation> => {
-    const op: Operation = [
-        'delegate_vesting_shares',
-        {
-            delegator,
-            delegatee,
-            vesting_shares: vestingShares
-        }
-    ]
+export const createDelegateVestingSharesOp = (delegator: string, delegatee: string, vestingShares: string) : Operation => {
+	const parts = vestingShares.split(/ /);
+	const currency = parts[parts.length-1];
+	const quantity = parts[0].replace(/,/g,'');
+	if (currency === "VESTS") { 			
+		return [
+			'delegate_vesting_shares',
+			{
+				delegator,
+				delegatee,
+				vesting_shares: vestingShares
+			}
+		];
+	} else {
+		return [
+			"custom_json",
+			{
+			  "id": "ssc-mainnet-hive",
+			  "required_auths": [ delegator ], 
+			  "required_posting_auths": [],
+			  "json": JSON.stringify({
+				  "contractName": "tokens",
+				  "contractAction": "delegate",
+				  "contractPayload": {
+					"symbol": currency,
+					"to": delegatee,
+					"quantity": quantity
+				  }
+				})
+			}
+		  
+		];
+	}
+}
+
+export const delegateVestingShares = (delegator: string, key: PrivateKey, delegatee: string, vestingShares: string): Promise<TransactionConfirmation> => {	
+    const op: Operation = createDelegateVestingSharesOp(delegator, delegatee, vestingShares);
     return hiveClient.broadcast.sendOperations([op], key);
 }
 export const delegateVestingSharesHot = (delegator: string, delegatee: string, vestingShares: string) => {
@@ -538,43 +566,56 @@ export const delegateVestingSharesHot = (delegator: string, delegatee: string, v
     });
 }
 export const delegateVestingSharesKc = (delegator: string, delegatee: string, vestingShares: string) => {
-    const op: Operation = [
-        'delegate_vesting_shares',
-        {
-            delegator,
-            delegatee,
-            vesting_shares: vestingShares
-        }
-    ]
+    const op: Operation = createDelegateVestingSharesOp(delegator, delegatee, vestingShares);
     return keychain.broadcast(delegator, [op], "Active");
 }
+export const createWithdrawVestingOp = (account: string, vestingShares: string) : Operation => {
+	const parts = vestingShares.split(/ /);
+	const currency = parts[parts.length-1];
+	const quantity = parts[0].replace(/,/g,'');
+	console.log(currency);
+	if (currency === "VESTS") { 			
+		return [
+			'withdraw_vesting',
+		    {
+		        account,
+		        vesting_shares: vestingShares
+		    }
+		];
+	} else {
+		return [
+			"custom_json",
+			{
+			  "id": "ssc-mainnet-hive",
+			  "required_auths": [ account ], 
+			  "required_posting_auths": [],
+			  "json": JSON.stringify({
+				  "contractName": "tokens",
+				  "contractAction": "unstake",
+				  "contractPayload": {
+					"symbol": currency,
+					"to": account,
+					"quantity": quantity
+				  }
+				})
+			}
+		  
+		];
+	}
+}
+
 export const withdrawVesting = (account: string, key: PrivateKey, vestingShares: string): Promise<TransactionConfirmation> => {
-    const op: Operation = [
-        'withdraw_vesting',
-        {
-            account,
-            vesting_shares: vestingShares
-        }
-    ]
+    const op: Operation = createWithdrawVestingOp(account, vestingShares);
     return hiveClient.broadcast.sendOperations([op], key);
 }
 export const withdrawVestingHot = (account: string, vestingShares: string) => {
-    const op: Operation = ['withdraw_vesting', {
-        account,
-        vesting_shares: vestingShares
-    }];
+    const op: Operation = createWithdrawVestingOp(account, vestingShares);
     const params: Parameters = {callback: `${document.location.href}/@${account}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
 export const withdrawVestingKc = (account: string, vestingShares: string) => {
-    const op: Operation = [
-        'withdraw_vesting',
-        {
-            account,
-            vesting_shares: vestingShares
-        }
-    ]
+    const op: Operation = createWithdrawVestingOp(account, vestingShares);
     return keychain.broadcast(account, [op], "Active");
 }
 export const setWithdrawVestingRoute = (from: string, key: PrivateKey, to: string, percent: number, autoVest: boolean): Promise<TransactionConfirmation> => {

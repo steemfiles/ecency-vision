@@ -647,7 +647,7 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             case "power-down":
             case "delegate":
-                assets = ["HP", LIQUID_TOKEN_UPPERCASE + ' Power'];
+                assets = ["HP", LIQUID_TOKEN_UPPERCASE];
                 break;
 
         }
@@ -707,24 +707,46 @@ export class Transfer extends BaseComponent<Props, State> {
 
         // Powering down
         if (step === 1 && mode === "power-down") {
-            const w = new HiveWallet(activeUser.data, dynamicProps);
-            if (w.isPoweringDown) {
-                return <div className="transfer-dialog-content">
-                    <div className="transaction-form">
-                        {formHeader1}
-                        <div className="transaction-form-body powering-down">
-                            <p>{_t("transfer.powering-down")}</p>
-                            <p> {_t("wallet.next-power-down", {
-                                time: moment(w.nextVestingWithdrawalDate).fromNow(),
-                                amount: `${formattedNumber(w.nextVestingSharesWithdrawalHive, {fractionDigits: (asset === LIQUID_TOKEN_UPPERCASE ? (this.props.LIQUID_TOKEN_precision || 3) : 3)}) } ))} HIVE`,
-                            })}</p>
-                            <p>
-                                <Button onClick={this.nextPowerDown} variant="danger">{_t("transfer.stop-power-down")}</Button>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            }
+        	if (asset === "HP") {
+				const w = new HiveWallet(activeUser.data, dynamicProps);
+				if (w.isPoweringDown) {
+					return <div className="transfer-dialog-content">
+						<div className="transaction-form">
+							{formHeader1}
+							<div className="transaction-form-body powering-down">
+								<p>{_t("transfer.powering-down")}</p>
+								<p> {_t("wallet.next-power-down", {
+									time: moment(w.nextVestingWithdrawalDate).fromNow(),
+									amount: `${formattedNumber(w.nextVestingSharesWithdrawalHive, {fractionDigits: (asset === LIQUID_TOKEN_UPPERCASE ? (this.props.LIQUID_TOKEN_precision || 3) : 3)}) } ))} HIVE`,
+								})}</p>
+								<p>
+									<Button onClick={this.nextPowerDown} variant="danger">{_t("transfer.stop-power-down")}</Button>
+								</p>
+							</div>
+						</div>
+					</div>
+				}
+			} else {
+				const tokensUnstakes = activeUser.data.token_unstakes;
+				let thisTokenUnstake;
+				if (tokensUnstakes && (thisTokenUnstake = tokensUnstakes.find( x => (x.symbol === asset) ))) {
+						return <div className="transfer-dialog-content">
+							<div className="transaction-form">
+								{formHeader1}
+								<div className="transaction-form-body powering-down">
+									<p>{_t("transfer.powering-down")}</p>
+									<p> {_t("wallet.next-power-down", {
+										time: moment(thisTokenUnstake.nextTransactionTimestamp).fromNow(),
+										amount: formattedNumber(thisTokenUnstake.quantity, {fractionDigits: this.props.LIQUID_TOKEN_precision, suffix:asset}),
+									})}</p>
+									<p>
+										<Button onClick={this.nextPowerDown} variant="danger">{_t("transfer.stop-power-down")}</Button>										
+									</p>
+								</div>
+							</div>
+					</div>
+				}
+			}
         }
 
         return <div className="transfer-dialog-content">
@@ -893,8 +915,10 @@ export class Transfer extends BaseComponent<Props, State> {
                                 })()}
                             </div>
                             {asset === "HP" && <div className="amount-vests">{formattedNumber(amount, {fractionDigits: 6, suffix: 'VESTS'})}</div>}
+                            {(asset != "HIVE" && asset != "HBD" && asset != "HP") && ["power-down", "delegate"].includes(mode) &&
+                            	<div className="amount-vests">{formattedNumber(amount, {fractionDigits: 6, suffix: asset})}</div>}				
                             {memo && <div className="memo">{memo}</div>}
-
+                            	
                         </div>
                         <div className="d-flex justify-content-center">
                             <Button variant="outline-secondary" disabled={inProgress} onClick={this.back}>
@@ -923,7 +947,7 @@ export class Transfer extends BaseComponent<Props, State> {
                             onHot: this.signHs,
                             onKc: this.signKs,
                             // power-ups are broken for Hive Siger for HE tokens.  Quietly hide that option.
-                            hSBroken: LIQUID_TOKEN_UPPERCASE === this.props.asset && this.props.mode === "power-up",
+                            hSBroken: LIQUID_TOKEN_UPPERCASE === this.props.asset && ["transfer-saving", "withdraw-saving", "convert", "power-up", "power-down", "delegate"].includes(this.props.mode),
                         })}
                         <p className="text-center">
                             <a href="#" onClick={(e) => {

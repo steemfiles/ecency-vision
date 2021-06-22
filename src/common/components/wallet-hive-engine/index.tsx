@@ -281,6 +281,8 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         })();
         const w = new HiveEngineWallet(account, dynamicProps, converting, aPICoinName);
         const balances = w.engineBalanceTable[this.props.aPICoinName];
+        const {token_unstakes} = account;
+        const token_unstake = token_unstakes && token_unstakes.find(u => u.symbol === this.props.aPICoinName);
         return (
             <div className="wallet-hive">
 
@@ -294,7 +296,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                 <div className="rewards">
                                 	 
                                     {pending_token > 0 && (
-                                        <span className="reward-type">{formattedNumber(pending_token, {fractionDigits: 8, suffix: aPICoinName})}</span>
+                                        <span className="reward-type">{formattedNumber(pending_token, {fractionDigits: precision, suffix: aPICoinName})}</span>
                                     )}
                                     {isMyPage && (
                                         <Tooltip content={_t('wallet.claim-reward-balance')}>
@@ -387,8 +389,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                             const dropDownConfig = {
                                                 history: this.props.history,
                                                 label: '',
-                                                items: [   
-                                                	/*
+                                                items: [                                                   	
                                                     {
                                                         label: _t('wallet.delegate'),
                                                         onClick: () => {
@@ -406,8 +407,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                                         onClick: () => {
                                                             this.toggleWithdrawRoutes();
                                                         },
-                                                    },
-                                                    */
+                                                    },                                                    
                                                 ],
                                             };
                                             return <div className="amount-actions">
@@ -451,21 +451,25 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                     </div>;
                                 })()}
 
-                                {balances.pendingUnstake > 0 && (
-                                    <div className="amount amount-passive next-power-down-amount">
-                                        <Tooltip content={_t("wallet.next-power-down-amount")}>
-                                  <span>
-                                    {formattedNumber(balances.pendingUnstake, {prefix: "-", suffix: this.props.aPICoinName})}
-                                  </span>
-                                        </Tooltip>
-                                    </div>
-                                )}
+                                {
+                                (() => {	
+									  return token_unstake && (
+										<div className="amount amount-passive next-power-down-amount">
+											<Tooltip content={_t("wallet.next-power-down-amount")}>
+											  <span>									  
+												{formattedNumber(token_unstake.quantity, {prefix: "-", suffix: this.props.aPICoinName})}
+											  </span>
+											</Tooltip>
+										</div>
+									)
+								})()
+                                }
 
-                                {(balances.delegationsOut > 0 || balances.delegationsIn > 0 || balances.pendingUnstake > 0) && (
+                                {(balances.delegationsOut > 0 || balances.delegationsIn > 0 || token_unstake) && (
                                     <div className="amount total-hive-power">
                                         <Tooltip content={_t("wallet.hive-power-total")}>
                                   <span>
-                                    {formattedNumber(balances.pendingUnstake, {prefix: "=", suffix: this.props.aPICoinName})}
+                                    {formattedNumber(balances.stake-(token_unstake?token_unstake.quantity:0)+balances.delegationsIn-balances.delegationsOut, {prefix: "=", suffix: this.props.aPICoinName})}                                    
                                   </span>
                                         </Tooltip>
                                     </div>

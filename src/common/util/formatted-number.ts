@@ -51,6 +51,15 @@ export default (value: number | string, options: Options | undefined = undefined
       if (j && out[j-1] != ',')
   	    out = out.slice(0, j) + ',' + out.slice(j);
   }
+  
+  while (  ",0".indexOf( out.charAt(out.length-1) ) != -1  ) {
+  	  out = out.slice(0, out.length-1)
+  }
+  if (out.charAt(out.length-1) === '.') {
+  	  out = out.slice(0, out.length-1);
+  }
+  
+  
   if (prefix) out = prefix + " " + out;
   if (suffix) out += " " + suffix;
 

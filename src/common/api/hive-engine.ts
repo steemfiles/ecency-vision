@@ -47,7 +47,18 @@ export  interface TokenStatus {
     "voting_power":number;
 
 }
-
+/*
+ToDo 
+export interface UnStake {
+	"_id": 44318, 
+	"account": "leprechaun", 
+	"symbol": "POB", 
+	"quantity": "1.00000000", 
+	"quantityLeft": "1.00000000", 
+	"nextTransactionTimestamp": 1624807962000, 
+	"numberTransactionsLeft": 4, "millisecPerPeriod": "604800000", "txID": "7adbb831cf8d0ae066497d3b7c039a1c2041b5b1" 	
+}
+*/
 // Hopefully we can make this dynamic some soon
 const defaultPrices = {
 	'POB': 0,
