@@ -47,18 +47,19 @@ export  interface TokenStatus {
     "voting_power":number;
 
 }
-/*
-ToDo 
+
 export interface UnStake {
-	"_id": 44318, 
-	"account": "leprechaun", 
-	"symbol": "POB", 
-	"quantity": "1.00000000", 
-	"quantityLeft": "1.00000000", 
-	"nextTransactionTimestamp": 1624807962000, 
-	"numberTransactionsLeft": 4, "millisecPerPeriod": "604800000", "txID": "7adbb831cf8d0ae066497d3b7c039a1c2041b5b1" 	
+	"_id": number; 
+	"account": string; 
+	"symbol": string; 
+	"quantity": string; 
+	"quantityLeft": string; 
+	"nextTransactionTimestamp": number; 
+	"numberTransactionsLeft": number; 
+	"millisecPerPeriod": string; 
+	"txID": string; 	
 }
-*/
+
 // Hopefully we can make this dynamic some soon
 const defaultPrices = {
 	'POB': 0,
@@ -174,7 +175,7 @@ export interface CoinDescription {
 export interface FullHiveEngineAccount extends FullAccount {
     follow_stats: AccountFollowStats |undefined;
     token_balances: Array<TokenBalance>;
-    token_unstakes: Array<unknown>;
+    token_unstakes: Array<UnStake>;
     token_statuses: {data: {[id: string]:TokenStatus}, hiveData: {[id: string]:TokenStatus} | null};
     transfer_history: undefined|null|Array<HEFineTransaction>;
     token_delegations?: any; /* seems to be undefined sometimes */
@@ -242,7 +243,7 @@ export async function getScotDataAsync<T>(path : string, params : object) : Prom
     return x;
 }
 
-export async function getScotAccountDataAsync(account: string) {
+export async function getScotAccountDataAsync(account: string) : Promise<{ data: { [id: string]: TokenStatus}, hiveData:null|{ [id: string]: TokenStatus} }> {
     const data = await getScotDataAsync<{ [id: string]: TokenStatus}>(`@${account}`, {});
     const hiveData = DISABLE_HIVE
         ? null
@@ -289,7 +290,7 @@ export const fetchedHiveEngineTokensProperties = async (
 
 export async function getAccountHEFull(account : string, useHive: boolean) : Promise<FullHiveEngineAccount> {
 	try {
-		let hiveAccount: FullAccount, tokenBalances: Array<object>, tokenUnstakes: Array<object>,
+		let hiveAccount: FullAccount, tokenBalances: Array<object>, tokenUnstakes: Array<UnStake>,
 			tokenStatuses: { data: {[id:string]:TokenStatus}; hiveData: {[id:string]:TokenStatus}| null }, transferHistory: any, tokenDelegations: any;
 		[
 			hiveAccount,

@@ -28,7 +28,7 @@ import Transfer, {TransferMode, TransferAsset} from "../transfer";
 import {error, success} from "../feedback";
 import WalletMenu from "../wallet-menu";
 import WithdrawRoutes from "../withdraw-routes";
-import {is_not_FullHiveEngineAccount, FullHiveEngineAccount, getAccountHEFull, TokenStatus} from "../../api/hive-engine";
+import {is_FullHiveEngineAccount, is_not_FullHiveEngineAccount, FullHiveEngineAccount, getAccountHEFull, TokenStatus} from "../../api/hive-engine";
 import HiveEngineWallet from "../../helper/hive-engine-wallet";
 
 import {getAccount, getConversionRequests} from "../../api/hive";
@@ -44,7 +44,7 @@ import {_t} from "../../i18n";
 
 import {plusCircle} from "../../img/svg";
 import {resolveAny} from "dns";
-import {getScotDataAsync} from "../../api/hive-engine";
+import {getScotDataAsync, TokenBalance, UnStake} from "../../api/hive-engine";
 import HiveWallet from "../../helper/hive-wallet";
 
 interface Props {
@@ -61,6 +61,7 @@ interface Props {
     fetchTransactions: (username: string, group?: OperationGroup | "") => void;
     coinName: string;
     aPICoinName: string;
+    stakedCoinName: string;
 }
 
 interface State {
@@ -281,231 +282,260 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         })();
         const w = new HiveEngineWallet(account, dynamicProps, converting, aPICoinName);
         const balances = w.engineBalanceTable[this.props.aPICoinName];
-        const {token_unstakes} = account;
-        const token_unstake = token_unstakes && token_unstakes.find(u => u.symbol === this.props.aPICoinName);
-        return (
-            <div className="wallet-hive">
-
-                <div className="wallet-main">
-                    <div className="wallet-info">
-                        {(pending_token>0 && !claimed) && (
-                            <div className="unclaimed-rewards">
-                                <div className="title">
-                                    {_t('wallet.unclaimed-rewards')}
-                                </div>
-                                <div className="rewards">
-                                	 
-                                    {pending_token > 0 && (
-                                        <span className="reward-type">{formattedNumber(pending_token, {fractionDigits: precision, suffix: aPICoinName})}</span>
-                                    )}
-                                    {isMyPage && (
-                                        <Tooltip content={_t('wallet.claim-reward-balance')}>
-                                            <a
-                                                className={`claim-btn ${claiming ? 'in-progress' : ''}`}
-                                                onClick={this.claimRewardBalance}
-                                            >
-                                                {plusCircle}
-                                            </a>
-                                        </Tooltip>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                        
-
-
-                        {isMyPage && <div className="balance-row estimated alternative">
-                            <div className="balance-info">
-                                <div className="title">{_t("wallet.estimated")}</div>
-                                <div className="description">{_t("wallet.estimated-description")}</div>
-                            </div>
-                            <div className="balance-values">
-                                <div className="amount amount-bold">
-                                    <FormattedCurrency {...this.props} value={w.estimatedValue} fixAt={3}/>
-                                </div>
-                            </div>
-                        </div>}
-
-                        {w.engineBalanceTable && w.engineBalanceTable[this.props.aPICoinName] && <div className="balance-row">
-                            <div className="balance-info">
-                                <div className="title">{this.props.coinName}</div>
-                                <div className="description">{_t("wallet." + this.props.aPICoinName + "-description")}</div>
-                            </div>
-                            <div className="balance-values">
-                                <div className="amount">
-                                    {(() => {
-                                        if (isMyPage) {
-                                            const dropDownConfig = {
-                                                history: this.props.history,
-                                                label: '',
-                                                items: [                                                
-                                                    {
-                                                        label: _t('wallet.transfer'),
-                                                        onClick: () => {
-                                                            this.openTransferDialog('transfer', this.props.aPICoinName);
-                                                        }
-                                                    },
-
-                                                    {
-                                                        label: _t('wallet.power-up'),
-                                                        onClick: () => {
-                                                            this.openTransferDialog('power-up', this.props.aPICoinName);
-                                                        }
-                                                    },
-                                                    
-                                                    {
-                                                    	label: `Market (HiveEngine)`,
-                                                    	onClick: () => {
-                                                    		 window.open(`https://hive-engine.com/?p=market&t=${this.props.aPICoinName}`, this.props.aPICoinName); 
-                                                    	}
-                                                    }
-
-                                                ],
-                                            };
-                                            return <div className="amount-actions">
-                                                <DropDown {...dropDownConfig} float="right"/>
-                                            </div>;
-                                        }
-                                        return null;
-                                    })()}
-
-                                    <span>{formattedNumber(w.engineBalanceTable[this.props.aPICoinName].balance, {fractionDigits: precision, suffix: this.props.aPICoinName})}</span>
-                                </div>
-                            </div>
-
-                        </div>}
-
-                        {w.engineBalanceTable && balances && <div className="balance-row hive-power alternative">
-                            <div className="balance-info">
-                                <div className="title">{_t("wallet.staked", {c:this.props.coinName})}</div>
-                                <div className="description">{_t("wallet.staked-" + this.props.aPICoinName + "-description")}</div>
-                            </div>
-
-                            <div className="balance-values">
-                                <div className="amount">
-                                    {(() => {
-                                        if (isMyPage) {
-
-                                            const dropDownConfig = {
-                                                history: this.props.history,
-                                                label: '',
-                                                items: [                                                   	
-                                                    {
-                                                        label: _t('wallet.delegate'),
-                                                        onClick: () => {
-                                                            this.openTransferDialog('delegate', this.props.aPICoinName);
-                                                        },
-                                                    },
-                                                    {
-                                                        label: _t('wallet.power-down'),
-                                                        onClick: () => {
-                                                            this.openTransferDialog('power-down', this.props.aPICoinName);
-                                                        },
-                                                    },                                                    
-                                                    {
-                                                        label: _t('wallet.withdraw-routes'),
-                                                        onClick: () => {
-                                                            this.toggleWithdrawRoutes();
-                                                        },
-                                                    },                                                    
-                                                ],
-                                            };
-                                            return <div className="amount-actions">
-                                                <DropDown {...dropDownConfig} float="right"/>
-                                            </div>;
-                                        }
-                                        return null;
-                                    })()}
-                                    {formattedNumber(balances.stake, {suffix: this.props.aPICoinName, fractionDigits: precision})}
-                                </div>
-
-                                {balances.delegationsOut > 0 && (
-                                    <div className="amount amount-passive delegated-shares">
-                                        <Tooltip content={_t("wallet.hive-power-delegated")}>
-                                      <span className="amount-btn" onClick={this.toggleDelegatedList}>
-                                        {formattedNumber(balances.delegationsOut, {suffix: this.props.aPICoinName, fractionDigits: precision})}
-                                      </span>
-                                        </Tooltip>
-                                    </div>
-                                )}
-
-                                {(() => {
-                                    if (balances.delegationsIn <= 0) {
-                                        return null;
-                                    }
-
-                                    const strReceived = formattedNumber(balances.delegationsIn, {prefix: "+", suffix: this.props.aPICoinName});
-
-                                    if (global.usePrivate) {
-                                        return <div className="amount amount-passive received-shares">
-                                            <Tooltip content={_t("wallet.hive-power-received")}>
-                                                <span className="amount-btn" onClick={this.toggleReceivedList}>{strReceived}</span>
-                                            </Tooltip>
-                                        </div>;
-                                    }
-
-                                    return <div className="amount amount-passive received-shares">
-                                        <Tooltip content={_t("wallet.hive-power-received")}>
-                                            <span className="amount">{strReceived}</span>
-                                        </Tooltip>
-                                    </div>;
-                                })()}
-
-                                {
-                                (() => {	
-									  return token_unstake && (
-										<div className="amount amount-passive next-power-down-amount">
-											<Tooltip content={_t("wallet.next-power-down-amount")}>
-											  <span>									  
-												{formattedNumber(token_unstake.quantity, {prefix: "-", suffix: this.props.aPICoinName})}
-											  </span>
+        const {token_unstakes} = account as FullHiveEngineAccount;
+        if (token_unstakes) {
+			const token_unstake : undefined | UnStake = token_unstakes && token_unstakes.find(u => u.symbol === this.props.aPICoinName);
+			return (
+				<div className="wallet-hive">
+	
+					<div className="wallet-main">
+						<div className="wallet-info">
+							{(pending_token>0 && !claimed) && (
+								<div className="unclaimed-rewards">
+									<div className="title">
+										{_t('wallet.unclaimed-rewards')}
+									</div>
+									<div className="rewards">
+										 
+										{pending_token > 0 && (
+											<span className="reward-type">{formattedNumber(pending_token, {fractionDigits: precision, suffix: aPICoinName})}</span>
+										)}
+										{isMyPage && (
+											<Tooltip content={_t('wallet.claim-reward-balance')}>
+												<a
+													className={`claim-btn ${claiming ? 'in-progress' : ''}`}
+													onClick={this.claimRewardBalance}
+												>
+													{plusCircle}
+												</a>
+											</Tooltip>
+										)}
+									</div>
+								</div>
+							)}
+							
+	
+	
+							{isMyPage && <div className="balance-row estimated alternative">
+								<div className="balance-info">
+									<div className="title">{_t("wallet.estimated")}</div>
+									<div className="description">{_t("wallet.estimated-description")}</div>
+								</div>
+								<div className="balance-values">
+									<div className="amount amount-bold">
+										<FormattedCurrency {...this.props} value={w.estimatedValue} fixAt={3}/>
+									</div>
+								</div>
+							</div>}
+	
+							{w.engineBalanceTable && w.engineBalanceTable[this.props.aPICoinName] && <div className="balance-row">
+								<div className="balance-info">
+									<div className="title">{this.props.coinName}</div>
+									<div className="description">{_t("wallet." + this.props.aPICoinName + "-description")}</div>
+								</div>
+								<div className="balance-values">
+									<div className="amount">
+										{(() => {
+											if (isMyPage) {
+												const dropDownConfig = {
+													history: this.props.history,
+													label: '',
+													items: [
+														{
+															label: 'Wallet Operations',
+															onClick: () => {
+																window.open(`https://www.proofofbrain.io/@${account.name}/transfers`, 'origPOB')
+															}
+														},
+														{
+															label: _t('wallet.transfer'),
+															onClick: () => {
+																this.openTransferDialog('transfer', this.props.aPICoinName);
+															}
+														},
+	
+														//{
+														//    label: _t('wallet.power-up'),
+														//    onClick: () => {
+														//        //this.openTransferDialog('power-up', this.props.aPICoinName);
+														//        
+														//    }
+														//},
+														{	
+															label: "Trade at LeoDex",
+															onClick: () => {
+																window.open("https://leodex.io/market/POB", 'leodex');
+															}
+														},
+														{	
+															label: "Trade at TribalDex",
+															onClick: () => {
+																window.open("https://tribaldex.com/trade/POB", 'tribaldex');
+															}
+														},
+														{
+															label: `Trade at HiveEngine`,
+															onClick: () => {
+																 window.open(`https://hive-engine.com/?p=market&t=${this.props.aPICoinName}`, 'hiveEngineDex'); 
+															
+															}
+														},                                                                                                       
+													],
+												};
+												return <div className="amount-actions">
+													<DropDown {...dropDownConfig} float="right"/>
+												</div>;
+											}
+											return null;
+										})()}
+	
+										<span>{formattedNumber(w.engineBalanceTable[this.props.aPICoinName].balance, {fractionDigits: precision, suffix: this.props.aPICoinName})}</span>
+									</div>
+								</div>
+	
+							</div>}
+	
+							{w.engineBalanceTable && balances && <div className="balance-row hive-power alternative">
+								<div className="balance-info">
+									<div className="title">{_t("wallet.staked", {c:this.props.coinName})}</div>
+									<div className="description">{_t("wallet.staked-" + this.props.aPICoinName + "-description")}</div>
+								</div>
+	
+								<div className="balance-values">
+									<div className="amount">
+										{(() => {
+											if (isMyPage) {
+	
+												const dropDownConfig = {
+													history: this.props.history,
+													label: '',
+													items: [                                                   	
+														{
+															label: 'Wallet Operations',
+															onClick: () => {
+																window.open(`https://www.proofofbrain.io/@${account.name}/transfers`, 'origPOB')
+															}
+														},
+														//{
+														//    label: _t('wallet.delegate'),
+														//    onClick: () => {
+														//        this.openTransferDialog('delegate', this.props.aPICoinName);
+														//    },
+														//},
+														{
+															label: _t('wallet.power-down'),
+															onClick: () => {
+																this.openTransferDialog('power-down', this.props.aPICoinName);
+															},
+														},                                                    
+														//{
+														//    label: _t('wallet.withdraw-routes'),
+														//    onClick: () => {
+														//        this.toggleWithdrawRoutes();
+														//    },
+														//},                                                    
+													],
+												};
+												return <div className="amount-actions">
+													<DropDown {...dropDownConfig} float="right"/>
+												</div>;
+											}
+											return null;
+										})()}
+										{formattedNumber(balances.stake, {suffix: this.props.aPICoinName, fractionDigits: precision})}
+									</div>
+	
+									{balances.delegationsOut > 0 && (
+										<div className="amount amount-passive delegated-shares">
+											<Tooltip content={_t("wallet.hive-power-delegated")}>
+										  <span className="amount-btn" onClick={this.toggleDelegatedList}>
+											{formattedNumber(balances.delegationsOut, {suffix: this.props.aPICoinName, fractionDigits: precision})}
+										  </span>
 											</Tooltip>
 										</div>
-									)
-								})()
-                                }
-
-                                {(balances.delegationsOut > 0 || balances.delegationsIn > 0 || token_unstake) && (
-                                    <div className="amount total-hive-power">
-                                        <Tooltip content={_t("wallet.hive-power-total")}>
-                                  <span>
-                                    {formattedNumber(balances.stake-(token_unstake?token_unstake.quantity:0)+balances.delegationsIn-balances.delegationsOut, {prefix: "=", suffix: this.props.aPICoinName})}                                    
-                                  </span>
-                                        </Tooltip>
-                                    </div>
-                                )}
-                            </div>
-                        </div>}
-
-                        
-                        { // Commented out until we can put POB transactions in its place.
-                        }
-                        {// TransactionList({...this.props})
-                        }
-                    </div>
-                    <WalletMenu global={global} username={account.name} active="hiveEngine"/>
-                </div>
-
-                {transfer && <Transfer {...this.props} activeUser={activeUser!}
-                                       mode={transferMode!} asset={transferAsset!}
-                                       LIQUID_TOKEN_balances={balances}
-                                       LIQUID_TOKEN_precision={precision}
-                                       onHide={this.closeTransferDialog}/>}
-
-                {this.state.delegatedList && (
-                    <DelegatedVesting {...this.props} account={account} onHide={this.toggleDelegatedList}/>
-                )}
-
-                {this.state.receivedList && (
-                    <ReceivedVesting {...this.props} account={account} onHide={this.toggleReceivedList}/>
-                )}
-
-                {this.state.withdrawRoutes && (
-                    <WithdrawRoutes {...this.props} activeUser={activeUser!} onHide={this.toggleWithdrawRoutes}/>
-                )}
-            </div>
-        );
-    }
+									)}
+	
+									{(() => {
+										if (balances.delegationsIn <= 0) {
+											return null;
+										}
+	
+										const strReceived = formattedNumber(balances.delegationsIn, {prefix: "+", suffix: this.props.aPICoinName});
+	
+										if (global.usePrivate) {
+											return <div className="amount amount-passive received-shares">
+												<Tooltip content={_t("wallet.hive-power-received")}>
+													<span className="amount-btn" onClick={this.toggleReceivedList}>{strReceived}</span>
+												</Tooltip>
+											</div>;
+										}
+	
+										return <div className="amount amount-passive received-shares">
+											<Tooltip content={_t("wallet.hive-power-received")}>
+												<span className="amount">{strReceived}</span>
+											</Tooltip>
+										</div>;
+									})()}
+	
+									{
+									(() => {	
+										  return token_unstake && (
+											<div className="amount amount-passive next-power-down-amount">
+												<Tooltip content={_t("wallet.next-power-down-amount")}>
+												  <span>									  
+													{formattedNumber(token_unstake.quantity, {prefix: "-", suffix: this.props.aPICoinName})}
+												  </span>
+												</Tooltip>
+											</div>
+										)
+									})()
+									}
+	
+									{(balances.delegationsOut > 0 || balances.delegationsIn > 0 || token_unstake) && (
+										<div className="amount total-hive-power">
+											<Tooltip content={_t("wallet.hive-power-total")}>
+									  <span>
+										{formattedNumber(
+											balances.stake-(token_unstake?parseFloat(token_unstake.quantity):0)+balances.delegationsIn-balances.delegationsOut, {prefix: "=", suffix: this.props.aPICoinName})}                                    
+									  </span>
+											</Tooltip>
+										</div>
+									)}
+								</div>
+							</div>}
+	
+							
+							{ // Commented out until we can put POB transactions in its place.
+							}
+							{// TransactionList({...this.props})
+							}
+						</div>
+						<WalletMenu global={global} username={account.name} active="hiveEngine"/>
+					</div>
+	
+					{transfer && <Transfer {...this.props} activeUser={activeUser!}
+										   mode={transferMode!} asset={transferAsset!}
+										   LIQUID_TOKEN_balances={balances}
+										   LIQUID_TOKEN_precision={precision}
+										   onHide={this.closeTransferDialog}/>}
+	
+					{this.state.delegatedList && (
+						<DelegatedVesting {...this.props} account={account} onHide={this.toggleDelegatedList}/>
+					)}
+	
+					{this.state.receivedList && (
+						<ReceivedVesting {...this.props} account={account} onHide={this.toggleReceivedList}/>
+					)}
+	
+					{this.state.withdrawRoutes && (
+						<WithdrawRoutes {...this.props} activeUser={activeUser!} onHide={this.toggleWithdrawRoutes}/>
+					)}
+				</div>
+			);
+		} else {
+			return <div>Hive Engine Data not available</div>;
+		}  // if
+	}
 }
 
 
@@ -524,6 +554,7 @@ export default (p: Props) => {
         fetchTransactions: p.fetchTransactions,
         aPICoinName: p.aPICoinName,
         coinName: p.coinName,
+        stakedCoinName: p.stakedCoinName,
     }
 
     return <WalletHiveEngine {...props}/>;

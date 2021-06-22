@@ -31,7 +31,7 @@ import WalletHiveEngine from "../components/wallet-hive-engine";
 import ScrollToTop from "../components/scroll-to-top";
 
 import {getAccountHEFull} from "../api/hive-engine";
-import {LIQUID_TOKEN, LIQUID_TOKEN_UPPERCASE} from "../../client_config";
+import {LIQUID_TOKEN, LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN} from "../../client_config";
 
 import defaults from "../constants/defaults.json";
 
@@ -247,6 +247,7 @@ class ProfilePage extends BaseComponent<Props, State> {
                                 return WalletHiveEngine({
                                 	coinName:LIQUID_TOKEN,
                                 	aPICoinName:LIQUID_TOKEN_UPPERCASE,
+                                	stakedCoinName:VESTING_TOKEN,
                                     ...this.props,
                                     account
                                 });

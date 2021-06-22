@@ -569,11 +569,27 @@ export const delegateVestingSharesKc = (delegator: string, delegatee: string, ve
     const op: Operation = createDelegateVestingSharesOp(delegator, delegatee, vestingShares);
     return keychain.broadcast(delegator, [op], "Active");
 }
-export const createWithdrawVestingOp = (account: string, vestingShares: string) : Operation => {
-	const parts = vestingShares.split(/ /);
-	const currency = parts[parts.length-1];
-	const quantity = parts[0].replace(/,/g,'');
-	console.log(currency);
+export const createStopWithdrawVestingOp = (account: string, txId: string) : Operation => {
+	return [
+			"custom_json",
+			{
+			  "id": "ssc-mainnet-hive",
+			  "required_auths": [ account ], 
+			  "required_posting_auths": [],
+			  "json": JSON.stringify({
+				  "contractName": "tokens",
+				  "contractAction": "cancelUnstake",
+				  "contractPayload": {
+					"txID": txId
+				  }
+				})
+			}
+		  
+		];		
+}
+
+
+export const createWithdrawVestingOp = (account: string, quantity: number, currency: string) : Operation => {
 	if (currency === "VESTS") { 			
 		return [
 			'withdraw_vesting',
@@ -604,20 +620,55 @@ export const createWithdrawVestingOp = (account: string, vestingShares: string) 
 	}
 }
 
-export const withdrawVesting = (account: string, key: PrivateKey, vestingShares: string): Promise<TransactionConfirmation> => {
-    const op: Operation = createWithdrawVestingOp(account, vestingShares);
+export const withdrawVesting = (account: string, key: PrivateKey, vestingShares: number, symbol: string): Promise<TransactionConfirmation> => {
+    const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
     return hiveClient.broadcast.sendOperations([op], key);
 }
-export const withdrawVestingHot = (account: string, vestingShares: string) => {
-    const op: Operation = createWithdrawVestingOp(account, vestingShares);
+export const withdrawVestingHot = (account: string, vestingShares: number, symbol: string) => {
+    const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
     const params: Parameters = {callback: `${document.location.href}/@${account}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
-export const withdrawVestingKc = (account: string, vestingShares: string) => {
-    const op: Operation = createWithdrawVestingOp(account, vestingShares);
+export const withdrawVestingKc = (account: string, vestingShares: number, symbol: string) => {
+    const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
     return keychain.broadcast(account, [op], "Active");
 }
+
+export const createCancelPowerDownOp = (account:string, txID: string) : Operation => {
+	return [
+		"custom_json",
+		{
+		  "id": "ssc-mainnet-hive",
+		  "required_auths": [
+			"leprechaun"
+		  ],
+		  "required_posting_auths": [],
+		  "json": JSON.stringify({
+			  "contractName": "tokens",
+			  "contractAction": "cancelUnstake",
+			  "contractPayload": {
+				"txID": txID,
+			  }
+			})
+		}
+	  ];
+}	
+export const cancelWithdrawVesting = (account: string, key: PrivateKey, txID: string): Promise<TransactionConfirmation> => {
+    const op: Operation = createCancelPowerDownOp(account, txID);
+    return hiveClient.broadcast.sendOperations([op], key);
+}
+export const cancelWithdrawVestingHot = (account: string, txID: string) => {
+    const op: Operation = createCancelPowerDownOp(account, txID);
+    const params: Parameters = {callback: `${document.location.href}/@${account}/wallet`};
+    return hs.sendOperation(op, params, () => {
+    });
+}
+export const cancelWithdrawVestingKc = (account: string, txID: string) => {
+    const op: Operation = createCancelPowerDownOp(account, txID);
+    return keychain.broadcast(account, [op], "Active");
+}
+
 export const setWithdrawVestingRoute = (from: string, key: PrivateKey, to: string, percent: number, autoVest: boolean): Promise<TransactionConfirmation> => {
     const op: Operation = [
         'set_withdraw_vesting_route',

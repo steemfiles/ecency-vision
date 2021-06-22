@@ -35,7 +35,7 @@ import HiveWallet from "../../helper/hive-wallet";
 import amountFormatCheck from '../../helper/amount-format-check';
 import parseAsset from "../../helper/parse-asset";
 import {vestsToHp, hpToVests} from "../../helper/vesting";
-import {LIQUID_TOKEN_UPPERCASE } from "../../../client_config";
+import {LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN} from "../../../client_config";
 import FormattedNumber from "../../util/formatted-number";
 import {getAccount} from "../../api/hive";
 import {
@@ -66,6 +66,9 @@ import {
     withdrawVesting,
     withdrawVestingHot,
     withdrawVestingKc,
+    cancelWithdrawVesting,
+    cancelWithdrawVestingHot,
+    cancelWithdrawVestingKc,
     formatError
 } from "../../api/operations";
 
@@ -73,7 +76,7 @@ import {_t} from "../../i18n";
 import {Tsx} from "../../i18n/helper";
 
 import {arrowRightSvg} from "../../img/svg";
-import {getAccountHEFull, TokenBalance} from "../../api/hive-engine";
+import {getAccountHEFull, TokenBalance, UnStake, is_FullHiveEngineAccount, FullHiveEngineAccount} from "../../api/hive-engine";
 import HiveEngineWallet from "../../helper/hive-engine-wallet";
 
 export type TransferMode = "transfer" | "transfer-saving" | "withdraw-saving" | "convert" | "power-up" | "power-down" | "delegate";
@@ -364,6 +367,12 @@ export class Transfer extends BaseComponent<Props, State> {
                 return LIQUID_TOKEN_balances.balance;
             }
         }
+        
+        if (asset === VESTING_TOKEN) {
+            if (!!LIQUID_TOKEN_balances) {
+                return LIQUID_TOKEN_balances.stake;
+            }
+        }
 
         return 0;
     };
@@ -416,7 +425,15 @@ export class Transfer extends BaseComponent<Props, State> {
         const {to, amount, asset, memo} = this.state;
         const fullAmount = `${amount} ${asset}`;
         const username = activeUser?.username!
-
+        
+        const assetUnstakes : UnStake | undefined | null = (() => {
+				if (is_FullHiveEngineAccount(activeUser.data)) {
+					const {token_unstakes} = activeUser.data as FullHiveEngineAccount;
+					return token_unstakes ? (token_unstakes as Array<UnStake>).find( x => x.symbol === asset ) : null;
+				}
+				return undefined;
+			})();
+        
         let promise: Promise<any>;
         switch (mode) {
             case "transfer": {
@@ -446,12 +463,20 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "power-down": {
-                const vests = this.hpToVests(Number(amount));
-                promise = withdrawVesting(username, key, vests);
+                const vests = asset === "HIVE" ? this.hpToVests(Number(amount)) : amount;
+                const stake_asset = asset === "HIVE" ? "HP" : asset;
+                if (parseFloat(amount) == 0 && asset !== 'HIVE') {
+                	if (!assetUnstakes) {
+                		return;
+                	}
+                	promise = cancelWithdrawVesting(username, key, assetUnstakes.txID ); 
+                } else {
+                	promise = withdrawVesting(username, key, vests, stake_asset);
+                }
                 break;
             }
             case "delegate": {
-                const vests = this.hpToVests(Number(amount));
+                const vests = asset === "HIVE" ? this.hpToVests(Number(amount)) : amount;
                 promise = delegateVestingShares(username, key, to, vests);
                 break;
             }
@@ -481,6 +506,8 @@ export class Transfer extends BaseComponent<Props, State> {
         const {to, amount, asset, memo} = this.state;
         const fullAmount = `${amount} ${asset}`;
         const username = activeUser?.username!
+        const {token_unstakes} = activeUser.data as FullHiveEngineAccount | {token_unstakes: undefined};
+        const assetUnstakes = token_unstakes && token_unstakes.find( x => x.symbol === asset );
 
         switch (mode) {
             case "transfer": {
@@ -510,12 +537,19 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "power-down": {
-                const vests = this.hpToVests(Number(amount));
-                withdrawVestingHot(username, vests);
+                const vests = asset === "HIVE" ? this.hpToVests(Number(amount)) : amount;
+                const stake_asset = asset === "HIVE" ? "HP" : LIQUID_TOKEN_UPPERCASE;
+                if (parseFloat(amount) == 0 && asset !== 'HIVE') {
+                	if (!assetUnstakes)
+                		return;
+                	cancelWithdrawVestingHot(username, assetUnstakes.txID); 
+                } else {
+                	withdrawVestingHot(username, vests, stake_asset);
+                }
                 break;
             }
             case "delegate": {
-                const vests = this.hpToVests(Number(amount));
+                const vests = asset === "HIVE" ? this.hpToVests(Number(amount)) : amount;
                 delegateVestingSharesHot(username, to, vests);
                 break;
             }
@@ -531,6 +565,8 @@ export class Transfer extends BaseComponent<Props, State> {
         const {to, amount, asset, memo} = this.state;
         const fullAmount = `${amount} ${asset}`;
         const username = activeUser?.username!
+        const {token_unstakes} = activeUser.data as FullHiveEngineAccount;
+        const assetUnstakes = token_unstakes && token_unstakes.find( x => x.symbol === asset );
 
         let promise: Promise<any>;
         switch (mode) {
@@ -561,12 +597,17 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "power-down": {
-                const vests = this.hpToVests(Number(amount));
-                promise = withdrawVestingKc(username, vests);
+                const vests = asset === "HIVE" ? this.hpToVests(Number(amount)) : amount;
+                const stake_asset = asset === "HIVE" ? "HP" : LIQUID_TOKEN_UPPERCASE;
+                if (assetUnstakes && asset !== 'HIVE') {
+                	promise = cancelWithdrawVestingKc(username, assetUnstakes.txID);
+                } else {
+                	promise = withdrawVestingKc(username, vests, stake_asset);
+                }
                 break;
             }
             case "delegate": {
-                const vests = this.hpToVests(Number(amount));
+                const vests = asset === "HIVE" ? this.hpToVests(Number(amount)) : amount;
                 promise = delegateVestingSharesKc(username, to, vests);
                 break;
             }
@@ -602,7 +643,8 @@ export class Transfer extends BaseComponent<Props, State> {
     render() {
         const {global, mode, activeUser, transactions, dynamicProps} = this.props;
         const {step, asset, to, toError, toWarning, amount, amountError, memo, inProgress} = this.state;
-
+        const EnginelessHiveAccount = activeUser.data;
+        
         const recent = [...new Set(
             transactions.list
                 .filter(x => x.type === 'transfer' && x.from === activeUser.username)
@@ -647,7 +689,7 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             case "power-down":
             case "delegate":
-                assets = ["HP", LIQUID_TOKEN_UPPERCASE];
+                assets = ["HP", VESTING_TOKEN];
                 break;
 
         }
@@ -707,8 +749,10 @@ export class Transfer extends BaseComponent<Props, State> {
 
         // Powering down
         if (step === 1 && mode === "power-down") {
+        	// @ts-ignore
         	if (asset === "HP") {
 				const w = new HiveWallet(activeUser.data, dynamicProps);
+				const fractionDigits = 3;
 				if (w.isPoweringDown) {
 					return <div className="transfer-dialog-content">
 						<div className="transaction-form">
@@ -717,7 +761,7 @@ export class Transfer extends BaseComponent<Props, State> {
 								<p>{_t("transfer.powering-down")}</p>
 								<p> {_t("wallet.next-power-down", {
 									time: moment(w.nextVestingWithdrawalDate).fromNow(),
-									amount: `${formattedNumber(w.nextVestingSharesWithdrawalHive, {fractionDigits: (asset === LIQUID_TOKEN_UPPERCASE ? (this.props.LIQUID_TOKEN_precision || 3) : 3)}) } ))} HIVE`,
+									amount: formattedNumber(w.nextVestingSharesWithdrawalHive, {fractionDigits: 3, suffix:"HIVE"}),
 								})}</p>
 								<p>
 									<Button onClick={this.nextPowerDown} variant="danger">{_t("transfer.stop-power-down")}</Button>
@@ -726,15 +770,15 @@ export class Transfer extends BaseComponent<Props, State> {
 						</div>
 					</div>
 				}
-			} else {
-				const tokensUnstakes = activeUser.data.token_unstakes;
+			} else if (is_FullHiveEngineAccount(activeUser.data)) {
+				const tokensUnstakes : Array<UnStake> = (activeUser.data as FullHiveEngineAccount) .token_unstakes;
 				let thisTokenUnstake;
 				if (tokensUnstakes && (thisTokenUnstake = tokensUnstakes.find( x => (x.symbol === asset) ))) {
 						return <div className="transfer-dialog-content">
 							<div className="transaction-form">
 								{formHeader1}
 								<div className="transaction-form-body powering-down">
-									<p>{_t("transfer.powering-down")}</p>
+									<p>Power Down {VESTING_TOKEN}</p>
 									<p> {_t("wallet.next-power-down", {
 										time: moment(thisTokenUnstake.nextTransactionTimestamp).fromNow(),
 										amount: formattedNumber(thisTokenUnstake.quantity, {fractionDigits: this.props.LIQUID_TOKEN_precision, suffix:asset}),
@@ -746,6 +790,22 @@ export class Transfer extends BaseComponent<Props, State> {
 							</div>
 					</div>
 				}
+			} else {
+						return <div className="transfer-dialog-content">
+							<div className="transaction-form">
+								{formHeader1}
+								<div className="transaction-form-body powering-down">
+									<p>Power Down {VESTING_TOKEN}</p>
+									<p> {_t("wallet.next-power-down", {
+										time: 'Unknown (No HiveEngine Data Available)',
+										amount: 'Unknown',
+									})}</p>
+									<p>
+										<Button onClick={this.nextPowerDown} variant="danger">{_t("transfer.stop-power-down")}</Button>										
+									</p>
+								</div>
+							</div>
+					</div>
 			}
         }
 

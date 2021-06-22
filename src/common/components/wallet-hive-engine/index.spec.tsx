@@ -76,6 +76,7 @@ const defProps = {
     },
     aPICoinName: "POB",
     coinName: "Proof of Brain",
+    stakedCoinName: "Brain Power",
 }
 
 it("(1) Default Render", () => {
