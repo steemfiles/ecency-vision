@@ -81,7 +81,7 @@ import HiveEngineWallet from "../../helper/hive-engine-wallet";
 
 export type TransferMode = "transfer" | "transfer-saving" | "withdraw-saving" | "convert" | "power-up" | "power-down" | "delegate";
 export type TransferAsset = string;// "HIVE" | "HBD" | "HP" | "POINT" | "POB" | ...
-
+const NATIVE_PD_ASSET = "HP";
 interface AssetSwitchProps {
     options: TransferAsset[];
     selected: TransferAsset;
@@ -434,6 +434,7 @@ export class Transfer extends BaseComponent<Props, State> {
 				return undefined;
 			})();
         
+        
         let promise: Promise<any>;
         switch (mode) {
             case "transfer": {
@@ -463,16 +464,9 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "power-down": {
-                const vests = asset === "HIVE" ? this.hpToVests(Number(amount)) : amount;
-                const stake_asset = asset === "HIVE" ? "HP" : asset;
-                if (parseFloat(amount) == 0 && asset !== 'HIVE') {
-                	if (!assetUnstakes) {
-                		return;
-                	}
-                	promise = cancelWithdrawVesting(username, key, assetUnstakes.txID ); 
-                } else {
-                	promise = withdrawVesting(username, key, vests, stake_asset);
-                }
+                const vests = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : amount;
+                const stake_asset = (asset === NATIVE_PD_ASSET) ? "VESTS" : LIQUID_TOKEN_UPPERCASE;
+                promise = withdrawVesting(username, key, parseFloat(vests), stake_asset);                
                 break;
             }
             case "delegate": {
@@ -537,15 +531,9 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "power-down": {
-                const vests = asset === "HIVE" ? this.hpToVests(Number(amount)) : amount;
-                const stake_asset = asset === "HIVE" ? "HP" : LIQUID_TOKEN_UPPERCASE;
-                if (parseFloat(amount) == 0 && asset !== 'HIVE') {
-                	if (!assetUnstakes)
-                		return;
-                	cancelWithdrawVestingHot(username, assetUnstakes.txID); 
-                } else {
-                	withdrawVestingHot(username, vests, stake_asset);
-                }
+                const vests = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : amount;
+                const stake_asset = (asset === NATIVE_PD_ASSET) ? "VESTS" : LIQUID_TOKEN_UPPERCASE;
+               	promise = withdrawVestingHot(username, parseFloat(vests), stake_asset);
                 break;
             }
             case "delegate": {
@@ -597,13 +585,9 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "power-down": {
-                const vests = asset === "HIVE" ? this.hpToVests(Number(amount)) : amount;
-                const stake_asset = asset === "HIVE" ? "HP" : LIQUID_TOKEN_UPPERCASE;
-                if (assetUnstakes && asset !== 'HIVE') {
-                	promise = cancelWithdrawVestingKc(username, assetUnstakes.txID);
-                } else {
-                	promise = withdrawVestingKc(username, vests, stake_asset);
-                }
+                const vests = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : amount;
+                const stake_asset = (asset === NATIVE_PD_ASSET) ? "VESTS" : LIQUID_TOKEN_UPPERCASE;
+               	promise = withdrawVestingKc(username, parseFloat(vests), stake_asset);
                 break;
             }
             case "delegate": {
@@ -974,7 +958,7 @@ export class Transfer extends BaseComponent<Props, State> {
                                 	}
                                 })()}
                             </div>
-                            {asset === "HP" && <div className="amount-vests">{formattedNumber(amount, {fractionDigits: 6, suffix: 'VESTS'})}</div>}
+                            {asset === "HP" && <div className="amount-vests">{formattedNumber(this.hpToVests(Number(amount)), {fractionDigits: 6, suffix: 'VESTS'})}</div>}
                             {(asset != "HIVE" && asset != "HBD" && asset != "HP") && ["power-down", "delegate"].includes(mode) &&
                             	<div className="amount-vests">{formattedNumber(amount, {fractionDigits: 6, suffix: asset})}</div>}				
                             {memo && <div className="memo">{memo}</div>}

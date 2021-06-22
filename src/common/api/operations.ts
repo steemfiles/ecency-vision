@@ -595,7 +595,7 @@ export const createWithdrawVestingOp = (account: string, quantity: number, curre
 			'withdraw_vesting',
 		    {
 		        account,
-		        vesting_shares: vestingShares
+		        vesting_shares: quantity
 		    }
 		];
 	} else {

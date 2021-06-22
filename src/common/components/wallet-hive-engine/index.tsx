@@ -397,7 +397,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
 	
 							{w.engineBalanceTable && balances && <div className="balance-row hive-power alternative">
 								<div className="balance-info">
-									<div className="title">{_t("wallet.staked", {c:this.props.coinName})}</div>
+									<div className="title">{this.props.stakedCoinName}</div>
 									<div className="description">{_t("wallet.staked-" + this.props.aPICoinName + "-description")}</div>
 								</div>
 	

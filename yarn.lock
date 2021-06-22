@@ -1241,17 +1241,10 @@
   resolved "https://registry.yarnpkg.com/@csstools/convert-colors/-/convert-colors-1.4.0.tgz#ad495dc41b12e75d588c6db8b9834f08fa131eb7"
   integrity sha512-5a6wqoJV/xEdbRNKVo6I4hO3VjyDq//8q2f9I6PBAvMesJHFauXDorcNCsr9RzvsZnaWi5NYCcfyqP1QeFHFbw==
 
-<<<<<<< HEAD
 "@ecency/render-helper@^2.1.8":
   version "2.1.8"
   resolved "https://registry.yarnpkg.com/@ecency/render-helper/-/render-helper-2.1.8.tgz#c30508abe46e1a8e146eefe93cee5c6b2b31ce27"
   integrity sha512-AKEJ0hgzd5IL8+11ofqUS2QR/yJtVWcnkonudkazEmK/xpvLzQEeQmGq2iSp8yDmhHRx1zxM2Kznk+hZFCyKZQ==
-=======
-"@ecency/render-helper@^2.1.5":
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/@ecency/render-helper/-/render-helper-2.1.5.tgz#bcc7d1165795a656765a80918541afa9a5eb0507"
-  integrity sha512-3fxOk2rUkIUzFzDT6cdDIcBPSE3MoinKQJS9uM/YRY/mrvrZk36bFDlEujqZeIx2K/zDLpIEmjKf8y/GerB8TQ==
->>>>>>> development
   dependencies:
     he "^1.2.0"
     lru-cache "^5.1.1"
@@ -10874,6 +10867,11 @@ sortablejs@1.10.1:
   version "1.10.1"
   resolved "https://registry.yarnpkg.com/sortablejs/-/sortablejs-1.10.1.tgz#3d52b00f871be00f00f84d99a60d120bf3dfe52c"
   integrity sha512-N6r7GrVmO8RW1rn0cTdvK3JR0BcqecAJ0PmYMCL3ZuqTH3pY+9QyqkmJSkkLyyDvd+AJnwaxTP22Ybr/83V9hQ==
+
+sortablejs@^1.13.0:
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/sortablejs/-/sortablejs-1.13.0.tgz#3ab2473f8c69ca63569e80b1cd1b5669b51269e9"
+  integrity sha512-RBJirPY0spWCrU5yCmWM1eFs/XgX2J5c6b275/YyxFRgnzPhKl/TDeU2hNR8Dt7ITq66NRPM4UlOt+e5O4CFHg==
 
 source-list-map@^2.0.0:
   version "2.0.1"
