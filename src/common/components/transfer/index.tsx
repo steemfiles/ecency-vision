@@ -533,7 +533,7 @@ export class Transfer extends BaseComponent<Props, State> {
             case "power-down": {
                 const vests = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : amount;
                 const stake_asset = (asset === NATIVE_PD_ASSET) ? "VESTS" : LIQUID_TOKEN_UPPERCASE;
-               	promise = withdrawVestingHot(username, parseFloat(vests), stake_asset);
+               	withdrawVestingHot(username, parseFloat(vests), stake_asset);
                 break;
             }
             case "delegate": {
