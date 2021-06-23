@@ -48,11 +48,13 @@ export default (value: number | string, options: Options | undefined = undefined
 	  }
   }
   for (let j = decimal_location - 3; j >= 0; j -= 3) {  	  
-      if (j && out[j-1] != ',')
+      if (j && out[j-1] != ',') {
   	    out = out.slice(0, j) + ',' + out.slice(j);
+  	    ++decimal_location;
+  	  }
   }
   
-  while (  ",0".indexOf( out.charAt(out.length-1) ) != -1  ) {
+  while (decimal_location < out.length &&  ",0".indexOf( out.charAt(out.length-1) ) != -1  ) {
   	  out = out.slice(0, out.length-1)
   }
   if (out.charAt(out.length-1) === '.') {
