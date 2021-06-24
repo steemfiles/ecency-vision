@@ -589,8 +589,8 @@ export const createStopWithdrawVestingOp = (account: string, txId: string) : Ope
 }
 
 
-export const createWithdrawVestingOp = (account: string, quantity: number, currency: string) : Operation => {
-	if (currency === "VESTS") { 			
+export const createWithdrawVestingOp = (account: string, quantity: string, currency: string) : Operation => {
+	if (currency === "VESTS") {
 		return [
 			'withdraw_vesting',
 		    {
@@ -620,17 +620,17 @@ export const createWithdrawVestingOp = (account: string, quantity: number, curre
 	}
 }
 
-export const withdrawVesting = (account: string, key: PrivateKey, vestingShares: number, symbol: string): Promise<TransactionConfirmation> => {
+export const withdrawVesting = (account: string, key: PrivateKey, vestingShares: string, symbol: string): Promise<TransactionConfirmation> => {
     const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
     return hiveClient.broadcast.sendOperations([op], key);
 }
-export const withdrawVestingHot = (account: string, vestingShares: number, symbol: string) => {
+export const withdrawVestingHot = (account: string, vestingShares: string, symbol: string) => {
     const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
     const params: Parameters = {callback: `${document.location.href}/@${account}/wallet`};
     return hs.sendOperation(op, params, () => {
     });
 }
-export const withdrawVestingKc = (account: string, vestingShares: number, symbol: string) => {
+export const withdrawVestingKc = (account: string, vestingShares: string, symbol: string) => {
     const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
     return keychain.broadcast(account, [op], "Active");
 }

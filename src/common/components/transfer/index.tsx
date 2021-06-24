@@ -454,7 +454,7 @@ export class Transfer extends BaseComponent<Props, State> {
 
     sign = (key: PrivateKey) => {
         const {activeUser, mode} = this.props;
-        const {to, amount, asset, memo} = this.state;
+        const {to, amount, asset, memo, precision} = this.state;
         const fullAmount = `${amount} ${asset}`;
         const username = activeUser?.username!
         
@@ -496,9 +496,9 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "power-down": {
-                const vests = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : amount;
-                const stake_asset = (asset === NATIVE_PD_ASSET) ? "VESTS" : LIQUID_TOKEN_UPPERCASE;
-                promise = withdrawVesting(username, key, parseFloat(vests), stake_asset);                
+                const stake_asset = (asset === NATIVE_PD_ASSET || asset === "VESTS") ? "VESTS" : LIQUID_TOKEN_UPPERCASE;
+                const vests = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : this.formatNumber(amount, getPrecision(stake_asset));
+                promise = withdrawVesting(username, key, vests, stake_asset);                
                 break;
             }
             case "delegate": {
@@ -529,7 +529,7 @@ export class Transfer extends BaseComponent<Props, State> {
 
     signHs = () => {
         const {activeUser, mode, onHide} = this.props;
-        const {to, amount, asset, memo} = this.state;
+        const {to, amount, asset, memo, precision} = this.state;
         const fullAmount = `${amount} ${asset}`;
         const username = activeUser?.username!
         const {token_unstakes} = activeUser.data as FullHiveEngineAccount | {token_unstakes: undefined};
@@ -563,9 +563,9 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "power-down": {
-                const vests = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : amount;
-                const stake_asset = (asset === NATIVE_PD_ASSET) ? "VESTS" : LIQUID_TOKEN_UPPERCASE;
-               	withdrawVestingHot(username, parseFloat(vests), stake_asset);
+                const stake_asset = (asset === NATIVE_PD_ASSET || asset === "VESTS") ? "VESTS" : LIQUID_TOKEN_UPPERCASE;
+                const vests = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : this.formatNumber(amount, getPrecision(stake_asset));
+                withdrawVestingHot(username, vests, stake_asset);                
                 break;
             }
             case "delegate": {
@@ -582,7 +582,7 @@ export class Transfer extends BaseComponent<Props, State> {
 
     signKs = () => {
         const {activeUser, mode} = this.props;
-        const {to, amount, asset, memo} = this.state;
+        const {to, amount, asset, memo, precision} = this.state;
         const fullAmount = `${amount} ${asset}`;
         const username = activeUser?.username!
         const {token_unstakes} = activeUser.data as FullHiveEngineAccount;
@@ -617,9 +617,9 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "power-down": {
-                const vests = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : amount;
-                const stake_asset = (asset === NATIVE_PD_ASSET) ? "VESTS" : LIQUID_TOKEN_UPPERCASE;
-               	promise = withdrawVestingKc(username, parseFloat(vests), stake_asset);
+                const stake_asset = (asset === NATIVE_PD_ASSET || asset === "VESTS") ? "VESTS" : LIQUID_TOKEN_UPPERCASE;
+                const vests : string = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : this.formatNumber(amount, getPrecision(stake_asset));
+               	promise = withdrawVestingKc(username, vests, stake_asset);
                 break;
             }
             case "delegate": {
