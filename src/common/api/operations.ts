@@ -624,11 +624,10 @@ export const withdrawVesting = (account: string, key: PrivateKey, vestingShares:
     const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
     return hiveClient.broadcast.sendOperations([op], key);
 }
-export const withdrawVestingHot = (account: string, vestingShares: string, symbol: string) => {
+export const withdrawVestingHot = (account: string, vestingShares: string, symbol: string, fn : ()=>void) => {
     const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
     const params: Parameters = {callback: `${document.location.href}/@${account}/wallet`};
-    return hs.sendOperation(op, params, () => {
-    });
+    return hs.sendOperation(op, params, fn);
 }
 export const withdrawVestingKc = (account: string, vestingShares: string, symbol: string) => {
     const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
