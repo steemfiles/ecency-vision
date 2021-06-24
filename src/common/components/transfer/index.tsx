@@ -35,7 +35,6 @@ import HiveWallet from "../../helper/hive-wallet";
 import amountFormatCheck from '../../helper/amount-format-check';
 import parseAsset from "../../helper/parse-asset";
 import {vestsToHp, hpToVests} from "../../helper/vesting";
-import {LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN} from "../../../client_config";
 import FormattedNumber from "../../util/formatted-number";
 import {getAccount} from "../../api/hive";
 import {
@@ -72,6 +71,7 @@ import {
     formatError
 } from "../../api/operations";
 
+import {LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN} from "../../../client_config";
 import {_t} from "../../i18n";
 import {Tsx} from "../../i18n/helper";
 
@@ -295,6 +295,16 @@ export class Transfer extends BaseComponent<Props, State> {
                     this.stateSet({inProgress: false});
                 });
         }, 500);
+    }
+    
+    maximumFractionalDigits() : number {
+    	const {asset} = this.state;
+    	const {global} = this.props;
+    	const {hiveEngineTokensProperties} = global;
+    	let x : any;
+    	if ([LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN].includes(asset)) 
+   			return this.props.LIQUID_TOKEN_precision || 3;
+    	return 3;
     }
 
     checkAmount = () => {
@@ -708,7 +718,7 @@ export class Transfer extends BaseComponent<Props, State> {
         const titleLngKey = (mode === "transfer" && asset === "POINT") ? _t("transfer-title-point") : `${mode}-title`;
         const subTitleLngKey = `${mode}-sub-title`;
         const summaryLngKey = `${mode}-summary`;
-
+        
         const formHeader1 = <div className="transaction-form-header">
             <div className="step-no">1</div>
             <div className="box-titles">
@@ -907,12 +917,23 @@ export class Transfer extends BaseComponent<Props, State> {
                                 </div>
                                 {(() => {
                                     if (mode === "power-down") {
-                                        const hive = Math.round((Number(amount) / 13) * 1000) / 1000;
-                                        if (!isNaN(hive) && hive > 0) {
-                                            return <div className="power-down-estimation">
-                                                {_t("transfer.power-down-estimated", {n: `${this.formatNumber(hive, precision)} HIVE`})}
-                                            </div>;
-                                        }
+                                    	if (asset === LIQUID_TOKEN_UPPERCASE || asset == VESTING_TOKEN) {
+                                    		const antiLogPrecision = Math.pow(10, precision || 0);  
+											const hiveEngineTokens = Math.round((this.parseFloat(amount) / 4) * antiLogPrecision) / antiLogPrecision;
+											// FormattedNumber cannot display numbers that are so small the format() function displays scientific notation.
+											if ((!isNaN(hiveEngineTokens)) && (hiveEngineTokens >= 1e-6)) {
+												return <div className="power-down-estimation">
+													{_t("transfer.power-down-estimated", {n: formattedNumber(hiveEngineTokens, {fractionDigits: precision, suffix: LIQUID_TOKEN_UPPERCASE})})}
+												</div>;
+											}
+										} else {
+											const hive = Math.round((Number(amount) / 13) * 1000) / 1000;
+											if (!isNaN(hive) && hive > 0) {
+												return <div className="power-down-estimation">
+													{_t("transfer.power-down-estimated", {n: `${this.formatNumber(hive, 3)} HIVE`})}
+												</div>;
+											}
+										}
                                     }
                                     return null;
                                 })()}

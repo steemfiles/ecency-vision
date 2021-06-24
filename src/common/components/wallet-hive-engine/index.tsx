@@ -10,7 +10,7 @@ import React from "react";
 import {History} from "history";
 
 import moment from "moment";
-
+import {LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN} from "../../../client_config";
 import {Global} from "../../store/global/types";
 import {Account} from "../../store/accounts/types";
 import {DynamicProps} from "../../store/dynamic-props/types";
@@ -238,6 +238,10 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     }
 
     openTransferDialog = (mode: TransferMode, asset: TransferAsset) => {
+    	const {aPICoinName, stakedCoinName} = this.props;
+    	if (mode === 'power-down' && asset === LIQUID_TOKEN_UPPERCASE) {
+    		asset = VESTING_TOKEN;
+    	}
         this.stateSet({transfer: true, transferMode: mode, transferAsset: asset});
     }
 
