@@ -240,6 +240,30 @@ export class WalletHive extends BaseComponent<Props, State> {
                                                             this.openTransferDialog('power-up', 'HIVE');
                                                         }
                                                     },
+                                                    {
+                                                    	label: _t('wallet.trade-internal-market'),
+                                                    	onClick: () => {
+                                                    		window.open(`https://wallet.hive.blog/market`, 'HiveDEx'); 
+                                                    	}
+                                                    },
+                                                    {
+                                                    	label: _t('wallet.trade-on-Blocktrades'),
+                                                    	onClick: () => {
+                                                    		window.open(`https://blocktrades.us/`, 'BlockTrades'); 
+                                                    	}
+                                                    },
+                                                    {
+                                                    	label: _t('wallet.trade-on-Upbit'),
+                                                    	onClick: () => {
+                                                    		window.open(`https://upbit.com/`, 'UpBit');
+                                                    	}
+                                                    },
+                                                    {
+                                                    	label: _t('wallet.trade-on-BitTrex'),
+                                                    	onClick: () => {
+                                                    		window.open(`https://global.bittrex.com/`, 'BitTrex'); 
+                                                    	}
+                                                    }                                                    
                                                 ],
                                             };
                                             return <div className="amount-actions">
@@ -287,7 +311,7 @@ export class WalletHive extends BaseComponent<Props, State> {
                                                             this.toggleWithdrawRoutes();
                                                         },
                                                     },
-                                                ],
+                                                 ],
                                             };
                                             return <div className="amount-actions">
                                                 <DropDown {...dropDownConfig} float="right"/>
@@ -383,6 +407,30 @@ export class WalletHive extends BaseComponent<Props, State> {
                                                             this.openTransferDialog('convert', 'HBD');
                                                         }
                                                     },
+                                                    {
+                                                    	label: _t('wallet.trade-internal-market'),
+                                                    	onClick: () => {
+                                                    		window.open(`https://wallet.hive.blog/market`, 'HiveDEx'); 
+                                                    	}
+                                                    },
+                                                    {
+                                                    	label: _t('wallet.trade-on-Blocktrades'),
+                                                    	onClick: () => {
+                                                    		window.open(`https://blocktrades.us/`, 'BlockTrades'); 
+                                                    	}
+                                                    },
+                                                    {
+                                                    	label: _t('wallet.trade-on-Upbit'),
+                                                    	onClick: () => {
+                                                    		window.open(`https://upbit.com/`, 'UpBit');
+                                                    	}
+                                                    },
+                                                    {
+                                                    	label: _t('wallet.trade-on-BitTrex'),
+                                                    	onClick: () => {
+                                                    		window.open(`https://global.bittrex.com/`, 'BitTrex'); 
+                                                    	}
+                                                    },                                                    
                                                 ],
                                             };
 

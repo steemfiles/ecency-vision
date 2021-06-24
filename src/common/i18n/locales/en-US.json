@@ -438,14 +438,18 @@
     "next-power-down": "The next power down is {{time}}, {{amount}}",
     "transfer": "Transfer",
     "transfer-to-savings": "Transfer to savings",
-    "convert": "Convert",
+    "convert": "Destroy for Hive",
     "power-up": "Power up",
     "withdraw-hive": "Withdraw Hive",
     "withdraw-hbd": "Withdraw Hive Dollar",
     "delegate": "Delegate",
     "power-down": "Power down",
     "withdraw-routes": "Withdraw Routes",
-    "converting-hbd-amount": "Converting to HIVE"
+    "converting-hbd-amount": "Converting to HIVE",
+    "trade-internal-market": "Trade on Hive DeX",
+    "trade-on-Blocktrades": "Trade on BlockTrades",
+    "trade-on-Upbit": "Trade on UpBit",
+    "trade-on-BitTrex": "Trade on BitTrex"
   },
   "withdraw-routes": {
     "title": "Withdraw accounts",
