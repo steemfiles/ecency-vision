@@ -76,7 +76,7 @@ import {_t} from "../../i18n";
 import {Tsx} from "../../i18n/helper";
 
 import {arrowRightSvg} from "../../img/svg";
-import {getAccountHEFull, TokenBalance, UnStake, is_FullHiveEngineAccount, FullHiveEngineAccount} from "../../api/hive-engine";
+import {getAccountHEFull, TokenBalance, UnStake, is_FullHiveEngineAccount, is_not_FullHiveEngineAccount, FullHiveEngineAccount} from "../../api/hive-engine";
 import HiveEngineWallet from "../../helper/hive-engine-wallet";
 
 export type TransferMode = "transfer" | "transfer-saving" | "withdraw-saving" | "convert" | "power-up" | "power-down" | "delegate";
@@ -437,7 +437,7 @@ export class Transfer extends BaseComponent<Props, State> {
     };
 
     nextPowerDown = () => {
-        this.stateSet({step: 2, amount: "0.000"});
+        this.stateSet({step: 2, amount: "0.000", asset: this.state.asset === VESTING_TOKEN ? "POB" : this.state.asset });
     }
 
     back = () => {
@@ -496,9 +496,15 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "power-down": {
+            	// stake_asset must be LIQUID_TOKEN_UPPERCASE, or "VESTS"
                 const stake_asset = (asset === NATIVE_PD_ASSET || asset === "VESTS") ? "VESTS" : LIQUID_TOKEN_UPPERCASE;
-                const vests = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : this.formatNumber(amount, getPrecision(stake_asset));
-                promise = withdrawVesting(username, key, vests, stake_asset);                
+                // vests is a string number formatted for a the HiveEngine or Hive RPC nodes to read like: "1234.567890"
+                const vests : string = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : this.formatNumber(amount, getPrecision(stake_asset));                
+                if (stake_asset === LIQUID_TOKEN_UPPERCASE && parseFloat(vests) === 0 && assetUnstakes) {
+                	promise = cancelWithdrawVesting(username, key, assetUnstakes.txID);
+                } else {
+                	promise = withdrawVesting(username, key, vests, stake_asset);
+                }                
                 break;
             }
             case "delegate": {
@@ -533,7 +539,7 @@ export class Transfer extends BaseComponent<Props, State> {
         const fullAmount = `${amount} ${asset}`;
         const username = activeUser?.username!
         const {token_unstakes} = activeUser.data as FullHiveEngineAccount | {token_unstakes: undefined};
-        const assetUnstakes = token_unstakes && token_unstakes.find( x => x.symbol === asset );
+        const assetUnstakes = token_unstakes && token_unstakes.find( x => x.symbol === LIQUID_TOKEN_UPPERCASE);
 
         switch (mode) {
             case "transfer": {
@@ -564,8 +570,13 @@ export class Transfer extends BaseComponent<Props, State> {
             }
             case "power-down": {
                 const stake_asset = (asset === NATIVE_PD_ASSET || asset === "VESTS") ? "VESTS" : LIQUID_TOKEN_UPPERCASE;
-                const vests = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : this.formatNumber(amount, getPrecision(stake_asset));
-                withdrawVestingHot(username, vests, stake_asset, () => {});                
+                const vests : string = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : this.formatNumber(amount, getPrecision(stake_asset));
+                
+                if (stake_asset === LIQUID_TOKEN_UPPERCASE && parseFloat(vests) === 0 && assetUnstakes) {
+                	cancelWithdrawVestingHot(username, assetUnstakes.txID);
+                } else {
+                	withdrawVestingHot(username, vests, stake_asset, ()=>{});
+                }                
                 break;
             }
             case "delegate": {
@@ -619,7 +630,12 @@ export class Transfer extends BaseComponent<Props, State> {
             case "power-down": {
                 const stake_asset = (asset === NATIVE_PD_ASSET || asset === "VESTS") ? "VESTS" : LIQUID_TOKEN_UPPERCASE;
                 const vests : string = (asset === NATIVE_PD_ASSET) ? this.hpToVests(Number(amount)) : this.formatNumber(amount, getPrecision(stake_asset));
-               	promise = withdrawVestingKc(username, vests, stake_asset);
+                
+                if (stake_asset === LIQUID_TOKEN_UPPERCASE && parseFloat(vests) === 0 && assetUnstakes) {
+                	promise = cancelWithdrawVestingKc(username, assetUnstakes.txID);
+                } else {
+                	promise = withdrawVestingKc(username, vests, stake_asset);
+                }                
                 break;
             }
             case "delegate": {
@@ -660,7 +676,7 @@ export class Transfer extends BaseComponent<Props, State> {
         const {global, mode, activeUser, transactions, dynamicProps} = this.props;
         const {step, asset, to, toError, toWarning, amount, amountError, memo, inProgress, precision} = this.state;
         const EnginelessHiveAccount = activeUser.data;
-        
+
         const recent = [...new Set(
             transactions.list
                 .filter(x => x.type === 'transfer' && x.from === activeUser.username)
@@ -765,62 +781,42 @@ export class Transfer extends BaseComponent<Props, State> {
 
         // Powering down
         if (step === 1 && mode === "power-down") {
-        	// @ts-ignore
-        	if (asset === "HP") {
-				const w = new HiveWallet(activeUser.data, dynamicProps);
-				const fractionDigits = 3;
-				if (w.isPoweringDown) {
+			const w = new HiveWallet(activeUser.data, dynamicProps);
+			
+			let liquid_asset : string;
+			let fhea : FullHiveEngineAccount;			
+			let unstakes : Array<UnStake>;
+			let pob_unstake;
+			let nextTransactionTimestamp;
+			// @ts-ignore
+        	if (    (asset === "HP" && w.isPoweringDown && (liquid_asset="HIVE")) 
+        		|| (VESTING_TOKEN && asset === VESTING_TOKEN 
+        			&& (fhea=activeUser.data as FullHiveEngineAccount) 
+        			&& (unstakes=fhea.token_unstakes) 
+        			&& (pob_unstake=unstakes.find( x => x.symbol === "POB")) 
+        			&& (liquid_asset="POB")) ) {
+        			const fractionDigits = getPrecision(liquid_asset);
 					return <div className="transfer-dialog-content">
 						<div className="transaction-form">
 							{formHeader1}
-							<div className="transaction-form-body powering-down">
+							<div className="transaction-form-body powering-down">							
 								<p>{_t("transfer.powering-down")}</p>
-								<p> {_t("wallet.next-power-down", {
+								
+								{asset === "HP" && <p> {_t("wallet.next-power-down", {
 									time: moment(w.nextVestingWithdrawalDate).fromNow(),
-									amount: formattedNumber(w.nextVestingSharesWithdrawalHive, {fractionDigits: 3, suffix:"HIVE"}),
-								})}</p>
+									amount: formattedNumber(w.nextVestingSharesWithdrawalHive, {fractionDigits, suffix: "HIVE"}),
+								})}</p>}
+								
+								{pob_unstake && <p> {_t("wallet.next-power-down", {
+									time: moment(pob_unstake.nextTransactionTimestamp).fromNow(),
+									amount: formattedNumber((parseFloat(pob_unstake.quantityLeft)/pob_unstake.numberTransactionsLeft).toFixed(8), {fractionDigits: 8, suffix: "POB"}),
+								})}</p>}
+																					
 								<p>
 									<Button onClick={this.nextPowerDown} variant="danger">{_t("transfer.stop-power-down")}</Button>
 								</p>
 							</div>
 						</div>
-					</div>
-				}
-			} else if (is_FullHiveEngineAccount(activeUser.data)) {
-				const tokensUnstakes : Array<UnStake> = (activeUser.data as FullHiveEngineAccount) .token_unstakes;
-				let thisTokenUnstake;
-				if (tokensUnstakes && (thisTokenUnstake = tokensUnstakes.find( x => (x.symbol === asset) ))) {
-						return <div className="transfer-dialog-content">
-							<div className="transaction-form">
-								{formHeader1}
-								<div className="transaction-form-body powering-down">
-									<p>Power Down {VESTING_TOKEN}</p>
-									<p> {_t("wallet.next-power-down", {
-										time: moment(thisTokenUnstake.nextTransactionTimestamp).fromNow(),
-										amount: formattedNumber(thisTokenUnstake.quantity, {fractionDigits: precision, suffix:asset}),
-									})}</p>
-									<p>
-										<Button onClick={this.nextPowerDown} variant="danger">{_t("transfer.stop-power-down")}</Button>										
-									</p>
-								</div>
-							</div>
-					</div>
-				}
-			} else {
-						return <div className="transfer-dialog-content">
-							<div className="transaction-form">
-								{formHeader1}
-								<div className="transaction-form-body powering-down">
-									<p>Power Down {VESTING_TOKEN}</p>
-									<p> {_t("wallet.next-power-down", {
-										time: 'Unknown (No HiveEngine Data Available)',
-										amount: 'Unknown',
-									})}</p>
-									<p>
-										<Button onClick={this.nextPowerDown} variant="danger">{_t("transfer.stop-power-down")}</Button>										
-									</p>
-								</div>
-							</div>
 					</div>
 			}
         }
@@ -918,7 +914,7 @@ export class Transfer extends BaseComponent<Props, State> {
                                 {(() => {
                                     if (mode === "power-down") {
                                     	if (asset === LIQUID_TOKEN_UPPERCASE || asset == VESTING_TOKEN) {
-                                    		const antiLogPrecision = Math.pow(10, precision || 0);  
+                                    		const antiLogPrecision = Math.pow(10, precision || 0);
 											const hiveEngineTokens = Math.round((this.parseFloat(amount) / 4) * antiLogPrecision) / antiLogPrecision;
 											// FormattedNumber cannot display numbers that are so small the format() function displays scientific notation.
 											if ((!isNaN(hiveEngineTokens)) && (hiveEngineTokens >= 1e-6)) {

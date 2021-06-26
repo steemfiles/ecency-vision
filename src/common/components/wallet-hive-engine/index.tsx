@@ -288,7 +288,11 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         const balances = w.engineBalanceTable[this.props.aPICoinName];
         const {token_unstakes} = account as FullHiveEngineAccount;
         if (token_unstakes) {
+        	let powerDownId;
+        	
 			const token_unstake : undefined | UnStake = token_unstakes && token_unstakes.find(u => u.symbol === this.props.aPICoinName);
+			if (token_unstake)
+				powerDownId = token_unstake.txID;
 			return (
 				<div className="wallet-hive">
 	
@@ -431,7 +435,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
 															onClick: () => {
 																this.openTransferDialog('power-down', this.props.aPICoinName);
 															},
-														},                                                    
+														},                                      
 														//{
 														//    label: _t('wallet.withdraw-routes'),
 														//    onClick: () => {

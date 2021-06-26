@@ -660,7 +660,7 @@ export const cancelWithdrawVesting = (account: string, key: PrivateKey, txID: st
 export const cancelWithdrawVestingHot = (account: string, txID: string) => {
     const op: Operation = createCancelPowerDownOp(account, txID);
     const params: Parameters = {callback: `${document.location.href}/@${account}/wallet`};
-    return hs.sendOperation(op, params, () => {
+    hs.sendOperation(op, params, () => {
     });
 }
 export const cancelWithdrawVestingKc = (account: string, txID: string) => {

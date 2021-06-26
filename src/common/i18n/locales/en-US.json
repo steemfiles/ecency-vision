@@ -449,7 +449,8 @@
     "trade-internal-market": "Trade on Hive DeX",
     "trade-on-Blocktrades": "Trade on BlockTrades",
     "trade-on-Upbit": "Trade on UpBit",
-    "trade-on-BitTrex": "Trade on BitTrex"
+    "trade-on-BitTrex": "Trade on BitTrex",
+    "stop-power-down": "Stop the Current Powerdown"
   },
   "withdraw-routes": {
     "title": "Withdraw accounts",
