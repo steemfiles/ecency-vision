@@ -7,13 +7,13 @@ import * as ls from "../util/local-storage";
 export const getUser = (username: string): User => {
     const raw = ls.get(`user_${username}`);
     if (!raw) {
-        throw "User is not exists!";
+        throw "User does not exist!";
     }
 
     try {
         return decodeObj(raw) as User;
     } catch (e) {
-        throw "User is not exists!";
+        throw "User does not exist!";
     }
 }
 
