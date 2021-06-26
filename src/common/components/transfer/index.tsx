@@ -1030,7 +1030,7 @@ export class Transfer extends BaseComponent<Props, State> {
                             onHot: this.signHs,
                             onKc: this.signKs,
                             // power-ups are broken for Hive Siger for HE tokens.  Quietly hide that option.
-                            hSBroken: LIQUID_TOKEN_UPPERCASE === this.props.asset && ["transfer-saving", "withdraw-saving", "convert", "power-up", "power-down", "delegate"].includes(this.props.mode),
+                            hSBroken: LIQUID_TOKEN_UPPERCASE === this.props.asset || VESTING_TOKEN === this.props.asset,
                         })}
                         <p className="text-center">
                             <a href="#" onClick={(e) => {
