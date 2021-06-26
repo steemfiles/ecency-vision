@@ -103,11 +103,17 @@ export const getNotifications = (username: string, filter: NotificationFilter | 
 };
 
 export const getUnreadNotificationCount = (username: string): Promise<number> => {
-    const data = {code: getAccessToken(username)};
-
-    return axios
-        .post(apiBase(`/private-api/notifications/unread`), data)
-        .then(resp => resp.data.count);
+	try {
+		const data = {code: getAccessToken(username)};
+	
+		return axios
+			.post(apiBase(`/private-api/notifications/unread`), data)
+			.then(resp => resp.data.count);
+	} catch (e) {
+		return new Promise<number>((resolve, reject) => {
+				resolve(0);
+		});
+	}
 }
 
 export const markNotifications = (username: string, id: string | null = null) => {
