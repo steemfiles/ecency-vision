@@ -59,6 +59,7 @@ import {
     convert,
     convertHot,
     convertKc,
+    collateralizedConvert,
     delegateVestingShares,
     delegateVestingSharesHot,
     delegateVestingSharesKc,
@@ -71,7 +72,7 @@ import {
     formatError
 } from "../../api/operations";
 
-import {LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN} from "../../../client_config";
+import {LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN, LIQUID_TICKER} from "../../../client_config";
 import {_t} from "../../i18n";
 import {Tsx} from "../../i18n/helper";
 
@@ -79,7 +80,7 @@ import {arrowRightSvg} from "../../img/svg";
 import {getAccountHEFull, TokenBalance, UnStake, is_FullHiveEngineAccount, is_not_FullHiveEngineAccount, FullHiveEngineAccount} from "../../api/hive-engine";
 import HiveEngineWallet from "../../helper/hive-engine-wallet";
 
-export type TransferMode = "transfer" | "transfer-saving" | "withdraw-saving" | "convert" | "power-up" | "power-down" | "delegate";
+export type TransferMode = "transfer" | "transfer-saving" | "withdraw-saving" | "convert" | "borrow" | "power-up" | "power-down" | "delegate";
 export type TransferAsset = string;// "HIVE" | "HBD" | "HP" | "POINT" | "POB" | ...
 const NATIVE_PD_ASSET = "HP";
 interface AssetSwitchProps {
@@ -170,7 +171,7 @@ const pureState = (props: Props): State => {
         
     const precision = props.asset === LIQUID_TOKEN_UPPERCASE ? liquid_token_precision : 3;
     	
-    if (["transfer-saving", "withdraw-saving", "convert", "power-up", "power-down"].includes(props.mode)) {
+    if (["transfer-saving", "withdraw-saving", "borrow", "convert", "power-up", "power-down"].includes(props.mode)) {
         _to = props.activeUser.username;
         _toData = props.activeUser.data
     }
@@ -375,11 +376,12 @@ export class Transfer extends BaseComponent<Props, State> {
         }
 
         const w = new HiveEngineWallet(activeUser.data, dynamicProps, 0, LIQUID_TOKEN_UPPERCASE);
+        
         if (mode === "withdraw-saving") {
             return asset === "HIVE" ? w.savingBalance : w.savingBalanceHbd;
         }
 
-        if (asset === "HIVE") {
+        if (asset === LIQUID_TICKER || asset === 'HIVE') {
             return w.balance;
         }
 
@@ -454,8 +456,10 @@ export class Transfer extends BaseComponent<Props, State> {
 
     sign = (key: PrivateKey) => {
         const {activeUser, mode} = this.props;
-        const {to, amount, asset, memo, precision} = this.state;
+        const {to, amount, asset, memo, precision} = this.state;        
         const fullAmount = `${amount} ${asset}`;
+        console.log({fullAmount});
+        
         const username = activeUser?.username!
         
         const assetUnstakes : UnStake | undefined | null = (() => {
@@ -465,7 +469,6 @@ export class Transfer extends BaseComponent<Props, State> {
 				}
 				return undefined;
 			})();
-        
         
         let promise: Promise<any>;
         switch (mode) {
@@ -483,6 +486,10 @@ export class Transfer extends BaseComponent<Props, State> {
                 promise = transferToSavings(username, key, to, fullAmount, memo);
                 break;
             }
+			case "borrow": {				
+				promise = collateralizedConvert(username, key, fullAmount.replace('HIVE','TESTS'));
+				break;
+			}
             case "convert": {
                 promise = convert(username, key, fullAmount)
                 break;
@@ -529,6 +536,7 @@ export class Transfer extends BaseComponent<Props, State> {
             })
             .catch(err => {
                 error(formatError(err));
+                console.log(err);
                 this.stateSet({inProgress: false});
             });
     }
@@ -713,6 +721,9 @@ export class Transfer extends BaseComponent<Props, State> {
             case "withdraw-saving":
                 assets = ["HIVE", "HBD"];
                 break;
+            case "borrow":
+            	assets = ["HIVE"];
+            	break;
             case "convert":
                 assets = ["HBD"];
                 break;

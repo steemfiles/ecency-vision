@@ -396,6 +396,17 @@ export const transferToSavingsKc = (from: string, to: string, amount: string, me
     ]
     return keychain.broadcast(from, [op], "Active");
 }
+export const collateralizedConvert = (owner: string, key: PrivateKey, amount: string): Promise<TransactionConfirmation> => {
+    const op: Operation = [
+        'collateralized_convert',
+        {
+            owner,
+            amount,
+            requestid: new Date().getTime() >>> 0
+        }
+    ]
+    return hiveClient.broadcast.sendOperations([op], key);
+}
 export const convert = (owner: string, key: PrivateKey, amount: string): Promise<TransactionConfirmation> => {
     const op: Operation = [
         'convert',

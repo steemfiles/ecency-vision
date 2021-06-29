@@ -12,11 +12,16 @@ import isCommunity from "../helper/is-community";
 
 import SERVERS from "../constants/servers.json";
 import {getAccountHEFull} from "./hive-engine";
+import {LIQUID_TOKEN_UPPERCASE, ADDRESS_PREFIX, CHAIN_ID, TEST_NET} from "../../client_config";
+
+
 
 export const client = new Client(SERVERS, {
     timeout: 4000,
     failoverThreshold: 10,
     consoleOnFailover: true,
+    addressPrefix: ADDRESS_PREFIX,
+    chainId: CHAIN_ID,
 });
 
 export interface Vote {

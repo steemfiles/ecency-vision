@@ -1,3 +1,7 @@
+export const ADDRESS_PREFIX = "STM";
+export const CHAIN_ID = "0000000000000000000000000000000000000000000000000000000000000000";
+export const TEST_NET = false;
+
 // sometimes it's impossible to use html tags to style coin name, hence usage of _UPPERCASE modifier
 export const APP_NAME = 'WeedCash';
 
@@ -45,7 +49,7 @@ export const PRIVACY_POLICY_URL = 'https://' + APP_DOMAIN + '/privacy.html';
 export const WHITEPAPER_URL = 'https://hive.io/hive-whitepaper.pdf';
 
 // these are dealing with asset types, not displaying to client, rather sending data over websocket
-//           Base layer liquid token
+//           Base layer liquid token.  This is HIVE on mainnet, and TESTS on testnet
 export const LIQUID_TICKER = 'HIVE';
 //           Base layer non liquid value
 export const VEST_TICKER = 'VESTS';

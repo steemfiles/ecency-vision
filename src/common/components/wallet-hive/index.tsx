@@ -37,7 +37,7 @@ import parseAsset from "../../helper/parse-asset";
 import {_t} from "../../i18n";
 
 import {plusCircle} from "../../img/svg";
-
+import {LIQUID_TICKER} from "../../../client_config";
 interface Props {
     history: History;
     global: Global;
@@ -241,6 +241,12 @@ export class WalletHive extends BaseComponent<Props, State> {
                                                         }
                                                     },
                                                     {
+                                                    	label: "Borrow new HBD against Hive",
+                                                    	onClick: () => {
+                                                    		this.openTransferDialog('borrow', 'HIVE'); 
+                                                    	}
+                                                    },
+                                                    {
                                                     	label: _t('wallet.trade-internal-market'),
                                                     	onClick: () => {
                                                     		window.open(`https://wallet.hive.blog/market`, 'HiveDEx'); 
@@ -263,7 +269,7 @@ export class WalletHive extends BaseComponent<Props, State> {
                                                     	onClick: () => {
                                                     		window.open(`https://global.bittrex.com/`, 'BitTrex'); 
                                                     	}
-                                                    }                                                    
+                                                    }                                                   
                                                 ],
                                             };
                                             return <div className="amount-actions">
