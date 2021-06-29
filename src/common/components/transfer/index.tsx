@@ -60,6 +60,8 @@ import {
     convertHot,
     convertKc,
     collateralizedConvert,
+    collateralizedConvertHot,
+    collateralizedConvertKc,
     delegateVestingShares,
     delegateVestingSharesHot,
     delegateVestingSharesKc,
@@ -72,7 +74,7 @@ import {
     formatError
 } from "../../api/operations";
 
-import {LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN, LIQUID_TICKER} from "../../../client_config";
+import {LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN, HIVE_API_NAME} from "../../../client_config";
 import {_t} from "../../i18n";
 import {Tsx} from "../../i18n/helper";
 
@@ -381,7 +383,7 @@ export class Transfer extends BaseComponent<Props, State> {
             return asset === "HIVE" ? w.savingBalance : w.savingBalanceHbd;
         }
 
-        if (asset === LIQUID_TICKER || asset === 'HIVE') {
+        if (asset === HIVE_API_NAME || asset === 'HIVE') {
             return w.balance;
         }
 
@@ -564,6 +566,10 @@ export class Transfer extends BaseComponent<Props, State> {
                 transferToSavingsHot(username, to, fullAmount, memo);
                 break;
             }
+			case "borrow": {				
+				collateralizedConvertHot(username, fullAmount);
+				break;
+			}
             case "convert": {
                 convertHot(username, fullAmount)
                 break;
@@ -623,6 +629,10 @@ export class Transfer extends BaseComponent<Props, State> {
                 promise = transferToSavingsKc(username, to, fullAmount, memo);
                 break;
             }
+			case "borrow": {				
+				promise = collateralizedConvertKc(username, fullAmount);
+				break;
+			}
             case "convert": {
                 promise = convertKc(username, fullAmount)
                 break;

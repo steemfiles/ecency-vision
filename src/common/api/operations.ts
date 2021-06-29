@@ -407,6 +407,30 @@ export const collateralizedConvert = (owner: string, key: PrivateKey, amount: st
     ]
     return hiveClient.broadcast.sendOperations([op], key);
 }
+export const collateralizedConvertHot = (owner: string, amount: string): Promise<TransactionConfirmation> => {
+    const op: Operation = [
+        'collateralized_convert',
+        {
+            owner,
+            amount,
+            requestid: new Date().getTime() >>> 0
+        }
+    ]
+    const params: Parameters = {callback: `${document.location.href}/@${owner}/wallet`};
+    return hs.sendOperation(op, params, () => {
+    });
+}
+export const collateralizedConvertKc = (owner: string, amount: string): Promise<TransactionConfirmation> => {
+    const op: Operation = [
+        'collateralized_convert',
+        {
+            owner,
+            amount,
+            requestid: new Date().getTime() >>> 0
+        }
+    ]
+    return keychain.broadcast(owner, [op], "Active");
+}
 export const convert = (owner: string, key: PrivateKey, amount: string): Promise<TransactionConfirmation> => {
     const op: Operation = [
         'convert',
