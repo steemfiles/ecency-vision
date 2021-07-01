@@ -90,6 +90,11 @@ need to add the account name to the common config file.
 As the corresponding constant to HIVE_SIGNER_CLIENT_SECRET,
 this should be set to the account username you have at Hive Signer.  Do not use the '@' sign in the username.
 
+##### Set the Servers File
+
+Symlink either src/common/constants/production-servers.json or src/common/constants/testnet-servers.json to servers.json depending on whether you are using mainnet or testnet.
+
+
 ##### Start website in dev
 `$ yarn start`
 
