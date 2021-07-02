@@ -530,6 +530,9 @@
     "success-message": "Your request submitted. It will be activated in a couple minutes."
   },
   "transfer": {
+    "borrow-title": "Borrow New Hive Dollars",
+    "borrow-sub-title": "Create New Dollars for Hive",
+    "borrow-summary":  "New Dollars Have Been Created",
     "transfer-title": "Transfer to Account",
     "transfer-title-point": "Gift to Account",
     "transfer-sub-title": "Move funds to another Hive account",
