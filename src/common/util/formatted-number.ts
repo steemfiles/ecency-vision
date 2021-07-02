@@ -20,7 +20,7 @@ export default (value: number | string, options: Options | undefined = undefined
   const { fractionDigits, prefix, suffix } = opts;
   
   let out : string = "";
-  if (typeof value == 'number') {	 	
+  if (typeof value == 'number') {
 	  let format = "0,0";
 	
 	  if (fractionDigits) {
@@ -28,7 +28,7 @@ export default (value: number | string, options: Options | undefined = undefined
 	  }	
 
 	  out += numeral(value).format(format);
-	  //out = out.replace(',','');
+	  out = out.replace(',','');
   } else  {
   	  value = value.replace(',','');
   	  const m = value.match(RegExp(/\d+(\.\d+)?/))
