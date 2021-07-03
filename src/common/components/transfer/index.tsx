@@ -396,6 +396,10 @@ export class Transfer extends BaseComponent<Props, State> {
             })();
         let promise: Promise<any>;
         switch (mode) {
+            case "borrow": {
+                promise = collateralizedConvert(username, key, fullAmount);
+                break;
+            }
             case "transfer": {
                 if (asset === "POINT") {
                     promise = transferPoint(username, key, to, fullAmount, memo);

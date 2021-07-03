@@ -263,8 +263,8 @@ export class WalletHive extends BaseComponent<Props, State> {
                                                     	onClick: () => {
                                                     		window.open(`https://global.bittrex.com/`, 'BitTrex'); 
                                                     	}
-                                                    }
-                                                ],
+                                                    },
+                                               ],
                                             };
                                             return <div className="amount-actions">
                                                 <DropDown {...dropDownConfig} float="right"/>
