@@ -1,4 +1,4 @@
 [
-  "http://testnet.openhive.network:8091",
-  "ws://testnet.openhive.network:8090"
+  "https://rpc.ecency.com",
+  "https://api.hive.blog"
 ]
