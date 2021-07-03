@@ -38,7 +38,7 @@ export const makePreloadedState = async (req: express.Request): Promise<AppState
 						try {
 							if (!prices)
 								return;
-							storedPrices = {...prices...storedPrices};
+							storedPrices = {...prices,...storedPrices};
 							for (const token in prices) {
 								let config : HiveEngineTokenConfig | undefined;
 								if (hiveEngineTokensProperties[token]) {
