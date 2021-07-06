@@ -24,6 +24,8 @@ import {ticketSvg, commentSvg, compareHorizontalSvg, cashSvg, cashMultiple, reOr
 import {_t} from "../../i18n";
 import {Tsx} from "../../i18n/helper";
 
+import {HIVE_API_NAME, DOLLAR_API_NAME} from "../../api/hive";
+
 interface RowProps {
     history: History;
     dynamicProps: DynamicProps;
@@ -64,10 +66,10 @@ export class TransactionRow extends Component<RowProps> {
             numbers = (
                 <>
                     {hbd_payout.amount > 0 && (
-                        <span className="number">{formattedNumber(hbd_payout.amount, {suffix: "HBD"})}</span>
+                        <span className="number">{formattedNumber(hbd_payout.amount, {suffix: DOLLAR_API_NAME})}</span>
                     )}
                     {hive_payout.amount > 0 && (
-                        <span className="number">{formattedNumber(hive_payout.amount, {suffix: "HIVE"})}</span>
+                        <span className="number">{formattedNumber(hive_payout.amount, {suffix: HIVE_API_NAME})}</span>
                     )}
                     {vesting_payout.amount > 0 && (
                         <span className="number">{formattedNumber(vestsToHp(vesting_payout.amount, hivePerMVests), {suffix: "HP"})}{" "}</span>
@@ -100,10 +102,10 @@ export class TransactionRow extends Component<RowProps> {
             numbers = (
                 <>
                     {reward_hbd.amount > 0 && (
-                        <span className="number">{formattedNumber(reward_hbd.amount, {suffix: "HBD"})}</span>
+                        <span className="number">{formattedNumber(reward_hbd.amount, {suffix: DOLLAR_API_NAME})}</span>
                     )}
                     {reward_hive.amount > 0 && (
-                        <span className="number">{formattedNumber(reward_hive.amount, {suffix: "HIVE"})}</span>
+                        <span className="number">{formattedNumber(reward_hive.amount, {suffix: HIVE_API_NAME})}</span>
                     )}
                     {reward_vests.amount > 0 && (
                         <span className="number">{formattedNumber(vestsToHp(reward_vests.amount, hivePerMVests), {suffix: "HP"})}</span>

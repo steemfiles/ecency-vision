@@ -191,8 +191,8 @@ export default class MarketData extends Component {
             </div>
             <Market label="HIVE" coin="hive" vsCurrency="usd" fromTs={fromTs} toTs={toTs} formatter="0.000$"/>
             <Market label="HBD" coin="hive_dollar" vsCurrency="usd" fromTs={fromTs} toTs={toTs} formatter="0.000$"/>
-            <Market label="BTC" coin="bitcoin" vsCurrency="usd" fromTs={fromTs} toTs={toTs} formatter=",$"/>
-            <Market label="ETH" coin="ethereum" vsCurrency="usd" fromTs={fromTs} toTs={toTs} formatter="0.000$"/>
+            <Market label="XMR" coin="monero" vsCurrency="usd" fromTs={fromTs} toTs={toTs} formatter=",$"/>
+            <Market label="ADA" coin="ada" vsCurrency="usd" fromTs={fromTs} toTs={toTs} formatter="0.000$"/>
 
         </div>
     }

@@ -1,6 +1,8 @@
 export enum Symbol {
     HIVE = 'HIVE',
     HBD = 'HBD',
+    TESTS = 'TESTS',
+    TBD = 'TBD',
 }
 
 export interface Asset {

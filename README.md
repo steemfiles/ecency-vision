@@ -90,9 +90,14 @@ need to add the account name to the common config file.
 As the corresponding constant to HIVE_SIGNER_CLIENT_SECRET,
 this should be set to the account username you have at Hive Signer.  Do not use the '@' sign in the username.
 
-##### Set the Servers File
+###### TEST_NET
 
-Symlink either src/common/constants/production-servers.json or src/common/constants/testnet-servers.json to servers.json depending on whether you are using mainnet or testnet.
+Set this value to be true if you wish to use the testnet for Hive for testing.  You will have to use the browser with CORS turned off because
+the nodes for testnet do not properly give allow any CORS header.  This can be done in the following way:
+
+```
+chromium --disable-web-security --disable-gpu --user-data-dir=$HOME/userTmp http://localhost:3000
+```
 
 
 ##### Start website in dev

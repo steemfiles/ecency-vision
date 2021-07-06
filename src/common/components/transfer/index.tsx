@@ -27,7 +27,7 @@ import amountFormatCheck from '../../helper/amount-format-check';
 import parseAsset from "../../helper/parse-asset";
 import {vestsToHp, hpToVests} from "../../helper/vesting";
 import FormattedNumber from "../../util/formatted-number";
-import {getAccount} from "../../api/hive";
+import {getAccount, HIVE_API_NAME, DOLLAR_API_NAME} from "../../api/hive";
 import {
     transfer,
     transferHot,
@@ -64,14 +64,14 @@ import {
     cancelWithdrawVestingKc,
     formatError
 } from "../../api/operations";
-import {LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN, HIVE_API_NAME} from "../../../client_config";
+import {LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN} from "../../../client_config";
 import {_t} from "../../i18n";
 import {Tsx} from "../../i18n/helper";
 import {arrowRightSvg} from "../../img/svg";
 import {getAccountHEFull, TokenBalance, UnStake, is_FullHiveEngineAccount, is_not_FullHiveEngineAccount, FullHiveEngineAccount} from "../../api/hive-engine";
 import HiveEngineWallet from "../../helper/hive-engine-wallet";
 export type TransferMode = "borrow" | "transfer" | "transfer-saving" | "withdraw-saving" | "convert" | "power-up" | "power-down" | "delegate";
-export type TransferAsset = string;// "HIVE" | "HBD" | "HP" | "POINT" | "POB" | ...
+export type TransferAsset = string;// "HIVE" | DOLLAR_API_NAME | "HP" | "POINT" | "POB" | ...
 const NATIVE_PD_ASSET = "HP";
 interface AssetSwitchProps {
     options: TransferAsset[];
@@ -170,7 +170,7 @@ const pureState = (props: Props): State => {
     }
 }
 function getPrecision(asset: string) {
-    if (asset == "HIVE" || asset == "HP") {
+    if (asset == HIVE_API_NAME || asset === DOLLAR_API_NAME || asset == "HP") {
         return 3;
     } else if (asset == "POB" || asset === "Brain Power") {
         return 8;
@@ -324,12 +324,12 @@ export class Transfer extends BaseComponent<Props, State> {
         }
         const w = new HiveEngineWallet(activeUser.data, dynamicProps, 0, LIQUID_TOKEN_UPPERCASE);
         if (mode === "withdraw-saving") {
-            return asset === "HIVE" ? w.savingBalance : w.savingBalanceHbd;
+            return asset === HIVE_API_NAME ? w.savingBalance : w.savingBalanceHbd;
         }
         if (asset === HIVE_API_NAME) {
             return w.balance;
         }
-        if (asset === "HBD") {
+        if (asset === DOLLAR_API_NAME) {
             return w.hbdBalance;
         }
         if (asset === "HP") {
@@ -403,7 +403,7 @@ export class Transfer extends BaseComponent<Props, State> {
             case "transfer": {
                 if (asset === "POINT") {
                     promise = transferPoint(username, key, to, fullAmount, memo);
-                } else if (["HBD","HIVE"].includes(asset)) {
+                } else if ([DOLLAR_API_NAME,HIVE_API_NAME].includes(asset)) {
                     promise = transfer(username, key, to, fullAmount, memo);
                 } else {
                     promise = transferHiveEngineAsset(username, key, to, fullAmount, memo);
@@ -439,7 +439,7 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "delegate": {
-                const vests = asset === "HIVE" ? this.hpToVests(Number(amount)) : amount;
+                const vests = asset === "HP" ? this.hpToVests(Number(amount)) : amount;
                 promise = delegateVestingShares(username, key, to, vests);
                 break;
             }
@@ -472,7 +472,7 @@ export class Transfer extends BaseComponent<Props, State> {
             case "transfer": {
                 if (asset === "POINT") {
                     transferPointHot(username, to, fullAmount, memo);
-                } else if (["HBD","HIVE"].includes(asset)) {
+                } else if ([DOLLAR_API_NAME,HIVE_API_NAME].includes(asset)) {
                     transferHot(username, to, fullAmount, memo);
                 } else {
                     transferHiveEngineAssetHot(username, to, fullAmount, memo);
@@ -510,7 +510,7 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "delegate": {
-                const vests = asset === "HIVE" ? this.hpToVests(Number(amount)) : amount;
+                const vests = asset === HIVE_API_NAME ? this.hpToVests(Number(amount)) : amount;
                 delegateVestingSharesHot(username, to, vests);
                 break;
             }
@@ -531,7 +531,7 @@ export class Transfer extends BaseComponent<Props, State> {
             case "transfer": {
                 if (asset === "POINT") {
                     promise = transferPointKc(username, to, fullAmount, memo);
-                } else if (["HBD","HIVE"].includes(asset)) {
+                } else if ([DOLLAR_API_NAME,HIVE_API_NAME].includes(asset)) {
                     promise = transferKc(username, to, fullAmount, memo);
                 } else {
                     promise = transferHiveEngineAssetKc(username, to, fullAmount, memo);
@@ -569,7 +569,7 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "delegate": {
-                const vests = asset === "HIVE" ? this.hpToVests(Number(amount)) : amount;
+                const vests = asset === HIVE_API_NAME ? this.hpToVests(Number(amount)) : amount;
                 promise = delegateVestingSharesKc(username, to, vests);
                 break;
             }
@@ -626,20 +626,20 @@ export class Transfer extends BaseComponent<Props, State> {
         switch (mode) {
             case "transfer":
                 if (global.usePrivate) {
-                    assets = ["HIVE", "HBD", LIQUID_TOKEN_UPPERCASE];
+                    assets = [HIVE_API_NAME, DOLLAR_API_NAME, LIQUID_TOKEN_UPPERCASE];
                 } else {
-                    assets = ["HIVE", "HBD", LIQUID_TOKEN_UPPERCASE];
+                    assets = [HIVE_API_NAME, DOLLAR_API_NAME, LIQUID_TOKEN_UPPERCASE];
                 }
                 break;
             case "transfer-saving":
             case "withdraw-saving":
-                assets = ["HIVE", "HBD"];
+                assets = [HIVE_API_NAME, DOLLAR_API_NAME];
                 break;
             case "convert":
-                assets = ["HBD"];
+                assets = [DOLLAR_API_NAME];
                 break;
             case "power-up":
-                assets = ["HIVE", LIQUID_TOKEN_UPPERCASE];
+                assets = [HIVE_API_NAME, LIQUID_TOKEN_UPPERCASE];
                 break;
             case "power-down":
             case "delegate":
@@ -701,7 +701,7 @@ export class Transfer extends BaseComponent<Props, State> {
             let pob_unstake;
             let nextTransactionTimestamp;
             // @ts-ignore
-            if (    (asset === "HP" && w.isPoweringDown && (liquid_asset="HIVE"))
+            if (    (asset === "HP" && w.isPoweringDown && (liquid_asset=HIVE_API_NAME))
                 || (VESTING_TOKEN && asset === VESTING_TOKEN
                     && (fhea=activeUser.data as FullHiveEngineAccount)
                     && (unstakes=fhea.token_unstakes)
@@ -715,7 +715,7 @@ export class Transfer extends BaseComponent<Props, State> {
                                 <p>{_t("transfer.powering-down")}</p>
                                 {asset === "HP" && <p> {_t("wallet.next-power-down", {
                                     time: moment(w.nextVestingWithdrawalDate).fromNow(),
-                                    amount: formattedNumber(w.nextVestingSharesWithdrawalHive, {fractionDigits, suffix: "HIVE"}),
+                                    amount: formattedNumber(w.nextVestingSharesWithdrawalHive, {fractionDigits, suffix: HIVE_API_NAME}),
                                 })}</p>}
                                 {pob_unstake && <p> {_t("wallet.next-power-down", {
                                     time: moment(pob_unstake.nextTransactionTimestamp).fromNow(),
@@ -899,7 +899,7 @@ export class Transfer extends BaseComponent<Props, State> {
                                 })()}
                             </div>
                             {asset === "HP" && <div className="amount-vests">{formattedNumber(this.hpToVests(Number(amount)), {fractionDigits: 6, suffix: 'VESTS'})}</div>}
-                            {(asset != "HIVE" && asset != "HBD" && asset != "HP") && ["power-down", "delegate"].includes(mode) &&
+                            {(asset != HIVE_API_NAME && asset != DOLLAR_API_NAME && asset != "HP") && ["power-down", "delegate"].includes(mode) &&
                                 <div className="amount-vests">{formattedNumber(amount, {fractionDigits: 6, suffix: asset})}</div>}
                             {memo && <div className="memo">{memo}</div>}
                         </div>

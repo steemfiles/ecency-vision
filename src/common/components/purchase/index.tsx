@@ -17,6 +17,7 @@ import {_t} from "../../i18n";
 
 import _c from "../../util/fix-class-names";
 import formattedNumber from "../../util/formatted-number";
+import {DOLLAR_API_NAME, HIVE_API_NAME} from "../../api/hive";
 
 interface Props {
     global: Global;
@@ -42,7 +43,7 @@ interface State {
 export class Purchase extends BaseComponent<Props, State> {
     state: State = {
         submitted: false,
-        asset: 'HIVE',
+        asset: HIVE_API_NAME,
         amount: 250,
         points: 0,
         usd: 0
@@ -96,14 +97,14 @@ export class Purchase extends BaseComponent<Props, State> {
                     <div className="nav-item">
                         <a href="#" onClick={e => {
                             e.preventDefault();
-                            this.setAsset('HIVE')
-                        }} className={_c(`nav-link ${asset === 'HIVE' ? 'active' : ''}`)}>HIVE</a>
+                            this.setAsset(HIVE_API_NAME)
+                        }} className={_c(`nav-link ${asset === HIVE_API_NAME ? 'active' : ''}`)}>HIVE</a>
                     </div>
                     <div className="nav-item">
                         <a href="#" onClick={e => {
                             e.preventDefault();
-                            this.setAsset('HBD')
-                        }} className={_c(`nav-link ${asset === 'HBD' ? 'active' : ''}`)}>HBD</a>
+                            this.setAsset(DOLLAR_API_NAME)
+                        }} className={_c(`nav-link ${asset === DOLLAR_API_NAME ? 'active' : ''}`)}>HBD</a>
                     </div>
                 </div>
             </div>

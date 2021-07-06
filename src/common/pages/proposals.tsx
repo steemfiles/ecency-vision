@@ -40,6 +40,7 @@ import parseAsset from "../helper/parse-asset";
 import parseDate from "../helper/parse-date";
 
 import {closeSvg} from "../img/svg";
+import {DOLLAR_API_NAME} from "../api/hive";
 
 enum Filter {
     ALL = "all",
@@ -171,20 +172,20 @@ class ProposalsPage extends BaseComponent<PageProps, State> {
                         <div className="funding-numbers">
                             <div className="funding-number">
                                 <div className="value">
-                                    {numeral(dailyFunded).format("0.00,")} {"HBD"}
+                                    {numeral(dailyFunded).format("0.00,")} {DOLLAR_API_NAME}
                                 </div>
                                 <div className="label">daily funded</div>
                             </div>
                             <div className="funding-number">
                                 <div className="value">
-                                    {numeral(dailyBudget).format("0.00,")} {"HBD"}
+                                    {numeral(dailyBudget).format("0.00,")} {DOLLAR_API_NAME}
                                 </div>
                                 <div className="label">daily budget</div>
                             </div>
 
                             <div className="funding-number">
                                 <div className="value">
-                                    {numeral(totalBudget).format("0.00,")} {"HBD"}
+                                    {numeral(totalBudget).format("0.00,")} {DOLLAR_API_NAME}
                                 </div>
                                 <div className="label">total budget</div>
                             </div>

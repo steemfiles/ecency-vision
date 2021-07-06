@@ -1,7 +1,7 @@
 import hs from "hivesigner";
 import {PrivateKey, Operation, TransactionConfirmation, AccountUpdateOperation, CustomJsonOperation} from '@hiveio/dhive';
 import {Parameters} from 'hive-uri';
-import {client as hiveClient} from "./hive";
+import {client as hiveClient, HIVE_API_NAME} from "./hive";
 import {Account} from "../store/accounts/types";
 import {usrActivity} from "./private-api";
 import {getAccessToken, getPostingKey} from "../helper/user-token";
@@ -9,7 +9,6 @@ import * as keychain from "../helper/keychain";
 import parseAsset from "../helper/parse-asset";
 import {hotSign} from "../helper/hive-signer";
 // Base Layer 1 token name
-import {LIQUID_TICKER} from "../../client_config";
 import {_t} from "../i18n";
 export interface MetaData {
     links?: string[];
@@ -505,7 +504,7 @@ export const createTransferToVestingOp = (from: string, to: string, amount: stri
 	const parts = amount.split(/ /);
 	const currency = parts[parts.length-1];
 	const quantity = parts[0].replace(/,/g,'');
-	if (currency === LIQUID_TICKER) { 			
+	if (currency === HIVE_API_NAME) {
 		return [
 			'transfer_to_vesting',
 			{
@@ -534,7 +533,6 @@ export const createTransferToVestingOp = (from: string, to: string, amount: stri
 		  
 		];
 	}
-	
 }
 export const transferToVesting = (from: string, key: PrivateKey, to: string, amount: string): Promise<TransactionConfirmation> => {    
     return hiveClient.broadcast.sendOperations([createTransferToVestingOp(from, to, amount)], key);
@@ -552,9 +550,13 @@ export const transferToVestingKc = (from: string, to: string, amount: string) =>
     return keychain.broadcast(from, [createTransferToVestingOp(from, to, amount)], "Active");
 }
 export const createDelegateVestingSharesOp = (delegator: string, delegatee: string, vestingShares: string) : Operation => {
+	if (!/[0-9]+(.[0-9]+)? [A-Z][A-Z0-9]+/.test(vestingShares)) {
+		throw new Error("Invalid vestingShares Amount specified");
+	}
 	const parts = vestingShares.split(/ /);
 	const currency = parts[parts.length-1];
 	const quantity = parts[0].replace(/,/g,'');
+
 	if (currency === "VESTS") { 			
 		return [
 			'delegate_vesting_shares',
@@ -591,6 +593,9 @@ export const delegateVestingShares = (delegator: string, key: PrivateKey, delega
     return hiveClient.broadcast.sendOperations([op], key);
 }
 export const delegateVestingSharesHot = (delegator: string, delegatee: string, vestingShares: string) => {
+	if (!/[0-9]+(.[0-9]+)? [A-Z][A-Z0-9]+/.test(vestingShares)) {
+		throw new Error("Invalid vestingShares Amount specified");
+	}
     const op: Operation = ['delegate_vesting_shares', {
         delegator,
         delegatee,

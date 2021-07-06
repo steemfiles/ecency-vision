@@ -18,6 +18,7 @@ import Tooltip from "../tooltip";
 import {_t} from "../../i18n";
 
 import {giftOutlineSvg} from "../../img/svg";
+import {HIVE_API_NAME} from "../../api/hive";
 
 interface Props {
     global: Global;
@@ -60,7 +61,7 @@ export class TippingDialog extends Component<DialogProps> {
             {...this.props}
             activeUser={activeUser}
             transactions={transactions}
-            asset={global.usePrivate ? "POINT" : "HIVE"}
+            asset={global.usePrivate ? "POINT" : HIVE_API_NAME}
             mode="transfer"
             amount={global.usePrivate ? "100.000" : "1.000"}
             to={to}

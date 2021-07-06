@@ -29,6 +29,7 @@ import now from "../../util/now";
 import {_t} from "../../i18n";
 
 import {linkSvg} from "../../img/svg";
+import {DOLLAR_API_NAME} from "../../api/hive";
 
 interface Props {
     history: History;
@@ -127,8 +128,8 @@ export class ProposalListItem extends Component<Props, State> {
                                 {startDate.format('ll')} {"-"} {endDate.format("ll")} ({_t("proposals.duration-days", {n: duration})})
                             </div>
                             <div className="proposal-payment">
-                                <span className="all-pay">{`${strAllPayment} HBD`}</span>
-                                <span className="daily-pay">({_t("proposals.daily-pay", {n: strDailyHdb})}{" "}{"HBD"})</span>
+                                <span className="all-pay">{`${strAllPayment} ${DOLLAR_API_NAME}`}</span>
+                                <span className="daily-pay">({_t("proposals.daily-pay", {n: strDailyHdb})}{" "}{DOLLAR_API_NAME})</span>
                             </div>
                         </div>
                         <div className="permlink">

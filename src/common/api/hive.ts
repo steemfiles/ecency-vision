@@ -1,4 +1,4 @@
-import {Client, RCAPI, utils} from "@hiveio/dhive";
+import {Client, RCAPI, utils, DEFAULT_CHAIN_ID, DEFAULT_ADDRESS_PREFIX} from "@hiveio/dhive";
 
 import {RCAccount} from "@hiveio/dhive/lib/chain/rc";
 
@@ -10,13 +10,33 @@ import parseAsset from "../helper/parse-asset";
 import {vestsToRshares} from "../helper/vesting";
 import isCommunity from "../helper/is-community";
 
-import SERVERS from "../constants/servers.json";
+import TESTNET_SERVERS from "../constants/servers-testnet.json";
+import MAINNET_SERVERS from "../constants/servers-mainnet.json";
 import {getAccountHEFull} from "./hive-engine";
+import {LIQUID_TOKEN_UPPERCASE, TEST_NET} from "../../client_config";
+
+const SERVERS = TEST_NET ? TESTNET_SERVERS : MAINNET_SERVERS;
+
+export const CHAIN_ID = TEST_NET ?
+"18dcf0a285365fc58b71f18b3d3fec954aa0c141c44e4e5cb4cf777b9eab274e"
+	: DEFAULT_CHAIN_ID.toString('hex');
+
+export const ADDRESS_PREFIX = TEST_NET ? "TST"
+	: DEFAULT_ADDRESS_PREFIX;
+
+export const HIVE_API_NAME =  TEST_NET ? "TESTS" : "HIVE";
+export const DOLLAR_API_NAME =  TEST_NET ? "TBD" : "HBD";
+
+export const HIVE_LANGUAGE_KEY = HIVE_API_NAME.toLowerCase();
+export const HIVE_HUMAN_NAME = TEST_NET ? "Hive" : "Tests";
+export const HIVE_HUMAN_NAME_UPPERCASE = HIVE_HUMAN_NAME.toUpperCase();
 
 export const client = new Client(SERVERS, {
     timeout: 4000,
     failoverThreshold: 10,
     consoleOnFailover: true,
+    addressPrefix: ADDRESS_PREFIX,
+    chainId: CHAIN_ID,
 });
 
 export interface Vote {

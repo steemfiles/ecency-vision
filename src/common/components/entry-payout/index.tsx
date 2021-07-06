@@ -19,7 +19,7 @@ import {_t} from "../../i18n";
 import {TokenInfoConfigPair} from "../../store/hive-engine-tokens/types";
 
 import _c from "../../util/fix-class-names";
-
+import {HIVE_API_NAME, DOLLAR_API_NAME} from "../../api/hive";
 
 interface Props {
     global: Global;
@@ -76,11 +76,11 @@ export class EntryPayoutDetail extends Component<Props> {
         let breakdownPayout: string[] = [];
         if (pendingHivePayout > 0) {
             if (pendingPayoutPrintedHbd > 0) {
-                breakdownPayout.push(formattedNumber(pendingPayoutPrintedHbd, {fractionDigits: 3, suffix: 'HBD'}))
+                breakdownPayout.push(formattedNumber(pendingPayoutPrintedHbd, {fractionDigits: 3, suffix: DOLLAR_API_NAME}))
             }
 
             if (pendingPayoutPrintedHive > 0) {
-                breakdownPayout.push(formattedNumber(pendingPayoutPrintedHive, {fractionDigits: 3, suffix: 'HIVE'}))
+                breakdownPayout.push(formattedNumber(pendingPayoutPrintedHive, {fractionDigits: 3, suffix: HIVE_API_NAME}))
             }
 
             if (pendingPayoutHp > 0) {
