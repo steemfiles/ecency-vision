@@ -189,6 +189,12 @@ export class TransactionRow extends Component<RowProps> {
             numbers = <span className="number">{tr.amount_in} = {tr.amount_out}</span>
         }
 
+        if (tr.type === "collateralized_convert") {
+            flag = true;
+            icon = reOrderHorizontalSvg;
+            numbers = <span className="number">{tr.amount}</span>
+        }
+
         if (tr.type === "return_vesting_delegation") {
             flag = true;
             icon = arrowRightSvg;

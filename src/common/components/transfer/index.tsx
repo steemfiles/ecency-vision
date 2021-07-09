@@ -27,7 +27,11 @@ import amountFormatCheck from '../../helper/amount-format-check';
 import parseAsset from "../../helper/parse-asset";
 import {vestsToHp, hpToVests} from "../../helper/vesting";
 import FormattedNumber from "../../util/formatted-number";
-import {getAccount, HIVE_API_NAME, DOLLAR_API_NAME} from "../../api/hive";
+import {getFeedHistory, getAccount, HIVE_API_NAME,
+    DOLLAR_API_NAME, estimateHiveCollateral,
+    HIVE_CONVERSION_COLLATERAL_RATIO} from "../../api/hive";
+import Tooltip from "../tooltip";
+
 import {
     transfer,
     transferHot,
@@ -137,6 +141,7 @@ interface State {
     amountError: string;
     memo: string,
     inProgress: boolean;
+    estimatedRequiredHiveCollateral: number;
 }
 const pureState = (props: Props): State => {
     const {global, activeUser} = props;
@@ -151,7 +156,7 @@ const pureState = (props: Props): State => {
         && (x=x.info)
         && (x=x.precision)) || 6;
     const precision = props.asset === LIQUID_TOKEN_UPPERCASE ? liquid_token_precision : 3;
-    if (["transfer-saving", "withdraw-saving", "convert", "power-up", "power-down"].includes(props.mode)) {
+    if (["transfer-saving", "withdraw-saving", "convert", "power-up", "power-down", "borrow"].includes(props.mode)) {
         _to = props.activeUser.username;
         _toData = props.activeUser.data
     }
@@ -166,6 +171,7 @@ const pureState = (props: Props): State => {
         amount: props.amount || "",
         amountError: "",
         memo: props.memo || "",
+        estimatedRequiredHiveCollateral: 0,
         inProgress: false
     }
 }
@@ -267,6 +273,7 @@ export class Transfer extends BaseComponent<Props, State> {
         return 3;
     }
     checkAmount = () => {
+        const {mode, activeUser, dynamicProps} = this.props;
         const {asset} = this.state;
         const precision = getPrecision(asset);
         const raw_amount = this.state.amount;
@@ -300,11 +307,23 @@ export class Transfer extends BaseComponent<Props, State> {
                 }
             }
         }
-        if (parseFloat(amount) > this.getBalance()) {
+        if (parseFloat(amount) > this.getBalance() && this.props.mode != 'borrow') {
             this.stateSet({amountError: _t("trx-common.insufficient-funds"), precision});
             return;
         }
-        this.stateSet({amountError: '', precision});
+        const stateSet = this.stateSet.bind(this);
+        if (this.props.mode === 'borrow') {
+            estimateHiveCollateral(parseFloat(amount)).then(amount => {
+                const w = new HiveEngineWallet(activeUser.data, dynamicProps, 0, LIQUID_TOKEN_UPPERCASE);
+                if (amount > w.balance) {
+                    stateSet({estimatedRequiredHiveCollateral: amount, amountError: _t("trx-common.insufficient-funds"), precision});
+                } else {
+                    stateSet({estimatedRequiredHiveCollateral: amount, amountError: '', precision});
+                }
+            });
+        } else {
+            this.stateSet({amountError: '', precision});
+        }
     };
     copyBalance = () => {
         const amount = this.formatBalance(this.getBalance());
@@ -384,8 +403,10 @@ export class Transfer extends BaseComponent<Props, State> {
     }
     sign = (key: PrivateKey) => {
         const {activeUser, mode} = this.props;
-        const {to, amount, asset, memo, precision} = this.state;
+        const {to, amount, asset, memo, precision, estimatedRequiredHiveCollateral} = this.state;
         const fullAmount = `${amount} ${asset}`;
+        console.log({fullAmount});
+
         const username = activeUser?.username!
         const assetUnstakes : UnStake | undefined | null = (() => {
                 if (is_FullHiveEngineAccount(activeUser.data)) {
@@ -394,12 +415,9 @@ export class Transfer extends BaseComponent<Props, State> {
                 }
                 return undefined;
             })();
+
         let promise: Promise<any>;
         switch (mode) {
-            case "borrow": {
-                promise = collateralizedConvert(username, key, fullAmount);
-                break;
-            }
             case "transfer": {
                 if (asset === "POINT") {
                     promise = transferPoint(username, key, to, fullAmount, memo);
@@ -412,6 +430,12 @@ export class Transfer extends BaseComponent<Props, State> {
             }
             case "transfer-saving": {
                 promise = transferToSavings(username, key, to, fullAmount, memo);
+                break;
+            }
+            case "borrow": {
+                const hiveCollaterialFullAmount = this.formatNumber(estimatedRequiredHiveCollateral, 3) + ` ${HIVE_API_NAME}`;
+                console.log(hiveCollaterialFullAmount);
+                promise = collateralizedConvert(username, key, hiveCollaterialFullAmount);
                 break;
             }
             case "convert": {
@@ -458,16 +482,19 @@ export class Transfer extends BaseComponent<Props, State> {
             })
             .catch(err => {
                 error(formatError(err));
+                console.log(err);
                 this.stateSet({inProgress: false});
             });
     }
     signHs = () => {
         const {activeUser, mode, onHide} = this.props;
-        const {to, amount, asset, memo, precision} = this.state;
+        const {to, amount, asset, memo, precision, estimatedRequiredHiveCollateral} = this.state;
         const fullAmount = `${amount} ${asset}`;
         const username = activeUser?.username!
         const {token_unstakes} = activeUser.data as FullHiveEngineAccount | {token_unstakes: undefined};
         const assetUnstakes = token_unstakes && token_unstakes.find( x => x.symbol === LIQUID_TOKEN_UPPERCASE);
+
+
         switch (mode) {
             case "transfer": {
                 if (asset === "POINT") {
@@ -484,7 +511,9 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "borrow": {
-                collateralizedConvertHot(username, fullAmount);
+                const hiveCollaterialFullAmount = this.formatNumber(estimatedRequiredHiveCollateral, 3) + ` ${HIVE_API_NAME}`;
+                console.log(hiveCollaterialFullAmount);
+                collateralizedConvertHot(username, hiveCollaterialFullAmount);
                 break;
             }
             case "convert": {
@@ -521,8 +550,11 @@ export class Transfer extends BaseComponent<Props, State> {
     }
     signKs = () => {
         const {activeUser, mode} = this.props;
-        const {to, amount, asset, memo, precision} = this.state;
+        const {to, amount, asset, memo, precision, estimatedRequiredHiveCollateral} = this.state;
         const fullAmount = `${amount} ${asset}`;
+
+        console.log({fullAmount});
+
         const username = activeUser?.username!
         const {token_unstakes} = activeUser.data as FullHiveEngineAccount;
         const assetUnstakes = token_unstakes && token_unstakes.find( x => x.symbol === asset );
@@ -543,7 +575,9 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "borrow": {
-                promise = collateralizedConvertKc(username, fullAmount);
+                const hiveCollaterialFullAmount = this.formatNumber(estimatedRequiredHiveCollateral, 3) + ` ${HIVE_API_NAME}`;
+                console.log(hiveCollaterialFullAmount);
+                promise = collateralizedConvertKc(username, hiveCollaterialFullAmount);
                 break;
             }
             case "convert": {
@@ -588,6 +622,7 @@ export class Transfer extends BaseComponent<Props, State> {
             })
             .catch(err => {
                 error(formatError(err));
+                console.log(err);
                 this.stateSet({inProgress: false});
             });
     }
@@ -600,7 +635,7 @@ export class Transfer extends BaseComponent<Props, State> {
     }
     render() {
         const {global, mode, activeUser, transactions, dynamicProps} = this.props;
-        const {step, asset, to, toError, toWarning, amount, amountError, memo, inProgress, precision} = this.state;
+        const {step, asset, to, toError, toWarning, amount, amountError, memo, inProgress, precision, estimatedRequiredHiveCollateral} = this.state;
         const EnginelessHiveAccount = activeUser.data;
         const recent = [...new Set(
             transactions.list
@@ -634,6 +669,9 @@ export class Transfer extends BaseComponent<Props, State> {
             case "transfer-saving":
             case "withdraw-saving":
                 assets = [HIVE_API_NAME, DOLLAR_API_NAME];
+                break;
+            case "borrow":
+                assets = [HIVE_API_NAME];
                 break;
             case "convert":
                 assets = [DOLLAR_API_NAME];
@@ -815,6 +853,23 @@ export class Transfer extends BaseComponent<Props, State> {
                                     <span className="balance-num" onClick={this.copyBalance}>{balance}{" "}{asset}</span>
                                     {asset === "HP" && (<div className="balance-hp-hint">{_t("transfer.available-hp-hint")}</div>)}
                                 </div>
+                                {!!estimatedRequiredHiveCollateral &&
+                                    <div>
+                                        <Tooltip content={_t("transfer.required-collateral-explanation")}>
+                                            <div className="balance">
+                                                <span className="balance-label">{_t('transfer.required-collateral')}{": "}</span>
+                                                <span className="balance-num">{formattedNumber(estimatedRequiredHiveCollateral, {fractionDigits: 3, suffix: HIVE_API_NAME})}</span>
+                                            </div>
+                                        </Tooltip>
+                                        <Tooltip content={_t('transfer.collaterial-convert-explanation')}>
+                                            <div className="balance">
+                                                <span className="balance-label">{_t('transfer.collateral-convert-exchange-rate')}{": "}</span>
+                                                <span className="balance-num">{formattedNumber(HIVE_CONVERSION_COLLATERAL_RATIO * this.parseFloat(amount) / estimatedRequiredHiveCollateral, {fractionDigits: 3, suffix: `${DOLLAR_API_NAME}/${HIVE_API_NAME}`})}</span>
+                                            </div>
+                                        </Tooltip>
+                                </div>}
+
+
                                 {(() => {
                                     if (mode === "power-down") {
                                         if (asset === LIQUID_TOKEN_UPPERCASE || asset == VESTING_TOKEN) {
@@ -901,6 +956,9 @@ export class Transfer extends BaseComponent<Props, State> {
                             {asset === "HP" && <div className="amount-vests">{formattedNumber(this.hpToVests(Number(amount)), {fractionDigits: 6, suffix: 'VESTS'})}</div>}
                             {(asset != HIVE_API_NAME && asset != DOLLAR_API_NAME && asset != "HP") && ["power-down", "delegate"].includes(mode) &&
                                 <div className="amount-vests">{formattedNumber(amount, {fractionDigits: 6, suffix: asset})}</div>}
+                            {mode === 'borrow' && asset === HIVE_API_NAME &&
+                                    <div>Estimated Hive required ... {this.state.estimatedRequiredHiveCollateral}{" "}{HIVE_API_NAME}</div>
+                            }
                             {memo && <div className="memo">{memo}</div>}
                         </div>
                         <div className="d-flex justify-content-center">

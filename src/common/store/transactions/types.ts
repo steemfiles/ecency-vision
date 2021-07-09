@@ -5,6 +5,13 @@ interface BaseTransaction {
     trx_id: string
 }
 
+export interface CollateralizedConvert extends BaseTransaction {
+	type: 'collateralized_convert';
+	owner: string;
+	amount: string;
+	requestid: number;
+};
+
 export interface CurationReward extends BaseTransaction {
     type: "curation_reward";
     comment_author: string;
@@ -172,7 +179,8 @@ export type Transaction =
     | Interest
     | FillConvertRequest
     | ReturnVestingDelegation
-    | ProposalPay;
+    | ProposalPay
+    | CollateralizedConvert;
 
 export type OperationGroup = "transfers" | "market-orders" | "interests" | "stake-operations" | "rewards";
 

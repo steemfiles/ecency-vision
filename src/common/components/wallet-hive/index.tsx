@@ -26,7 +26,8 @@ import HiveWallet from "../../helper/hive-wallet";
 
 import {vestsToHp} from "../../helper/vesting";
 
-import {getAccount, getConversionRequests} from "../../api/hive";
+import {getAccount, getConversionRequests, getCollateralizedConversionRequests}
+from "../../api/hive";
 
 import {claimRewardBalance, formatError} from "../../api/operations";
 
@@ -38,7 +39,7 @@ import {_t} from "../../i18n";
 
 import {plusCircle} from "../../img/svg";
 import {TEST_NET} from "../../../client_config";
-import {HIVE_API_NAME, DOLLAR_API_NAME, HIVE_LANGUAGE_KEY} from "../../api/hive";
+import {HIVE_API_NAME, DOLLAR_API_NAME, HIVE_LANGUAGE_KEY, HIVE_HUMAN_NAME_UPPERCASE} from "../../api/hive";
 
 interface Props {
     history: History;
@@ -63,7 +64,8 @@ interface State {
     withdrawRoutes: boolean;
     transferMode: null | TransferMode;
     transferAsset: null | TransferAsset;
-    converting: number
+    converting: number;
+    collaterializedConverting: number;
 }
 
 export class WalletHive extends BaseComponent<Props, State> {
@@ -76,7 +78,8 @@ export class WalletHive extends BaseComponent<Props, State> {
         withdrawRoutes: false,
         transferMode: null,
         transferAsset: null,
-        converting: 0
+        converting: 0,
+        collaterializedConverting: 0,
     };
 
     componentDidMount() {
@@ -97,6 +100,14 @@ export class WalletHive extends BaseComponent<Props, State> {
             });
 
             this.stateSet({converting});
+        });
+
+        getCollateralizedConversionRequests(account.name).then(rs => {
+            let collaterializedConverting = 0;
+            for (const r of rs) {
+                collaterializedConverting += parseAsset(r.collateral_amount).amount;
+            }
+            this.setState({collaterializedConverting});
         });
     }
 
@@ -155,7 +166,8 @@ export class WalletHive extends BaseComponent<Props, State> {
 
     render() {
         const {global, dynamicProps, account, activeUser} = this.props;
-        const {claiming, claimed, transfer, transferAsset, transferMode, converting} = this.state;
+        const {claiming, claimed, transfer, transferAsset, transferMode,
+            converting, collaterializedConverting} = this.state;
 
         if (!account.__loaded) {
             return null;
@@ -243,46 +255,52 @@ export class WalletHive extends BaseComponent<Props, State> {
                                                         }
                                                     },
                                                     {
-                                                    	label: _t('wallet.trade-internal-market'),
-                                                    	onClick: () => {
-                                                    		window.open(`https://wallet.hive.blog/market`, 'HiveDEx'); 
-                                                    	}
-                                                    },
-													{
-														label: `Trade at HiveEngine`,
-														onClick: () => {
-															 window.open(`https://hive-engine.com/?p=balances&a=${account.name}`, 'hiveEngineDex');
-														}
-													},
-													{
-														label: "Trade at LeoDex",
-														onClick: () => {
-															window.open("https://leodex.io/market/POB", 'leodex');
-														}
-													},
-													{
-														label: "Trade at TribalDex",
-														onClick: () => {
-															window.open("https://tribaldex.com/trade/POB", 'tribaldex');
-														}
-													},
-                                                    {
-                                                    	label: _t('wallet.trade-on-Blocktrades'),
-                                                    	onClick: () => {
-                                                    		window.open(`https://blocktrades.us/`, 'BlockTrades'); 
-                                                    	}
+                                                        label: "Borrow new HBD against Hive",
+                                                        onClick: () => {
+                                                            this.openTransferDialog('borrow', DOLLAR_API_NAME);
+                                                        }
                                                     },
                                                     {
-                                                    	label: _t('wallet.trade-on-Upbit'),
-                                                    	onClick: () => {
-                                                    		window.open(`https://upbit.com/`, 'UpBit');
-                                                    	}
+                                                        label: _t('wallet.trade-internal-market'),
+                                                        onClick: () => {
+                                                            window.open(`https://wallet.hive.blog/market`, 'HiveDEx');
+                                                        }
                                                     },
                                                     {
-                                                    	label: _t('wallet.trade-on-BitTrex'),
-                                                    	onClick: () => {
-                                                    		window.open(`https://global.bittrex.com/`, 'BitTrex'); 
-                                                    	}
+                                                        label: `Trade at HiveEngine`,
+                                                        onClick: () => {
+                                                             window.open(`https://hive-engine.com/?p=balances&a=${account.name}`, 'hiveEngineDex');
+                                                        }
+                                                    },
+                                                    {
+                                                        label: "Trade at LeoDex",
+                                                        onClick: () => {
+                                                            window.open("https://leodex.io/market/POB", 'leodex');
+                                                        }
+                                                    },
+                                                    {
+                                                        label: "Trade at TribalDex",
+                                                        onClick: () => {
+                                                            window.open("https://tribaldex.com/trade/POB", 'tribaldex');
+                                                        }
+                                                    },
+                                                    {
+                                                        label: _t('wallet.trade-on-Blocktrades'),
+                                                        onClick: () => {
+                                                            window.open(`https://blocktrades.us/`, 'BlockTrades');
+                                                        }
+                                                    },
+                                                    {
+                                                        label: _t('wallet.trade-on-Upbit'),
+                                                        onClick: () => {
+                                                            window.open(`https://upbit.com/`, 'UpBit');
+                                                        }
+                                                    },
+                                                    {
+                                                        label: _t('wallet.trade-on-BitTrex'),
+                                                        onClick: () => {
+                                                            window.open(`https://global.bittrex.com/`, 'BitTrex');
+                                                        }
                                                     },
                                                ],
                                             };
@@ -293,8 +311,18 @@ export class WalletHive extends BaseComponent<Props, State> {
                                         return null;
                                     })()}
 
-                                    <span>{formattedNumber(w.balance, {suffix: HIVE_API_NAME})}</span>
+                                    <span>{formattedNumber(w.balance, {suffix: HIVE_HUMAN_NAME_UPPERCASE})}</span>
                                 </div>
+                                {collaterializedConverting > 0 && (
+                                    <div className="amount amount-passive converting-hbd">
+                                        <Tooltip content={_t("wallet.collateral-hive-amount")}>
+                                      <span>
+                                          {"+"} {formattedNumber(collaterializedConverting, {suffix: HIVE_HUMAN_NAME_UPPERCASE})}
+                                      </span>
+                                        </Tooltip>
+                                    </div>
+                                )}
+
                             </div>
                         </div>
 
@@ -428,40 +456,40 @@ export class WalletHive extends BaseComponent<Props, State> {
                                                         }
                                                     },
                                                     {
-                                                    	label: _t('wallet.trade-internal-market'),
-                                                    	onClick: () => {
-                                                    		window.open(`https://wallet.hive.blog/market`, 'HiveDEx'); 
-                                                    	}
-                                                    },
-													{
-														label: `Trade at HiveEngine`,
-														onClick: () => {
-															 window.open(`https://hive-engine.com/?p=balances&a=${account.name}`, 'hiveEngineDex');
-														}
-													},
-													{
-														label: "Trade at TribalDex",
-														onClick: () => {
-															window.open("https://tribaldex.com/trade/POB", 'tribaldex');
-														}
-													},
-                                                    {
-                                                    	label: _t('wallet.trade-on-Blocktrades'),
-                                                    	onClick: () => {
-                                                    		window.open(`https://blocktrades.us/`, 'BlockTrades'); 
-                                                    	}
+                                                        label: _t('wallet.trade-internal-market'),
+                                                        onClick: () => {
+                                                            window.open(`https://wallet.hive.blog/market`, 'HiveDEx');
+                                                        }
                                                     },
                                                     {
-                                                    	label: _t('wallet.trade-on-Upbit'),
-                                                    	onClick: () => {
-                                                    		window.open(`https://upbit.com/`, 'UpBit');
-                                                    	}
+                                                        label: `Trade at HiveEngine`,
+                                                        onClick: () => {
+                                                             window.open(`https://hive-engine.com/?p=balances&a=${account.name}`, 'hiveEngineDex');
+                                                        }
                                                     },
                                                     {
-                                                    	label: _t('wallet.trade-on-BitTrex'),
-                                                    	onClick: () => {
-                                                    		window.open(`https://global.bittrex.com/`, 'BitTrex'); 
-                                                    	}
+                                                        label: "Trade at TribalDex",
+                                                        onClick: () => {
+                                                            window.open("https://tribaldex.com/trade/POB", 'tribaldex');
+                                                        }
+                                                    },
+                                                    {
+                                                        label: _t('wallet.trade-on-Blocktrades'),
+                                                        onClick: () => {
+                                                            window.open(`https://blocktrades.us/`, 'BlockTrades');
+                                                        }
+                                                    },
+                                                    {
+                                                        label: _t('wallet.trade-on-Upbit'),
+                                                        onClick: () => {
+                                                            window.open(`https://upbit.com/`, 'UpBit');
+                                                        }
+                                                    },
+                                                    {
+                                                        label: _t('wallet.trade-on-BitTrex'),
+                                                        onClick: () => {
+                                                            window.open(`https://global.bittrex.com/`, 'BitTrex');
+                                                        }
                                                     },
                                                 ],
                                             };
