@@ -10,8 +10,8 @@ import {
     FetchedAction,
     FetchErrorAction,
     ResetAction,
-} from "./types";
 
+} from "./types";
 import {getAccountHistory} from "../../api/hive";
 
 

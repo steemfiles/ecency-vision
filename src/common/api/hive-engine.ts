@@ -8,7 +8,6 @@ import {
 } from './util/CrossPosts';
 */
 import {DISABLE_HIVE, LIQUID_TOKEN_UPPERCASE} from '../../client_config';
-
 import axios from 'axios';
 // @ts-ignore
 import SSC from "sscjs";
@@ -17,10 +16,8 @@ import {getAccount, getAccounts, getFollowCount, getPost} from "./hive";
 import {AccountFollowStats, BaseAccount, Account, FullAccount} from "../store/accounts/types";
 import {Entry, EntryBeneficiaryRoute, EntryStat, EntryVote} from "../store/entries/types";
 import {EntryVoteBtn} from "../components/entry-vote-btn";
-
 const hiveSsc = new SSC('https://api.hive-engine.com/rpc');
-
-export  interface TokenStatus {
+export interface TokenStatus {
     "downvote_weight_multiplier":number;
     "downvoting_power":number;
     "earned_mining_token":number;
@@ -45,36 +42,32 @@ export  interface TokenStatus {
     "symbol":string;
     "vote_weight_multiplier":number;
     "voting_power":number;
-
 }
-
 export interface UnStake {
-	"_id": number; 
-	"account": string; 
-	"symbol": string; 
-	"quantity": string; 
-	"quantityLeft": string; 
-	"nextTransactionTimestamp": number; 
-	"numberTransactionsLeft": number; 
-	"millisecPerPeriod": string; 
-	"txID": string; 	
+    "_id": number;
+    "account": string;
+    "symbol": string;
+    "quantity": string;
+    "quantityLeft": string;
+    "nextTransactionTimestamp": number;
+    "numberTransactionsLeft": number;
+    "millisecPerPeriod": string;
+    "txID": string;
 }
-
 // Hopefully we can make this dynamic some soon
 const defaultPrices = {
-	'POB': 0,
-	'LEO': 0,
-	'SWAP.BTC': 1,
-	'SWAP.HIVE': 1 
+    'POB': 0,
+    'LEO': 0,
+    'SWAP.BTC': 1,
+    'SWAP.HIVE': 1
 };
-
 export async function getPrices(token_list: undefined|Array<string>) : Promise<{[shortCoinName: string]: number /* in Hive */}> {
-	try {
-	    let obj : any = {
-	    	'SWAP.HIVE': 1,
-	    };
+    try {
+        let obj : any = {
+            'SWAP.HIVE': 1,
+        };
         try {
-		    // others
+            // others
             const others = await hiveSsc.find('market', 'tradesHistory', {
                 'type': 'buy',
             });
@@ -82,44 +75,37 @@ export async function getPrices(token_list: undefined|Array<string>) : Promise<{
                 obj[other.symbol] = parseFloat(other.price);
             }
         } catch (e) {
-		    console.log(e);
-		    // do nothing...
+            console.log(e);
+            // do nothing...
         }
-        
-		try {
-			
-			if (!obj["POB"]) {        
-				const HIVEpPOB = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
-						'symbol': 'POB',
-						'type': 'buy',
-				}))[0].price);
-			}
-			if (!obj["LEO"]) {
-				const HIVEpLEO = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
-						'symbol': 'LEO',
-						'type': 'buy',
-				}))[0].price);
-			}
-			
-			if (!obj['SWAP.BTC']) {
-				obj['SWAP.BTC'] = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
-					'symbol': 'SWAP.BTC',
-					'type': 'buy',
-				}))[0].price);
-			}
-			
-		} catch (e) {
-			// do nothing....
-		}
-			
-		return obj;
-	} catch (e) {
-		console.log("getPrices are failing:", e.message);
-	}
-	
-	return defaultPrices;
+        try {
+            if (!obj["POB"]) {
+                const HIVEpPOB = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
+                        'symbol': 'POB',
+                        'type': 'buy',
+                }))[0].price);
+            }
+            if (!obj["LEO"]) {
+                const HIVEpLEO = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
+                        'symbol': 'LEO',
+                        'type': 'buy',
+                }))[0].price);
+            }
+            if (!obj['SWAP.BTC']) {
+                obj['SWAP.BTC'] = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
+                    'symbol': 'SWAP.BTC',
+                    'type': 'buy',
+                }))[0].price);
+            }
+        } catch (e) {
+            // do nothing....
+        }
+        return obj;
+    } catch (e) {
+        console.log("getPrices are failing:", e.message);
+    }
+    return defaultPrices;
 }
-
 interface RawTokenBalance {
     _id: number,
     account: string,
@@ -131,8 +117,6 @@ interface RawTokenBalance {
     delegationsOut: string,
     pendingUndelegations: string
 }
-
-
 export interface TokenBalance {
     _id: number,
     account: string,
@@ -144,7 +128,6 @@ export interface TokenBalance {
     delegationsOut: number,
     pendingUndelegations: number
 }
-
 export interface CoinDescription {
     "downvote_weight_multiplier": number;
     "downvoting_power": number;
@@ -171,7 +154,6 @@ export interface CoinDescription {
     "vote_weight_multiplier": number;
     "voting_power": number;
 }
-
 export interface FullHiveEngineAccount extends FullAccount {
     follow_stats: AccountFollowStats |undefined;
     token_balances: Array<TokenBalance>;
@@ -181,22 +163,17 @@ export interface FullHiveEngineAccount extends FullAccount {
     token_delegations?: any; /* seems to be undefined sometimes */
     prices: {[id:string]:number};
 }
-
 function is_not_FullAccount(account: Account) {
-	return (!account);
+    return (!account);
 }
-
 export function is_not_FullHiveEngineAccount(account :  FullHiveEngineAccount | FullAccount | BaseAccount) {
-	if (is_not_FullAccount(account) || !account["token_balances"] || !account["prices"] || !account["follow_stats"])
-		return true;
-	return false;
+    if (is_not_FullAccount(account) || !account["token_balances"] || !account["prices"] || !account["follow_stats"])
+        return true;
+    return false;
 }
-
 export function is_FullHiveEngineAccount(account : FullHiveEngineAccount | FullAccount | BaseAccount) {
-	return !is_not_FullHiveEngineAccount(account);
+    return !is_not_FullHiveEngineAccount(account);
 }
-
-
 async function callApi(url : string, params: any) {
     return await axios({
         url,
@@ -211,9 +188,8 @@ async function callApi(url : string, params: any) {
             return [];
         });
 }
-
 // Exclude author and curation reward details
-async function getCoarseTransactionHistory(account: string, limit: 50, offset: number = 0) {
+export async function getCoarseTransactions(account: string, limit: number, offset: number = 0) {
     const transfers : Array<HECoarseTransaction> = await callApi(
         'https://accounts.hive-engine.com/accountHistory',
         {
@@ -226,9 +202,8 @@ async function getCoarseTransactionHistory(account: string, limit: 50, offset: n
     );
     return transfers;
 }
-
 // Include virtual transactions like curation and author reward details.
-async function getFineTransactions(account : string, limit: number, offset: number)  : Promise<Array<HEFineTransaction>> {
+export async function getFineTransactions(account : string, limit: number, offset: number)  : Promise<Array<HEFineTransaction>> {
     const history : Array<HEFineTransaction> = await getScotDataAsync<Array<HEFineTransaction>>('get_account_history', {
         account,
         token: LIQUID_TOKEN_UPPERCASE,
@@ -237,12 +212,10 @@ async function getFineTransactions(account : string, limit: number, offset: numb
     });
     return history;
 }
-
 export async function getScotDataAsync<T>(path : string, params : object) : Promise<T> {
     const x : T = await callApi(`https://scot-api.hive-engine.com/${path}`, params);
     return x;
 }
-
 export async function getScotAccountDataAsync(account: string) : Promise<{ data: { [id: string]: TokenStatus}, hiveData:null|{ [id: string]: TokenStatus} }> {
     const data = await getScotDataAsync<{ [id: string]: TokenStatus}>(`@${account}`, {});
     const hiveData = DISABLE_HIVE
@@ -250,15 +223,11 @@ export async function getScotAccountDataAsync(account: string) : Promise<{ data:
         : await getScotDataAsync<{[id: string]: TokenStatus} >(`@${account}`, { hive: 1 });
     return { data, hiveData };
 }
-
-
-
 function mergeContent(content : Entry, tokenPostData : {[id:string]:ScotPost}) {
     const {he} = content;
     content.he = Object.assign(he ?? {}, tokenPostData);
     return content;
 }
-
 export const enginifyPost = (post: Entry, observer: string): Promise<Entry> => {
     const {author, permlink} = post;
     const scot_data_promise = getScotDataAsync<{[id: string]: ScotPost}>(`@${post.author}/${post.permlink}?hive=1`, {});
@@ -271,71 +240,66 @@ export const enginifyPost = (post: Entry, observer: string): Promise<Entry> => {
             return post;
         }
     ).catch(e => {
-    	console.log("enginify failed.");
-    	return post;
+        console.log("enginify failed.");
+        return post;
     });
 }
-
-export const fetchedHiveEngineTokensProperties = async ( 
-	r : [HiveEngineTokenInfo, 
-		HiveEngineTokenConfig,  
-		{[shortCoinName: string]: number /* in Hive */}]) => {
-
+export const fetchedHiveEngineTokensProperties = async (
+    r : [HiveEngineTokenInfo,
+        HiveEngineTokenConfig,
+        {[shortCoinName: string]: number /* in Hive */}]) => {
         const info = r[0] as HiveEngineTokenInfo;
         const config = r[1] as HiveEngineTokenConfig;
         const prices = r[2] as {[shortCoinName: string]: number /* in Hive */};
         const hivePrice = prices["POB"];
         return {[LIQUID_TOKEN_UPPERCASE]: {info, config, hivePrice}};
 }
-
 export async function getAccountHEFull(account : string, useHive: boolean) : Promise<FullHiveEngineAccount> {
-	try {
-		let hiveAccount: FullAccount, tokenBalances: Array<object>, tokenUnstakes: Array<UnStake>,
-			tokenStatuses: { data: {[id:string]:TokenStatus}; hiveData: {[id:string]:TokenStatus}| null }, transferHistory: any, tokenDelegations: any;
-		[
-			hiveAccount,
-			tokenBalances,
-	
-			tokenUnstakes,
-	
-			tokenStatuses,
-			transferHistory,
-			tokenDelegations,
-		] = await Promise.all([
-			getAccount(account),
-			// modified to get all tokens. - by anpigon
-			hiveSsc.find('tokens', 'balances', {
-				account,
-			}),
-			hiveSsc.find('tokens', 'pendingUnstakes', {
-				account,
-				symbol: LIQUID_TOKEN_UPPERCASE,
-			}),
-			getScotAccountDataAsync(account),
-			getFineTransactions(account, 100, 0),
-			hiveSsc.find('tokens', 'delegations', {
-				$or: [{from: account}, {to: account}],
-				symbol: LIQUID_TOKEN_UPPERCASE,
-			}),
-		]);	
-		let modifiedTokenBalances : Array<TokenBalance> = [];
-	   // There is no typesafe way to modify the type of something
-	   // in place.  You have to do a typecast eventually or participate in
-	   // copying.
-	   for (const tokenBalance of tokenBalances) {
-		   const b = tokenBalance;
-		   if (typeof(b['_id']) !== 'number'
-			||
-			   typeof(b['symbol']) !== 'string'
-			   ||
-			   typeof(b['balance']) !== 'string'
-			   ||
-			   typeof(b['stake']) !== 'string'
-		   )
-			   continue;
-		   const b2: RawTokenBalance = b as RawTokenBalance;
-		   // pass by reference semantics modifies the array.
-		   // This is on purpose.
+    try {
+        let hiveAccount: FullAccount, tokenBalances: Array<object>, tokenUnstakes: Array<UnStake>,
+            tokenStatuses: { data: {[id:string]:TokenStatus}; hiveData: {[id:string]:TokenStatus}| null }, transferHistory: any, tokenDelegations: any;
+        [
+            hiveAccount,
+            tokenBalances,
+            tokenUnstakes,
+            tokenStatuses,
+            transferHistory,
+            tokenDelegations,
+        ] = await Promise.all([
+            getAccount(account),
+            // modified to get all tokens. - by anpigon
+            hiveSsc.find('tokens', 'balances', {
+                account,
+            }),
+            hiveSsc.find('tokens', 'pendingUnstakes', {
+                account,
+                symbol: LIQUID_TOKEN_UPPERCASE,
+            }),
+            getScotAccountDataAsync(account),
+            getFineTransactions(account, 100, 0),
+            hiveSsc.find('tokens', 'delegations', {
+                $or: [{from: account}, {to: account}],
+                symbol: LIQUID_TOKEN_UPPERCASE,
+            }),
+        ]);
+        let modifiedTokenBalances : Array<TokenBalance> = [];
+       // There is no typesafe way to modify the type of something
+       // in place.  You have to do a typecast eventually or participate in
+       // copying.
+       for (const tokenBalance of tokenBalances) {
+           const b = tokenBalance;
+           if (typeof(b['_id']) !== 'number'
+            ||
+               typeof(b['symbol']) !== 'string'
+               ||
+               typeof(b['balance']) !== 'string'
+               ||
+               typeof(b['stake']) !== 'string'
+           )
+               continue;
+           const b2: RawTokenBalance = b as RawTokenBalance;
+           // pass by reference semantics modifies the array.
+           // This is on purpose.
            const b1: TokenBalance = Object.assign(b2, {
                "delegationsIn": parseFloat(b2.delegationsIn),
                "balance": parseFloat(b2.balance),
@@ -346,22 +310,20 @@ export async function getAccountHEFull(account : string, useHive: boolean) : Pro
            });
            modifiedTokenBalances.push(b1);
         }
-	   // Now tokenBalances is an Array<TokenBalance>.
-		const prices = await getPrices(Object.keys(tokenBalances));
-		let follow_stats: AccountFollowStats | undefined;
-		try {
-			follow_stats = await getFollowCount(account);
-		} catch (e) {
-	
-		}
-		return {...hiveAccount, follow_stats, token_balances: modifiedTokenBalances, token_unstakes: tokenUnstakes,
+       // Now tokenBalances is an Array<TokenBalance>.
+        const prices = await getPrices(Object.keys(tokenBalances));
+        let follow_stats: AccountFollowStats | undefined;
+        try {
+            follow_stats = await getFollowCount(account);
+        } catch (e) {
+        }
+        return {...hiveAccount, follow_stats, token_balances: modifiedTokenBalances, token_unstakes: tokenUnstakes,
             token_statuses: tokenStatuses, transfer_history: transferHistory, token_delegations: tokenDelegations, prices, __loaded: true };
-	} catch (e) {
-		console.log("getAccountHEFull threw an exception");
-		throw e;
-	}
+    } catch (e) {
+        console.log("getAccountHEFull threw an exception");
+        throw e;
+    }
 }
-
 export interface HiveEngineTokenInfo {
     "claimed_token": number;
     "comment_pending_rshares": number;
@@ -407,7 +369,6 @@ export interface HiveEngineTokenInfo {
     "total_generated_token": number;
     "voting_enabled": boolean;
 }
-
 export interface HiveEngineTokenConfig {
     allowlist_account: null;
     author_curve_exponent: number;
@@ -472,7 +433,6 @@ export interface HiveEngineTokenConfig {
     vote_regeneration_seconds: number;
     vote_window_days: number;
 }
-
 export interface ScotVoteShare {
     "authorperm": "",
     "block_num": number;
@@ -484,8 +444,6 @@ export interface ScotVoteShare {
     "voter": string;
     "weight": number;
 }
-
-
 async function getAuthorRep(feedData : Array<Entry>, useHive : boolean) {
     // Disable for now.
     const authors = Array.from(new Set(feedData.map(d => d.author)));
@@ -499,12 +457,7 @@ async function getAuthorRep(feedData : Array<Entry>, useHive : boolean) {
         }
     );
     return authorRep;
-    
 }
-
-
-
-
 async function fetchMissingData(tag : string, feedType : string, state : any, feedData : Array<Entry>) {
     /*
     if (!state.content) {
@@ -527,7 +480,6 @@ async function fetchMissingData(tag : string, feedType : string, state : any, fe
     missingContent.forEach(c => {
         state.content[`${c.author}/${c.permlink}`] = c;
     });
-
     if (!state.discussion_idx) {
         state.discussion_idx = {};
     }
@@ -557,10 +509,8 @@ async function fetchMissingData(tag : string, feedType : string, state : any, fe
         state.discussion_idx[tag] = {};
     }
     state.discussion_idx[tag][feedType] = discussionIndex;
-
      */
 }
-
 /*
 async function addAccountToState(state, account, useHive) {
     const profile = await callBridge('get_profile', { account }, useHive);
@@ -568,7 +518,6 @@ async function addAccountToState(state, account, useHive) {
         state['profiles'][account] = profile;
     }
 }
-
 export async function attachScotData(url, state, useHive, ssr = false) {
     let urlParts = url.match(
         /^(trending|hot|created|promoted|payout|payout_comments)($|\/([^\/]+)$)/
@@ -593,7 +542,6 @@ export async function attachScotData(url, state, useHive, ssr = false) {
         await fetchMissingData(tag, feedType, state, feedData, useHive);
         return;
     }
-
     urlParts = url.match(/^[\/]?@([^\/]+)\/transfers[\/]?$/);
     if (urlParts) {
         const account = urlParts[1];
@@ -603,13 +551,11 @@ export async function attachScotData(url, state, useHive, ssr = false) {
                 useHive
             );
         }
-
         if (!state.props) {
             state.props = await getDynamicGlobalProperties();
         }
         return;
     }
-
     urlParts = url.match(/^[\/]?@([^\/]+)\/feed[\/]?$/);
     if (urlParts) {
         const account = urlParts[1];
@@ -621,7 +567,6 @@ export async function attachScotData(url, state, useHive, ssr = false) {
         await fetchMissingData(`@${account}`, 'feed', state, feedData, useHive);
         return;
     }
-
     urlParts = url.match(/^[\/]?@([^\/]+)(\/blog)?[\/]?$/);
     if (urlParts) {
         const account = urlParts[1];
@@ -637,7 +582,6 @@ export async function attachScotData(url, state, useHive, ssr = false) {
         await fetchMissingData(`@${account}`, 'blog', state, feedData, useHive);
         return;
     }
-
     urlParts = url.match(/^[\/]?@([^\/]+)(\/posts)?[\/]?$/);
     if (urlParts) {
         const account = urlParts[1];
@@ -658,7 +602,6 @@ export async function attachScotData(url, state, useHive, ssr = false) {
         );
         return;
     }
-
     urlParts = url.match(/^[\/]?@([^\/]+)(\/comments)?[\/]?$/);
     if (urlParts) {
         const account = urlParts[1];
@@ -679,7 +622,6 @@ export async function attachScotData(url, state, useHive, ssr = false) {
         );
         return;
     }
-
     urlParts = url.match(/^[\/]?@([^\/]+)(\/replies)?[\/]?$/);
     if (urlParts) {
         const account = urlParts[1];
@@ -700,14 +642,12 @@ export async function attachScotData(url, state, useHive, ssr = false) {
         );
         return;
     }
-
     if (state.content) {
         Object.entries(state.content).forEach(entry => {
             if (useHive) {
                 entry[1].hive = true;
             }
         });
-
         // Do not do this merging except on client side.
         if (!ssr) {
             await Promise.all(
@@ -743,21 +683,18 @@ export async function attachScotData(url, state, useHive, ssr = false) {
         }
     }
 }
-
 async function getContentFromBridge(author, permlink, useHive = true) {
     try {
         const content = getContentAsync(
             author,
             permlink
         );
-
         return await normalizePost(content);
     } catch (e) {
         console.log(e);
     }
     return null;
 }
-
 export async function getContentAsync(author :  string, permlink : string) {
     const [content, scotData] = await Promise.all([
         getPost(author, permlink),
@@ -769,7 +706,6 @@ export async function getContentAsync(author :  string, permlink : string) {
     mergeContent(content, scotData[LIQUID_TOKEN_UPPERCASE]);
     return content;
 }
-
 export async function getCommunityStateAsync(
     url,
     observer,
@@ -778,9 +714,7 @@ export async function getCommunityStateAsync(
 ) {
     console.log('getStateAsync');
     if (observer === undefined) observer = null;
-
     const { page, tag, sort, key } = parsePath(url);
-
     console.log('GSA', url, observer, ssr);
     let state = {
         accounts: {},
@@ -789,7 +723,6 @@ export async function getCommunityStateAsync(
         discussion_idx: {},
         profiles: {},
     };
-
     // load `content` and `discussion_idx`
     if (page == 'posts' || page == 'account') {
         const posts = await loadPosts(sort, tag, observer, useHive);
@@ -801,7 +734,6 @@ export async function getCommunityStateAsync(
     } else {
         // no-op
     }
-
     // append `community` key
     if (tag && ifHivemind(tag)) {
         try {
@@ -815,7 +747,6 @@ export async function getCommunityStateAsync(
             );
         } catch (e) {}
     }
-
     // for SSR, load profile on any profile page or discussion thread author
     const account =
         tag && tag[0] == '@'
@@ -828,7 +759,6 @@ export async function getCommunityStateAsync(
             state['profiles'][account] = profile;
         }
     }
-
     if (ssr) {
         // append `topics` key
         state['topics'] = await callBridge(
@@ -839,11 +769,9 @@ export async function getCommunityStateAsync(
             useHive
         );
     }
-
     const cleansed = stateCleaner(state);
     return cleansed;
 }
-
 async function loadThread(account, permlink, useHive) {
     const author = account.slice(1);
     const content = await callBridge(
@@ -851,7 +779,6 @@ async function loadThread(account, permlink, useHive) {
         { author, permlink },
         useHive
     );
-
     if (content) {
         // Detect fetch with scot vs fetch with getState. We use body length vs body to tell
         // if it was a partial fetch. To clean up later.
@@ -871,14 +798,11 @@ async function loadThread(account, permlink, useHive) {
             );
         }
     }
-
     return { content };
 }
-
 async function loadPosts(sort, tag, observer, useHive) {
     console.log('loadPosts');
     const account = tag && tag[0] == '@' ? tag.slice(1) : null;
-
     let posts;
     if (account) {
         const params = { sort, account, observer };
@@ -887,18 +811,15 @@ async function loadPosts(sort, tag, observer, useHive) {
         const params = { sort, tag, observer };
         posts = await callBridge('get_ranked_posts', params, useHive);
     }
-
     const { content, keys, crossPosts } = await fetchCrossPosts(
         posts,
         observer,
         useHive
     );
-
     if (Object.keys(crossPosts).length > 0) {
         for (let ki = 0; ki < keys.length; ki += 1) {
             const contentKey = keys[ki];
             let post = content[contentKey];
-
             if (Object.prototype.hasOwnProperty.call(post, 'cross_post_key')) {
                 post = augmentContentWithCrossPost(
                     post,
@@ -907,26 +828,20 @@ async function loadPosts(sort, tag, observer, useHive) {
             }
         }
     }
-
     const discussion_idx = {};
     discussion_idx[tag] = {};
     discussion_idx[tag][sort] = keys;
-
     return { content, discussion_idx };
 }
-
 function parsePath(url) {
     // strip off query string
     url = url.split('?')[0];
-
     // strip off leading and trailing slashes
     if (url.length > 0 && url[0] == '/') url = url.substring(1, url.length);
     if (url.length > 0 && url[url.length - 1] == '/')
         url = url.substring(0, url.length - 1);
-
     // blank URL defaults to `trending`
     if (url === '') url = 'trending';
-
     const part = url.split('/');
     const parts = part.length;
     const sorts = [
@@ -946,12 +861,10 @@ function parsePath(url) {
         'replies',
         'payout',
     ];
-
     let page = null;
     let tag = null;
     let sort = null;
     let key = null;
-
     if (parts == 1 && sorts.includes(part[0])) {
         page = 'posts';
         sort = part[0];
@@ -981,17 +894,14 @@ function parsePath(url) {
     }
     return { page, tag, sort, key };
 }
-
 export async function getStateAsync(url, observer, ssr = false) {
     // strip off query string
     let path = url.split('?')[0];
-
     // strip off leading and trailing slashes
     if (path.length > 0 && path[0] == '/')
         path = path.substring(1, path.length);
     if (path.length > 0 && path[path.length - 1] == '/')
         path = path.substring(0, path.length - 1);
-
     // Steemit state not needed for main feeds.
     const steemitApiStateNeeded =
         path !== '' &&
@@ -1002,7 +912,6 @@ export async function getStateAsync(url, observer, ssr = false) {
         !path.match(
             /^@[^\/]+(\/(feed|blog|comments|recent-replies|transfers|posts|replies|followers|followed)?)?$/
         );
-
     let raw = {
         accounts: {},
         community: {},
@@ -1051,11 +960,9 @@ export async function getStateAsync(url, observer, ssr = false) {
         raw.content = {};
     }
     await attachScotData(path, raw, useHive, ssr);
-
     const cleansed = stateCleaner(raw);
     return cleansed;
 }
-
 export async function fetchFeedDataAsync(useHive, call_name, args) {
     const fetchSize = args.limit;
     let feedData;
@@ -1063,7 +970,6 @@ export async function fetchFeedDataAsync(useHive, call_name, args) {
     let endOfData;
     // To indicate last fetched value from API.
     let lastValue;
-
     const callNameMatch = call_name.match(
         /getDiscussionsBy(Trending|Hot|Created|Promoted|Blog|Feed|Comments|Replies)Async/
     );
@@ -1141,7 +1047,6 @@ export async function fetchFeedDataAsync(useHive, call_name, args) {
         feedData.forEach(d => {
             d.author_reputation = authorRep[d.author];
         });
-
         // this indicates no further pages in feed.
         endOfData = feedData.length < fetchSize;
         lastValue = feedData.length > 0 ? feedData[feedData.length - 1] : null;
@@ -1165,7 +1070,6 @@ export async function fetchFeedDataAsync(useHive, call_name, args) {
     return { feedData, endOfData, lastValue };
 }
 */
-
 export async function fetchSnaxBalanceAsync(account : string) {
     const url = 'https://cdn.snax.one/v1/chain/get_currency_balance';
     const data = {
@@ -1183,7 +1087,6 @@ export async function fetchSnaxBalanceAsync(account : string) {
             return [];
         });
 }
-
 export interface ScotPost {
     "active_votes": Array<ScotVoteShare>,
     "app": string;
@@ -1220,7 +1123,6 @@ export interface ScotPost {
     "total_vote_weight": number;
     "vote_rshares": number;
 }
-
 export interface MergedEntry {
     active_votes: {[tokenName:string]: Array<ScotVoteShare>};
     "app"?: string;
@@ -1266,7 +1168,6 @@ export interface MergedEntry {
     percent_hbd: number,
     permlink: string;
     post_id: number;
-
     "precision"?: number;
     "score_hot"?: number;
     "score_promoted"?: number;
@@ -1283,7 +1184,6 @@ export interface MergedEntry {
     updated: string;
     url: string;
 }
-
 export interface MergedEntry {
     active_votes: {[tokenName:string]: Array<ScotVoteShare>};
     "app"?: string;
@@ -1329,7 +1229,6 @@ export interface MergedEntry {
     percent_hbd: number,
     permlink: string;
     post_id: number;
-
     "precision"?: number;
     "score_hot"?: number;
     "score_promoted"?: number;
@@ -1346,7 +1245,6 @@ export interface MergedEntry {
     updated: string;
     url: string;
 }
-
 export const historicalPOBInfo: HiveEngineTokenInfo = {
     "claimed_token": 66024178279461,
     "comment_pending_rshares": 81513634111,

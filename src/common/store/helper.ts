@@ -1,32 +1,23 @@
 import {Store} from "redux";
-
 import i18n from 'i18next';
-
 import {AppState} from "./index";
 import {ActiveUser, UserPoints} from "./active-user/types";
 import {loginAct as loginActiveUser, logoutAct as logoutActiveUser, updateAct as updateActiveUserAct} from "./active-user";
-
 import {getAccount, getDynamicProps} from "../api/hive";
 import {getPoints, usrActivity, getPromotedEntries} from "../api/private-api";
 import {reloadAct as reloadUsers} from "./users";
 import {fetchedAct as loadDynamicProps} from "./dynamic-props";
 import {fetchedAct as entriesFetchedAct} from "./entries";
 import {setCurrencyAct as setCurrency, muteNotificationsAct as muteNotifications, setLangAct as setLang, setNsfwAct as setNsfw} from "./global";
-
 import {getCurrencyRate} from "../api/misc";
-
 import currencies from "../constants/currencies.json";
-
 import * as ls from "../../common/util/local-storage";
-
 import currencySymbol from "../../common/helper/currency-symbol";
-
 import {AppWindow} from "../../client/window";
 import {getAccountHEFull, getScotDataAsync, getPrices, HiveEngineTokenConfig, HiveEngineTokenInfo} from "../api/hive-engine";
 import {includeInfoConfigsAction} from "./hive-engine-tokens/index";
 import {LIQUID_TOKEN_UPPERCASE} from "../../client_config";
 declare var window: AppWindow;
-
 export const activeUserMaker = (name: string, points: string = "0.000", uPoints: string = "0.000"): ActiveUser => {
     return {
         username: name,
@@ -38,19 +29,16 @@ export const activeUserMaker = (name: string, points: string = "0.000", uPoints:
         hiveEngineBalances: []
     }
 }
-
 export const activeUserUpdater = async (store: Store<AppState>) => {
     const state = store.getState();
     if (state.activeUser) {
         const {username} = state.activeUser;
-
         let account;
         try {
             account = await getAccountHEFull(state.activeUser.username, true);
         } catch (e) {
             return;
         }
-
         let points: UserPoints;
         try {
             const p = await getPoints(username);
@@ -61,30 +49,23 @@ export const activeUserUpdater = async (store: Store<AppState>) => {
                 uPoints: "0.000"
             };
         }
-
-
         store.dispatch(updateActiveUserAct(account, points));
     }
 };
-
 export const syncActiveUser = (store: Store<AppState>) => {
     const state = store.getState();
-
     const activeUser = ls.get("active_user");
-
     // logout
     if (!activeUser && state.activeUser) {
         store.dispatch(logoutActiveUser());
         return;
     }
-
     // login
     if (activeUser && !state.activeUser) {
         store.dispatch(loginActiveUser());
         activeUserUpdater(store).then();
         return;
     }
-
     // switch
     if (activeUser && state.activeUser && activeUser !== state.activeUser.username) {
         store.dispatch(loginActiveUser());
@@ -92,50 +73,41 @@ export const syncActiveUser = (store: Store<AppState>) => {
         return;
     }
 }
-
-export const updateTokensProperties = async (store: Store<AppState>, 
-	r : [HiveEngineTokenInfo, 
-		HiveEngineTokenConfig,  
-		{[shortCoinName: string]: number /* in Hive */}]) => {
+export const updateTokensProperties = async (store: Store<AppState>,
+    r : [HiveEngineTokenInfo,
+        HiveEngineTokenConfig,
+        {[shortCoinName: string]: number /* in Hive */}]) => {
         const info = r[0] as HiveEngineTokenInfo;
         const config = r[1] as HiveEngineTokenConfig;
         const prices = r[2] as {[shortCoinName: string]: number /* in Hive */};
         const hivePrice = prices["POB"];
         store.dispatch(includeInfoConfigsAction({[LIQUID_TOKEN_UPPERCASE]: {info, config, hivePrice}}));
 }
-
 export const clientStoreTasks = (store: Store<AppState>) => {
-
     // To use in places where we can't access to store
     window.usePrivate = store.getState().global.usePrivate;
-
     // Initial state from browser's local storage
     store.dispatch(reloadUsers());
     store.dispatch(loginActiveUser());
-
     // Load dynamic props
     getDynamicProps().then((resp) => {
         store.dispatch(loadDynamicProps(resp));
     });
-
-	Promise.all(
-	[
-		getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,}),
-		getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE,}),
-		getPrices([LIQUID_TOKEN_UPPERCASE])]
+    Promise.all(
+    [
+        getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE,}),
+        getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE,}),
+        getPrices([LIQUID_TOKEN_UPPERCASE])]
     ).then(updateTokensProperties.bind(null, store));
-
     // Update active user in interval
     activeUserUpdater(store).then();
     setInterval(() => {
         activeUserUpdater(store).then();
     }, 60 * 1000);
-
     // Active user sync between tabs / windows
     setInterval(() => {
         syncActiveUser(store);
     }, 2000);
-
     // Do check-in in interval
     const checkIn = () => {
         const state = store.getState();
@@ -143,13 +115,11 @@ export const clientStoreTasks = (store: Store<AppState>) => {
             usrActivity(state.activeUser?.username!, 10).then();
         }
     }
-
     // wait for initial user sync
     setTimeout(() => {
         checkIn();
     }, 5000);
     setInterval(checkIn, 1000 * 60 * 15 + 8);
-
     // Inject / update promoted entries to store
     const promotedEntries = () => {
         getPromotedEntries().then(r => {
@@ -158,7 +128,6 @@ export const clientStoreTasks = (store: Store<AppState>) => {
     }
     promotedEntries();
     setInterval(promotedEntries, 1000 * 60 * 5);
-
     // Currency
     const currency = ls.get("currency");
     if (currency && currencies.find(x => x.id === currency)) {
@@ -167,12 +136,10 @@ export const clientStoreTasks = (store: Store<AppState>) => {
             store.dispatch(setCurrency(currency, rate, symbol));
         });
     }
-
     // Notifications
     if (ls.get("notifications") === false) {
         store.dispatch(muteNotifications());
     }
-
     // Language
     const lang = ls.get("lang");
     if (lang) {
@@ -182,7 +149,6 @@ export const clientStoreTasks = (store: Store<AppState>) => {
             });
         }
     }
-
     // NSFW
     if (ls.get("nsfw") === true) {
         store.dispatch(setNsfw(true));

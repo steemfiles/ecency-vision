@@ -1,14 +1,9 @@
 import React from "react";
-
 import {connect} from "react-redux";
-
 import {match} from "react-router";
-
 import {ListStyle} from "../store/global/types";
-
 import {makeGroupKey} from "../store/entries";
 import {ProfileFilter} from "../store/global/types";
-
 import BaseComponent from "../components/base";
 import Meta from "../components/meta";
 import Theme from "../components/theme";
@@ -29,101 +24,75 @@ import WalletHive from "../components/wallet-hive";
 import WalletEcency from "../components/wallet-ecency";
 import WalletHiveEngine from "../components/wallet-hive-engine";
 import ScrollToTop from "../components/scroll-to-top";
-
 import {getAccountHEFull} from "../api/hive-engine";
 import {LIQUID_TOKEN, LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN} from "../../client_config";
-
 import defaults from "../constants/defaults.json";
-
 import _c from "../util/fix-class-names";
-
 import {PageProps, pageMapDispatchToProps, pageMapStateToProps} from "./common";
 import {getAccountFull} from "../api/hive";
 interface MatchParams {
     username: string;
     section?: string;
 }
-
 interface Props extends PageProps {
-
     match: match<MatchParams>;
 }
-
 interface State {
     loading: boolean;
 }
-
 class ProfilePage extends BaseComponent<Props, State> {
     state: State = {
         loading: false
     };
-
     async componentDidMount() {
         await this.ensureAccount();
-
         const {match, global, fetchEntries, fetchTransactions, fetchPoints} = this.props;
         const {username, section} = match.params
-
         if (!section || (section && Object.keys(ProfileFilter).includes(section))) {
             // fetch posts
             fetchEntries(global.filter, global.tag, false);
         }
-
         // fetch wallet transactions
         fetchTransactions(username);
-
         // fetch points
         fetchPoints(username);
     }
-
     componentDidUpdate(prevProps: Readonly<Props>): void {
         const {match, global, fetchEntries, fetchTransactions, resetTransactions, fetchPoints, resetPoints} = this.props;
         const {match: prevMatch} = prevProps;
-
         const {username, section} = match.params;
-
         // username changed. re-fetch wallet transactions and points
         if (username !== prevMatch.params.username) {
             this.ensureAccount().then(() => {
                 resetTransactions();
                 fetchTransactions(username);
-
                 resetPoints();
                 fetchPoints(username);
             });
         }
-
         // Wallet and points are not a correct filter to fetch posts
         if (section && !Object.keys(ProfileFilter).includes(section)) {
             return;
         }
-
         // filter or username changed. fetch posts.
         if (section !== prevMatch.params.section || username !== prevMatch.params.username) {
             fetchEntries(global.filter, global.tag, false);
         }
     }
-
     componentWillUnmount() {
         super.componentWillUnmount();
-
         const {resetTransactions, resetPoints} = this.props;
-
         // reset transactions and points on unload
         resetTransactions();
         resetPoints();
     }
-
     ensureAccount = () => {
         const {match, accounts, addAccount} = this.props;
-
         const username = match.params.username.replace("@", "");
         const account = accounts.find((x) => x.name === username);
-
         if (!account) {
             // The account isn't in reducer. Fetch it and add to reducer.
             this.stateSet({loading: true});
-
             return getAccountHEFull(username, true).then(data => {
                 if (data.name === username) {
                     addAccount(data);
@@ -141,34 +110,27 @@ class ProfilePage extends BaseComponent<Props, State> {
             })
         }
     };
-
     bottomReached = () => {
         const {global, entries, fetchEntries} = this.props;
         const {filter, tag} = global;
         const groupKey = makeGroupKey(filter, tag);
-
         const data = entries[groupKey];
         const {loading, hasMore} = data;
-
         if (!loading && hasMore) {
             fetchEntries(filter, tag, true);
         }
     };
-
     reload = () => {
         const {match, global, invalidateEntries, fetchEntries, resetTransactions, fetchTransactions, resetPoints, fetchPoints} = this.props;
         const {username, section} = match.params
-
         this.stateSet({loading: true});
         this.ensureAccount().then(() => {
             // reload transactions
             resetTransactions();
             fetchTransactions(username);
-
             // reload points
             resetPoints();
             fetchPoints(username);
-
             if (!section || (section && Object.keys(ProfileFilter).includes(section))) {
                 // reload posts
                 invalidateEntries(makeGroupKey(global.filter, global.tag));
@@ -178,29 +140,23 @@ class ProfilePage extends BaseComponent<Props, State> {
             this.stateSet({loading: false});
         });
     }
-
     render() {
         const {global, entries, accounts, match} = this.props;
         const {loading} = this.state;
-
         const navBar = global.isElectron ? NavBarElectron({
             ...this.props,
             reloadFn: this.reload,
             reloading: loading,
         }) : NavBar({...this.props});
-
         if (loading) {
             return <>{navBar}<LinearProgress/></>;
         }
-
         const username = match.params.username.replace("@", "");
         const {section = ProfileFilter.blog} = match.params;
         const account = accounts.find((x) => x.name === username);
-
         if (!account) {
             return NotFound({...this.props});
         }
-
         //  Meta config
         const url = `${defaults.base}/@${username}${section ? `/${section}` : ""}`;
         const metaProps = account.__loaded ? {
@@ -212,7 +168,6 @@ class ProfilePage extends BaseComponent<Props, State> {
             rss: `${defaults.base}/@${username}/rss`,
             keywords: `${username}, ${username}'s blog`,
         } : {};
-
         return (
             <>
                 <Meta {...metaProps} />
@@ -220,7 +175,6 @@ class ProfilePage extends BaseComponent<Props, State> {
                 <Theme global={this.props.global}/>
                 <Feedback/>
                 {navBar}
-
                 <div className="app-content profile-page">
                     <div className="profile-side">
                         {ProfileCard({
@@ -242,53 +196,45 @@ class ProfilePage extends BaseComponent<Props, State> {
                             account
                         })}
                         {(() => {
-
                             if (section === "wallet") {
                                 return WalletHiveEngine({
-                                	coinName:LIQUID_TOKEN,
-                                	aPICoinName:LIQUID_TOKEN_UPPERCASE,
-                                	stakedCoinName:VESTING_TOKEN,
+                                    coinName:LIQUID_TOKEN,
+                                    aPICoinName:LIQUID_TOKEN_UPPERCASE,
+                                    stakedCoinName:VESTING_TOKEN,
                                     ...this.props,
                                     account
                                 });
                             }
-
                             if (section === "hive") {
                                 return WalletHive({
                                     ...this.props,
                                     account
                                 });
                             }
-
                             if (section === "points") {
                                 return WalletEcency({
                                     ...this.props,
                                     account
                                 });
                             }
-
                             if (section === "communities") {
                                 return ProfileCommunities({
                                     ...this.props,
                                     account
                                 })
                             }
-
                             if (section === "settings") {
                                 return ProfileSettings({
                                     ...this.props,
                                     account
                                 })
                             }
-
                             const {filter, tag} = global;
                             const groupKey = makeGroupKey(filter, tag);
                             const data = entries[groupKey];
-
                             if (data !== undefined) {
                                 const entryList = data?.entries;
                                 const loading = data?.loading;
-
                                 return (
                                     <>
                                         <div className={_c(`entry-list ${loading ? "loading" : ""}`)}>
@@ -302,7 +248,6 @@ class ProfilePage extends BaseComponent<Props, State> {
                                     </>
                                 );
                             }
-
                             return null;
                         })()}
                     </div>
@@ -311,6 +256,4 @@ class ProfilePage extends BaseComponent<Props, State> {
         );
     }
 }
-
-
 export default connect(pageMapStateToProps, pageMapDispatchToProps)(ProfilePage);

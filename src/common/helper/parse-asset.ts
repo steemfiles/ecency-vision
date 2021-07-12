@@ -1,9 +1,4 @@
-export enum Symbol {
-    HIVE = 'HIVE',
-    HBD = 'HBD',
-    TESTS = 'TESTS',
-    TBD = 'TBD',
-}
+export type Symbol = string;
 
 export interface Asset {
     amount: number,
@@ -15,6 +10,6 @@ export default (strVal: string): Asset => {
     const sp = strVal.split(' ');
     return {
         amount: parseFloat(sp[0]),
-        symbol: Symbol[sp[1]]
+        symbol: sp[1],
     }
 }

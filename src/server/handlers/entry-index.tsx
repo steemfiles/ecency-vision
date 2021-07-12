@@ -1,53 +1,39 @@
 import express from "express";
-
 import {AppState} from "../../common/store";
 import {EntryFilter} from "../../common/store/global/types";
 import {Entry} from "../../common/store/entries/types";
 import {makeGroupKey} from "../../common/store/entries";
-
 import * as hiveApi from "../../common/api/hive";
 import * as bridgeApi from "../../common/api/bridge";
-
 import filterTagExtract from "../../common/helper/filter-tag-extract";
-
 import {optimizeEntries} from "../helper";
-
 import {makePreloadedState} from "../state";
-
 import {render} from "../template";
-
 import {cache} from "../cache";
-
 import {LIQUID_TOKEN_UPPERCASE} from "../../client_config";
-import { getScotDataAsync, HiveEngineTokenInfo, 
-HiveEngineTokenConfig, getPrices, 
+import { getScotDataAsync, HiveEngineTokenInfo,
+HiveEngineTokenConfig, getPrices,
 fetchedHiveEngineTokensProperties} from "../../common/api/hive-engine";
-
 export default async (req: express.Request, res: express.Response) => {
     const params = filterTagExtract(req.originalUrl.split("?")[0])!;
     const {filter, tag} = params;
-
     const state = await makePreloadedState(req);
     const observer = state.activeUser?.username || "";
-    
-    
-    if (Object.keys(state.global.hiveEngineTokensProperties || {}).length === 0) {    	
-    	console.log("HETP is empty!");
-    	try {
-			console.log(state.global.hiveEngineTokensProperties = await Promise.all([		
-					getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE}),
-					getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE}),
-					getPrices([LIQUID_TOKEN_UPPERCASE])]
-				).then(fetchedHiveEngineTokensProperties));
-		} catch (e) {
-			console.log(e);
-		}
+    if (Object.keys(state.global.hiveEngineTokensProperties || {}).length === 0) {
+        console.log("HETP is empty!");
+        try {
+            console.log(state.global.hiveEngineTokensProperties = await Promise.all([
+                    getScotDataAsync<HiveEngineTokenInfo>('info', {token: LIQUID_TOKEN_UPPERCASE}),
+                    getScotDataAsync<HiveEngineTokenConfig>('config', {token: LIQUID_TOKEN_UPPERCASE}),
+                    getPrices([LIQUID_TOKEN_UPPERCASE])]
+                ).then(fetchedHiveEngineTokensProperties));
+        } catch (e) {
+            console.log(e);
+        }
     } else {
-		console.log("HETP is full.");
-	}
-
+        console.log("HETP is full.");
+    }
     let entries: Entry[];
-
     try {
         if (filter === "feed") {
             entries = (await bridgeApi.getAccountPosts(filter, tag.replace("@", ""), "", "", 8, observer)) || [];
@@ -57,7 +43,6 @@ export default async (req: express.Request, res: express.Response) => {
     } catch (e) {
         entries = [];
     }
-
     let tags: string[] | undefined = cache.get("trending-tag");
     if (tags === undefined) {
         try {
@@ -65,13 +50,10 @@ export default async (req: express.Request, res: express.Response) => {
         } catch (e) {
             tags = []
         }
-
         if (tags.length > 0) {
             cache.set("trending-tag", tags, 7200);
         }
     }
-
-
     const preLoadedState: AppState = {
         ...state,
         global: {
@@ -92,12 +74,10 @@ export default async (req: express.Request, res: express.Response) => {
             }
         }
     }
-
     // No active user but requesting special "my" filter
     if (preLoadedState.activeUser === null && preLoadedState.global.tag === "my") {
         res.redirect(`/`);
         return;
     }
-
     res.send(render(req, preLoadedState));
 };

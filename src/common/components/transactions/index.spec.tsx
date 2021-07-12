@@ -1,7 +1,5 @@
 import React from "react";
-
 import {createBrowserHistory} from "history";
-
 import {TransactionRow} from "./index";
 import TestRenderer from "react-test-renderer";
 import {
@@ -21,18 +19,14 @@ import {
     ReturnVestingDelegation,
     ProposalPay
 } from "../../store/transactions/types";
-
 import {dynamicPropsIntance1} from "../../helper/test-helper";
-
 jest.mock("moment", () => () => ({
     fromNow: () => "2 hours ago",
 }));
-
 const defProps = {
     history: createBrowserHistory(),
     dynamicProps: dynamicPropsIntance1,
 }
-
 it("(1) curation_reward", () => {
     const transaction: CurationReward = {
         trx_id: "0x14123213",
@@ -44,18 +38,16 @@ it("(1) curation_reward", () => {
         timestamp: "2020-06-06T09:25:12",
         type: "curation_reward",
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(2) author_reward", () => {
     const transaction: AuthorReward = {
+           he_payout: "0 POB",
         trx_id: "0x14123213",
         author: "user1",
         num: 358711,
@@ -66,18 +58,16 @@ it("(2) author_reward", () => {
         type: "author_reward",
         vesting_payout: "31749.102292 VESTS",
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(3) comment_benefactor_reward", () => {
     const transaction: CommentBenefactor = {
+           he_payout: "0 POB",
         trx_id: "0x14123213",
         author: "xxxthorxxx",
         benefactor: "esteemapp",
@@ -89,37 +79,32 @@ it("(3) comment_benefactor_reward", () => {
         type: "comment_benefactor_reward",
         vesting_payout: "3.893128 VESTS",
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(4) claim_reward_balance", () => {
     const transaction: ClaimRewardBalance = {
         trx_id: "0x14123213",
         account: "user1",
         num: 359042,
+        reward_he: "0 POB",
         reward_hbd: "0.000 HBD",
         reward_hive: "0.000 HIVE",
         reward_vests: "806.030497 VESTS",
         timestamp: "2020-06-04T07:25:33",
         type: "claim_reward_balance",
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(5) transfer", () => {
     const transaction: Transfer = {
         trx_id: "0x14123213",
@@ -131,16 +116,13 @@ it("(5) transfer", () => {
         to: "user2",
         type: "transfer",
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(6) transfer_to_vesting", () => {
     const transaction: TransferToVesting = {
         trx_id: "0x14123213",
@@ -151,16 +133,13 @@ it("(6) transfer_to_vesting", () => {
         to: "user2",
         type: "transfer_to_vesting",
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(7) withdraw_vesting", () => {
     const transaction: WithdrawVesting = {
         trx_id: "0x14123213",
@@ -170,16 +149,13 @@ it("(7) withdraw_vesting", () => {
         vesting_shares: "806.030497 VESTS",
         type: "withdraw_vesting",
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(8) fill_order", () => {
     const transaction: FillOrder = {
         trx_id: "0x14123213",
@@ -189,16 +165,13 @@ it("(8) fill_order", () => {
         open_pays: "bar",
         type: "fill_order",
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(9) producer_reward", () => {
     const transaction: ProducerReward = {
         trx_id: "0x14123213",
@@ -208,16 +181,13 @@ it("(9) producer_reward", () => {
         vesting_shares: "466.396582 VESTS",
         type: "producer_reward"
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(10) interest", () => {
     const transaction: Interest = {
         trx_id: "0x14123213",
@@ -227,16 +197,13 @@ it("(10) interest", () => {
         interest: "0.570 HBD",
         type: "interest",
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(11) transfer_to_savings", () => {
     const transaction: TransferToSavings = {
         trx_id: "0x14123213",
@@ -248,16 +215,13 @@ it("(11) transfer_to_savings", () => {
         to: "talhasch",
         type: "transfer_to_savings",
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(12) fill_convert_request", () => {
     const transaction: FillConvertRequest = {
         trx_id: "0x14123213",
@@ -267,16 +231,13 @@ it("(12) fill_convert_request", () => {
         timestamp: "2021-01-29T21:27:00",
         type: "fill_convert_request"
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(13) cancel_transfer_from_savings", () => {
     const transaction: CancelTransferFromSavings = {
         trx_id: "0x14123213",
@@ -286,16 +247,13 @@ it("(13) cancel_transfer_from_savings", () => {
         timestamp: "2021-02-06T09:00:51",
         type: "cancel_transfer_from_savings",
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(14) return_vesting_delegation", () => {
     const transaction: ReturnVestingDelegation = {
         trx_id: "0x14123213",
@@ -304,16 +262,13 @@ it("(14) return_vesting_delegation", () => {
         type: "return_vesting_delegation",
         vesting_shares: "3825.116651 VESTS",
     };
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(15) proposal_pay", () => {
     const transaction: ProposalPay = {
         "num": 151892,
@@ -322,25 +277,20 @@ it("(15) proposal_pay", () => {
         "trx_id": "0000000000000000000000000000000000000000",
         "payment": "14.560 HBD"
     }
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });
-
 it("(30) fallback", () => {
     // @ts-ignore
     const transaction: ReturnVestingDelegation = {trx_id: "0x14123213", type: "unknown_operation"};
-
     const props = {
         ...defProps,
         transaction,
     };
-
     const renderer = TestRenderer.create(<TransactionRow {...props} />);
     expect(renderer.toJSON()).toMatchSnapshot();
 });

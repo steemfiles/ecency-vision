@@ -208,40 +208,38 @@ export const claimRewardBalance = (username: string, rewardHive: string, rewardH
     const opArray: Operation[] = [['claim_reward_balance', params]];
     return broadcastPostingOperations(username, opArray);
 }
-
 export const claimRewardBalanceHiveEngineAssetJSON =(from: string, to: string, amount: string) : string => {
-		const [quantity, token_name] = (amount).split(/ /);
-		const json = JSON.stringify({
-				"symbol": token_name
-		});
-		return json;				
+        const [quantity, token_name] = (amount).split(/ /);
+        const json = JSON.stringify({
+                "symbol": token_name
+        });
+        return json;
 }
 interface ClaimTokenParams { "id": "scot_claim_token", "json": string, "required_auths": [], "required_posting_auths": [string] };
-
 export const claimHiveEngineRewardBalance = (from:string, to:string, amount: string) => {
-	const params : ClaimTokenParams = {
-		id: "scot_claim_token",
-		json: claimRewardBalanceHiveEngineAssetJSON(from, to, amount),
-		required_auths: [],
-		required_posting_auths: [from]
-	};
-	const opArray: Operation[] = [["custom_json", params]];
-	return broadcastPostingOperations(from, opArray);
+    const params : ClaimTokenParams = {
+        id: "scot_claim_token",
+        json: claimRewardBalanceHiveEngineAssetJSON(from, to, amount),
+        required_auths: [],
+        required_posting_auths: [from]
+    };
+    const opArray: Operation[] = [["custom_json", params]];
+    return broadcastPostingOperations(from, opArray);
 };
 /*
 export const HECustomJSONWithPostingKey = (key: PrivateKey, from:string, json: string): Promise<TransactionConfirmation> => {
-	const op = {
-		id: 'ssc-mainnet-hive',
-		json,
-		required_auths: [],
-		required_posting_auths: [from]
-	};
-	return hiveClient.broadcast.json(op, key);	
+    const op = {
+        id: 'ssc-mainnet-hive',
+        json,
+        required_auths: [],
+        required_posting_auths: [from]
+    };
+    return hiveClient.broadcast.json(op, key);
 }
 export const HECustomJSONPostingKc = (from:string, json: string, description: string): Promise<TxResponse> => {
-	return keychain.customJson(from, 'ssc-mainnet-hive', "Posting", json, description);	
+    return keychain.customJson(from, 'ssc-mainnet-hive', "Posting", json, description);
 }
-export const HECustomJSONPostingHot = (from:string, json: string, destination: string) => { 
+export const HECustomJSONPostingHot = (from:string, json: string, destination: string) => {
     const params = {
         authority: "posting",
         required_auths: `[]`,
@@ -276,42 +274,42 @@ export const transferKc = (from: string, to: string, amount: string, memo: strin
     return keychain.transfer(from, to, asset.amount.toString(), memo, asset.symbol, true);
 }
 const transferHiveEngineAssetJSON =(from: string, to: string, amount: string, memo: string) : string => {
-		const [quantity, token_name] = (amount.replace(/,/g,"")).split(/ /);
-		const json = JSON.stringify({
-			// is it always 'tokens'?
-			"contractName": "tokens",
-			"contractAction": "transfer",
-			"contractPayload": {
-				"symbol": token_name,
-				"to": to,
-				quantity,
-				"memo": memo,
-			}
-		});
-		return json;
+        const [quantity, token_name] = (amount.replace(/,/g,"")).split(/ /);
+        const json = JSON.stringify({
+            // is it always 'tokens'?
+            "contractName": "tokens",
+            "contractAction": "transfer",
+            "contractPayload": {
+                "symbol": token_name,
+                "to": to,
+                quantity,
+                "memo": memo,
+            }
+        });
+        return json;
 }
 export const transferHiveEngineAsset = (from: string, key: PrivateKey, to: string, amount: string, memo: string): Promise<TransactionConfirmation> => {
-	const json = transferHiveEngineAssetJSON(from, to, amount, memo);
-	const op = {
-		id: 'ssc-mainnet-hive',
-		json,
-		required_auths: [from],
-		required_posting_auths: []
-	};
-	return hiveClient.broadcast.json(op, key);
+    const json = transferHiveEngineAssetJSON(from, to, amount, memo);
+    const op = {
+        id: 'ssc-mainnet-hive',
+        json,
+        required_auths: [from],
+        required_posting_auths: []
+    };
+    return hiveClient.broadcast.json(op, key);
 }
 export const transferHiveEngineAssetKc = (from: string, to: string, amount: string, memo: string) => {
-	const json = transferHiveEngineAssetJSON(from, to, amount, memo);
-	const op = {
-		id: 'ssc-mainnet-hive',
-		json,
-		required_auths: [from],
-		required_posting_auths: []
-	};
+    const json = transferHiveEngineAssetJSON(from, to, amount, memo);
+    const op = {
+        id: 'ssc-mainnet-hive',
+        json,
+        required_auths: [from],
+        required_posting_auths: []
+    };
     return keychain.customJson(from, 'ssc-mainnet-hive', "Active", json, "Hive Engine Asset Transfer")
 }
 export const transferHiveEngineAssetHot = (from: string, to: string, amount: string, memo: string) => {
-	const json = transferHiveEngineAssetJSON(from, to, amount, memo);
+    const json = transferHiveEngineAssetJSON(from, to, amount, memo);
     const params = {
         authority: "active",
         required_auths: `["${from}"]`,
@@ -501,48 +499,47 @@ export const transferFromSavingsKc = (from: string, to: string, amount: string, 
     return keychain.broadcast(from, [op], "Active");
 }
 export const createTransferToVestingOp = (from: string, to: string, amount: string): Operation => {
-	const parts = amount.split(/ /);
-	const currency = parts[parts.length-1];
-	const quantity = parts[0].replace(/,/g,'');
-	if (currency === HIVE_API_NAME) {
-		return [
-			'transfer_to_vesting',
-			{
-				from,
-				to,
-				amount
-			}
-		];
-	} else {
-		return [
-			"custom_json",
-			{
-			  "id": "ssc-mainnet-hive",
-			  "required_auths": [ from ], 
-			  "required_posting_auths": [],
-			  "json": JSON.stringify({
-				  "contractName": "tokens",
-				  "contractAction": "stake",
-				  "contractPayload": {
-					"symbol": currency,
-					"to": to,
-					"quantity": quantity
-				  }
-				})
-			}
-		  
-		];
-	}
+    const parts = amount.split(/ /);
+    const currency = parts[parts.length-1];
+    const quantity = parts[0].replace(/,/g,'');
+    if (currency === HIVE_API_NAME) {
+        return [
+            'transfer_to_vesting',
+            {
+                from,
+                to,
+                amount
+            }
+        ];
+    } else {
+        return [
+            "custom_json",
+            {
+              "id": "ssc-mainnet-hive",
+              "required_auths": [ from ],
+              "required_posting_auths": [],
+              "json": JSON.stringify({
+                  "contractName": "tokens",
+                  "contractAction": "stake",
+                  "contractPayload": {
+                    "symbol": currency,
+                    "to": to,
+                    "quantity": quantity
+                  }
+                })
+            }
+        ];
+    }
 }
-export const transferToVesting = (from: string, key: PrivateKey, to: string, amount: string): Promise<TransactionConfirmation> => {    
+export const transferToVesting = (from: string, key: PrivateKey, to: string, amount: string): Promise<TransactionConfirmation> => {
     return hiveClient.broadcast.sendOperations([createTransferToVestingOp(from, to, amount)], key);
 }
 export const transferToVestingHot = (from: string, to: string, amount: string) => {
     const params: Parameters = {callback: `${document.location.href}/@${from}/wallet`};
     const op : Operation =  createTransferToVestingOp(from, to, amount);
     if (op[0] === "custom_json") {
-    	Error("Hive Signer cannot be used for Staking Hive Engine Tokens");
-    	return
+        Error("Hive Signer cannot be used for Staking Hive Engine Tokens");
+        return
     }
     return hs.sendOperation(op, params, () => {});
 }
@@ -550,52 +547,49 @@ export const transferToVestingKc = (from: string, to: string, amount: string) =>
     return keychain.broadcast(from, [createTransferToVestingOp(from, to, amount)], "Active");
 }
 export const createDelegateVestingSharesOp = (delegator: string, delegatee: string, vestingShares: string) : Operation => {
-	if (!/[0-9]+(.[0-9]+)? [A-Z][A-Z0-9]+/.test(vestingShares)) {
-		throw new Error("Invalid vestingShares Amount specified");
-	}
-	const parts = vestingShares.split(/ /);
-	const currency = parts[parts.length-1];
-	const quantity = parts[0].replace(/,/g,'');
-
-	if (currency === "VESTS") { 			
-		return [
-			'delegate_vesting_shares',
-			{
-				delegator,
-				delegatee,
-				vesting_shares: vestingShares
-			}
-		];
-	} else {
-		return [
-			"custom_json",
-			{
-			  "id": "ssc-mainnet-hive",
-			  "required_auths": [ delegator ], 
-			  "required_posting_auths": [],
-			  "json": JSON.stringify({
-				  "contractName": "tokens",
-				  "contractAction": "delegate",
-				  "contractPayload": {
-					"symbol": currency,
-					"to": delegatee,
-					"quantity": quantity
-				  }
-				})
-			}
-		  
-		];
-	}
+    if (!/[0-9]+(.[0-9]+)? [A-Z][A-Z0-9]+/.test(vestingShares)) {
+        throw new Error("Invalid vestingShares Amount specified");
+    }
+    const parts = vestingShares.split(/ /);
+    const currency = parts[parts.length-1];
+    const quantity = parts[0].replace(/,/g,'');
+    if (currency === "VESTS") {
+        return [
+            'delegate_vesting_shares',
+            {
+                delegator,
+                delegatee,
+                vesting_shares: vestingShares
+            }
+        ];
+    } else {
+        return [
+            "custom_json",
+            {
+              "id": "ssc-mainnet-hive",
+              "required_auths": [ delegator ],
+              "required_posting_auths": [],
+              "json": JSON.stringify({
+                  "contractName": "tokens",
+                  "contractAction": "delegate",
+                  "contractPayload": {
+                    "symbol": currency,
+                    "to": delegatee,
+                    "quantity": quantity
+                  }
+                })
+            }
+        ];
+    }
 }
-
-export const delegateVestingShares = (delegator: string, key: PrivateKey, delegatee: string, vestingShares: string): Promise<TransactionConfirmation> => {	
+export const delegateVestingShares = (delegator: string, key: PrivateKey, delegatee: string, vestingShares: string): Promise<TransactionConfirmation> => {
     const op: Operation = createDelegateVestingSharesOp(delegator, delegatee, vestingShares);
     return hiveClient.broadcast.sendOperations([op], key);
 }
 export const delegateVestingSharesHot = (delegator: string, delegatee: string, vestingShares: string) => {
-	if (!/[0-9]+(.[0-9]+)? [A-Z][A-Z0-9]+/.test(vestingShares)) {
-		throw new Error("Invalid vestingShares Amount specified");
-	}
+    if (!/[0-9]+(.[0-9]+)? [A-Z][A-Z0-9]+/.test(vestingShares)) {
+        throw new Error("Invalid vestingShares Amount specified");
+    }
     const op: Operation = ['delegate_vesting_shares', {
         delegator,
         delegatee,
@@ -610,56 +604,51 @@ export const delegateVestingSharesKc = (delegator: string, delegatee: string, ve
     return keychain.broadcast(delegator, [op], "Active");
 }
 export const createStopWithdrawVestingOp = (account: string, txId: string) : Operation => {
-	return [
-			"custom_json",
-			{
-			  "id": "ssc-mainnet-hive",
-			  "required_auths": [ account ], 
-			  "required_posting_auths": [],
-			  "json": JSON.stringify({
-				  "contractName": "tokens",
-				  "contractAction": "cancelUnstake",
-				  "contractPayload": {
-					"txID": txId
-				  }
-				})
-			}
-		  
-		];		
+    return [
+            "custom_json",
+            {
+              "id": "ssc-mainnet-hive",
+              "required_auths": [ account ],
+              "required_posting_auths": [],
+              "json": JSON.stringify({
+                  "contractName": "tokens",
+                  "contractAction": "cancelUnstake",
+                  "contractPayload": {
+                    "txID": txId
+                  }
+                })
+            }
+        ];
 }
-
-
 export const createWithdrawVestingOp = (account: string, quantity: string, currency: string) : Operation => {
-	if (currency === "VESTS") {
-		return [
-			'withdraw_vesting',
-		    {
-		        account,
-		        vesting_shares: quantity
-		    }
-		];
-	} else {
-		return [
-			"custom_json",
-			{
-			  "id": "ssc-mainnet-hive",
-			  "required_auths": [ account ], 
-			  "required_posting_auths": [],
-			  "json": JSON.stringify({
-				  "contractName": "tokens",
-				  "contractAction": "unstake",
-				  "contractPayload": {
-					"symbol": currency,
-					"to": account,
-					"quantity": quantity
-				  }
-				})
-			}
-		  
-		];
-	}
+    if (currency === "VESTS") {
+        return [
+            'withdraw_vesting',
+            {
+                account,
+                vesting_shares: quantity
+            }
+        ];
+    } else {
+        return [
+            "custom_json",
+            {
+              "id": "ssc-mainnet-hive",
+              "required_auths": [ account ],
+              "required_posting_auths": [],
+              "json": JSON.stringify({
+                  "contractName": "tokens",
+                  "contractAction": "unstake",
+                  "contractPayload": {
+                    "symbol": currency,
+                    "to": account,
+                    "quantity": quantity
+                  }
+                })
+            }
+        ];
+    }
 }
-
 export const withdrawVesting = (account: string, key: PrivateKey, vestingShares: string, symbol: string): Promise<TransactionConfirmation> => {
     const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
     return hiveClient.broadcast.sendOperations([op], key);
@@ -673,26 +662,25 @@ export const withdrawVestingKc = (account: string, vestingShares: string, symbol
     const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
     return keychain.broadcast(account, [op], "Active");
 }
-
 export const createCancelPowerDownOp = (account:string, txID: string) : Operation => {
-	return [
-		"custom_json",
-		{
-		  "id": "ssc-mainnet-hive",
-		  "required_auths": [
-			"leprechaun"
-		  ],
-		  "required_posting_auths": [],
-		  "json": JSON.stringify({
-			  "contractName": "tokens",
-			  "contractAction": "cancelUnstake",
-			  "contractPayload": {
-				"txID": txID,
-			  }
-			})
-		}
-	  ];
-}	
+    return [
+        "custom_json",
+        {
+          "id": "ssc-mainnet-hive",
+          "required_auths": [
+            "leprechaun"
+          ],
+          "required_posting_auths": [],
+          "json": JSON.stringify({
+              "contractName": "tokens",
+              "contractAction": "cancelUnstake",
+              "contractPayload": {
+                "txID": txID,
+              }
+            })
+        }
+      ];
+}
 export const cancelWithdrawVesting = (account: string, key: PrivateKey, txID: string): Promise<TransactionConfirmation> => {
     const op: Operation = createCancelPowerDownOp(account, txID);
     return hiveClient.broadcast.sendOperations([op], key);
@@ -707,7 +695,6 @@ export const cancelWithdrawVestingKc = (account: string, txID: string) => {
     const op: Operation = createCancelPowerDownOp(account, txID);
     return keychain.broadcast(account, [op], "Active");
 }
-
 export const setWithdrawVestingRoute = (from: string, key: PrivateKey, to: string, percent: number, autoVest: boolean): Promise<TransactionConfirmation> => {
     const op: Operation = [
         'set_withdraw_vesting_route',

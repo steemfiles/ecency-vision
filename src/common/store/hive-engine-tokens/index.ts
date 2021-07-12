@@ -10,9 +10,7 @@ import {
     HiveEngineTokenInfo,
 } from "../../api/hive-engine";
 import {LIQUID_TOKEN_UPPERCASE} from "../../../client_config";
-
 export const initialState: TokenPropertiesMap = {};
-
 export default (state: TokenPropertiesMap = initialState, action: HEActions): TokenPropertiesMap => {
     switch (action.type) {
         case HEActionTypes.INCLUDE: {
@@ -20,19 +18,17 @@ export default (state: TokenPropertiesMap = initialState, action: HEActions): To
             return Object.assign(state,data);
         }
         case HEActionTypes.FETCH: {
-        	// should call a fetch routine here.
-			return state;
+            // should call a fetch routine here.
+            return state;
         }
         default:
-        	return state;
+            return state;
     }
 };
-
 /* HEActions */
 export const includeInfoConfigs = (data: TokenPropertiesMap) => (dispatch: Dispatch) => {
     dispatch(includeInfoConfigsAction(data));
 };
-
 /* Action Creators */
 export const includeInfoConfigsAction = (data: TokenPropertiesMap): HEIncludeAction => {
     return {
@@ -40,7 +36,6 @@ export const includeInfoConfigsAction = (data: TokenPropertiesMap): HEIncludeAct
         data,
     };
 };
-
 /* Action Creators */
 export const fetchedAct = (_map: TokenPropertiesMap): HEFetchAction => {
     return {

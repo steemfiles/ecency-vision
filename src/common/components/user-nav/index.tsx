@@ -1,7 +1,6 @@
 import React, {Component} from "react";
 import {History, Location} from "history";
 import {Link} from "react-router-dom";
-
 import {Global} from "../../store/global/types";
 import {User} from "../../store/users/types";
 import {Account} from "../../store/accounts/types";
@@ -9,7 +8,6 @@ import {ActiveUser} from "../../store/active-user/types";
 import {ToggleType, UI} from "../../store/ui/types";
 import {NotificationFilter, Notifications} from "../../store/notifications/types";
 import {DynamicProps} from "../../store/dynamic-props/types";
-
 import ToolTip from "../tooltip";
 import UserAvatar from "../user-avatar";
 import DropDown from "../dropdown";
@@ -20,31 +18,22 @@ import Bookmarks from "../bookmarks";
 import Schedules from "../schedules";
 import Fragments from "../fragments";
 import {hiveSvg} from "../../img/svg";
-
-
 import {_t} from "../../i18n";
-
 import HiveWallet from "../../helper/hive-wallet";
-
 import {creditCardSvg, gifCardSvg, bellSvg, bellOffSvg, chevronUpSvg} from "../../img/svg";
 const logoCircle = require("../../img/logo-small-white-bluebrain-transparent.png");
-
 import {votingPower, downVotingPower} from "../../api/hive";
-
 class WalletBadge extends Component<{
     activeUser: ActiveUser;
     dynamicProps: DynamicProps;
 }> {
     render() {
         const {activeUser, dynamicProps} = this.props;
-
         let hasUnclaimedRewards = false;
         const {data: account} = activeUser;
-
         if (account.__loaded) {
             hasUnclaimedRewards = new HiveWallet(account, dynamicProps).hasUnclaimedRewards;
         }
-
         return <>
             <ToolTip content={hasUnclaimedRewards ? _t("user-nav.unclaimed-reward-notice") : _t("user-nav.wallet")}>
                 <Link to={`/@${activeUser.username}/hive`} className="user-wallet">
@@ -55,15 +44,12 @@ class WalletBadge extends Component<{
         </>
     }
 }
-
 import {LIQUID_TOKEN_UPPERCASE} from "../../../client_config";
 import {is_FullHiveEngineAccount, FullHiveEngineAccount} from "../../api/hive-engine";
 class PointsBadge extends Component<{ activeUser: ActiveUser }> {
     render() {
         const {activeUser} = this.props;
-        
         let hasUnclaimedPoints = activeUser.points.uPoints !== "0.000";
-
         return <>
             <ToolTip content={hasUnclaimedPoints ? _t("user-nav.unclaimed-points-notice") : _t("user-nav.points")}>
                 <Link to={`/@${activeUser.username}/wallet`} className="user-points">
@@ -74,35 +60,32 @@ class PointsBadge extends Component<{ activeUser: ActiveUser }> {
         </>
     }
 }
-
 class HiveEngineBadge extends Component<{ activeUser: ActiveUser, coinName: string }> {
-	render() {
-		const {activeUser, coinName} = this.props;
-		if (!activeUser)
-			return null;
-		const {data} = activeUser;
-		
-		let hasUnclaimedToken = false;
-		let x : any;
-		if (is_FullHiveEngineAccount(data as any)) {
-			const fheAccount : FullHiveEngineAccount = data as FullHiveEngineAccount;			
-			try {
-				let {hiveData} = fheAccount.token_statuses;
-				if (hiveData && (x=hiveData[coinName]) && (x=x.pending_token))   
-					hasUnclaimedToken = x !== 0;
-			} catch (e) {
-				console.log(e);
-			}
-		}
-		return <>
-		    <Link to={`/@${activeUser.username}/wallet`} className="user-points">
-		    {hasUnclaimedToken && <span className="reward-badge"/>}
-		    {this.props.children}
+    render() {
+        const {activeUser, coinName} = this.props;
+        if (!activeUser)
+            return null;
+        const {data} = activeUser;
+        let hasUnclaimedToken = false;
+        let x : any;
+        if (is_FullHiveEngineAccount(data as any)) {
+            const fheAccount : FullHiveEngineAccount = data as FullHiveEngineAccount;
+            try {
+                let {hiveData} = fheAccount.token_statuses;
+                if (hiveData && (x=hiveData[coinName]) && (x=x.pending_token))
+                    hasUnclaimedToken = x !== 0;
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        return <>
+            <Link to={`/@${activeUser.username}/wallet`} className="user-points">
+            {hasUnclaimedToken && <span className="reward-badge"/>}
+            {this.props.children}
             </Link>
         </>;
-	}
+    }
 }
-
 interface Props {
     global: Global;
     dynamicProps: DynamicProps;
@@ -124,7 +107,6 @@ interface Props {
     muteNotifications: () => void;
     unMuteNotifications: () => void;
 }
-
 interface State {
     gallery: boolean,
     drafts: boolean,
@@ -132,7 +114,6 @@ interface State {
     schedules: boolean,
     fragments: boolean,
 }
-
 export default class UserNav extends Component<Props, State> {
     state: State = {
         gallery: false,
@@ -141,52 +122,42 @@ export default class UserNav extends Component<Props, State> {
         schedules: false,
         fragments: false
     }
-
     toggleLogin = () => {
         const {toggleUIProp} = this.props;
         toggleUIProp('login');
     };
-
     toggleDrafts = () => {
         const {drafts} = this.state;
         this.setState({drafts: !drafts});
     }
-
     toggleGallery = () => {
         const {gallery} = this.state;
         this.setState({gallery: !gallery});
     }
-
     toggleBookmarks = () => {
         const {bookmarks} = this.state;
         this.setState({bookmarks: !bookmarks});
     }
-
     toggleSchedules = () => {
         const {schedules} = this.state;
         this.setState({schedules: !schedules});
     }
-
     toggleFragments = () => {
         const {fragments} = this.state;
         this.setState({fragments: !fragments});
     }
-
     toggleNotifications = () => {
         const {toggleUIProp} = this.props;
         toggleUIProp('notifications');
     }
-
     goToSettings = () => {
         const {activeUser, history} = this.props;
         history.push(`/@${activeUser.username}/settings`);
     }
-
     render() {
         const {gallery, drafts, bookmarks, schedules, fragments} = this.state;
         const {activeUser, ui, notifications, global, dynamicProps} = this.props;
         const {unread} = notifications;
-
         const preDropDownElem = activeUser.data.__loaded ? <div className="drop-down-menu-power">
             <div className="label">{_t("user-nav.vote-power")}</div>
             <div className="power">
@@ -194,8 +165,6 @@ export default class UserNav extends Component<Props, State> {
                 <div className="downVoting">{chevronUpSvg}{downVotingPower(activeUser.data).toFixed(0)}{"%"}</div>
             </div>
         </div> : undefined;
-
-
         const dropDownItems = [
             {
                 label: _t('user-nav.profile'),
@@ -239,14 +208,12 @@ export default class UserNav extends Component<Props, State> {
                 },
             }
         ];
-
         const dropDownConfig = {
             history: this.props.history,
             label: UserAvatar({...this.props, username: activeUser.username, size: "medium"}),
             items: dropDownItems,
             preElem: preDropDownElem,
         };
-
         return (
             <>
                 <div className="user-nav">
@@ -264,7 +231,6 @@ export default class UserNav extends Component<Props, State> {
                             {global.notifications ? bellSvg : bellOffSvg}
                         </span>
                     </ToolTip>)}
-
                     <DropDown
                         {...dropDownConfig}
                         float="right"

@@ -27,64 +27,64 @@ export const makePreloadedState = async (req: express.Request): Promise<AppState
     let hiveEngineTokensProperties: TokenPropertiesMap = storedHiveEngineTokensProperties;
     let tokensInfos,tokensConfigs, prices;
     try {
-		if (storedHiveEngineTokensProperties && storedHiveEngineTokensProperties[LIQUID_TOKEN_UPPERCASE]) {
-			let newStore : Date;
-			if (lastStore.getTime() + ten_minutes < (newStore = new Date).getTime() && (!fetchingPrices)) {
-				// It's been five minutes since last update
-				console.log("Pulling new price data", lastStore, newStore);
-				fetchingPrices = true;
-				getPrices(undefined).then(
-					prices => {
-						try {
-							if (!prices)
-								return;
-							storedPrices = {...prices,...storedPrices};
-							for (const token in prices) {
-								let config : HiveEngineTokenConfig | undefined;
-								if (hiveEngineTokensProperties[token]) {
-									hiveEngineTokensProperties[token].hivePrice = prices[token];
-								} else if (storedInfos[token] && (config=storedConfigs.find(c => c.token === token))) {
-									hiveEngineTokensProperties[token] = {info: storedInfos[token], config, hivePrice: prices[token]};
-								}
-							} // for
-							lastStore = new Date;
-						} catch (e) {
-						} finally {
-							fetchingPrices = false;
-						}
-					});
-			}
-		} else {
-			console.log("No tokens stored.  Loading tokens Properties.");
-			tokensInfos = await getScotDataAsync<{[coinname:string]:HiveEngineTokenInfo}>('info', {});
-			tokensConfigs = await getScotDataAsync<Array<HiveEngineTokenConfig>>('config', {});
-			prices = await getPrices(undefined);
-			let ret = storedHiveEngineTokensProperties || {};
-			if (tokensInfos && tokensConfigs && prices) {
-				// cache them all here.
-				storedInfos = tokensInfos;
-				storedConfigs = tokensConfigs;
-				storedPrices = prices;
-				for (const config of tokensConfigs) {
-					const token = config.token;
-					if (!tokensInfos[token] || !prices[token]) {
-						//console.log("Cannot get info or price for ", token);
-						continue;
-					}
-					ret[token] = {info: tokensInfos[token], config, hivePrice: prices[token]};
-				}
-				storedHiveEngineTokensProperties = hiveEngineTokensProperties = ret;
-				if (ret[LIQUID_TOKEN_UPPERCASE]) {
-					lastStore = new Date();
-					console.log({lastStore});
-				}
-				console.log("Success loading HiveEngine Tokens Properties from API");
-			}
-		}
-	} catch (e) {
-		hiveEngineTokensProperties = {};
-		console.log("Trying to get data resulted in this exception:", JSON.stringify(e));
-	}
+        if (storedHiveEngineTokensProperties && storedHiveEngineTokensProperties[LIQUID_TOKEN_UPPERCASE]) {
+            let newStore : Date;
+            if (lastStore.getTime() + ten_minutes < (newStore = new Date).getTime() && (!fetchingPrices)) {
+                // It's been five minutes since last update
+                console.log("Pulling new price data", lastStore, newStore);
+                fetchingPrices = true;
+                getPrices(undefined).then(
+                    prices => {
+                        try {
+                            if (!prices)
+                                return;
+                            storedPrices = {...prices,...storedPrices};
+                            for (const token in prices) {
+                                let config : HiveEngineTokenConfig | undefined;
+                                if (hiveEngineTokensProperties[token]) {
+                                    hiveEngineTokensProperties[token].hivePrice = prices[token];
+                                } else if (storedInfos[token] && (config=storedConfigs.find(c => c.token === token))) {
+                                    hiveEngineTokensProperties[token] = {info: storedInfos[token], config, hivePrice: prices[token]};
+                                }
+                            } // for
+                            lastStore = new Date;
+                        } catch (e) {
+                        } finally {
+                            fetchingPrices = false;
+                        }
+                    });
+            }
+        } else {
+            console.log("No tokens stored.  Loading tokens Properties.");
+            tokensInfos = await getScotDataAsync<{[coinname:string]:HiveEngineTokenInfo}>('info', {});
+            tokensConfigs = await getScotDataAsync<Array<HiveEngineTokenConfig>>('config', {});
+            prices = await getPrices(undefined);
+            let ret = storedHiveEngineTokensProperties || {};
+            if (tokensInfos && tokensConfigs && prices) {
+                // cache them all here.
+                storedInfos = tokensInfos;
+                storedConfigs = tokensConfigs;
+                storedPrices = prices;
+                for (const config of tokensConfigs) {
+                    const token = config.token;
+                    if (!tokensInfos[token] || !prices[token]) {
+                        //console.log("Cannot get info or price for ", token);
+                        continue;
+                    }
+                    ret[token] = {info: tokensInfos[token], config, hivePrice: prices[token]};
+                }
+                storedHiveEngineTokensProperties = hiveEngineTokensProperties = ret;
+                if (ret[LIQUID_TOKEN_UPPERCASE]) {
+                    lastStore = new Date();
+                    console.log({lastStore});
+                }
+                console.log("Success loading HiveEngine Tokens Properties from API");
+            }
+        }
+    } catch (e) {
+        hiveEngineTokensProperties = {};
+        console.log("Trying to get data resulted in this exception:", JSON.stringify(e));
+    }
     const globalState: Global = {
         ...initialState.global,
         // @ts-ignore
