@@ -216,6 +216,26 @@ export class TransactionRow extends Component<RowProps> {
 			icon = ticketSvg;
 			numbers = <span className="number">{tr.payment}</span>
 		}
+		if (tr.type === "tokens_undelegateDone") {
+			flag = true;
+			icon = arrowRightSvg;
+		}
+		if (tr.type === "tokens_undelegateStart") {
+			flag = true;
+			icon = arrowRightSvg;
+		}
+		if (tr.type === "tokens_delegate") {
+			flag = true;
+			icon = arrowRightSvg;
+			details = <span>@{tr.to}</span>;
+			numbers = <span className='number'>{tr.amount}</span>
+		}
+		if (tr.type === "market_cancel") {
+			flag = true;
+			icon = commentSvg;
+			details = <span>{tr.orderType}</span>;
+			numbers = <span className="number">{tr.amount}</span>;
+		}
 		if (flag) {
 			const transDate = parseDate(tr.timestamp);
 			return (
@@ -230,9 +250,9 @@ export class TransactionRow extends Component<RowProps> {
 				</div>
 			);
 		}
-		return <div className="transaction-list-item transaction-list-item-raw">
+		return <a className="transaction-list-item transaction-list-item-raw">
 			<div className="raw-code">{JSON.stringify(tr)}</div>
-		</div>;
+		</a>;
 	}
 }
 interface Props {

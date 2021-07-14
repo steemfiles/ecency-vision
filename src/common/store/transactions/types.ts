@@ -1,15 +1,11 @@
 export type nAACRS = string; // number as a computer readable string:  No commas.  No units.
 export type nAAHRS = string; // number as a computer readable string:  Commas, but no units.
 export type aAAS = string;  // amount as a string: commas and units.
-
 export type orderTypeType = "buy" | "sell" | "marketSell" | "marketBuy";
-
 export function validateOrderType(s: string) {
 	if (!["buy" , "sell" , "marketSell" , "marketBuy"].includes(s))
-	throw new Error("Unexpected orderType value:", JSON.stringify(s));
+	throw new Error("Unexpected orderType value:" + JSON.stringify(s));
 }
-
-
 interface BaseTransaction {
 	num: number;
 	type: string;

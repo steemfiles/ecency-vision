@@ -163,7 +163,7 @@ export function HEToHMarketPlaceOrder(t : HEMarketPlaceOrder) : MarketPlaceOrder
 function HEToHMarketCancel(t : HEMarketCancel) : MarketCancel {
 	const {orderId, orderType, account, quantityReturned} = t;
 	validateOrderType(orderType);
-	return {type: 'market_cancel', ...HEB2B(t), orderId, orderType,
+	return {type: 'market_cancel', ...HEB2B(t), account, orderId, orderType,
 		amount: FormattedNumber(quantityReturned, {suffix:t.symbol})};
 }
 export function HEToHTransaction(t : HECoarseTransaction) : Transaction {

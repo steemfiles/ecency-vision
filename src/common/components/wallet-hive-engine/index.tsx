@@ -169,15 +169,17 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
 	}
 	fetchHETransactions = (name : string, group?: OperationGroup | "") => {
 		const {transactions} = this.state;
-		const {list, group} = transactions;
+		const {list} = transactions;
 		console.log("fetchHETransactions called.");
-		this.stateSet({transactions: {list, loading:true, group:group || ""}});
-		if ((group === "" || group === "rewards"))
+		this.stateSet({transactions: {list:[], loading:true, group:group || ""}});
+		// @ts-ignore
+		if ((!group || group === "" || group === "rewards"))
 			getFineTransactions(name, group === "rewards" ? 200 : 10, 0).then(this.handleFineTransactions.bind(this)).catch(e => {
 				console.log(e);
 		});
-		if (group === "" || group !== "rewards")
-			getCoarseTransactions(name, 200, 0).then(this.handleCoarseTransactions.bind(this, group ? group : ""));
+		// @ts-ignore
+		if (!group || group === "" || group !== "rewards")
+			getCoarseTransactions(name, 300, 0).then(this.handleCoarseTransactions.bind(this, group ? group : ""));
 	}
 	fetchConvertingAmount = () => {
 		const {account} = this.props;
