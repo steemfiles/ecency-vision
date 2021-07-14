@@ -216,6 +216,14 @@ export class TransactionRow extends Component<RowProps> {
 			icon = ticketSvg;
 			numbers = <span className="number">{tr.payment}</span>
 		}
+		if (tr.type === "tokens_undelegateDone") {
+			flag = true;
+			icon = arrowRightSvg;
+		}
+		if (tr.type === "tokens_undelegateStart") {
+			flag = true;
+			icon = arrowRightSvg;
+		}
 		if (flag) {
 			const transDate = parseDate(tr.timestamp);
 			return (
