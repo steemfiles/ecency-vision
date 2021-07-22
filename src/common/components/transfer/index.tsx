@@ -31,7 +31,6 @@ import {getFeedHistory, getAccount, HIVE_API_NAME,
     DOLLAR_API_NAME, estimateHiveCollateral,
     HIVE_CONVERSION_COLLATERAL_RATIO} from "../../api/hive";
 import Tooltip from "../tooltip";
-
 import {
     transfer,
     transferHot,
@@ -406,7 +405,6 @@ export class Transfer extends BaseComponent<Props, State> {
         const {to, amount, asset, memo, precision, estimatedRequiredHiveCollateral} = this.state;
         const fullAmount = `${amount} ${asset}`;
         console.log({fullAmount});
-
         const username = activeUser?.username!
         const assetUnstakes : UnStake | undefined | null = (() => {
                 if (is_FullHiveEngineAccount(activeUser.data)) {
@@ -415,7 +413,6 @@ export class Transfer extends BaseComponent<Props, State> {
                 }
                 return undefined;
             })();
-
         let promise: Promise<any>;
         switch (mode) {
             case "transfer": {
@@ -463,7 +460,7 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "delegate": {
-                const vests = asset === "HP" ? this.hpToVests(Number(amount)) : amount;
+                const vests = asset === HIVE_API_NAME ? this.hpToVests(Number(amount)) : `${amount} ${asset === VESTING_TOKEN ? LIQUID_TOKEN_UPPERCASE : asset}`;
                 promise = delegateVestingShares(username, key, to, vests);
                 break;
             }
@@ -493,8 +490,6 @@ export class Transfer extends BaseComponent<Props, State> {
         const username = activeUser?.username!
         const {token_unstakes} = activeUser.data as FullHiveEngineAccount | {token_unstakes: undefined};
         const assetUnstakes = token_unstakes && token_unstakes.find( x => x.symbol === LIQUID_TOKEN_UPPERCASE);
-
-
         switch (mode) {
             case "transfer": {
                 if (asset === "POINT") {
@@ -539,7 +534,7 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "delegate": {
-                const vests = asset === HIVE_API_NAME ? this.hpToVests(Number(amount)) : amount;
+                const vests = asset === HIVE_API_NAME ? this.hpToVests(Number(amount)) : `${amount} ${asset === VESTING_TOKEN ? LIQUID_TOKEN_UPPERCASE : asset}`;
                 delegateVestingSharesHot(username, to, vests);
                 break;
             }
@@ -551,10 +546,8 @@ export class Transfer extends BaseComponent<Props, State> {
     signKs = () => {
         const {activeUser, mode} = this.props;
         const {to, amount, asset, memo, precision, estimatedRequiredHiveCollateral} = this.state;
-        const fullAmount = `${amount} ${asset}`;
-
+        const fullAmount = `${amount} ${asset === VESTING_TOKEN ? LIQUID_TOKEN_UPPERCASE : asset}`;
         console.log({fullAmount});
-
         const username = activeUser?.username!
         const {token_unstakes} = activeUser.data as FullHiveEngineAccount;
         const assetUnstakes = token_unstakes && token_unstakes.find( x => x.symbol === asset );
@@ -603,7 +596,7 @@ export class Transfer extends BaseComponent<Props, State> {
                 break;
             }
             case "delegate": {
-                const vests = asset === HIVE_API_NAME ? this.hpToVests(Number(amount)) : amount;
+                const vests = asset === HIVE_API_NAME ? this.hpToVests(Number(amount)) : `${amount} ${asset === VESTING_TOKEN ? LIQUID_TOKEN_UPPERCASE : asset}`;
                 promise = delegateVestingSharesKc(username, to, vests);
                 break;
             }
@@ -868,8 +861,6 @@ export class Transfer extends BaseComponent<Props, State> {
                                             </div>
                                         </Tooltip>
                                 </div>}
-
-
                                 {(() => {
                                     if (mode === "power-down") {
                                         if (asset === LIQUID_TOKEN_UPPERCASE || asset == VESTING_TOKEN) {

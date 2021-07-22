@@ -548,7 +548,7 @@ export const transferToVestingKc = (from: string, to: string, amount: string) =>
 }
 export const createDelegateVestingSharesOp = (delegator: string, delegatee: string, vestingShares: string) : Operation => {
     if (!/[0-9]+(.[0-9]+)? [A-Z][A-Z0-9]+/.test(vestingShares)) {
-        throw new Error("Invalid vestingShares Amount specified");
+        throw new Error(`Invalid vestingShares Amount specified: "${vestingShares}"`);
     }
     const parts = vestingShares.split(/ /);
     const currency = parts[parts.length-1];

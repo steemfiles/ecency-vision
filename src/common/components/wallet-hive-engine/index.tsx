@@ -460,12 +460,12 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
 																window.open(`https://www.proofofbrain.io/@${account.name}/transfers`, 'origPOB')
 															}
 														},
-														//{
-														//	label: _t('wallet.delegate'),
-														//	onClick: () => {
-														//		this.openTransferDialog('delegate', this.props.aPICoinName);
-														//	},
-														//},
+														{
+															label: _t('wallet.delegate'),
+															onClick: () => {
+																this.openTransferDialog('delegate', this.props.aPICoinName);
+															},
+														},
 														{
 															label: _t('wallet.power-down'),
 															onClick: () => {
