@@ -8,7 +8,7 @@ export function validateOrderType(s: string) {
     throw new Error("Unexpected orderType value:" + JSON.stringify(s));
 }
 interface BaseTransaction {
-    num: number;
+  num: number;
   type: string;
   timestamp: string;
   trx_id: string;

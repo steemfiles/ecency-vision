@@ -270,9 +270,7 @@ export async function getScotDataAsync<T>(
   );
   return x;
 }
-export async function getScotAccountDataAsync(
-  account: string
-): Promise<{
+export async function getScotAccountDataAsync(account: string): Promise<{
   data: { [id: string]: TokenStatus };
   hiveData: null | { [id: string]: TokenStatus };
 }> {
