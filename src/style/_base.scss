@@ -2,7 +2,6 @@
 @import "mixins";
 
 html {
-  scroll-behavior: smooth;
   text-shadow: rgba(0, 0, 0, 0.01) 0 0 1px;
   -webkit-text-size-adjust: 100%;
   font-variant-ligatures: none;
@@ -13,7 +12,7 @@ html {
 }
 
 #root {
-  min-width: 320px;
+  min-width: 280px;
 
   &.full-height {
     position: absolute;

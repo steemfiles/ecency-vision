@@ -1,19 +1,14 @@
 import axios, {AxiosResponse, Method} from "axios";
+import {baseApiRequest} from "./util";
 
 import {Entry} from "../common/store/entries/types";
 import {DynamicProps} from "../common/store/dynamic-props/types";
 
 import {initialState as dynamicPropsInitialState} from "../common/store/dynamic-props";
-
-import {getPost} from "../common/api/bridge";
-
 import * as hiveApi from "../common/api/hive";
 
 import {cache} from "./cache";
-
 import config from "../config";
-
-import {baseApiRequest} from "./util";
 
 export const optimizeEntries = (entries: Entry[]): Entry[] => {
     return entries;

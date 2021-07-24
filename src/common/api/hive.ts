@@ -21,6 +21,7 @@ export const DOLLAR_API_NAME =  TEST_NET ? "TBD" : "HBD";
 export const HIVE_LANGUAGE_KEY = HIVE_API_NAME.toLowerCase();
 export const HIVE_HUMAN_NAME = TEST_NET ? "Tests" : "Hive";
 export const HIVE_HUMAN_NAME_UPPERCASE = TEST_NET ? "TESTS" : "HIVE";
+export const DOLLAR_HUMAN_NAME = DOLLAR_API_NAME;
 export const client = new Client(SERVERS, {
     timeout: 4000,
     failoverThreshold: 10,

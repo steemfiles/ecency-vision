@@ -54,6 +54,7 @@ import random from "../util/rnd";
 import {checkSvg, alertCircleSvg} from "../img/svg";
 
 import {PageProps, pageMapDispatchToProps, pageMapStateToProps} from "./common";
+import { handleInvalid, handleOnInput } from "../util/input-util";
 import config from "../../config";
 import {HIVE_SIGNER_APP} from '../../client_config';
 
@@ -112,7 +113,7 @@ class CommunitiesPage extends BaseComponent<PageProps, State> {
             });
     };
 
-    queryChanged = (e: React.ChangeEvent<FormControl & HTMLInputElement>) => {
+    queryChanged = (e: React.ChangeEvent<typeof FormControl & HTMLInputElement>) => {
         if (this._timer) {
             clearTimeout(this._timer);
             this._timer = null;
@@ -125,7 +126,7 @@ class CommunitiesPage extends BaseComponent<PageProps, State> {
         });
     };
 
-    sortChanged = (e: React.ChangeEvent<FormControl & HTMLInputElement>) => {
+    sortChanged = (e: React.ChangeEvent<typeof FormControl & HTMLInputElement>) => {
         this.stateSet({sort: e.target.value}, (): void => {
             this.fetch();
         });
@@ -248,7 +249,7 @@ class CommunityCreatePage extends BaseComponent<PageProps, CreateState> {
         return 'P' + base58.encode(cryptoUtils.sha256(random()));
     };
 
-    onInput = (e: React.ChangeEvent<FormControl & HTMLInputElement>): void => {
+    onInput = (e: React.ChangeEvent<typeof FormControl & HTMLInputElement>): void => {
         const {target: el} = e;
         const {name: key, value} = el;
 
@@ -256,7 +257,7 @@ class CommunityCreatePage extends BaseComponent<PageProps, CreateState> {
         this.stateSet({[key]: value});
     }
 
-    usernameChanged = (e: React.ChangeEvent<FormControl & HTMLInputElement>): void => {
+    usernameChanged = (e: React.ChangeEvent<typeof FormControl & HTMLInputElement>): void => {
         const {value: username} = e.target;
         this.stateSet({username}, () => {
             clearTimeout(this._timer);
@@ -403,7 +404,7 @@ class CommunityCreatePage extends BaseComponent<PageProps, CreateState> {
         try {
             await keychain.addAccount(username, {
                 active: keys.activeKey.toString(),
-                posting: keys.activeKey.toString(),
+                posting: keys.postingKey.toString(),
                 memo: keys.memoKey.toString()
             });
         } catch (e) {
@@ -532,7 +533,8 @@ class CommunityCreatePage extends BaseComponent<PageProps, CreateState> {
                         }
 
                         this.toggleKeyDialog();
-                    }}>
+                    }}
+                    >
                         <h1 className="form-title">{_t("communities-create.page-title")}</h1>
                         {(() => {
                             if (done) {
@@ -555,7 +557,10 @@ class CommunityCreatePage extends BaseComponent<PageProps, CreateState> {
                                         maxLength={20}
                                         onChange={this.onInput}
                                         required={true}
+                                        onInvalid={(e: any) => handleInvalid(e, 'communities-create.', 'title-validation')}
+                                        onInput={(e:any) => e.target.setCustomValidity("")}
                                         name="title"
+                                        isValid={title.length > 2 && title.length < 21}
                                     />
                                 </Form.Group>
                                 <Form.Group>
@@ -604,7 +609,13 @@ class CommunityCreatePage extends BaseComponent<PageProps, CreateState> {
                                                 <pre className="password"><span>{wif}</span></pre>
                                             </Form.Group>
                                             <Form.Group>
-                                                <label><input type="checkbox" required={true}/> {_t("communities-create.confirmation")}</label>
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        required={true} 
+                                                        onInvalid={(e: any) => handleInvalid(e, 'communities-create.', 'checkbox-validation')}
+                                                        onInput={handleOnInput}
+                                                    /> {_t("communities-create.confirmation")}</label>
                                             </Form.Group>
                                             <Form.Group>
                                                 <Button type="submit" disabled={inProgress}>

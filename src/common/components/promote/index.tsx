@@ -98,14 +98,14 @@ export class Promote extends BaseComponent<Props, State> {
         });
     }
 
-    durationChanged = (e: React.ChangeEvent<FormControl & HTMLInputElement>) => {
+    durationChanged = (e: React.ChangeEvent<typeof FormControl & HTMLInputElement>) => {
         const duration = Number(e.target.value);
         this.stateSet({duration}, () => {
             this.checkBalance();
         });
     }
 
-    pathChanged = (e: React.ChangeEvent<FormControl & HTMLInputElement>) => {
+    pathChanged = (e: React.ChangeEvent<typeof FormControl & HTMLInputElement>) => {
         const path = e.target.value;
         this.stateSet({path, postError: ''});
 
@@ -229,7 +229,6 @@ export class Promote extends BaseComponent<Props, State> {
 
     render() {
         const {activeUser} = this.props;
-
         const {prices, balanceError, path, paths, postError, duration, inProgress, step} = this.state;
 
         const canSubmit = !postError && !balanceError && this.isValidPath(path);
@@ -336,6 +335,7 @@ export class Promote extends BaseComponent<Props, State> {
 }
 
 export default class PromoteDialog extends Component<Props> {
+    
     render() {
         const {onHide} = this.props;
         return (

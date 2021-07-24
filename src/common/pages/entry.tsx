@@ -6,8 +6,6 @@ import {match} from "react-router";
 
 import moment from "moment";
 
-import {Button} from "react-bootstrap";
-
 import {renderPostBody, setProxyBase, catchPostImage, postBodySummary} from "@ecency/render-helper";
 
 import {Entry, EntryVote} from "../store/entries/types";
@@ -31,7 +29,6 @@ import Comment from "../components/comment"
 import SimilarEntries from "../components/similar-entries";
 import BookmarkBtn from "../components/bookmark-btn";
 import EditHistory from "../components/edit-history";
-
 import {error} from "../components/feedback";
 import Meta from "../components/meta";
 import Theme from "../components/theme/index";
@@ -43,6 +40,7 @@ import ScrollToTop from "../components/scroll-to-top";
 import EntryBodyExtra from "../components/entry-body-extra";
 import EntryTipBtn from "../components/entry-tip-btn";
 import EntryMenu from "../components/entry-menu";
+import AuthorInfoCard from "../components/author-info-card";
 
 import * as bridgeApi from "../api/bridge";
 import {comment, formatError} from "../api/operations";
@@ -87,27 +85,35 @@ interface Props extends PageProps {
 interface State {
     loading: boolean;
     replying: boolean;
-    showIfHidden: boolean;
     showIfNsfw: boolean;
     editHistory: boolean;
+    showProfileBox: boolean;
+    showIfHidden: boolean;
 }
 
 class EntryPage extends BaseComponent<Props, State> {
     state: State = {
         loading: false,
         replying: false,
-        showIfHidden: false,
         showIfNsfw: false,
+        showIfHidden: false,
         editHistory: false,
+        showProfileBox: false
     };
+    
+    viewElement: HTMLDivElement | undefined;
 
     componentDidMount() {
         this.ensureEntry();
-        const setState = this.setState.bind(this);
+
         const {location, global} = this.props;
         if (global.usePrivate && location.search === "?history") {
             this.toggleEditHistory();
         }
+
+        window.addEventListener("scroll", this.detect);
+        window.addEventListener("resize", this.detect);
+
     }
 
     componentDidUpdate(prevProps: Readonly<Props>): void {
@@ -117,13 +123,40 @@ class EntryPage extends BaseComponent<Props, State> {
         }
     }
 
+    componentWillUnmount() {
+        const p1 = new Promise((resolve, reject) => {    
+            resolve(window.removeEventListener("scroll", this.detect))
+        });
+        const p2 = new Promise((resolve, reject) => {    
+            resolve(window.removeEventListener("resize", this.detect))
+        });
+        Promise.all([p1, p2])
+    }
+
+    // detects distance between title and comments section sets visibility of profile card
+    detect = () => {
+
+       const infoCard:HTMLElement | null = document.getElementById("avatar-fixed");
+       const top = this?.viewElement?.getBoundingClientRect()?.top;
+
+       if(infoCard != null && window.scrollY > 180  && top && !(top <= 0)) {
+            infoCard.classList.add('visible')
+       } else if( infoCard != null && window.scrollY <= 180) {
+            infoCard.classList.remove('visible')
+       } else if(top && top <= 0 && infoCard !== null){
+            infoCard.classList.remove('visible')
+       } else return
+
+    }
+    
+
     toggleEditHistory = () => {
         const {editHistory} = this.state;
         this.stateSet({editHistory: !editHistory});
     }
 
-    ensureEntry = () => {
-        const {match, addEntry, updateEntry, addCommunity, activeUser} = this.props;
+    ensureEntry = async () => {
+        const {match, addEntry, updateEntry, addCommunity, activeUser, global} = this.props;
         const entry = this.getEntry();
         const {category, username, permlink} = match.params;
         const author = username.replace("@", "");
@@ -282,7 +315,7 @@ class EntryPage extends BaseComponent<Props, State> {
     }
 
     render() {
-        const {loading, replying, showIfHidden, showIfNsfw, editHistory} = this.state;
+        const {loading, replying, showIfNsfw, editHistory} = this.state;
         const {global, history} = this.props;
 
         const navBar = global.isElectron ? NavBarElectron({
@@ -301,6 +334,10 @@ class EntryPage extends BaseComponent<Props, State> {
             return NotFound({...this.props});
         }
 
+        let setRef = (el:HTMLDivElement) => {
+            this.viewElement = el;
+        };
+
         const originalEntry = entry.original_entry || null;
 
         const community = this.getCommunity();
@@ -311,15 +348,21 @@ class EntryPage extends BaseComponent<Props, State> {
 
         // Sometimes tag list comes with duplicate items
         const tags = [...new Set(entry.json_metadata.tags)];
+        // If category is not present in tags then add
+        if (entry.category && tags[0] !== entry.category) {
+            tags.splice(0, 0, entry.category);
+        }
         const app = appName(entry.json_metadata.app);
+        const appShort = app.split('/')[0].split(' ')[0];
 
         const isComment = !!entry.parent_author;
 
         const {activeUser} = this.props;
 
         const ownEntry = activeUser && activeUser.username === entry.author;
-
-        const isHidden = entry?.stats?.gray;
+        const isHidden = entry?.net_rshares < 0;
+        const isMuted = entry?.stats?.gray && entry?.net_rshares >= 0 && entry?.author_reputation >= 0;
+        const isLowReputation = entry?.stats?.gray && entry?.net_rshares >= 0 && entry?.author_reputation < 0;
 
         //  Meta config
         const url = entryCanonical(entry) || "";
@@ -331,10 +374,10 @@ class EntryPage extends BaseComponent<Props, State> {
             description: `${truncate(postBodySummary(entry.body, 210), 140)} by @${entry.author}`,
             url: entry.url,
             canonical: url,
-            image: catchPostImage(entry.body, 600, 500, global.canUseWebp ? 'webp' : 'match'),
+            image: catchPostImage(entry, 600, 500, global.canUseWebp ? 'webp' : 'match'),
             published: published.toISOString(),
             modified: modified.toISOString(),
-            tag: tags[0],
+            tag: isCommunity(tags[0]) ? tags[1] : tags[0],
             keywords: tags.join(", "),
         };
 
@@ -377,15 +420,6 @@ class EntryPage extends BaseComponent<Props, State> {
                         )}
                         <span itemScope={true} itemType="http://schema.org/Article">
                             {(() => {
-                                if (isHidden && !showIfHidden) {
-                                    return <div className="hidden-warning">
-                                        <span>{_t('entry.hidden-warning')}</span>
-                                        <Button variant="danger" size="sm" onClick={() => {
-                                            this.stateSet({showIfHidden: true});
-                                        }}>{_t('g.show')}</Button>
-                                    </div>
-                                }
-
                                 if (nsfw && !showIfNsfw && !global.nsfw) {
                                     return <div className="nsfw-warning">
                                         <div className="nsfw-title"><span className="nsfw-badge">NSFW</span></div>
@@ -449,12 +483,14 @@ class EntryPage extends BaseComponent<Props, State> {
                                                                                         </span>
                                                                                     </span>
                                                                                 </span>
-                                                                        <span className="author-reputation">{reputation}</span>
+                                                                        <span className="author-reputation" title={_t("entry.author-reputation")}>{reputation}</span>
                                                                     </div>
                                                                 })}
                                                             </div>
 
                                                             <div className="info-line-2">
+                                                                <span className="date" title={published.format("LLLL")}>{published.fromNow()}</span>
+                                                                <span className="separator"/>
                                                                 <div className="entry-tag">
                                                                     <span className="in-tag">{_t("entry.community-in")}</span>
                                                                     {Tag({
@@ -466,8 +502,6 @@ class EntryPage extends BaseComponent<Props, State> {
                                                                         </div>
                                                                     })}
                                                                 </div>
-                                                                <span className="separator"/>
-                                                                <span className="date" title={published.format("LLLL")}>{published.fromNow()}</span>
                                                             </div>
                                                         </div>
                                                         <span className="flex-spacer"/>
@@ -487,8 +521,21 @@ class EntryPage extends BaseComponent<Props, State> {
                                         }
 
                                         const renderedBody = {__html: renderPostBody(entry.body, false, global.canUseWebp)};
+                                        const ctitle = entry.community ? entry.community_title : "";
                                         return <>
                                             <div className="entry-header">
+                                                {isMuted && (<div className="hidden-warning">
+                                                    <span><Tsx k="entry.muted-warning" args={{community: ctitle}}><span/></Tsx></span>
+                                                </div>)}
+
+                                                {isHidden && (<div className="hidden-warning">
+                                                    <span>{_t('entry.hidden-warning')}</span>
+                                                </div>)}
+
+                                                {isLowReputation && (<div className="hidden-warning">
+                                                    <span>{_t('entry.lowrep-warning')}</span>
+                                                </div>)}
+
                                                 {isComment && (
                                                     <div className="comment-entry-header">
                                                         <div className="comment-entry-header-title">RE: {entry.title}</div>
@@ -522,6 +569,8 @@ class EntryPage extends BaseComponent<Props, State> {
                                                         })}</div>
                                                     })}
 
+                                                    
+
                                                     <div className="entry-info-inner">
                                                         <div className="info-line-1">
                                                             {ProfileLink({
@@ -535,12 +584,14 @@ class EntryPage extends BaseComponent<Props, State> {
                                                                                         </span>
                                                                                     </span>
                                                                                 </span>
-                                                                    <span className="author-reputation">{reputation}</span>
+                                                                    <span className="author-reputation" title={_t("entry.author-reputation")}>{reputation}</span>
                                                                 </div>
                                                             })}
                                                         </div>
 
                                                         <div className="info-line-2">
+                                                            <span className="date" title={published.format("LLLL")}>{published.fromNow()}</span>
+                                                            <span className="separator"/>
                                                             <div className="entry-tag">
                                                                 <span className="in-tag">{_t("entry.community-in")}</span>
                                                                 {Tag({
@@ -552,8 +603,6 @@ class EntryPage extends BaseComponent<Props, State> {
                                                                     </div>
                                                                 })}
                                                             </div>
-                                                            <span className="separator"/>
-                                                            <span className="date" title={published.format("LLLL")}>{published.fromNow()}</span>
                                                         </div>
                                                     </div>
                                                     <span className="flex-spacer"/>
@@ -573,6 +622,9 @@ class EntryPage extends BaseComponent<Props, State> {
                                             <meta itemProp="image" content={metaProps.image}/>
                                         </>
                                     })()}
+
+
+                                    {!global.isMobile && <AuthorInfoCard {...this.props} entry={entry} />}
 
                                     <div className="entry-footer">
                                         <div className="entry-tags">
@@ -613,7 +665,7 @@ class EntryPage extends BaseComponent<Props, State> {
                                                 username: entry.author,
                                                 children: <div className="author notranslate">
                                                     <span className="author-name">{entry.author}</span>
-                                                    <span className="author-reputation">{reputation}</span>
+                                                    <span className="author-reputation" title={_t("entry.author-reputation")}>{reputation}</span>
                                                 </div>
                                             })}
                                             {app && (
@@ -622,13 +674,13 @@ class EntryPage extends BaseComponent<Props, State> {
                                                     <span itemProp="publisher" itemScope={true} itemType="http://schema.org/Person">
                                                             <meta itemProp="name" content={entry.author}/>
                                                         </span>
-                                                    <div className="app">
-                                                        <Tsx k="entry.via-app" args={{app}}><a href="/faq#source-label"/></Tsx>
+                                                    <div className="app" title={app}>
+                                                        <Tsx k="entry.via-app" args={{app: appShort}}><a href="/faq#source-label"/></Tsx>
                                                     </div>
                                                 </>
                                             )}
                                         </div>
-                                        <div className="entry-controls">
+                                        <div className="entry-controls" ref={setRef}>
                                             {EntryVoteBtn({
 
                                                 ...this.props,

@@ -1,3 +1,4 @@
+import { SMTAsset } from '@hiveio/dhive';
 export type nAACRS = string; // number as a computer readable string:  No commas.  No units.
 export type nAAHRS = string; // number as a computer readable string:  Commas, but no units.
 export type aAAS = string;  // amount as a string: commas and units.
@@ -6,6 +7,7 @@ export function validateOrderType(s: string) {
 	if (!["buy" , "sell" , "marketSell" , "marketBuy"].includes(s))
 	throw new Error("Unexpected orderType value:" + JSON.stringify(s));
 }
+
 interface BaseTransaction {
 	num: number;
 	type: string;
@@ -78,6 +80,7 @@ export interface ClaimRewardBalance extends BaseTransaction {
 	reward_hive: string;
 	reward_vests: string;
 }
+
 export interface Transfer extends BaseTransaction {
 	type: "transfer";
 	amount: string;
@@ -112,6 +115,7 @@ export interface TransferToSavings extends BaseTransaction {
 	from: string;
 	to: string;
 }
+
 export interface CancelTransferFromSavings extends BaseTransaction {
 	from: string,
 	request_id: number,
@@ -299,33 +303,214 @@ export interface CancelUnstake extends BaseTransaction {
 	amount: aAAS;
 	unstakeTxID: string;
 }
+
+export interface CurationReward extends BaseTransaction {
+    type: "curation_reward";
+    comment_author: string;
+    comment_permlink: string;
+    curator: string;
+    reward: string;
+}
+
+export interface AuthorReward extends BaseTransaction {
+    type: "author_reward";
+    author: string;
+    permlink: string;
+    hbd_payout: string;
+    hive_payout: string;
+    vesting_payout: string;
+}
+
+export interface CommentBenefactor extends BaseTransaction {
+    type: "comment_benefactor_reward";
+    benefactor: string;
+    author: string;
+    permlink: string;
+    hbd_payout: string;
+    hive_payout: string;
+    vesting_payout: string;
+}
+
+export interface ClaimRewardBalance extends BaseTransaction {
+    type: "claim_reward_balance";
+    account: string;
+    reward_hbd: string;
+    reward_hive: string;
+    reward_vests: string;
+}
+
+export interface Transfer extends BaseTransaction {
+    type: "transfer";
+    amount: string;
+    memo: string;
+    from: string;
+    to: string;
+}
+
+export interface TransferToVesting extends BaseTransaction {
+    type: "transfer_to_vesting";
+    amount: string;
+    memo?: string;
+    from: string;
+    to: string;
+}
+
+export interface TransferToSavings extends BaseTransaction {
+    type: "transfer_to_savings";
+    amount: string;
+    memo?: string;
+    from: string;
+    to: string;
+}
+
+export interface CancelTransferFromSavings extends BaseTransaction {
+    from: string,
+    request_id: number,
+    type: "cancel_transfer_from_savings",
+}
+
+export interface WithdrawVesting extends BaseTransaction {
+    type: "withdraw_vesting";
+    acc: string;
+    vesting_shares: string;
+}
+
+export interface FillOrder extends BaseTransaction {
+    type: "fill_order";
+    current_pays: string;
+    open_pays: string;
+}
+
+export interface ProducerReward extends BaseTransaction {
+    type: "producer_reward";
+    vesting_shares: string;
+    producer: string
+}
+
+export interface Interest extends BaseTransaction {
+    type: "interest";
+    owner: string;
+    interest: string
+}
+
+export interface FillConvertRequest extends BaseTransaction {
+    type: "fill_convert_request",
+    amount_in: string,
+    amount_out: string,
+}
+
+export interface ReturnVestingDelegation extends BaseTransaction {
+    type: "return_vesting_delegation"
+    vesting_shares: string
+}
+
+export interface ProposalPay extends BaseTransaction {
+    type: "proposal_pay"
+    payment: string
+}
+
+export interface CommentPayoutUpdate extends BaseTransaction {
+    type: "comment_payout_update"
+    author: string
+    permlink: string
+}
+
+export interface CommentReward extends BaseTransaction {
+    type: "comment_reward"
+    author: string
+    permlink: string
+    payout: string
+}
+
+export interface CollateralizedConvert extends BaseTransaction {
+    type: "collateralized_convert"
+    owner: string
+    requestid: number
+    amount: string
+}
+
+export interface RecurrentTransfers extends BaseTransaction {
+    type: "recurrent_transfer"
+    amount: string;
+    memo: string;
+    from: string;
+    to: string;
+    recurrence: number;
+    executions: number;
+}
+
+export interface FillRecurrentTransfers extends BaseTransaction {
+    type: "fill_recurrent_transfer"
+    amount: SMTAsset;
+    memo: string;
+    from: string;
+    to: string;
+    remaining_executions: number;
+}
+
+export interface LimitOrderCreate extends BaseTransaction {
+    type: "limit_order_create";
+    owner: string;
+    orderid: number;
+    amount_to_sell: string;
+    min_to_receive: string;
+    expiration: string;
+}
+
+export interface FillVestingWithdraw extends BaseTransaction {
+    type: "fill_vesting_withdraw";
+    from_account: string;
+    to_account: string;
+    withdrawn: string;
+    deposited: string;
+}
+
+export interface EffectiveCommentVote extends BaseTransaction {
+    type: "effective_comment_vote"
+    voter: string
+    author: string
+    permlink: string
+    pending_payout: string
+    total_vote_weight: number
+    rshares: number
+    weight: number
+}
+
 export type Transaction =
-	| CurationReward
-	| AuthorReward
-	| CommentBenefactor
-	| ClaimRewardBalance
-	| Transfer
-	| TransferToVesting
-	| TransferToSavings
-	| CancelTransferFromSavings
-	| WithdrawVesting
-	| UnstakeStart
-	| FillOrder
-	| ProducerReward
-	| Interest
-	| FillConvertRequest
-	| ReturnVestingDelegation
-	| ProposalPay
-	| CollateralizedConvert
-	| TokensIssue
-	| MarketSell
-	| MarketBuy
-	| CancelUnstake
-	| MarketPlaceOrder
-	| MarketCancel
-	| TokensDelegate
-	| TokensUndelegateStart
-	| TokensUndelegateDone;
+    | CurationReward
+    | AuthorReward
+    | CommentBenefactor
+    | ClaimRewardBalance
+    | Transfer
+    | TransferToVesting
+    | TransferToSavings
+    | CancelTransferFromSavings
+    | WithdrawVesting
+    | FillOrder
+    | ProducerReward
+    | Interest
+    | FillConvertRequest
+    | ReturnVestingDelegation
+    | ProposalPay
+    | MarketBuy
+    | CommentReward
+    | CommentPayoutUpdate
+    | TokensDelegate
+    | TokensUndelegateDone
+    | TokensUndelegateStart
+    | MarketCancel
+    | MarketPlaceOrder
+    | CancelUnstake
+    | UnstakeStart
+    | MarketSell
+    | TokensIssue
+    | CollateralizedConvert
+    | RecurrentTransfers
+    | FillRecurrentTransfers
+    | LimitOrderCreate
+    | FillVestingWithdraw
+    | EffectiveCommentVote;
+
 export type OperationGroup = "transfers" | "market-orders" | "interests" | "stake-operations" | "rewards";
 export interface Transactions {
 	list: Transaction[];

@@ -25,7 +25,7 @@ export const createPermlink = (title: string, random: boolean = false): string =
         perm = `${perm}-${rnd}`;
     }
 
-    // STEEMIT_MAX_PERMLINK_LENGTH
+    // HIVE_MAX_PERMLINK_LENGTH
     if (perm.length > 255) {
         perm = perm.substring(perm.length - 255, perm.length);
     }
@@ -43,7 +43,7 @@ export const createPermlink = (title: string, random: boolean = false): string =
 export const extractMetaData = (body: string): MetaData => {
     const urlReg = /(\b(https?|ftp):\/\/[A-Z0-9+&@#/%?=~_|!:,.;-]*[-A-Z0-9+&@#/%=~_|])/gim;
     const userReg = /(^|\s)(@[a-z][-.a-z\d]+[a-z\d])/gim;
-    const imgReg = /(https?:\/\/.*\.(?:tiff?|jpe?g|gif|png|svg|ico|heic))/gim;
+    const imgReg = /(https?:\/\/.*\.(?:tiff?|jpe?g|gif|png|svg|ico|heic|webp))/gim;
 
     const out: MetaData = {};
 
@@ -66,10 +66,10 @@ export const extractMetaData = (body: string): MetaData => {
     }
 
     if (matchedLinks.length) {
-        out.links = matchedLinks;
+        out.links = matchedLinks.slice(0,10);
     }
     if (matchedImages.length) {
-        out.image = matchedImages;
+        out.image = matchedImages.slice(0,10);
     }
 
     if (mUsers) {
@@ -79,7 +79,7 @@ export const extractMetaData = (body: string): MetaData => {
     }
 
     if (matchedUsers.length) {
-        out.users = matchedUsers;
+        out.users = matchedUsers.slice(0,10);
     }
 
     return out;

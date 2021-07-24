@@ -13,6 +13,9 @@ import {UI, ToggleType} from "../../store/ui/types";
 
 import EntryListItem from "../entry-list-item/index";
 import {EntryPinTracker} from "../../store/entry-pin-tracker/types";
+import MessageNoData from "../message-no-data";
+import { Link } from "react-router-dom";
+import { _t } from "../../i18n";
 import {TokenPropertiesMap} from "../../store/hive-engine-tokens/types";
 
 interface Props {
@@ -27,6 +30,7 @@ interface Props {
     users: User[];
     activeUser: ActiveUser | null;
     reblogs: Reblogs;
+    loading: boolean;
     ui: UI;
     entryPinTracker: EntryPinTracker;
     signingKey: string;
@@ -48,15 +52,17 @@ interface Props {
 
 export class EntryListContent extends Component<Props> {
     render() {
-        const {entries, promotedEntries} = this.props;
+        const {entries, promotedEntries, global, activeUser, loading } = this.props;
+        const {filter} = global;
 
-        return (
-            <>
+         
+        return entries.length > 0 ? (
+              <>
                 {entries.map((e, i) => {
                     const l = [];
 
-                    if (i % 3 === 0 && i > 0) {
-                        const ix = i / 3 - 1;
+                    if (i % 4 === 0 && i > 0) {
+                        const ix = i / 4 - 1;
 
                         if (promotedEntries[ix]) {
                             const p = promotedEntries[ix];
@@ -66,7 +72,7 @@ export class EntryListContent extends Component<Props> {
                                     <EntryListItem
                                         key={`${p.author}-${p.permlink}`}
                                         {...Object.assign({}, this.props, {entry: p})}
-                                        promoted={true} order={3}
+                                        promoted={true} order={4}
                                     />
                                 );
                             }
@@ -77,7 +83,14 @@ export class EntryListContent extends Component<Props> {
                     return [...l];
                 })}
             </>
-        );
+        ) : !loading && <MessageNoData>
+                {(global.tag===`@${activeUser?.username}` && global.filter === "posts") ? 
+                <div className='text-center'>
+                    <div className="info">{_t("profile-info.no-posts")}</div>
+                    <Link to='/submit' className="action"><b>{_t("profile-info.create-posts")}</b></Link>
+                </div>:
+                <div className="info">{`${_t("g.no")} ${_t(`g.${filter}`)} ${_t("g.found")}.`}</div>}
+            </MessageNoData>;
     }
 }
 
@@ -110,6 +123,7 @@ export default (p: Props) => {
         trackEntryPin: p.trackEntryPin,
         setSigningKey: p.setSigningKey,
         setEntryPin: p.setEntryPin,
+        loading: p.loading,
         hiveEngineTokensProperties: p.hiveEngineTokensProperties,
     }
 

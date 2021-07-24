@@ -69,8 +69,7 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
-        envs: STAGING_PORT,PRIVATE_API_ADDR,PRIVATE_API_AUTH,HIVESIGNER_CLIENT_ID,HIVESIGNER_CLIENT_SECRET,SEARCH_API_ADDR,SEARCH_API_SECRET,USE_PRIVATE
-        script: |
+      script: |
           export PRIVATE_API_ADDR=$PRIVATE_API_ADDR
           export PRIVATE_API_AUTH=$PRIVATE_API_AUTH
           export HIVESIGNER_CLIENT_ID=$HIVESIGNER_CLIENT_ID
@@ -82,4 +81,3 @@ jobs:
           git pull origin development
           docker pull ecency/vision:development
           docker stack deploy -c docker-compose.yml vision
-          docker system prune -f

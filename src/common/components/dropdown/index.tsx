@@ -4,12 +4,12 @@ import {History} from "history";
 import {menuDownSvg} from "../../img/svg";
 
 import _c from "../../util/fix-class-names"
-
 export interface MenuItem {
     label: string;
     href?: string;
     onClick?: () => void;
     active?: boolean;
+    flash?: boolean;
     id?: string;
     icon?: JSX.Element
 }
@@ -102,6 +102,7 @@ export default class MyDropDown extends Component<Props> {
     render() {
         const {label, icon, float, alignBottom, header, preElem, postElem, items} = this.props;
         const {menu} = this.state;
+
 
         const child =
             typeof label === "string" ? (

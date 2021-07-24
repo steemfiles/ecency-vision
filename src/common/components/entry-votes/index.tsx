@@ -60,10 +60,14 @@ interface DetailProps {
     global: Global;
     entry: Entry;
     addAccount: (data: Account) => void;
+    updateInputDisable: (value: boolean) => void;
+    searchText: string;
+    hiveEngineTokensProperties?: TokenPropertiesMap;
 }
 interface DetailState {
     loading: boolean;
     votes: Vote[];
+    originalVotes: Vote[];
     page: number;
     sort: SortOption
 }
@@ -71,11 +75,13 @@ export class EntryVotesDetail extends BaseComponent<DetailProps, DetailState> {
     state: DetailState = {
         loading: false,
         votes: [],
+        originalVotes: [],
         page: 1,
         sort: "reward"
     };
     componentDidMount() {
-        const {entry} = this.props;
+        const { entry, updateInputDisable } = this.props;
+
         this.stateSet({loading: true});
         getActiveVotes(entry.author, entry.permlink)
             .then((r) => {
@@ -83,15 +89,24 @@ export class EntryVotesDetail extends BaseComponent<DetailProps, DetailState> {
             })
             .finally(() => {
                 this.stateSet({loading: false});
+                updateInputDisable(false)
             });
     }
     setVotes = (data: Vote[]) => {
-        const {entry} = this.props;
-        this.stateSet({votes: prepareVotes(entry, data, this.props.global.hiveEngineTokensProperties), loading: false});
+        const {entry, hiveEngineTokensProperties} = this.props;
+        this.stateSet({ votes: prepareVotes(entry, data, hiveEngineTokensProperties), loading: false, originalVotes: prepareVotes(entry, data, hiveEngineTokensProperties) });
     };
-    sortChanged = (e: React.ChangeEvent<FormControl & HTMLInputElement>) => {
+
+    sortChanged = (e: React.ChangeEvent<typeof FormControl & HTMLInputElement>) => {
         this.stateSet({sort: e.target.value as SortOption});
     };
+
+    componentDidUpdate(prevProps: DetailProps){
+        if(prevProps.searchText !== this.props.searchText){
+            this.setState({ votes: this.state.originalVotes.filter(item=>item.voter.toLocaleLowerCase().includes(this.props.searchText.toLocaleLowerCase())), page: 1 });
+        }
+    }
+
     render() {
         const {loading, votes, page, sort} = this.state;
         if (loading) {
@@ -115,7 +130,7 @@ export class EntryVotesDetail extends BaseComponent<DetailProps, DetailState> {
             <>
                 <div className="voters-list">
                     <div className="list-body">
-                        {sliced.map(x => {
+                        {sliced && sliced.length > 0 ? sliced.map(x => {
                             return <div className="list-item" key={x.voter}>
                                 <div className="item-main">
                                     {ProfileLink({
@@ -142,12 +157,12 @@ export class EntryVotesDetail extends BaseComponent<DetailProps, DetailState> {
                                     </Tooltip>
                                 </div>
                             </div>;
-                        })}
+                        }): _t("communities.no-results")}
                     </div>
                 </div>
                 <div className="list-tools">
                     <div className="pages">
-                        {votes.length > pageSize && <Pagination dataLength={votes.length} pageSize={pageSize} maxItems={4} onPageChange={(page) => {
+                        {votes.length > pageSize && <Pagination dataLength={votes.length} pageSize={pageSize} maxItems={4} page={page} onPageChange={(page) => {
                             this.stateSet({page});
                         }}/>}
                     </div>
@@ -170,21 +185,26 @@ interface Props {
     global: Global;
     entry: Entry;
     addAccount: (data: Account) => void;
+    hiveEngineTokensProperties?: TokenPropertiesMap;
 }
 interface State {
     visible: boolean;
+    searchText: string;
+    searchTextDisabled: boolean;
 }
 export class EntryVotes extends Component<Props, State> {
     state: State = {
         visible: false,
+        searchText: "",
+        searchTextDisabled: true
     };
     toggle = () => {
-        const {visible} = this.state;
-        this.setState({visible: !visible});
+        const { visible } = this.state;
+        this.setState({ visible: !visible, searchText: "" });
     };
     render() {
-        const {entry} = this.props;
-        const {visible} = this.state;
+        const { entry } = this.props;
+        const { visible, searchText, searchTextDisabled } = this.state;
         const totalVotes = entry.active_votes.length;
         const title =
             totalVotes === 0
@@ -212,12 +232,22 @@ export class EntryVotes extends Component<Props, State> {
                     <Tooltip content={title}><span className="inner-btn" onClick={this.toggle}>{child}</span></Tooltip>
                 </div>
                 {visible && (
-                    <Modal onHide={this.toggle} show={true} centered={true} size="lg" animation={false} className="entry-votes-modal">
-                        <Modal.Header closeButton={true}>
+                    <Modal onHide={this.toggle} show={true} centered={true} size="lg" animation={false} className="entry-votes-modal px-3">
+                        <Modal.Header closeButton={true} className="align-items-center px-0">
                             <Modal.Title>{title}</Modal.Title>
                         </Modal.Header>
-                        <Modal.Body>
-                            <EntryVotesDetail {...this.props} entry={entry}/>
+                        <Form.Group className="w-100 mb-3">
+                                <Form.Control
+                                    type="text" 
+                                    placeholder={_t('friends.search-placeholder')} 
+                                    value={searchText} 
+                                    onChange={(e) => {
+                                    this.setState({ searchText: e.target.value });
+                                    }} 
+                                    disabled={searchTextDisabled}/>
+                        </Form.Group>
+                        <Modal.Body className="px-0">
+                            <EntryVotesDetail {...this.props} entry={entry} searchText={searchText} updateInputDisable={(value:boolean)=>this.setState({searchTextDisabled: value})} />
                         </Modal.Body>
                     </Modal>
                 )}
@@ -230,7 +260,8 @@ export default (p: Props) => {
         history: p.history,
         global: p.global,
         entry: p.entry,
-        addAccount: p.addAccount
+        addAccount: p.addAccount,
+        hiveEngineTokensProperties: p.hiveEngineTokensProperties        
     }
     return <EntryVotes {...props} />;
 }

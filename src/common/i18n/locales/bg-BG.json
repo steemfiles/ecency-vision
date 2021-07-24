@@ -17,6 +17,7 @@
     "days": "дни",
     "finish": "Приключи",
     "next": "Напред",
+    "previous": "Previous",
     "back": "Назад",
     "load-more": "Зареди още",
     "empty-list": "Няма нищо тук",
@@ -28,8 +29,19 @@
     "off": "Изкл.",
     "yes": "Да",
     "no": "Не",
+    "hot": "feed",
+    "trending": "feed",
+    "created": "feed",
+    "muted": "feed",
+    "found": "found",
+    "feed": "feed",
+    "blog": "blogs",
+    "posts": "posts",
+    "comments": "comments",
+    "replies": "replies",
     "done": "Готово",
     "apply": "Потвърди",
+    "warning": "Warning",
     "close": "Затвори"
   },
   "confirm": {
@@ -46,7 +58,14 @@
     "filter-muted": "Заглушени",
     "filter-feed": "Моят поток",
     "filter-feed-friends": "Приятели",
-    "filter-feed-subscriptions": "Общности"
+    "filter-feed-subscriptions": "Общности",
+    "filter-global": "Global",
+    "filter-global-part1": "This feed contains ",
+    "filter-global-part2": " discussions on entire platform.",
+    "filter-global-part3": " discussions from Your subscribed communities. You can join more communities to fill up this feed.",
+    "filter-global-part4": " discussions from people you follow. You can follow more people to fill up this feed.",
+    "filter-global-discover": "Discover People",
+    "filter-global-join-communities": "Join Communities"
   },
   "navbar": {
     "discover": "Открийте",
@@ -62,6 +81,10 @@
     "header-tag": "Тагове",
     "header-account": "Потребители",
     "header-community": "Общности"
+  },
+  "tag": {
+    "unmoderated": "Unmoderated topics",
+    "moderated": "Moderated community"
   },
   "switch-lang": {
     "contributors": "Сътрудници"
@@ -98,6 +121,7 @@
     "error-public-key": "Вие въведохте публичен ключ. Нужна е парола/WIF",
     "error-user-fetch": "Данните за потребителят немогат да бъдат заредени",
     "error-user-not-found": "Потребителят не съществува",
+    "error-user-not-found-cache": "Cache inconsistency detected. Please retry login with your credentials.",
     "error-permission": "Неможахме да получим право да публикуваме",
     "error-authenticate": "Грешен личен ключ. Нужен е главен или активен личен ключ.",
     "with-hive-signer": "Влез чрез hivesigner",
@@ -114,6 +138,8 @@
     "email": "Въведете вашия имейл адрес",
     "ref": "Кой ви покани в платформата(Опция)",
     "submit": "Продължи",
+    "validation-username": "Username is required.",
+    "validation-email": "Email is required.",
     "success": "Изпратихме имейл на {{email}}.",
     "success-2": "Следвайте инструкциите за да завършите регистрирането.",
     "login-text-1": "Имате ли акаунт?",
@@ -128,11 +154,13 @@
   "entry-list-item": {
     "cross-posted": "cross-posted",
     "cross-posted-to": "to",
-    "reblogged": "{{n}} сподели",
-    "promoted": "промотирани",
+    "reblogged": "{{n}} Reblogged",
+    "promoted": "Promoted",
     "pinned": "Закачен пост",
     "replies": "1 отговор. Натисни да отговориш.",
     "replies-n": "{{n}} отговори. Натисни за да отговориш.",
+    "vote-error": "Previous value is not acceptable. Vote with a different value.",
+    "vote-warning": "Voting 0% unvotes the content.",
     "no-replies": "Няма отговори все още. Натисни за да отговориш."
   },
   "nsfw": {
@@ -196,7 +224,8 @@
     "curators-payout": "Възнаграждение на гласувалите",
     "payout-date": "Изплащане",
     "beneficiary": "Бенефициент",
-    "breakdown": "Разбивка"
+    "breakdown": "Разбивка",
+    "max-accepted": "Max accepted"
   },
   "entry-index": {
     "feed": "Моят поток",
@@ -228,10 +257,13 @@
   },
   "entry": {
     "via-app": "чрез <span class=\"app-name\">{{app}}</span>",
+    "author-reputation": "Author's reputation",
     "comment-entry-title": "Разглеждате само този коментар от поста на: ",
     "comment-entry-go-root": "Покажи целия контекст",
     "comment-entry-go-parent": "Покажи коментара",
-    "hidden-warning": "Този пост е скрит поради ниски рейтинги.",
+    "hidden-warning": "This content got low rating by people. Proceed with caution.",
+    "muted-warning": "This content was muted by {{community}} moderators for not following community guidelines.",
+    "lowrep-warning": "Author of this post has low reputation. Proceed with caution.",
     "address-copy": "Копирай адреса",
     "address-copied": "Адресът е копиран в клипборда.",
     "browse-original": "Open original post",
@@ -245,7 +277,7 @@
     "version": "Версия {{n}}"
   },
   "similar-entries": {
-    "title": "More from @{{n}}"
+    "title": "Read next"
   },
   "comment": {
     "body-placeholder": "Напишете вашият отговор тук",
@@ -294,7 +326,7 @@
     "edit": "Редактирай настройките",
     "edit-team": "Редактиране на роли",
     "community-rewards": "Общностни награди",
-    "profile-image": "Обществена профилна снимка",
+    "profile-image": "Profile image",
     "profile-image-edit": "Редактирай профилната снимка ",
     "profile-image-updated": "Профилната снимка е обновена!"
   },
@@ -312,7 +344,8 @@
     "lang": "Език",
     "description": "Описание",
     "rules": "Правила",
-    "rules-help": "По едно на ред"
+    "rules-help": "По едно на ред",
+    "validation-title": "Title is required."
   },
   "communities": {
     "title": "Общности",
@@ -339,6 +372,8 @@
     "username-available": "Достъпно.",
     "username-not-available": "Не е достъпно.",
     "username-wrong-format": "Не е валиден формат. hive-1xxxxx формат е задължителен.",
+    "checkbox-validation": "Please tick this box if you want to proceed.",
+    "title-validation": "Please fill in this field.",
     "password": "Главна парола",
     "confirmation": "Безопасно си запазих потребителското име на собственика и паролата.",
     "submit": "Създаване на общност",
@@ -390,7 +425,10 @@
     "vote-power": "Сила на гласа: {{n}}%",
     "rc-power": "Ресурс кредити: {{n}}%",
     "recharge-time": "(напълно заредени {{n}})",
-    "down-vote-power": "Сила за отрицателно гласуване: {{n}}%"
+    "down-vote-power": "Сила за отрицателно гласуване: {{n}}%",
+    "no-posts": "Here you will see your posts, looks like no content exists.",
+    "create-posts": "Let's create a new post",
+    "no-posts-found": "Found nothing!"
   },
   "profile-edit": {
     "title": "Профил",
@@ -400,6 +438,7 @@
     "profile-image": "Профилна снимка",
     "website": "Уебсайт",
     "location": "Местоположение",
+    "copied": "Referral link copied to clipboard.",
     "updated": "Профила е актуализиран успешно!"
   },
   "image-upload-button": {
@@ -411,6 +450,7 @@
     "currency": "Валутa",
     "language": "Език",
     "nsfw": "Show NSFW content",
+    "referral-link": "Referral link",
     "updated": "Предпочитанията са обновени!"
   },
   "wallet": {
@@ -447,6 +487,8 @@
     "title": "Акаунти за теглене",
     "account": "Акаунт",
     "percent": "Процент",
+    "validation-account": "Account is required.",
+    "validation-percent": "Percentage is required.",
     "auto-power-up": "Автоматично увеличаване на силата"
   },
   "points": {
@@ -581,22 +623,33 @@
     "group-interests": "Interests",
     "group-stake-operations": "Stake operations",
     "group-rewards": "Rewards",
-    "type-curation_reward": "Награда за участие",
-    "type-author_reward": "Авторска награда",
-    "type-comment_benefactor_reward": "Награда от Благодетел за коментар",
+    "type-curation_reward": "Curation reward",
+    "type-author_reward": "Author reward",
+    "type-comment_benefactor_reward": "Comment benefactor reward",
     "type-claim_reward_balance": "Събиране на награди",
     "type-transfer": "Прехвърляне",
-    "type-transfer_to_vesting": "Прехвърляне към придобивка",
-    "type-withdraw_vesting": "Изтегляне на придобивки",
+    "type-transfer_to_vesting": "Power up",
+    "type-withdraw_vesting": "Power down",
+    "type-fill_vesting_withdraw": "Partial Power down occurred",
     "type-fill_order": "Попълнете поръчка",
     "type-producer_reward": "Producer reward",
     "type-interest": "Interest",
     "type-transfer_to_savings": "Transfer to savings",
-    "type-fill_convert_request": "Fill convert request",
+    "type-fill_convert_request": "Convert fulfilled",
     "type-cancel_transfer_from_savings": "Cancel transfer from savings",
     "type-cancel_transfer_from_savings-detail": "From: <strong>@{{from}}</strong> <br/> Request id: <strong>{{request}}</strong>",
-    "type-return_vesting_delegation": "Return vesting delegation",
-    "type-proposal_pay": "Proposal pay"
+    "type-return_vesting_delegation": "Return delegations",
+    "type-proposal_pay": "Proposal pay",
+    "type-comment_payout_update": "Content payout update",
+    "type-comment_reward": "Content reward",
+    "type-recurrent_transfer": "Recurring transfer",
+    "type-recurrent_transfer-detail": "{{executions}} transfers, each every {{recurrence}} hours",
+    "type-fill_recurrent_transfer": "Recurring transfer occurred",
+    "type-fill_recurrent_transfer-detail": "Remaining {{remaining_executions}} transfers",
+    "type-collateralized_convert": "Collateralized convert",
+    "type-collateralized_convert-detail": "Request id: <strong>{{request}}</strong>",
+    "type-limit_order_create": "New trade",
+    "type-effective_comment_vote": "Effective vote"
   },
   "key-or-hot": {
     "sign": "Вход",
@@ -614,7 +667,7 @@
   "friends": {
     "followers": "Последователи ({{n}})",
     "following": "Следва ({{n}})",
-    "search-placeholder": "Търсене на потребители"
+    "search-placeholder": "Search"
   },
   "follow-controls": {
     "follow": "Последвай",
@@ -646,6 +699,7 @@
     "gallery": "Галерия",
     "emoji": "Емоджи",
     "image-error": "Изображението не можа да бъде качено.",
+    "image-error-cache": "Couldn't upload image. You seem to be signed out. Try signing in again.",
     "image-error-size": "Размера на снимката е прекалено голям, опитай отново с по-малка.",
     "fragments": "Откъси"
   },
@@ -695,6 +749,7 @@
     "error-max": "Максимум {{n}} тагa"
   },
   "community-selector": {
+    "choose": "Choose a community",
     "my-blog": "Моят блог",
     "search-placeholder": "Търси Общности"
   },
@@ -710,6 +765,8 @@
     "username": "Потребителско име",
     "reward": "Награда",
     "user-error": "{{n}} не е валиден потребител.",
+    "validation-percentage": "Percentage is required.",
+    "validation-username": "Username is required.",
     "user-exists-error": "{{n}} е вече в избран"
   },
   "post-scheduler": {
@@ -754,16 +811,19 @@
     "unmute": "Включи всички известия"
   },
   "leaderboard": {
-    "title": "Класация",
-    "title-day": "Дневни топ потребители",
-    "title-week": "Седмични топ потребители",
-    "title-month": "Месечни топ потребители",
+    "title-stars": "Most active",
+    "title-curators": "Curators",
+    "title-day": "Daily leaders",
+    "title-week": "Weekly leaders",
+    "title-month": "Monthly leaders",
     "period-day": "Дневно",
     "period-week": "Седмично",
     "period-month": "Месечно",
     "header-score": "Дейности",
     "header-score-tip": "Пост + коментари направени от потребителя за избрания период",
-    "header-reward": "Награда"
+    "header-reward": "Награда",
+    "header-votes": "Votes",
+    "header-votes-tip": "Number of votes in this period"
   },
   "popular-users": {
     "title": "Известни Потребители"
@@ -794,9 +854,9 @@
     "tags": "Тагове",
     "tags-placeholder": "разделени със запетая",
     "date": "Дата",
-    "date-week": "Седмица",
-    "date-month": "Месец",
-    "date-year": "Година",
+    "date-week": "Last Week",
+    "date-month": "Last Month",
+    "date-year": "Last Year",
     "date-all": "Всички",
     "sort": "Сортиране",
     "sort-popularity": "Популярност",
@@ -878,6 +938,9 @@
     "create-first": "Създайте своя първи откъс",
     "filter": "Търси по заглавие",
     "form-title": "Заглавие",
+    "validation-title": "Title is required.",
+    "validation-value": "Value is required.",
+    "validation-body": "Body is required.",
     "form-body": "Основа"
   },
   "password-update": {
@@ -889,12 +952,28 @@
     "error-new2": "Паролите трябва да са същите",
     "pass-gen": "Натисни за да създадеш парола",
     "label-check": "Безопасно си запазих създадената паролата",
+    "validation-password": "Password is invalid.",
+    "validation-label": "Please tick this box to proceed.",
     "updated": "Паролата беше успешно променена!"
+  },
+  "view-keys": {
+    "title": "View Private keys",
+    "account": "Account",
+    "cur-pass": "Current password",
+    "owner": "Owner",
+    "active": "Active",
+    "posting": "Posting",
+    "memo": "Memo",
+    "view-keys": "Click to view keys",
+    "copied": "Private key copied into clipboard",
+    "error": "Password seem incorrect, please double check!"
   },
   "add-image": {
     "title": "Добави Снимка",
     "text-label": "Текст на снимката",
-    "link-label": "Линк към снимката"
+    "link-label": "Линк към снимката",
+    "validation-text": "Text is required.",
+    "validation-image": "Image is required."
   },
   "add-image-mobile": {
     "title": "Add Image",
@@ -905,7 +984,9 @@
   "add-link": {
     "title": "Добави линк",
     "text-label": "Текст",
-    "link-label": "https://"
+    "link-label": "https://",
+    "validation-text": "Text is required.",
+    "validation-link": "Link is required."
   },
   "scroll-to-top": {
     "title": "Прелистване до горе"
@@ -1000,5 +1081,61 @@
     "delete-comment-with-vote": "Can't delete a content with votes.",
     "comment-cashout": "Content cashout.",
     "paid-out-post-forbidden": "Voting for paid out content is not available."
+  },
+  "landing-page": {
+    "welcome-text": "Welcome to Ecency!",
+    "what-is-ecency": "Blockchain-based social network",
+    "powered-by-hive": "powered by Hive",
+    "get-started": "Get started",
+    "earn-money": "Earn money",
+    "earn-money-block-chain-based": "Blockchain-based social network, ",
+    "join-us": "join-us",
+    "various-digital-tokens": " and earn various digital tokens, reward others and build a rewarding community.",
+    "read-more": "Read more",
+    "true-ownership": "True ownership",
+    "true-ownership-desc": "Ecency is the next generation social network for Web 3.0. Blockchain technology gives you a real free speech, without any censorship or banning. Only you control your own account, content and communities.",
+    "decentralization": "Decentralization",
+    "hive-blockchain": "Hive blockchain",
+    "decentralization-desc": " has many social, gaming and financial apps that you can access with a single account you own. Access your social network account and content from any other 3rd party apps in decentralized way.",
+    "open-source": "Open source",
+    "open-source-desc": "Join and be part of the building team on Web 3.0. Everything that we build is blockchain-based and open source. We welcome tech talents, developers, creators and entrepreneurs.",
+    "feel-free-join": " Join and lets build together!",
+    "posts": "Posts",
+    "unique-visitors": "Unique visitors",
+    "points-distrubuted": "Points distributed",
+    "new-users": "New users",
+    "download-our-application": "Download our application",
+    "download-our-application-desc": "Looking for a unique experience? The social network with real free speech experience on your mobile phone or desktop. Blockchain's powerful benefits now always under your fingertips.",
+    "download-for-windows": "Download for Computer",
+    "download-for-ios": "Download for IOS",
+    "download-for-android": "Download for Android",
+    "our-history": "Our History",
+    "our-history-p-one": "<b>Ecency</b> (previously Esteem) started out in 2016, founder <span> <a href=\"/@good-karma\" class=\"push-link\"> @good-karma </a></span> started implementing a mobile application that would revolutionize the way you interact and create, build, engage online. With time grew to something much bigger.",
+    "our-history-p-two": "Since then we have been continuing to build for Web 3.0 and improve our blockchain-based social network, making sure apps are as accessible as possible, secure and in many languages the world speaks.",
+    "our-vision": "Our Vision",
+    "our-vision-p-one": "We want to bring a secure and rewarding blockchain experience to all people. Social media without any limits and censorship, where only you control your own account and your communities. Secured by blockchain, powered by people.",
+    "our-vision-p-two": "<b>Our main principles</b> : Bring rewarding communities, true ownership, empowered creators, free speech into the hands of millions.",
+    "our-team": "Our Team",
+    "founder": "Founder",
+    "devops-guru": "Devops master",
+    "design-guru": "Design guru",
+    "community-contributors": "Community Contributors",
+    "blockchain-witnesses": "Blockchain Witnesses",
+    "about": "About Us",
+    "privacy-policy": "Privacy Policy",
+    "terms-of-service": "Terms of Service",
+    "faq": "FAQ",
+    "discover": "Discover",
+    "sign-in": "Sign in",
+    "communities": "Communities",
+    "help": "Help",
+    "subscribe-us": "Subscribe Us",
+    "enter-your-email-adress": "Enter your email adress",
+    "send": "Send",
+    "subscribe-paragraph": "Be first to know what's happening in decentralized web.",
+    "copy-rights": "©2021 Ecency. All right reserved.",
+    "success-message-subscribe": "A verification link has been sent to your email account!",
+    "validation-email": "A valid email is required",
+    "error-occured": "A server error has been occured."
   }
 }

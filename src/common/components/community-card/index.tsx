@@ -35,7 +35,7 @@ import {accountGroupSvg, informationOutlineSvg, scriptTextOutlineSvg, pencilOutl
 
 interface EditPicProps {
     activeUser: ActiveUser;
-    community: Community;
+    community?: Community;
     account: FullAccount;
     addAccount: (data: Account) => void;
     onUpdate: () => void
@@ -47,7 +47,7 @@ interface EditPicState {
     inProgress: boolean;
 }
 
-class EditPic extends BaseComponent<EditPicProps, EditPicState> {
+export class EditPic extends BaseComponent<EditPicProps, EditPicState> {
     state: EditPicState = {
         account: null,
         dialog: false,
@@ -87,10 +87,9 @@ class EditPic extends BaseComponent<EditPicProps, EditPicState> {
             // update reducer
             addAccount(account);
 
-            onUpdate();
-
             // close dialog
             this.toggleDialog();
+            onUpdate();
         }).catch(() => {
             error(_t('g.server-error'));
         }).finally(() => {
@@ -285,7 +284,7 @@ export class CommunityCard extends Component<Props, State> {
                         <Modal.Header closeButton={true}>
                             <Modal.Title>{info.title}</Modal.Title>
                         </Modal.Header>
-                        <Modal.Body>{info.content}</Modal.Body>
+                        <Modal.Body><div className="description-wrapper">{info.content}</div></Modal.Body>
                     </Modal>
                 )}
 

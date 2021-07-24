@@ -7,14 +7,17 @@ import BaseComponent from "../base";
 import UserAvatar from "../user-avatar";
 import ProfileLink from "../profile-link"
 import {getCuration, CurationDuration, CurationItem} from "../../api/private-api";
-import {informationSvg} from "../../img/svg";
+
+import {informationSvg, informationVariantSvg} from "../../img/svg";
 import DropDown from "../dropdown";
-import Tooltip from "../tooltip";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import LinearProgress from "../linear-progress";
 import {_t} from "../../i18n";
 import _c from "../../util/fix-class-names"
 import {vestsToHp} from "../../helper/vesting";
 import formattedNumber from "../../util/formatted-number";
+import { getAccounts } from '../../api/hive';
+
 interface Props {
     global: Global;
     history: History;
@@ -35,22 +38,34 @@ export class Curation extends BaseComponent<Props, State> {
     componentDidMount() {
         this.fetch();
     }
+
+    compare = (a: CurationItem, b: CurationItem) => {
+        return b.efficiency - a.efficiency;
+    }
+
     fetch = () => {
         const {period} = this.state;
         this.stateSet({loading: true, data: []});
         getCuration(period).then(data => {
-            if (data.map!) {
+            const accounts = data.map((item) => item.account);
+            getAccounts(accounts).then(res => {
+                for (let index = 0; index < res.length; index++) {
+                    const element = res[index];
+                    const curator = data[index];
+                    const effectiveVest: number = parseFloat(element.vesting_shares) + parseFloat(element.received_vesting_shares) - parseFloat(element.delegated_vesting_shares) - parseFloat(element.vesting_withdraw_rate);
+                    curator.efficiency = curator.vests / effectiveVest;
+                }
+                data.sort(this.compare);
                 this.stateSet({data});
-            } else {
-                console.log("Error loading data invalid array:", JSON.stringify(data));
-            }
-            this.stateSet({loading: false});
+                this.stateSet({loading: false});
+            });
         });
     }
     render() {
         const {data, period, loading} = this.state;
         const {dynamicProps} = this.props;
         const {hivePerMVests} = dynamicProps;
+
         const menuItems = [
             ...["day", "week", "month"].map((f => {
                 return {
@@ -71,10 +86,10 @@ export class Curation extends BaseComponent<Props, State> {
             <div className={_c(`leaderboard-list ${loading ? "loading" : ""}`)}>
                 <div className="list-header">
                     <div className="list-filter">
-                        {_t('curation.title')} <DropDown {...dropDownConfig} float="left"/>
+                        {_t('leaderboard.title-curators')} <DropDown {...dropDownConfig} float="left"/>
                     </div>
                     <div className="list-title">
-                        {_t(`curation.title-${period}`)}
+                        {_t(`leaderboard.title-${period}`)}
                     </div>
                 </div>
                 {loading && <LinearProgress/>}
@@ -82,16 +97,30 @@ export class Curation extends BaseComponent<Props, State> {
                     <div className="list-body">
                         <div className="list-body-header">
                             <span/>
-                            <Tooltip content={_t('curation.header-score-tip')}>
-                            <span className="score">
-                                {informationSvg} {_t('curation.header-score')}
-                            </span>
-                            </Tooltip>
+                            <OverlayTrigger
+                                delay={{ show: 0, hide: 500 }}
+                                key={'bottom'}
+                                placement={'bottom'}
+                                overlay={
+                                    <Tooltip id={`tooltip-votes-${'bottom'}`}>
+                                        {_t('leaderboard.header-votes-tip')}
+                                    </Tooltip>
+                                }
+                                >
+                                <div className='d-flex align-items-center'>
+                                    <span className="info-icon mr-1">{informationVariantSvg}</span>
+                                    <span className="score">
+                                        {_t('leaderboard.header-votes')}
+                                    </span>
+                                </div>
+                            </OverlayTrigger>
                             <span className="points">
-                               {_t('curation.header-reward')}
+                               {_t('leaderboard.header-reward')}
                             </span>
                         </div>
-                        {data.map && data.map((r, i) => {
+
+                        {data.map((r, i) => {
+
                             return <div className="list-item" key={i}>
                                 <div className="index">{i + 1}</div>
                                 <div className="avatar">

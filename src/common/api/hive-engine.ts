@@ -15,7 +15,6 @@ import {HECoarseTransaction, HEFineTransaction} from "../store/transactions/type
 import {getAccount, getAccounts, getFollowCount, getPost} from "./hive";
 import {AccountFollowStats, BaseAccount, Account, FullAccount} from "../store/accounts/types";
 import {Entry, EntryBeneficiaryRoute, EntryStat, EntryVote} from "../store/entries/types";
-import {EntryVoteBtn} from "../components/entry-vote-btn";
 const hiveSsc = new SSC('https://api.hive-engine.com/rpc');
 export interface TokenStatus {
     "downvote_weight_multiplier":number;

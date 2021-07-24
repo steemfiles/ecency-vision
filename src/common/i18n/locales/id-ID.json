@@ -17,6 +17,7 @@
     "days": "hari",
     "finish": "Selesai",
     "next": "Lanjut",
+    "previous": "Sebelumnya",
     "back": "Kembali",
     "load-more": "Muat Lebih Banyak",
     "empty-list": "Tidak ada apa-apa di sini",
@@ -28,8 +29,19 @@
     "off": "Off",
     "yes": "Ya",
     "no": "Tidak",
+    "hot": "Umpan",
+    "trending": "Umpan",
+    "created": "umpan",
+    "muted": "umpan",
+    "found": "ditemukan",
+    "feed": "umpan",
+    "blog": "blog",
+    "posts": "postingan",
+    "comments": "komentar",
+    "replies": "balasan",
     "done": "Selesai",
     "apply": "Terapkan",
+    "warning": "Peringatan",
     "close": "Tutup"
   },
   "confirm": {
@@ -46,7 +58,14 @@
     "filter-muted": "Didiamkan",
     "filter-feed": "Umpan",
     "filter-feed-friends": "Teman",
-    "filter-feed-subscriptions": "Komunitas"
+    "filter-feed-subscriptions": "Komunitas",
+    "filter-global": "Global",
+    "filter-global-part1": "Umpan ini berisi ",
+    "filter-global-part2": " diskusi pada seluruh platform.",
+    "filter-global-part3": " diskusi dari komunitas langganan Anda. Anda dapat bergabung dengan lebih banyak komunitas untuk mengisi umpan ini.",
+    "filter-global-part4": " diskusi dari orang yang Anda ikuti. Anda dapat mengikuti lebih banyak orang untuk mengisi umpan ini.",
+    "filter-global-discover": "Temukan Orang",
+    "filter-global-join-communities": "Bergabunglah dengan Komunitas"
   },
   "navbar": {
     "discover": "Jelajahi",
@@ -62,6 +81,10 @@
     "header-tag": "Label",
     "header-account": "Pengguna",
     "header-community": "Komunitas"
+  },
+  "tag": {
+    "unmoderated": "Topik yang tidak dimoderasi",
+    "moderated": "Komunitas yang dimoderasi"
   },
   "switch-lang": {
     "contributors": "Kontributor"
@@ -91,13 +114,14 @@
     "title": "Selamat datang kembali!",
     "with-user-pass": "Masuk dengan nama pengguna dan Private Key Anda.",
     "username-placeholder": "nama pengguna",
-    "key-placeholder": "password / kunci pribadi",
+    "key-placeholder": "password/kunci pribadi",
     "login-info-1": "Kami tidak menyimpan private key Anda.",
     "login-info-2": "Info lebih lanjut",
     "error-fields-required": "Silahkan masukkan nama pengguna dan private key",
     "error-public-key": "Anda memasukkan Public Key. Password/WIF yang diperlukan",
     "error-user-fetch": "Data pengguna tidak dapat diambil",
     "error-user-not-found": "Pengguna tidak ada",
+    "error-user-not-found-cache": "Cache inconsistency detected. Please retry login with your credentials.",
     "error-permission": "Tidak ditemukan ijin postingan",
     "error-authenticate": "Kunci pribadi salah. Kunci pribadi posting atau kunci pribadi aktif atau kunci utama diperlukan.",
     "with-hive-signer": "Masuk dengan hivesigner",
@@ -106,14 +130,16 @@
     "sign-up-text-2": "Daftar sekarang!"
   },
   "sign-up": {
-    "header": "Selamat datang di Ecency",
-    "description": "Rumah Berkebebasan bicara dan Komunitas yang bermanfaat!",
-    "bottom-description": "Setiap akun yang dibuat di blockhain dan hanya anda yang memiliki kendali atas akun tersebut. Satu akun untuk mengelola semuanya di Blockhain dan Ecency.",
-    "learn-more": "Pelajari selengkapnya tentang keuntungan di <a href=\"/faq#how-to-join\">FAQ</a> kami",
+    "header": "Selamat datang ke Ecency",
+    "description": "Tempat yang Bebas bicara dan Komunitas yang mendapatkan reward!",
+    "bottom-description": "Setiap akun yang dibuat di blockchain dan hanya anda yang memiliki kendali atas akun tersebut. Satu akun untuk mengelola semuanya di Blockchain dan Ecency.",
+    "learn-more": "Pelajari selengkapnya tentang keuntungan di <a href=\"/faq#how-to-join\">FAQ</a>",
     "username": "Pilih nama pengguna",
     "email": "Masukkan alamat email Anda",
     "ref": "Pengguna rujukan (opsional)",
     "submit": "Lanjutkan",
+    "validation-username": "Nama pengguna diperlukan.",
+    "validation-email": "Email diperlukan.",
     "success": "Kami sudah mengirimkan email ke {{email}}.",
     "success-2": "Ikuti petunjuk melengkapi proses pendaftaran.",
     "login-text-1": "Apakah anda memiliki akun?",
@@ -128,11 +154,13 @@
   "entry-list-item": {
     "cross-posted": "diposting bersilangan",
     "cross-posted-to": "ke",
-    "reblogged": "{{n}} Dibagikan",
-    "promoted": "dipromosikan",
+    "reblogged": "{{n}} dibagikan dihalaman blog",
+    "promoted": "Dipromosikan",
     "pinned": "Postingan Disematkan",
     "replies": "1 respon, Klik untuk merespon.",
     "replies-n": "{{n}} respon. Klik untuk merespon.",
+    "vote-error": "Nilai sebelumnya tidak dapat diterima. Pilih dengan nilai yang berbeda.",
+    "vote-warning": "Voting 0% membatalkan vote konten ini.",
     "no-replies": "Belum ada respon. Klik untuk merespon."
   },
   "nsfw": {
@@ -164,7 +192,7 @@
     "title": "Bagikan"
   },
   "entry-menu": {
-    "cross-post": "Silangkan Postingan",
+    "cross-post": "Postingan berseberangan",
     "share": "Bagikan",
     "edit-history": "Edit Riwayat",
     "pin": "Sematkan",
@@ -196,7 +224,8 @@
     "curators-payout": "Pembayaran Kurator",
     "payout-date": "Pembayaran",
     "beneficiary": "Penerima",
-    "breakdown": "Kerusakan"
+    "breakdown": "Kerusakan",
+    "max-accepted": "Jumlah maksimum yang diterima"
   },
   "entry-index": {
     "feed": "Umpan",
@@ -228,10 +257,13 @@
   },
   "entry": {
     "via-app": "melalui <span class=\"app-name\">{{app}}</span>",
+    "author-reputation": "Reputasi pengarang",
     "comment-entry-title": "Anda melihat sebuah komentar tunggal dari: ",
     "comment-entry-go-root": "Lihat konteks lengkapnya",
     "comment-entry-go-parent": "Lihat sumber utamanya",
-    "hidden-warning": "Posting ini tersembunyi dikarenakan peringkat rendah.",
+    "hidden-warning": "Konten ini mendapat peringkat rendah oleh pengguna lain. Lanjutkan dengan hati hati.",
+    "muted-warning": "Konten ini dibisukan oleh moderator {{community}} karena tidak mengikuti pedoman komunitas.",
+    "lowrep-warning": "Penulis postingan ini memiliki reputasi rendah. Lanjutkan dengan hati hati.",
     "address-copy": "Salin alamat postingan",
     "address-copied": "Tempel alamat yang disalin ke papan klip.",
     "browse-original": "Tampilan tulisan asli",
@@ -245,7 +277,7 @@
     "version": "Versi {{n}}"
   },
   "similar-entries": {
-    "title": "Lebih banyak lagi dari @{{n}}"
+    "title": "Baca berikutnya"
   },
   "comment": {
     "body-placeholder": "Tulis balasan Anda disini",
@@ -294,7 +326,7 @@
     "edit": "Edit pengaturan",
     "edit-team": "Sunting peran",
     "community-rewards": "Rewards Komunitas",
-    "profile-image": "Gambar profil komunitas",
+    "profile-image": "Foto profil",
     "profile-image-edit": "Edit gambar profil",
     "profile-image-updated": "Gambar profil diperbaharui!"
   },
@@ -312,7 +344,8 @@
     "lang": "Bahasa",
     "description": "Deskripsi",
     "rules": "Aturan",
-    "rules-help": "Satu per baris"
+    "rules-help": "Satu per baris",
+    "validation-title": "Judul diperlukan."
   },
   "communities": {
     "title": "Komunitas",
@@ -339,6 +372,8 @@
     "username-available": "Tersedia.",
     "username-not-available": "Tidak tersedia.",
     "username-wrong-format": "Bukan format yang valid. format hive-1xxxxx yang diperlukan.",
+    "checkbox-validation": "Centang kotak ini untuk melanjutkan.",
+    "title-validation": "Silahkan isi dalam kolom ini.",
     "password": "Password Utama",
     "confirmation": "Saya telah menyimpan nama pengguna dan kata sandi saya dengan aman.",
     "submit": "Buatlah komunitas",
@@ -390,7 +425,10 @@
     "vote-power": "Power vote: {{n}}%",
     "rc-power": "Sumber Kredit: {{n}}%",
     "recharge-time": "(terisi penuh {{n}})",
-    "down-vote-power": "Power Downvote: {{n}}%"
+    "down-vote-power": "Power Downvote: {{n}}%",
+    "no-posts": "Di sini Anda akan melihat postingan Anda, sepertinya tidak ada konten.",
+    "create-posts": "Mari kita buat postingan baru",
+    "no-posts-found": "Tidak ditemukan apa-apa!"
   },
   "profile-edit": {
     "title": "Profil",
@@ -400,6 +438,7 @@
     "profile-image": "Gambar Profil",
     "website": "Website",
     "location": "Lokasi",
+    "copied": "Link referral sudah tersalin.",
     "updated": "Profil diperbaharui dengan sukses!"
   },
   "image-upload-button": {
@@ -411,6 +450,7 @@
     "currency": "Mata uang",
     "language": "Bahasa",
     "nsfw": "Perlihatkan konten NSFW",
+    "referral-link": "Link referral",
     "updated": "Preferensi diperbaharui!"
   },
   "wallet": {
@@ -447,6 +487,8 @@
     "title": "Akun penarikan",
     "account": "Akun",
     "percent": "Persen",
+    "validation-account": "Akun diperlukan.",
+    "validation-percent": "Persentase diperlukan.",
     "auto-power-up": "Power Up otomatis"
   },
   "points": {
@@ -581,22 +623,33 @@
     "group-interests": "Bunga",
     "group-stake-operations": "Operasi Stake",
     "group-rewards": "Reward",
-    "type-curation_reward": "Reward Kurasi",
-    "type-author_reward": "Reward Penulis",
-    "type-comment_benefactor_reward": "Reward Komentar Distributor",
+    "type-curation_reward": "Hadiah kurasi",
+    "type-author_reward": "Hadiah Penulis",
+    "type-comment_benefactor_reward": "Hadiah komentar kontributor",
     "type-claim_reward_balance": "Klaim reward",
     "type-transfer": "Transfer",
-    "type-transfer_to_vesting": "Transfer ke vesting",
-    "type-withdraw_vesting": "Menarik vesting",
+    "type-transfer_to_vesting": "Peningkatan kekuatan",
+    "type-withdraw_vesting": "Menurunkan kekuatan",
+    "type-fill_vesting_withdraw": "Penurunan kekuatan sedang berlangsung sebagian",
     "type-fill_order": "Isi pesanan",
     "type-producer_reward": "Reward produser",
     "type-interest": "Bunga",
     "type-transfer_to_savings": "Transfer untuk tabungan",
-    "type-fill_convert_request": "Isi permintaan konversi",
+    "type-fill_convert_request": "Konversi sudah terjadi",
     "type-cancel_transfer_from_savings": "Batalkan transfer untuk tabungan",
     "type-cancel_transfer_from_savings-detail": "Dari: <strong>@{{from}}</strong> <br/> Permintaan id: <strong>{{request}}</strong>",
-    "type-return_vesting_delegation": "Pengembalian vesting delegasi",
-    "type-proposal_pay": "Pembayaran proposal"
+    "type-return_vesting_delegation": "Mengembalikan delegasi",
+    "type-proposal_pay": "Pembayaran proposal",
+    "type-comment_payout_update": "Update pembayaran konten",
+    "type-comment_reward": "Hadiah konten",
+    "type-recurrent_transfer": "Transfer sedang berlangsung",
+    "type-recurrent_transfer-detail": "{{executions}} transfer, berlangsung setiap jam {{recurrence}}",
+    "type-fill_recurrent_transfer": "Transfer sedang terus berjalan",
+    "type-fill_recurrent_transfer-detail": "Transfer {{remaining_executions}} yang tersisa",
+    "type-collateralized_convert": "Konversi yang dijamin",
+    "type-collateralized_convert-detail": "Permintaan id: <strong>{{request}}</strong>",
+    "type-limit_order_create": "Perdagangan baru",
+    "type-effective_comment_vote": "Vote efektif"
   },
   "key-or-hot": {
     "sign": "Masuk",
@@ -614,7 +667,7 @@
   "friends": {
     "followers": "Pengikut ({{n}})",
     "following": "Mengikuti ({{n}})",
-    "search-placeholder": "Cari pengguna"
+    "search-placeholder": "Mencari"
   },
   "follow-controls": {
     "follow": "Ikuti",
@@ -646,6 +699,7 @@
     "gallery": "Galeri",
     "emoji": "Emoji",
     "image-error": "Tidak dapat mengunggah gambar.",
+    "image-error-cache": "Couldn't upload image. You seem to be signed out. Try signing in again.",
     "image-error-size": "Ukuran gambar terlalu besar, coba masukkan ukuran gambar yang lebih kecil.",
     "fragments": "Cuplikan"
   },
@@ -695,6 +749,7 @@
     "error-max": "Maksimum {{n}} tagar"
   },
   "community-selector": {
+    "choose": "Pilih sebuah komunitas",
     "my-blog": "Blog saya",
     "search-placeholder": "Cari Komunitas"
   },
@@ -710,6 +765,8 @@
     "username": "Nama Pengguna",
     "reward": "Imbalan",
     "user-error": "{{n}} bukan pengguna sah.",
+    "validation-percentage": "Diperlukan persentase.",
+    "validation-username": "Nama pengguna diperlukan.",
     "user-exists-error": "{{n}} sudah ada dalam daftar"
   },
   "post-scheduler": {
@@ -754,16 +811,19 @@
     "unmute": "Hidupkan pemberitahuan notifikasi"
   },
   "leaderboard": {
-    "title": "Papan Peringkat",
-    "title-day": "Pengguna teratas harian",
-    "title-week": "Pengguna teratas mingguan",
-    "title-month": "Pengguna teratas bulanan",
+    "title-stars": "Paling Aktif",
+    "title-curators": "Kurator",
+    "title-day": "Pemimpin Harian",
+    "title-week": "Pemimpin Mingguan",
+    "title-month": "Pemimpin Bulanan",
     "period-day": "Harian",
     "period-week": "Mingguan",
     "period-month": "Bulanan",
     "header-score": "Aktifitas",
     "header-score-tip": "Posting + komentar yang dibuat oleh pengguna untuk periode yang dipilih",
-    "header-reward": "Imbalan"
+    "header-reward": "Imbalan",
+    "header-votes": "Vote",
+    "header-votes-tip": "Jumlah vote dalam periode ini"
   },
   "popular-users": {
     "title": "Pengguna Populer"
@@ -794,9 +854,9 @@
     "tags": "Tagar",
     "tags-placeholder": "koma memisahkan tagar",
     "date": "Tanggal",
-    "date-week": "Minggu",
-    "date-month": "Bulan",
-    "date-year": "Tahun",
+    "date-week": "Minggu lalu",
+    "date-month": "Bulan Lalu",
+    "date-year": "Tahun Lalu",
     "date-all": "Semua",
     "sort": "Urutkan",
     "sort-popularity": "Popularitas",
@@ -878,6 +938,9 @@
     "create-first": "Buat catatan pertama Anda",
     "filter": "Cari berdasarkan judul",
     "form-title": "Judul",
+    "validation-title": "Judul diperlukan.",
+    "validation-value": "Nilai Dibutuhkan.",
+    "validation-body": "Isi konten diperlukan.",
     "form-body": "Isi"
   },
   "password-update": {
@@ -889,12 +952,28 @@
     "error-new2": "Kata sandi harus sama",
     "pass-gen": "Klik untuk membuat kata sandi baru",
     "label-check": "Saya telah menyimpan kata sandi saya dengan aman",
+    "validation-password": "Kata sandi tidak valid.",
+    "validation-label": "Centang kotak ini untuk melanjutkan.",
     "updated": "Kata Sandi berhasil diperbaharui!"
+  },
+  "view-keys": {
+    "title": "Lihat Kunci Pribadi",
+    "account": "Akun",
+    "cur-pass": "Password terkini",
+    "owner": "Pemilik",
+    "active": "Aktif",
+    "posting": "Postingan",
+    "memo": "Memo",
+    "view-keys": "Klik untuk melihat kunci",
+    "copied": "Kunci pribadi telah disalin",
+    "error": "Password sepertinya salah, tolong periksa kembali!"
   },
   "add-image": {
     "title": "Tambahkan gambar",
     "text-label": "Teks Gambar",
-    "link-label": "Link Gambar"
+    "link-label": "Link Gambar",
+    "validation-text": "Judul diperlukan.",
+    "validation-image": "Gambar diperlukan."
   },
   "add-image-mobile": {
     "title": "Tambahkan Gambar",
@@ -905,7 +984,9 @@
   "add-link": {
     "title": "Tambahkan Tautan",
     "text-label": "Teks",
-    "link-label": "https://"
+    "link-label": "https://",
+    "validation-text": "Judul diperlukan.",
+    "validation-link": "Link diperlukan."
   },
   "scroll-to-top": {
     "title": "Gulir ke Atas"
@@ -1000,5 +1081,61 @@
     "delete-comment-with-vote": "Tidak dapat menghapus konten yang sudah ada votingnya.",
     "comment-cashout": "Konten dibayar.",
     "paid-out-post-forbidden": "Voting untuk konten yang sudah dibayar tidak bisa dilakukan lagi."
+  },
+  "landing-page": {
+    "welcome-text": "Selamat datang ke Ecency!",
+    "what-is-ecency": "Jaringan sosial berbasis blockchain",
+    "powered-by-hive": "diberdayakan oleh Hive",
+    "get-started": "Yuk mulai",
+    "earn-money": "Mendapatkan uang",
+    "earn-money-block-chain-based": "Jaringan sosial berbasis blockchain, ",
+    "join-us": "bergabunglah dengan kami",
+    "various-digital-tokens": " dan dapatkan token digital beragam, imbalan lain dan bangunlah sebuah komunitas yang mendapatkan imbalan.",
+    "read-more": "Lebih lanjut",
+    "true-ownership": "Kepemilikan nyata",
+    "true-ownership-desc": "Ecency adalah jaringan sosial generasi berikutnya untuk Web 3.0. Teknologi Blockchain memberi Anda kebebasan berbicara yang nyata, tanpa sensor atau larangan apa pun. Hanya Anda yang mengontrol akun, konten, dan komunitas Anda sendiri.",
+    "decentralization": "Desentralisasi",
+    "hive-blockchain": "Blockchain Hive",
+    "decentralization-desc": " memiliki banyak aplikasi sosial, game, dan keuangan yang dapat Anda akses dengan satu akun yang Anda miliki. Akses akun dan konten jejaring sosial Anda dari aplikasi pihak ketiga lainnya dengan cara terdesentralisasi.",
+    "open-source": "Sumber terbuka",
+    "open-source-desc": "Bergabunglah dan jadilah bagian dari tim pembangun di Web 3.0. Semua yang kami bangun berbasis blockchain dan open source. Kami menyambut talenta teknologi, pengembang, pembuat konten, dan pengusaha.",
+    "feel-free-join": " Bergabunglah dan marilah membangunnya bersama-sama!",
+    "posts": "Postingan",
+    "unique-visitors": "Pengunjung tamu",
+    "points-distrubuted": "Poin yang didistribusikan",
+    "new-users": "Pengguna baru",
+    "download-our-application": "Unduh aplikasi kami",
+    "download-our-application-desc": "Mencari pengalaman unik? Jejaring sosial dengan pengalaman berbicara bebas yang nyata di ponsel atau desktop Anda. Manfaat kuat Blockchain sekarang selalu di bawah ujung jari Anda.",
+    "download-for-windows": "Unduh untuk Komputer",
+    "download-for-ios": "Unduh untuk IOS",
+    "download-for-android": "Unduh untuk Android",
+    "our-history": "Sejarah Kami",
+    "our-history-p-one": "<b>Ecency</b>(sebelumnya Esteem) dimulai pada 2016, penciptanya adalah <span> <a href=\"/@good-karma\" class=\"push-link\"> @good-karma </a></span> mulai menerapkan aplikasi seluler yang akan merevolusi cara Anda berinteraksi dan berkreasi, membangun, terlibat secara online. Dengan waktu tumbuh menjadi sesuatu yang jauh lebih besar.",
+    "our-history-p-two": "Sejak itu kami terus membangun untuk Web 3.0 dan meningkatkan jaringan sosial berbasis blockchain kami, memastikan aplikasi dapat diakses semudah mungkin, aman, dan dalam banyak bahasa yang digunakan dunia.",
+    "our-vision": "Visi Kami",
+    "our-vision-p-one": "Kami ingin menghadirkan pengalaman blockchain yang aman dan bermanfaat bagi semua orang. Media sosial tanpa batas dan sensor, di mana hanya Anda yang mengontrol akun dan komunitas Anda sendiri. Diamankan oleh blockchain, didukung oleh orang-orang.",
+    "our-vision-p-two": "<b>Prinsip utama kami</b> : Hadirkan komunitas yang bermanfaat, kepemilikan sejati, pembuat konten yang diberdayakan, kebebasan berbicara ke tangan jutaan orang.",
+    "our-team": "Tim Kami",
+    "founder": "Pencipta",
+    "devops-guru": "Kepala Pengembang",
+    "design-guru": "Guru desain",
+    "community-contributors": "Kontributor Komunitas",
+    "blockchain-witnesses": "Saksi Blockchain",
+    "about": "Tentang Kami",
+    "privacy-policy": "Kebijakan Privasi",
+    "terms-of-service": "Ketentuan Layanan",
+    "faq": "Pertanyaan yang sering ditanyakan",
+    "discover": "Jelajahi",
+    "sign-in": "Masuk",
+    "communities": "Komunitas",
+    "help": "Bantuan",
+    "subscribe-us": "Berlangganan dengan kami",
+    "enter-your-email-adress": "Masukkan email Anda",
+    "send": "Kirim",
+    "subscribe-paragraph": "Jadilah yang pertama mengetahui apa yang terjadi di web terdesentralisasi.",
+    "copy-rights": "Ecenxy @2021. Hak cipta dilindungi Undang-undang.",
+    "success-message-subscribe": "Tautan verifikasi telah dikirim ke akun email Anda!",
+    "validation-email": "Email valid diperlukan",
+    "error-occured": "Terjadi kesalahan server."
   }
 }

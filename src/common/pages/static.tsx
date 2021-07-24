@@ -17,12 +17,7 @@ import {_t} from "../i18n";
 import {Tsx} from "../i18n/helper";
 
 import {blogSvg, newsSvg, mailSvg, twitterSvg, githubSvg, telegramSvg, discordSvg} from "../img/svg";
-
-const surferSs = require("../img/surfer-ss.jpg");
-const mobileSs = require("../img/mobile-ss.jpg");
-
-const faq = require("../img/FAQ4.jpg");
-const faqWebp = require("../img/FAQ4-webp.webp");
+import { apiBase } from '../api/helper';
 
 const faqKeys = [
     'what-is-ecency',
@@ -90,8 +85,6 @@ class AboutPage extends Component<PageProps> {
                         <div className="down-cloud"/>
                     </div>
 
-                    <img src={surferSs} loading="lazy" className="surfer-ss" alt="Esteem Surfer"/>
-
                     <div className="downloads" id="downloads">
                         <h2 className="downloads-title">Downloads</h2>
                         <div className="downloads-text">
@@ -124,8 +117,6 @@ class AboutPage extends Component<PageProps> {
                             </a>
                         </div>
                     </div>
-
-                    <img src={mobileSs} loading="lazy" className="mobile-ss" alt="Ecency Mobile"/>
 
                     <div className="faq">
                         <h2 className="faq-title">{_t('static.about.faq-title')}</h2>
@@ -332,7 +323,7 @@ class PrivacyPage extends Component<PageProps> {
                 <div className="app-content static-page privacy-page">
                     <div className="static-content">
                         <h1 className="page-title">Privacy Policy</h1>
-                        <p>Effective: August 20, 2020</p>
+                        <p className="static-last-updated">Effective: August 20, 2020</p>
                         <p>This Privacy Policy describes how this site collects, uses and discloses information, and what choices you have with respect to the information.</p>
                         <p>Updates in this version of the Privacy Policy reflect changes in data protection law.</p>
                         <p>When we refer to this site’s operator, we mean the entity that acts as the controller of your information.</p>
@@ -576,7 +567,7 @@ class TosPage extends Component<PageProps> {
                 <div className="app-content static-page tos-page">
                     <div className="static-content">
                         <h1 className="page-title">Terms Of Service</h1>
-                        <p>Last Updated August 20, 2020</p>
+                        <p className="static-last-updated">Last Updated August 20, 2020</p>
                         <p>This agreement (the "Agreement") between you and this site’s operators ("we", "us", "our") sets out your rights to access and use of this site and any
                             other products or services provided by this web site (the "Service"). If you are accepting this Agreement and using the Services on behalf of a company,
                             organization, government, or other legal entity, you represent and warrant that you are authorized to do so and have the authority to bind such entity
@@ -810,6 +801,7 @@ class FaqPage extends Component<PageProps> {
         };
 
         const {global} = this.props;
+        const imgs = apiBase(`/assets/ecency-faq.${this.props.global.canUseWebp ? 'webp' : 'jpg'}`);
 
         return (
             <>
@@ -825,7 +817,7 @@ class FaqPage extends Component<PageProps> {
                 <div className="app-content static-page faq-page" itemScope={true} itemType="https://schema.org/FAQPage">
                     <div className="static-content">
                         <h1 className="page-title">{_t('static.faq.page-title')}</h1>
-                        <img src={this.props.global.canUseWebp ? faqWebp : faq}/>
+                        <img src={imgs}/>
                         <h3>{_t('static.faq.page-sub-title')}</h3>
                         <ul className="table-contents">
                             {faqKeys.map(x => {

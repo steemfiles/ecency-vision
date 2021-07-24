@@ -42,7 +42,7 @@ import truncate from "../../util/truncate";
 import {repeatSvg, pinSvg, commentSvg} from "../../img/svg";
 
 const fallbackImage = require("../../img/fallback.png");
-const noImage = require("../../img/noimage.png");
+const noImage = require("../../img/noimage.svg");
 const nsfwImage = require("../../img/nsfw.png");
 
 import defaults from "../../constants/defaults.json";
@@ -76,7 +76,7 @@ interface Props {
     fetchReblogs: () => void;
     addReblog: (author: string, permlink: string) => void;
     deleteReblog: (author: string, permlink: string) => void;
-    toggleUIProp: (what: ToggleType) => void;
+    toggleUIProp: (what: ToggleType | "login") => void;
     addCommunity: (data: Community) => void;
     trackEntryPin: (entry: Entry) => void;
     setSigningKey: (key: string) => void;
@@ -138,6 +138,9 @@ export default class EntryListItem extends Component<Props, State> {
 
         const imgGrid: string = (global.canUseWebp ? catchPostImage(entry, 600, 500, 'webp') : catchPostImage(entry, 600, 500)) || noImage;
         const imgRow: string = (global.canUseWebp ? catchPostImage(entry, 260, 200, 'webp') : catchPostImage(entry, 260, 200)) || noImage;
+        let svgSizeRow = imgRow === noImage ? "noImage" : "";
+        let svgSizeGrid = imgGrid === noImage ? "172px" : "auto";
+        
 
         const summary: string = postBodySummary(entry, 200);
 
@@ -165,7 +168,7 @@ export default class EntryListItem extends Component<Props, State> {
         let thumb: JSX.Element | null = null;
         if (global.listStyle === 'grid') {
             thumb = (
-                <img src={imgGrid} alt={title} onError={(e: React.SyntheticEvent) => {
+                <img src={imgGrid} alt={title} style={{ width: svgSizeGrid }} onError={(e: React.SyntheticEvent) => {
                     const target = e.target as HTMLImageElement;
                     target.src = fallbackImage;
                 }}
@@ -183,10 +186,10 @@ export default class EntryListItem extends Component<Props, State> {
                 </picture>
             );
         }
-
         const nsfw = entry.json_metadata.tags && entry.json_metadata.tags.includes("nsfw");
 
         const cls = `entry-list-item ${promoted ? "promoted-item" : ""}`;
+
         return (
             <div className={_c(cls)}>
 
@@ -235,7 +238,7 @@ export default class EntryListItem extends Component<Props, State> {
                             {ProfileLink({
                                 ...this.props,
                                 username: entry.author,
-                                children: <div className="author notranslate">{entry.author}<span className="author-reputation">{reputation}</span></div>
+                                children: <div className="author notranslate">{entry.author}<span className="author-reputation" title={_t("entry.author-reputation")}>{reputation}</span></div>
                             })}
                         </div>
                         {Tag({
@@ -298,7 +301,7 @@ export default class EntryListItem extends Component<Props, State> {
                         }
 
                         return <>
-                            <div className="item-image">
+                            <div className={"item-image " + svgSizeRow}>
                                 {EntryLink({
                                     ...this.props,
                                     entry: (crossPost ? theEntry : entry),
@@ -355,7 +358,6 @@ export default class EntryListItem extends Component<Props, State> {
                         {EntryReblogBtn({
                             ...this.props
                         })}
-                        <div className="flex-spacer"/>
                         {EntryMenu({
                             ...this.props,
                             alignBottom: order >= 1,

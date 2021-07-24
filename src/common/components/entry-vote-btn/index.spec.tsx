@@ -35,6 +35,8 @@ describe('(1) Dialog', () => {
         dynamicProps: dynamicPropsIntance1,
         global: globalInstance,
         entry: entryInstance1,
+        downVoted: false,
+        upVoted: false,
         onClick: () => {
         },
     };

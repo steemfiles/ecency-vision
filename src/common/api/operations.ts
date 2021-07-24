@@ -84,10 +84,12 @@ const broadcastPostingJSON = (username: string, id: string, json: {}): Promise<T
         return hiveClient.broadcast.json(operation, privateKey);
     }
     // With hivesigner access token
-    return new hs.Client({
-        accessToken: getAccessToken(username),
+
+    let token = getAccessToken(username);
+    return token ? new hs.Client({
+        accessToken: token,
     }).customJson([], [username], id, JSON.stringify(json))
-        .then((r: any) => r.result);
+        .then((r: any) => r.result) : Promise.resolve(0);
 }
 const broadcastPostingOperations = (username: string, operations: Operation[]): Promise<TransactionConfirmation> => {
     // With posting private key
@@ -97,10 +99,11 @@ const broadcastPostingOperations = (username: string, operations: Operation[]): 
         return hiveClient.broadcast.sendOperations(operations, privateKey);
     }
     // With hivesigner access token
-    return new hs.Client({
-        accessToken: getAccessToken(username),
+    let token = getAccessToken(username);
+    return token ? new hs.Client({
+        accessToken: token,
     }).broadcast(operations)
-        .then((r: any) => r.result);
+        .then((r: any) => r.result) : Promise.resolve(0);
 }
 export const reblog = (username: string, author: string, permlink: string, _delete: boolean = false): Promise<TransactionConfirmation> => {
     const message = {

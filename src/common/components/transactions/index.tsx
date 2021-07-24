@@ -1,35 +1,65 @@
 import React, {Component} from "react";
+
 import moment from "moment";
+
 import {History} from "history";
+
 import {FormControl} from "react-bootstrap";
+
 import {DynamicProps} from "../../store/dynamic-props/types";
 import {OperationGroup, Transaction, Transactions} from "../../store/transactions/types";
 import {Account} from "../../store/accounts/types";
+
 import LinearProgress from "../linear-progress";
 import EntryLink from "../entry-link";
+
 import parseAsset from "../../helper/parse-asset";
 import parseDate from "../../helper/parse-date";
 import {vestsToHp} from "../../helper/vesting";
 import formattedNumber from "../../util/formatted-number";
-import {ticketSvg, commentSvg, compareHorizontalSvg, cashSvg, cashMultiple, reOrderHorizontalSvg, pickAxeSvg, closeSvg, arrowRightSvg} from "../../img/svg";
+
+import {
+  arrowRightSvg,
+  cashCoinSvg,
+  cashMultiple,
+  cashSvg,
+  closeSvg,
+  commentSvg,
+  compareHorizontalSvg,
+  exchangeSvg,
+  pickAxeSvg,
+  powerDownSvg,
+  powerUpSvg,
+  reOrderHorizontalSvg,
+  starsSvg,
+  ticketSvg,
+} from "../../img/svg";
+
 import {_t} from "../../i18n";
 import {Tsx} from "../../i18n/helper";
 import {HIVE_API_NAME, DOLLAR_API_NAME} from "../../api/hive";
+const HIVE_HUMAN_NAME = 'Hive';
+const DOLLAR_HUMAN_NAME = 'HBD';
+
 interface RowProps {
 	history: History;
 	dynamicProps: DynamicProps;
 	transaction: Transaction;
 }
+
 export class TransactionRow extends Component<RowProps> {
 	render() {
 		const {dynamicProps, transaction: tr} = this.props;
 		const {hivePerMVests} = dynamicProps;
+		
 		let flag = false;
 		let icon = ticketSvg;
 		let numbers = null;
 		let details = null;
 		if (tr.type === "curation_reward") {
 			flag = true;
+      icon = cashCoinSvg;
+			
 			const reward = parseAsset(tr.reward);
 			if (reward.symbol === "VESTS")
 				numbers = <>{formattedNumber(vestsToHp(parseAsset(tr.reward).amount, hivePerMVests), {suffix: "HP"})}</>;
@@ -69,7 +99,7 @@ export class TransactionRow extends Component<RowProps> {
 			details = EntryLink({
 				...this.props,
 				entry: {
-					category: "ecency",
+          category: "history",
 					author: tr.author,
 					permlink: tr.permlink
 				},
@@ -110,9 +140,11 @@ export class TransactionRow extends Component<RowProps> {
 				</>
 			);
 		}
-		if (tr.type === "transfer" || tr.type === "transfer_to_vesting" || tr.type == "transfer_to_savings") {
+
+        if (tr.type === "transfer" || tr.type === "transfer_to_vesting" || tr.type === "transfer_to_savings") {
 			flag = true;
-			icon = compareHorizontalSvg;
+      icon = tr.type === "transfer_to_vesting" ? powerUpSvg : compareHorizontalSvg;
+
 			details = (
 				<span>
 					{tr.memo ? (
@@ -120,11 +152,43 @@ export class TransactionRow extends Component<RowProps> {
 							{tr.memo} <br/> <br/>
 						</>
 					) : null}
-					<strong>@{tr.from}</strong> -&gt; <strong>@{tr.to}</strong>
+                    <><strong>@{tr.from}</strong> -&gt; <strong>@{tr.to}</strong></>
 				</span>
 			);
 			numbers = <span className="number">{tr.amount}</span>;
 		}
+
+
+        if (tr.type ==="recurrent_transfer" || tr.type ==="fill_recurrent_transfer") {
+            flag = true;
+            icon = compareHorizontalSvg;
+
+            details = (
+                <span>
+                    {tr.memo ? (
+                        <>
+                            {tr.memo} <br/> <br/>
+                        </>
+                    ) : null}
+                    {tr.type === "recurrent_transfer" ? (
+                        <><Tsx k="transactions.type-recurrent_transfer-detail" args={{executions: tr.executions, recurrence: tr.recurrence}}>
+                        <span/>
+                        </Tsx><br/><br/><strong>@{tr.from}</strong> -&gt; <strong>@{tr.to}</strong></>
+                    ) : (<><Tsx k="transactions.type-fill_recurrent_transfer-detail" args={{remaining_executions: tr.remaining_executions}}>
+                            <span/>
+                            </Tsx><br/><br/><strong>@{tr.from}</strong> -&gt; <strong>@{tr.to}</strong></>)
+                    }
+                </span>
+            );
+            let aam = tr.amount;
+            if (tr.type === "fill_recurrent_transfer") {
+                const t = parseAsset(tr.amount);
+                aam = `${t.amount} ${t.symbol}`;
+            }
+            numbers = <span className="number">{aam}</span>;
+        }        
+		
+		
 		if (tr.type === "cancel_transfer_from_savings") {
 			flag = true;
 			icon = closeSvg;
@@ -174,6 +238,20 @@ export class TransactionRow extends Component<RowProps> {
 				</span>
 			) : null;
 		}
+
+        if (tr.type === "fill_vesting_withdraw") {
+            flag = true;
+            icon = powerDownSvg;
+
+            numbers = <span className="number">{tr.deposited}</span>;
+
+            details = tr.from_account ? (
+                <span>
+                    <strong>@{tr.from_account} -&gt; @{tr.to_account}</strong>
+                </span>
+            ) : null;
+        }
+
 		if (tr.type === "fill_order") {
 			flag = true;
 			icon = reOrderHorizontalSvg;
@@ -181,6 +259,16 @@ export class TransactionRow extends Component<RowProps> {
 				<span className="number">{tr.current_pays} = {tr.open_pays}</span>
 			);
 		}
+
+        if (tr.type === "limit_order_create") {
+            flag = true;
+            icon = reOrderHorizontalSvg;
+
+            numbers = (
+                <span className="number">{tr.amount_to_sell} = {tr.min_to_receive}</span>
+            );
+        }
+
 		if (tr.type === "producer_reward") {
 			flag = true;
 			icon = pickAxeSvg;
@@ -236,6 +324,88 @@ export class TransactionRow extends Component<RowProps> {
 			details = <span>{tr.orderType}</span>;
 			numbers = <span className="number">{tr.amount}</span>;
 		}
+        if (tr.type === "comment_payout_update") {
+            flag = true;
+            icon = starsSvg;
+
+            details = EntryLink({
+                ...this.props,
+                entry: {
+                    category: "history",
+                    author: tr.author,
+                    permlink: tr.permlink
+                },
+                children: <span>{"@"}{tr.author}/{tr.permlink}</span>
+            })
+        }
+
+        if (tr.type === "comment_reward") {
+            flag = true;
+            icon = cashCoinSvg;
+
+            const payout = parseAsset(tr.payout);
+
+            numbers = (
+                <>
+                    {payout.amount > 0 && (
+                        <span className="number">{formattedNumber(payout.amount, {suffix: DOLLAR_HUMAN_NAME})}</span>
+                    )}
+                </>
+            );
+
+            details = EntryLink({
+                ...this.props,
+                entry: {
+                    category: "history",
+                    author: tr.author,
+                    permlink: tr.permlink
+                },
+                children: <span>{"@"}{tr.author}/{tr.permlink}</span>
+            });
+        }
+        
+        if (tr.type === "collateralized_convert") {
+            flag = true;
+            icon = exchangeSvg;
+            const amount = parseAsset(tr.amount);
+
+            numbers = (
+                <>
+                    {amount.amount > 0 && (
+                        <span className="number">{formattedNumber(amount.amount, {suffix: HIVE_HUMAN_NAME})}</span>
+                    )}
+                </>
+            );
+
+            details = <Tsx k="transactions.type-collateralized_convert-detail" args={{request: tr.requestid}}>
+                <span/>
+            </Tsx>
+        }
+        
+        if (tr.type === "effective_comment_vote") {
+            flag = true;
+
+            const payout = parseAsset(tr.pending_payout);
+
+            numbers = (
+                <>
+                    {payout.amount > 0 && (
+                        <span className="number">{formattedNumber(payout.amount, {suffix: DOLLAR_HUMAN_NAME})}</span>
+                    )}
+                </>
+            );
+
+            details = EntryLink({
+                ...this.props,
+                entry: {
+                    category: "history",
+                    author: tr.author,
+                    permlink: tr.permlink
+                },
+                children: <span>{"@"}{tr.author}/{tr.permlink}</span>
+            });
+        }
+		
 		if (flag) {
 			const transDate = parseDate(tr.timestamp);
 			return (
@@ -263,7 +433,7 @@ interface Props {
 	fetchTransactions: (username: string, group?: OperationGroup | "") => void;
 }
 export class TransactionList extends Component<Props> {
-	typeChanged = (e: React.ChangeEvent<FormControl & HTMLInputElement>) => {
+	typeChanged = (e: React.ChangeEvent<typeof FormControl & HTMLInputElement>) => {
 		const {account, fetchTransactions} = this.props;
 		const group = e.target.value;
 		fetchTransactions(account.name, group as OperationGroup);

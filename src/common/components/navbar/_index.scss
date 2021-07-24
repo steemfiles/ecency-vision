@@ -1,11 +1,11 @@
 .nav-bar-toggle {
   position: absolute;
-  z-index: 1;
   top: 18px;
   right: 10px;
   width: 30px;
   height: 30px;
   cursor: pointer;
+  z-index: 1000;
 
   svg {
     height: 30px;
@@ -58,6 +58,7 @@
     .logo {
       width: 40px;
       height: 40px;
+      cursor: pointer;
     }
   }
 
@@ -68,6 +69,12 @@
     @media (min-width: $sm-break) {
       margin-left: 0;
     }
+    @media (max-width: $sm-break) {
+      font-size: 1rem;
+    }
+    @media (max-width: $xsm-break) {
+      font-size: 1rem;
+    }
   }
 }
 
@@ -76,7 +83,7 @@
   margin-bottom: 20px;
   position: relative;
   padding: 10px 0;
-
+  z-index: 4;
   &:not(.visible-sm) {
     display: none;
   }
@@ -136,8 +143,9 @@
       }
 
       .logo {
-        width: 44px;
-        height: 44px;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
       }
     }
 
@@ -217,10 +225,21 @@
       }
     }
 
+    .submit-post {
+      display: flex;
+      justify-content: center;
+      margin-top: 0.5rem;
+
+      @media (min-width: $md-break) {
+        display: none;
+      }
+    }
+
     .btn-menu {
       display: flex;
 
       .login-required {
+        margin-left: 1rem;
         .btn {
           margin-right: 4px;
         }
@@ -260,6 +279,11 @@
   }
 }
 
+.transparent {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
 // Custom dropdown colors
 .nav-bar, .nav-bar-sm {
   .custom-dropdown {
@@ -289,5 +313,23 @@
 body.medium-zoom--opened {
   .nav-bar {
     display: none !important;
+  }
+}
+
+.pencil {
+  svg {
+    width: 19px !important;
+    height: 19px !important;
+  }
+  @include themify(day) {
+    color: $warm-grey;
+  }
+
+  @include themify(night) {
+    color: $duck-egg-blue;
+  }
+
+  @media (max-width: $md-break) {
+    display: none;
   }
 }

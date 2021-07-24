@@ -35,6 +35,7 @@ exports[`(1) Default render 1`] = `
           good-karma
           <span
             className="author-reputation"
+            title="Author's reputation"
           >
             76
           </span>
@@ -44,6 +45,7 @@ exports[`(1) Default render 1`] = `
         className="category"
         href="/hot/hive"
         onClick={[Function]}
+        title="Unmoderated topics"
       >
         hive
       </a>
@@ -52,7 +54,7 @@ exports[`(1) Default render 1`] = `
       />
       <span
         className="date"
-        title="Monday, June 1, 2020 8:53 AM"
+        title="Monday, June 1, 2020 10:53 AM"
       >
         5 days
       </span>
@@ -65,7 +67,7 @@ exports[`(1) Default render 1`] = `
     className="item-body"
   >
     <div
-      className="item-image"
+      className="item-image "
     >
       <a
         href="/hive/@good-karma/awesome-hive"
@@ -74,12 +76,12 @@ exports[`(1) Default render 1`] = `
         <picture>
           <source
             media="(min-width: 576px)"
-            srcSet="https://images.ecency.com/p/HNWT6DgoBc1692QWn5trsGLxi44TrGuNZJMEdibBBbUKuho3EaW43JV4QzaQ258PEGNV2u43KAhU8r3Vjno4cBP8JeTFkbS2SCMjZZPprKzfMSdteRxSZxuPku4?format=match&mode=fit&width=260&height=200"
+            srcSet="https://images.ecency.com/p/HNWT6DgoBc1692QWn5trsGLxi44TrGuNZJMEdibBBbUKuho3EaW43JV4QzaQ258PEGNV2u43KAhU8r3Vjno4cBP8JeTFkbS2SCMjZZPprKzfMSdteRxSZxuPku4.png?format=match&mode=fit&width=260&height=200"
           />
           <img
             alt="Awesome Hive"
             onError={[Function]}
-            srcSet="https://images.ecency.com/p/HNWT6DgoBc1692QWn5trsGLxi44TrGuNZJMEdibBBbUKuho3EaW43JV4QzaQ258PEGNV2u43KAhU8r3Vjno4cBP8JeTFkbS2SCMjZZPprKzfMSdteRxSZxuPku4?format=match&mode=fit&width=600&height=500"
+            srcSet="https://images.ecency.com/p/HNWT6DgoBc1692QWn5trsGLxi44TrGuNZJMEdibBBbUKuho3EaW43JV4QzaQ258PEGNV2u43KAhU8r3Vjno4cBP8JeTFkbS2SCMjZZPprKzfMSdteRxSZxuPku4.png?format=match&mode=fit&width=600&height=500"
           />
         </picture>
       </a>
@@ -99,31 +101,42 @@ exports[`(1) Default render 1`] = `
         href="/hive/@good-karma/awesome-hive"
         onClick={[Function]}
       >
-        Hey developers, I just created Awesome-Hive, list of services and apps on Hive. If you don't know about Awesome project, take a look at here: Project contains list of services and links to various too
+        Hey developers, I just created Awesome-Hive, list of services and apps on Hive. If you don't know about Awesome project, take a look at here: Project contains list of services and links to various tools
       </a>
     </div>
     <div
       className="item-controls"
     >
       <div
-        className="entry-vote-btn"
         onClick={[Function]}
       >
-        <div
-          className="btn-vote btn-up-vote"
-        >
-          <span
-            className="btn-inner"
+        <div>
+          <div
+            className="entry-vote-btn"
+            onClick={[Function]}
           >
-            <svg
-              viewBox="0 0 24 24"
+            <div
+              className="btn-vote btn-up-vote"
             >
-              <path
-                d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
-                fill="currentColor"
-              />
-            </svg>
-          </span>
+              <div
+                className=""
+              >
+                <span
+                  className="btn-inner "
+                >
+                  <svg
+                    className="vote-svg"
+                    viewBox="6 8 12 7.41"
+                  >
+                    <path
+                      d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div
@@ -194,9 +207,6 @@ exports[`(1) Default render 1`] = `
           </svg>
         </a>
       </div>
-      <div
-        className="flex-spacer"
-      />
       <div
         className="entry-menu"
       >
@@ -265,6 +275,7 @@ exports[`(2) Grid view 1`] = `
           good-karma
           <span
             className="author-reputation"
+            title="Author's reputation"
           >
             76
           </span>
@@ -274,6 +285,7 @@ exports[`(2) Grid view 1`] = `
         className="category"
         href="/hot/hive"
         onClick={[Function]}
+        title="Unmoderated topics"
       >
         hive
       </a>
@@ -282,7 +294,7 @@ exports[`(2) Grid view 1`] = `
       />
       <span
         className="date"
-        title="Monday, June 1, 2020 8:53 AM"
+        title="Monday, June 1, 2020 10:53 AM"
       >
         5 days
       </span>
@@ -295,7 +307,7 @@ exports[`(2) Grid view 1`] = `
     className="item-body"
   >
     <div
-      className="item-image"
+      className="item-image "
     >
       <a
         href="/hive/@good-karma/awesome-hive"
@@ -304,7 +316,12 @@ exports[`(2) Grid view 1`] = `
         <img
           alt="Awesome Hive"
           onError={[Function]}
-          src="https://images.ecency.com/p/HNWT6DgoBc1692QWn5trsGLxi44TrGuNZJMEdibBBbUKuho3EaW43JV4QzaQ258PEGNV2u43KAhU8r3Vjno4cBP8JeTFkbS2SCMjZZPprKzfMSdteRxSZxuPku4?format=match&mode=fit&width=600&height=500"
+          src="https://images.ecency.com/p/HNWT6DgoBc1692QWn5trsGLxi44TrGuNZJMEdibBBbUKuho3EaW43JV4QzaQ258PEGNV2u43KAhU8r3Vjno4cBP8JeTFkbS2SCMjZZPprKzfMSdteRxSZxuPku4.png?format=match&mode=fit&width=600&height=500"
+          style={
+            Object {
+              "width": "auto",
+            }
+          }
         />
       </a>
     </div>
@@ -323,31 +340,42 @@ exports[`(2) Grid view 1`] = `
         href="/hive/@good-karma/awesome-hive"
         onClick={[Function]}
       >
-        Hey developers, I just created Awesome-Hive, list of services and apps on Hive. If you don't know about Awesome project, take a look at here: Project contains list of services and links to various too
+        Hey developers, I just created Awesome-Hive, list of services and apps on Hive. If you don't know about Awesome project, take a look at here: Project contains list of services and links to various tools
       </a>
     </div>
     <div
       className="item-controls"
     >
       <div
-        className="entry-vote-btn"
         onClick={[Function]}
       >
-        <div
-          className="btn-vote btn-up-vote"
-        >
-          <span
-            className="btn-inner"
+        <div>
+          <div
+            className="entry-vote-btn"
+            onClick={[Function]}
           >
-            <svg
-              viewBox="0 0 24 24"
+            <div
+              className="btn-vote btn-up-vote"
             >
-              <path
-                d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
-                fill="currentColor"
-              />
-            </svg>
-          </span>
+              <div
+                className=""
+              >
+                <span
+                  className="btn-inner "
+                >
+                  <svg
+                    className="vote-svg"
+                    viewBox="6 8 12 7.41"
+                  >
+                    <path
+                      d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div
@@ -418,9 +446,6 @@ exports[`(2) Grid view 1`] = `
           </svg>
         </a>
       </div>
-      <div
-        className="flex-spacer"
-      />
       <div
         className="entry-menu"
       >
@@ -489,6 +514,7 @@ exports[`(3) Nsfw 1`] = `
           good-karma
           <span
             className="author-reputation"
+            title="Author's reputation"
           >
             76
           </span>
@@ -498,6 +524,7 @@ exports[`(3) Nsfw 1`] = `
         className="category"
         href="/hot/hive"
         onClick={[Function]}
+        title="Unmoderated topics"
       >
         hive
       </a>
@@ -506,7 +533,7 @@ exports[`(3) Nsfw 1`] = `
       />
       <span
         className="date"
-        title="Monday, June 1, 2020 8:53 AM"
+        title="Monday, June 1, 2020 10:53 AM"
       >
         5 days
       </span>
@@ -566,24 +593,35 @@ exports[`(3) Nsfw 1`] = `
       className="item-controls"
     >
       <div
-        className="entry-vote-btn"
         onClick={[Function]}
       >
-        <div
-          className="btn-vote btn-up-vote"
-        >
-          <span
-            className="btn-inner"
+        <div>
+          <div
+            className="entry-vote-btn"
+            onClick={[Function]}
           >
-            <svg
-              viewBox="0 0 24 24"
+            <div
+              className="btn-vote btn-up-vote"
             >
-              <path
-                d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
-                fill="currentColor"
-              />
-            </svg>
-          </span>
+              <div
+                className=""
+              >
+                <span
+                  className="btn-inner "
+                >
+                  <svg
+                    className="vote-svg"
+                    viewBox="6 8 12 7.41"
+                  >
+                    <path
+                      d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div
@@ -654,9 +692,6 @@ exports[`(3) Nsfw 1`] = `
           </svg>
         </a>
       </div>
-      <div
-        className="flex-spacer"
-      />
       <div
         className="entry-menu"
       >
@@ -725,6 +760,7 @@ exports[`(4) Nsfw with active user 1`] = `
           good-karma
           <span
             className="author-reputation"
+            title="Author's reputation"
           >
             76
           </span>
@@ -734,6 +770,7 @@ exports[`(4) Nsfw with active user 1`] = `
         className="category"
         href="/hot/hive"
         onClick={[Function]}
+        title="Unmoderated topics"
       >
         hive
       </a>
@@ -742,7 +779,7 @@ exports[`(4) Nsfw with active user 1`] = `
       />
       <span
         className="date"
-        title="Monday, June 1, 2020 8:53 AM"
+        title="Monday, June 1, 2020 10:53 AM"
       >
         5 days
       </span>
@@ -802,25 +839,34 @@ exports[`(4) Nsfw with active user 1`] = `
     <div
       className="item-controls"
     >
-      <div
-        className="entry-vote-btn"
-        onClick={[Function]}
-      >
-        <div
-          className="btn-vote btn-up-vote"
-        >
-          <span
-            className="btn-inner"
+      <div>
+        <div>
+          <div
+            className="entry-vote-btn"
+            onClick={[Function]}
           >
-            <svg
-              viewBox="0 0 24 24"
+            <div
+              className="btn-vote btn-up-vote"
             >
-              <path
-                d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
-                fill="currentColor"
-              />
-            </svg>
-          </span>
+              <div
+                className=""
+              >
+                <span
+                  className="btn-inner "
+                >
+                  <svg
+                    className="vote-svg"
+                    viewBox="6 8 12 7.41"
+                  >
+                    <path
+                      d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div
@@ -891,9 +937,6 @@ exports[`(4) Nsfw with active user 1`] = `
           </svg>
         </a>
       </div>
-      <div
-        className="flex-spacer"
-      />
       <div
         className="entry-menu"
       >
@@ -962,6 +1005,7 @@ exports[`(5) Nsfw but allowed 1`] = `
           good-karma
           <span
             className="author-reputation"
+            title="Author's reputation"
           >
             76
           </span>
@@ -971,6 +1015,7 @@ exports[`(5) Nsfw but allowed 1`] = `
         className="category"
         href="/hot/hive"
         onClick={[Function]}
+        title="Unmoderated topics"
       >
         hive
       </a>
@@ -979,7 +1024,7 @@ exports[`(5) Nsfw but allowed 1`] = `
       />
       <span
         className="date"
-        title="Monday, June 1, 2020 8:53 AM"
+        title="Monday, June 1, 2020 10:53 AM"
       >
         5 days
       </span>
@@ -992,7 +1037,7 @@ exports[`(5) Nsfw but allowed 1`] = `
     className="item-body"
   >
     <div
-      className="item-image"
+      className="item-image "
     >
       <a
         href="/hive/@good-karma/awesome-hive"
@@ -1001,12 +1046,12 @@ exports[`(5) Nsfw but allowed 1`] = `
         <picture>
           <source
             media="(min-width: 576px)"
-            srcSet="https://images.ecency.com/p/HNWT6DgoBc1692QWn5trsGLxi44TrGuNZJMEdibBBbUKuho3EaW43JV4QzaQ258PEGNV2u43KAhU8r3Vjno4cBP8JeTFkbS2SCMjZZPprKzfMSdteRxSZxuPku4?format=match&mode=fit&width=260&height=200"
+            srcSet="https://images.ecency.com/p/HNWT6DgoBc1692QWn5trsGLxi44TrGuNZJMEdibBBbUKuho3EaW43JV4QzaQ258PEGNV2u43KAhU8r3Vjno4cBP8JeTFkbS2SCMjZZPprKzfMSdteRxSZxuPku4.png?format=match&mode=fit&width=260&height=200"
           />
           <img
             alt="Awesome Hive"
             onError={[Function]}
-            srcSet="https://images.ecency.com/p/HNWT6DgoBc1692QWn5trsGLxi44TrGuNZJMEdibBBbUKuho3EaW43JV4QzaQ258PEGNV2u43KAhU8r3Vjno4cBP8JeTFkbS2SCMjZZPprKzfMSdteRxSZxuPku4?format=match&mode=fit&width=600&height=500"
+            srcSet="https://images.ecency.com/p/HNWT6DgoBc1692QWn5trsGLxi44TrGuNZJMEdibBBbUKuho3EaW43JV4QzaQ258PEGNV2u43KAhU8r3Vjno4cBP8JeTFkbS2SCMjZZPprKzfMSdteRxSZxuPku4.png?format=match&mode=fit&width=600&height=500"
           />
         </picture>
       </a>
@@ -1026,31 +1071,42 @@ exports[`(5) Nsfw but allowed 1`] = `
         href="/hive/@good-karma/awesome-hive"
         onClick={[Function]}
       >
-        Hey developers, I just created Awesome-Hive, list of services and apps on Hive. If you don't know about Awesome project, take a look at here: Project contains list of services and links to various too
+        Hey developers, I just created Awesome-Hive, list of services and apps on Hive. If you don't know about Awesome project, take a look at here: Project contains list of services and links to various tools
       </a>
     </div>
     <div
       className="item-controls"
     >
       <div
-        className="entry-vote-btn"
         onClick={[Function]}
       >
-        <div
-          className="btn-vote btn-up-vote"
-        >
-          <span
-            className="btn-inner"
+        <div>
+          <div
+            className="entry-vote-btn"
+            onClick={[Function]}
           >
-            <svg
-              viewBox="0 0 24 24"
+            <div
+              className="btn-vote btn-up-vote"
             >
-              <path
-                d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
-                fill="currentColor"
-              />
-            </svg>
-          </span>
+              <div
+                className=""
+              >
+                <span
+                  className="btn-inner "
+                >
+                  <svg
+                    className="vote-svg"
+                    viewBox="6 8 12 7.41"
+                  >
+                    <path
+                      d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div
@@ -1122,9 +1178,6 @@ exports[`(5) Nsfw but allowed 1`] = `
         </a>
       </div>
       <div
-        className="flex-spacer"
-      />
-      <div
         className="entry-menu"
       >
         <div
@@ -1188,6 +1241,7 @@ exports[`(6) Cross post. Bottom menu 1`] = `
       className="community-name"
       href="/created/hive-125125"
       onClick={[Function]}
+      title="Moderated community"
     >
       Ecency
     </a>
@@ -1223,6 +1277,7 @@ exports[`(6) Cross post. Bottom menu 1`] = `
           regenerette
           <span
             className="author-reputation"
+            title="Author's reputation"
           >
             56
           </span>
@@ -1232,6 +1287,7 @@ exports[`(6) Cross post. Bottom menu 1`] = `
         className="category"
         href="/created/hive-167922"
         onClick={[Function]}
+        title="Moderated community"
       >
         LeoFinance
       </a>
@@ -1240,7 +1296,7 @@ exports[`(6) Cross post. Bottom menu 1`] = `
       />
       <span
         className="date"
-        title="Wednesday, March 24, 2021 6:14 PM"
+        title="Wednesday, March 24, 2021 9:14 PM"
       >
         10 months
       </span>
@@ -1253,7 +1309,7 @@ exports[`(6) Cross post. Bottom menu 1`] = `
     className="item-body"
   >
     <div
-      className="item-image"
+      className="item-image "
     >
       <a
         href="/hive-125125/@regenerette/we-need-each-one-of-you-sos-financial-advice-for-hive-newcomers-hive-125125"
@@ -1262,12 +1318,12 @@ exports[`(6) Cross post. Bottom menu 1`] = `
         <picture>
           <source
             media="(min-width: 576px)"
-            srcSet="https://images.ecency.com/p/9vWp6aU4y8kx949aDJ3YMzVLdPdgysaSmkB2s8acZPD2wLP9kmCfwvS7WXuviKVy7E4FQ9wVh4WA5pjURA85T8j9DcDS9aEKz33L2pEvgMVY6NyQE6wbedsZUqtk4KWeEB65eM5jx2qshJNei?format=match&mode=fit&width=260&height=200"
+            srcSet="https://images.ecency.com/p/9vWp6aU4y8kx949aDJ3YMzVLdPdgysaSmkB2s8acZPD2wLP9kmCfwvS7WXuviKVy7E4FQ9wVh4WA5pjURA85T8j9DcDS9aEKz33L2pEvgMVY6NyQE6wbedsZUqtk4KWeEB65eM5jx2qshJNei.png?format=match&mode=fit&width=260&height=200"
           />
           <img
             alt="WE NEED EACH ONE OF YOU - SOS Financial Advice For Hive Newcomers "
             onError={[Function]}
-            srcSet="https://images.ecency.com/p/9vWp6aU4y8kx949aDJ3YMzVLdPdgysaSmkB2s8acZPD2wLP9kmCfwvS7WXuviKVy7E4FQ9wVh4WA5pjURA85T8j9DcDS9aEKz33L2pEvgMVY6NyQE6wbedsZUqtk4KWeEB65eM5jx2qshJNei?format=match&mode=fit&width=600&height=500"
+            srcSet="https://images.ecency.com/p/9vWp6aU4y8kx949aDJ3YMzVLdPdgysaSmkB2s8acZPD2wLP9kmCfwvS7WXuviKVy7E4FQ9wVh4WA5pjURA85T8j9DcDS9aEKz33L2pEvgMVY6NyQE6wbedsZUqtk4KWeEB65eM5jx2qshJNei.png?format=match&mode=fit&width=600&height=500"
           />
         </picture>
       </a>
@@ -1287,31 +1343,42 @@ exports[`(6) Cross post. Bottom menu 1`] = `
         href="/hive-125125/@regenerette/we-need-each-one-of-you-sos-financial-advice-for-hive-newcomers-hive-125125"
         onClick={[Function]}
       >
-        Hi I have decided to write this article for newcomers (that need some guidance), for more experienced ones (that can contribute with input, commenting, and helping with suggestions for this article), 
+        Hi I have decided to write this article for newcomers (that need some guidance), for more experienced ones (that can contribute with input, commenting, and helping with suggestions for this article), and
       </a>
     </div>
     <div
       className="item-controls"
     >
       <div
-        className="entry-vote-btn"
         onClick={[Function]}
       >
-        <div
-          className="btn-vote btn-up-vote"
-        >
-          <span
-            className="btn-inner"
+        <div>
+          <div
+            className="entry-vote-btn"
+            onClick={[Function]}
           >
-            <svg
-              viewBox="0 0 24 24"
+            <div
+              className="btn-vote btn-up-vote"
             >
-              <path
-                d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
-                fill="currentColor"
-              />
-            </svg>
-          </span>
+              <div
+                className=""
+              >
+                <span
+                  className="btn-inner "
+                >
+                  <svg
+                    className="vote-svg"
+                    viewBox="6 8 12 7.41"
+                  >
+                    <path
+                      d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div
@@ -1382,9 +1449,6 @@ exports[`(6) Cross post. Bottom menu 1`] = `
           </svg>
         </a>
       </div>
-      <div
-        className="flex-spacer"
-      />
       <div
         className="entry-menu"
       >

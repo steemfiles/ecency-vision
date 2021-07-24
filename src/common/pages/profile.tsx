@@ -29,20 +29,24 @@ import {LIQUID_TOKEN, LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN} from "../../client_
 import defaults from "../constants/defaults.json";
 import _c from "../util/fix-class-names";
 import {PageProps, pageMapDispatchToProps, pageMapStateToProps} from "./common";
-import {getAccountFull} from "../api/hive";
+import {History} from "history";
+
 interface MatchParams {
     username: string;
     section?: string;
 }
 interface Props extends PageProps {
     match: match<MatchParams>;
+    history: History;
 }
 interface State {
     loading: boolean;
+    isDefaultPost:boolean;
 }
 class ProfilePage extends BaseComponent<Props, State> {
     state: State = {
-        loading: false
+        loading: false,
+        isDefaultPost:false
     };
     async componentDidMount() {
         await this.ensureAccount();
@@ -58,9 +62,12 @@ class ProfilePage extends BaseComponent<Props, State> {
         fetchPoints(username);
     }
     componentDidUpdate(prevProps: Readonly<Props>): void {
-        const {match, global, fetchEntries, fetchTransactions, resetTransactions, fetchPoints, resetPoints} = this.props;
-        const {match: prevMatch} = prevProps;
+        const {match, global, fetchEntries, fetchTransactions, resetTransactions, fetchPoints, resetPoints, history } = this.props;
+        const {match: prevMatch, entries} = prevProps;
+
         const {username, section} = match.params;
+        const { isDefaultPost } = this.state;
+
         // username changed. re-fetch wallet transactions and points
         if (username !== prevMatch.params.username) {
             this.ensureAccount().then(() => {
@@ -78,6 +85,19 @@ class ProfilePage extends BaseComponent<Props, State> {
         if (section !== prevMatch.params.section || username !== prevMatch.params.username) {
             fetchEntries(global.filter, global.tag, false);
         }
+
+        if(entries){
+        const { filter, tag } = global;
+        const groupKey = makeGroupKey(filter, tag);
+        const prevData = entries[groupKey];
+        if(prevData){
+        const data = this.props.entries[groupKey];
+        const { loading } = data;
+        const { loading: prevLoading } = prevData;
+        if(loading !== prevLoading && !loading && data.entries.length === 0 && groupKey === `blog-${username}` && !isDefaultPost){
+            this.setState({isDefaultPost:true})
+            history.push(`/${username}/posts`);}
+        }}
     }
     componentWillUnmount() {
         super.componentWillUnmount();
@@ -168,6 +188,11 @@ class ProfilePage extends BaseComponent<Props, State> {
             rss: `${defaults.base}/@${username}/rss`,
             keywords: `${username}, ${username}'s blog`,
         } : {};
+
+        const {filter, tag} = global;
+        const groupKey = makeGroupKey(filter, tag);
+        const data = entries[groupKey];
+
         return (
             <>
                 <Meta {...metaProps} />
@@ -179,7 +204,8 @@ class ProfilePage extends BaseComponent<Props, State> {
                     <div className="profile-side">
                         {ProfileCard({
                             ...this.props,
-                            account
+                            account,
+                            section
                         })}
                     </div>
                     <span itemScope={true} itemType="http://schema.org/Person">
@@ -229,9 +255,11 @@ class ProfilePage extends BaseComponent<Props, State> {
                                     account
                                 })
                             }
+
                             const {filter, tag} = global;
                             const groupKey = makeGroupKey(filter, tag);
                             const data = entries[groupKey];
+
                             if (data !== undefined) {
                                 const entryList = data?.entries;
                                 const loading = data?.loading;
@@ -240,7 +268,7 @@ class ProfilePage extends BaseComponent<Props, State> {
                                         <div className={_c(`entry-list ${loading ? "loading" : ""}`)}>
                                             <div className={_c(`entry-list-body ${global.listStyle === ListStyle.grid ? "grid-view" : ""}`)}>
                                                 {loading && entryList.length === 0 && <EntryListLoadingItem/>}
-                                                {EntryListContent({...this.props, entries: entryList, promotedEntries: []})}
+                                                {EntryListContent({...this.props, entries: entryList, promotedEntries: [], loading})}
                                             </div>
                                         </div>
                                         {loading && entryList.length > 0 ? <LinearProgress/> : ""}

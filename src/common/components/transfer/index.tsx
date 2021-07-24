@@ -207,20 +207,20 @@ export class Transfer extends BaseComponent<Props, State> {
             this.checkAmount();
         });
     };
-    toChanged = (e: React.ChangeEvent<FormControl & HTMLInputElement>) => {
+    toChanged = (e: React.ChangeEvent<typeof FormControl & HTMLInputElement>) => {
         const {value: to} = e.target;
         this.stateSet({to}, this.handleTo);
     };
     toSelected = (to: string) => {
         this.stateSet({to}, this.handleTo);
     }
-    amountChanged = (e: React.ChangeEvent<FormControl & HTMLInputElement>): void => {
+    amountChanged = (e: React.ChangeEvent<typeof FormControl & HTMLInputElement>): void => {
         const {value: amount} = e.target;
         this.stateSet({amount}, () => {
             this.checkAmount();
         });
     };
-    memoChanged = (e: React.ChangeEvent<FormControl & HTMLInputElement>): void => {
+    memoChanged = (e: React.ChangeEvent<typeof FormControl & HTMLInputElement>): void => {
         const {value: memo} = e.target;
         this.stateSet({memo});
     };
@@ -930,7 +930,8 @@ export class Transfer extends BaseComponent<Props, State> {
                                 )}
                             </div>
                             <div className="amount">
-                                {(()=> {
+                                {
+                                	(()=> {
                                     try {
                                         const {hiveEngineTokensProperties} = global;
                                         const tokenProperties = hiveEngineTokensProperties && hiveEngineTokensProperties[LIQUID_TOKEN_UPPERCASE];
@@ -1011,6 +1012,7 @@ export class Transfer extends BaseComponent<Props, State> {
         </div>
     }
 }
+
 export default class TransferDialog extends Component<Props> {
     render() {
         const {onHide} = this.props;

@@ -46,6 +46,7 @@ export class Browser extends BaseComponent<BrowserProps, BrowserState> {
 
     componentDidMount() {
         this.fetchSubscriptions().then();
+        document.getElementById("search-communities-input")?.focus()
     }
 
     fetchSubscriptions = () => {
@@ -57,7 +58,7 @@ export class Browser extends BaseComponent<BrowserProps, BrowserState> {
         })
     }
 
-    queryChanged = (e: React.ChangeEvent<FormControl & HTMLInputElement>) => {
+    queryChanged = (e: React.ChangeEvent<typeof FormControl & HTMLInputElement>) => {
         if (this._timer) {
             clearTimeout(this._timer);
             this._timer = null;
@@ -86,7 +87,7 @@ export class Browser extends BaseComponent<BrowserProps, BrowserState> {
         const {subscriptions, results, query} = this.state;
 
         const search = <div className="search">
-            <FormControl type="text" size="sm" placeholder={_t("community-selector.search-placeholder")} value={query} onChange={this.queryChanged}/>
+            <FormControl type="text" size="sm" placeholder={_t("community-selector.search-placeholder")} value={query} onChange={this.queryChanged} id="search-communities-input" />
         </div>
 
         if (query) {
@@ -183,6 +184,9 @@ export class CommunitySelector extends BaseComponent<Props, State> {
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
         if (!isEqual(this.props.tags, prevProps.tags)) {
+            if(this.props.tags.length > 0){
+                this.setState({ picked: false });
+            }
             this.detectCommunity().then();
         }
     }
@@ -255,8 +259,10 @@ export class CommunitySelector extends BaseComponent<Props, State> {
             }}>{content}</a>
 
             {visible && (
-                <Modal onHide={this.toggle} show={true} centered={true} animation={false} className="community-selector-modal">
-                    <Modal.Body>
+                <Modal onHide={this.toggle} show={true} centered={true} animation={false} className="community-selector-modal" >
+                    <Modal.Header closeButton={true}/>
+
+                    <Modal.Body >
                         <Browser {...this.props} onHide={this.toggle} onSelect={(name: string | null) => {
                             const prev = this.extractCommunityName();
                             onSelect(prev, name);

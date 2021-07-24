@@ -17,6 +17,7 @@
     "days": "दिनों",
     "finish": "समाप्त करें",
     "next": "अगला",
+    "previous": "Previous",
     "back": "वापस जाएँ।",
     "load-more": "अधिक लोड करे",
     "empty-list": "कुछ नहीं है",
@@ -28,8 +29,19 @@
     "off": "बंद",
     "yes": "हाँ",
     "no": "नहीं",
+    "hot": "फ़ीड",
+    "trending": "फ़ीड",
+    "created": "फ़ीड",
+    "muted": "feed",
+    "found": "मिला",
+    "feed": "फ़ीड",
+    "blog": "ब्लॉगस",
+    "posts": "लेख",
+    "comments": "टिप्पणियाँ",
+    "replies": "जवाब",
     "done": "पूर्ण हुवा",
     "apply": "लागू करें",
+    "warning": "Warning",
     "close": "बंद करें"
   },
   "confirm": {
@@ -46,7 +58,14 @@
     "filter-muted": "म्यूट है",
     "filter-feed": "संभरण",
     "filter-feed-friends": "दोस्त",
-    "filter-feed-subscriptions": "समुदाय"
+    "filter-feed-subscriptions": "समुदाय",
+    "filter-global": "ग्लोबल",
+    "filter-global-part1": "इस फ़ीड में शामिल हैं ",
+    "filter-global-part2": " discussions on entire platform.",
+    "filter-global-part3": " discussions from Your subscribed communities. You can join more communities to fill up this feed.",
+    "filter-global-part4": " discussions from people you follow. You can follow more people to fill up this feed.",
+    "filter-global-discover": "Discover People",
+    "filter-global-join-communities": "Join Communities"
   },
   "navbar": {
     "discover": "खोजिए",
@@ -62,6 +81,10 @@
     "header-tag": "चिप्पी",
     "header-account": "उपयोगकर्ता",
     "header-community": "समुदाय"
+  },
+  "tag": {
+    "unmoderated": "अनियंत्रित विषय",
+    "moderated": "मॉडरेट किया गया समुदाय"
   },
   "switch-lang": {
     "contributors": "योगदानकर्ता"
@@ -98,6 +121,7 @@
     "error-public-key": "आपने सार्वजनिक कुंजी डाला| पासवर्ड/डब्लूएआईएफ की जरुरत है",
     "error-user-fetch": "उपयोगकर्ता डेटा प्राप्त नहीं किया जा सका",
     "error-user-not-found": "उपयोगकर्ता उपलब्ध नहीं है",
+    "error-user-not-found-cache": "Cache inconsistency detected. Please retry login with your credentials.",
     "error-permission": "पोस्टिंग की अनुमति नहीं मिल सकी",
     "error-authenticate": "गलत निजी कुंजी। मास्टर या सक्रिय या निजी कुंजी पोस्ट करना आवश्यक है।",
     "with-hive-signer": "हाइवेसाईनर के साथ लॉगिन करें",
@@ -114,6 +138,8 @@
     "email": "अपना ईमेल पता दर्ज करें",
     "ref": "संदर्भित उपयोगकर्ता (वैकल्पिक)",
     "submit": "जारी रखें",
+    "validation-username": "यूज़रनेम आवश्यक है",
+    "validation-email": "ईमेल जरुरी है।",
     "success": "हमने {{email}} को एक ईमेल भेजा है।",
     "success-2": "साइनअप प्रक्रिया को पूरा करने के लिए निर्देशों का पालन करें।",
     "login-text-1": "क्या आपका अकाउंट है?",
@@ -129,10 +155,12 @@
     "cross-posted": "पोस्ट की गई",
     "cross-posted-to": "को",
     "reblogged": "{{n}} रीब्लॉगड",
-    "promoted": "पदोन्नत",
+    "promoted": "प्रचारित",
     "pinned": "पिन की गई पोस्ट",
     "replies": "१ प्रतिक्रिया| क्लिक करें जबाब के लिए|",
     "replies-n": "{{n}} प्रतिक्रियाएं। जवाब देने के लिए क्लिक करें।",
+    "vote-error": "Previous value is not acceptable. Vote with a different value.",
+    "vote-warning": "Voting 0% unvotes the content.",
     "no-replies": "अभी तक कोई प्रतिक्रिया नहीं। जवाब देने के लिए क्लिक करें।"
   },
   "nsfw": {
@@ -196,7 +224,8 @@
     "curators-payout": "अध्यक्ष्ता भुगतान",
     "payout-date": "भुगतान",
     "beneficiary": "लाभार्थी",
-    "breakdown": "विश्लेषण"
+    "breakdown": "विश्लेषण",
+    "max-accepted": "अधिकतम स्वीकृत"
   },
   "entry-index": {
     "feed": "फ़ीड",
@@ -228,10 +257,13 @@
   },
   "entry": {
     "via-app": "<span class=\"app-name\"> {{app}} </span> के माध्यम से",
+    "author-reputation": "लेखक की प्रतिष्ठा",
     "comment-entry-title": "आप किसी एकल टिप्पणी के सूत्र को देख रहे हैं: ",
     "comment-entry-go-root": "पूरा संदर्भ देखें",
     "comment-entry-go-parent": "सीधा मूल जनक को देखें",
-    "hidden-warning": "यह पोस्ट गुप्त था निम्न मूल्यांकन के कारण.",
+    "hidden-warning": "इस सामग्री को लोगों द्वारा कम रेटिंग मिली है। सावधानी के साथ आगे बढ़ें।",
+    "muted-warning": "इस सामग्री को {{community}} मॉडरेटर द्वारा सामुदायिक दिशानिर्देशों का पालन न करने के कारण म्यूट कर दिया गया था।",
+    "lowrep-warning": "Author of this post has low reputation. Proceed with caution.",
     "address-copy": "पोस्ट पता कापी करे",
     "address-copied": "क्लिपबोर्ड पर पोस्ट पता कॉपी किया गया।",
     "browse-original": "मूल पोस्ट खोलें",
@@ -245,7 +277,7 @@
     "version": "संस्करण {{n}}"
   },
   "similar-entries": {
-    "title": "से अधिक@{{n}}"
+    "title": "आगे पढ़िए"
   },
   "comment": {
     "body-placeholder": "अपना उत्तर यहाँ लिखें",
@@ -294,7 +326,7 @@
     "edit": "सेटिंग्स बदलें",
     "edit-team": "भूमिकाएं संपादित करें",
     "community-rewards": "सामुदायिक पुरस्कार",
-    "profile-image": "सामुदायिक प्रोफ़ाइल छवि",
+    "profile-image": "प्रोफ़ाइल तसवीर",
     "profile-image-edit": "प्रोफ़ाइल छवि संपादित करें",
     "profile-image-updated": "प्रोफ़ाइल छवि अपडेट हो गई!"
   },
@@ -312,7 +344,8 @@
     "lang": "भाषा",
     "description": "विवरण",
     "rules": "नियम",
-    "rules-help": "प्रति पंक्ति एक"
+    "rules-help": "प्रति पंक्ति एक",
+    "validation-title": "शीर्षक आवश्यक है।"
   },
   "communities": {
     "title": "समुदाय",
@@ -339,6 +372,8 @@
     "username-available": "उपलब्ध।",
     "username-not-available": "उपलब्ध नहीं है।",
     "username-wrong-format": "मान्य प्रारूप नहीं। छत्ता -1xxxxx प्रारूप की आवश्यकता है।",
+    "checkbox-validation": "अगर आप आगे बढ़ना चाहते हैं तो कृपया इस बॉक्स को चेक करें।",
+    "title-validation": "कृपया इस फील्ड को भरें",
     "password": "मास्टर पासवर्ड",
     "confirmation": "मैंने अपने स्वामी उपयोगकर्ता नाम और पासवर्ड को सुरक्षित रूप से सहेजा है।",
     "submit": "समुदाय बनाएँ",
@@ -390,7 +425,10 @@
     "vote-power": "वोट शक्ति: {{n}}%",
     "rc-power": "संसाधन क्रेडिट: {{n}}%",
     "recharge-time": "(पूर्णतःउर्जित {{n}})",
-    "down-vote-power": "डाउनवोट पावर: {{n}}%"
+    "down-vote-power": "डाउनवोट पावर: {{n}}%",
+    "no-posts": "यहां आप अपनी पोस्ट देखेंगे, ऐसा लगता है कि कोई सामग्री मौजूद नहीं है।",
+    "create-posts": "आइए एक नई पोस्ट बनाएं",
+    "no-posts-found": "कुछ भी नहीं मिला!"
   },
   "profile-edit": {
     "title": "रूपरेखा",
@@ -400,6 +438,7 @@
     "profile-image": "प्रोफ़ाइल तसवीर",
     "website": "वेबसाइट",
     "location": "स्थान",
+    "copied": "Referral link copied to clipboard.",
     "updated": "प्रोफाइल को सफलतापूर्वक अपडेट किया गया!"
   },
   "image-upload-button": {
@@ -411,6 +450,7 @@
     "currency": "करेंसी",
     "language": "भाषा",
     "nsfw": "NSFW सामग्री दिखाएं",
+    "referral-link": "Referral link",
     "updated": "वरीयता अद्यतन!"
   },
   "wallet": {
@@ -447,6 +487,8 @@
     "title": "निकाशी खाता",
     "account": "खाता",
     "percent": "प्रतिशत",
+    "validation-account": "खाते की आवश्यकता है।",
+    "validation-percent": "प्रतिशत आवश्यक है।",
     "auto-power-up": "स्वचालित रूप पावर उप"
   },
   "points": {
@@ -581,22 +623,33 @@
     "group-interests": "ब्याज",
     "group-stake-operations": "स्टेक ऑपरेशन",
     "group-rewards": "पुरस्कार",
-    "type-curation_reward": "क्यूरेशन रिवार्ड",
-    "type-author_reward": "लेखक इनाम",
-    "type-comment_benefactor_reward": "टिप्पणी लाभकारी पुरस्कार",
+    "type-curation_reward": "Curation reward",
+    "type-author_reward": "Author reward",
+    "type-comment_benefactor_reward": "Comment benefactor reward",
     "type-claim_reward_balance": "अंक अर्जित करे",
     "type-transfer": "स्थानांतरण",
-    "type-transfer_to_vesting": "अधिकार निधान में स्थांतरण करें",
-    "type-withdraw_vesting": "अधिकार निधान निकालें",
+    "type-transfer_to_vesting": "Power up",
+    "type-withdraw_vesting": "Power down",
+    "type-fill_vesting_withdraw": "Partial Power down occurred",
     "type-fill_order": "आर्डर भरें",
     "type-producer_reward": "निर्माता इनाम",
     "type-interest": "ब्याज",
     "type-transfer_to_savings": "बचत खाते में स्थांतरण करें",
-    "type-fill_convert_request": "कन्वर्ट अनुरोध भरें",
+    "type-fill_convert_request": "Convert fulfilled",
     "type-cancel_transfer_from_savings": "बचत से स्थान्तरण रद्द करें",
     "type-cancel_transfer_from_savings-detail": "से: <strong>@{{from}}</strong> <br/> अनुरोध आईडी:<strong>{{request}}</strong>",
-    "type-return_vesting_delegation": "लौटते हुए प्रतिनिधिमंडल",
-    "type-proposal_pay": "प्रस्ताव का भुगतान"
+    "type-return_vesting_delegation": "Return delegations",
+    "type-proposal_pay": "प्रस्ताव का भुगतान",
+    "type-comment_payout_update": "Content payout update",
+    "type-comment_reward": "Content reward",
+    "type-recurrent_transfer": "Recurring transfer",
+    "type-recurrent_transfer-detail": "{{executions}} transfers, each every {{recurrence}} hours",
+    "type-fill_recurrent_transfer": "Recurring transfer occurred",
+    "type-fill_recurrent_transfer-detail": "Remaining {{remaining_executions}} transfers",
+    "type-collateralized_convert": "Collateralized convert",
+    "type-collateralized_convert-detail": "Request id: <strong>{{request}}</strong>",
+    "type-limit_order_create": "New trade",
+    "type-effective_comment_vote": "Effective vote"
   },
   "key-or-hot": {
     "sign": "साइन करें",
@@ -614,7 +667,7 @@
   "friends": {
     "followers": "अनुयायी ({{n}})",
     "following": "निम्नलिखित ({{n}})",
-    "search-placeholder": "उपयोगकर्ताओं खोजें"
+    "search-placeholder": "Search"
   },
   "follow-controls": {
     "follow": "फॉलो करें",
@@ -646,6 +699,7 @@
     "gallery": "चित्रशाला",
     "emoji": "इमोजी",
     "image-error": "चित्र अपलोड नहीं किया जा सका।",
+    "image-error-cache": "Couldn't upload image. You seem to be signed out. Try signing in again.",
     "image-error-size": "छवि का आकार बहुत बड़ा है, फिर से छोटे आकार की छवि आज़माएं।",
     "fragments": "स्निपेट्स"
   },
@@ -695,6 +749,7 @@
     "error-max": "अधिकतम {{n}} टैग"
   },
   "community-selector": {
+    "choose": "एक समुदाय चुनें",
     "my-blog": "मेरा ब्लॉग",
     "search-placeholder": "समुदाय खोजें"
   },
@@ -710,6 +765,8 @@
     "username": "प्रयोक्ता नाम",
     "reward": "इनाम",
     "user-error": "{{n}} वैध उपयोगकर्ता नहीं है।",
+    "validation-percentage": "प्रतिशत आवश्यक है।",
+    "validation-username": "यूज़रनेम आवश्यक है",
     "user-exists-error": "{{n}} पहले से सूची में है"
   },
   "post-scheduler": {
@@ -754,16 +811,19 @@
     "unmute": "अधिसूचना अलर्ट चालू करें"
   },
   "leaderboard": {
-    "title": "लीडरबोर्ड",
-    "title-day": "दैनिक शीर्ष उपयोगकर्ता",
-    "title-week": "साप्ताहिक शीर्ष उपयोगकर्ता",
-    "title-month": "मासिक शीर्ष उपयोगकर्ता",
+    "title-stars": "सर्वाधिक क्रियाशील",
+    "title-curators": "क्यूरेटर",
+    "title-day": "दैनिक नेता",
+    "title-week": "साप्ताहिक नेता",
+    "title-month": "मासिक नेता",
     "period-day": "रोजाना",
     "period-week": "साप्ताहिक",
     "period-month": "मासिक",
     "header-score": "क्रियाएँ",
     "header-score-tip": "उपयोगकर्ता द्वारा चयनित अवधि के लिए पोस्ट + टिप्पणियाँ",
-    "header-reward": "इनाम"
+    "header-reward": "इनाम",
+    "header-votes": "वोटस",
+    "header-votes-tip": "इस अवधि में वोटों की संख्या"
   },
   "popular-users": {
     "title": "लोकप्रिय उपयोगकर्ता"
@@ -794,9 +854,9 @@
     "tags": "टैग्स",
     "tags-placeholder": "अल्पविराम अलग टैग",
     "date": "दिनांक",
-    "date-week": "सप्ताह",
-    "date-month": "महीना",
-    "date-year": "वर्ष",
+    "date-week": "पिछले सप्ताह",
+    "date-month": "पिछले महीने",
+    "date-year": "पिछले वर्ष",
     "date-all": "सभी",
     "sort": "क्रम",
     "sort-popularity": "लोकप्रियता",
@@ -878,6 +938,9 @@
     "create-first": "अपना पहला स्निपेट बनाएं",
     "filter": "शीर्षक से खोजें",
     "form-title": "शीर्षक",
+    "validation-title": "शीर्षक आवश्यक है।",
+    "validation-value": "मान आवश्यक है",
+    "validation-body": "शरीर की आवश्यकता है।",
     "form-body": "बॉडी"
   },
   "password-update": {
@@ -889,12 +952,28 @@
     "error-new2": "पासवर्ड समान होना चाहिए",
     "pass-gen": "पासवर्ड तैयार करने के लिए यहां क्लिक करें",
     "label-check": "मैंने अपने जनरेट किए गए पासवर्ड को सुरक्षित रूप से सहेजा है",
+    "validation-password": "पासवर्ड गलत है।",
+    "validation-label": "आगे बढ़ने के लिए कृपया इस बॉक्स को चेक करें।",
     "updated": "पासवर्ड सफलतापूर्वक अपडेट किया गया!"
+  },
+  "view-keys": {
+    "title": "View Private keys",
+    "account": "Account",
+    "cur-pass": "Current password",
+    "owner": "Owner",
+    "active": "Active",
+    "posting": "Posting",
+    "memo": "Memo",
+    "view-keys": "Click to view keys",
+    "copied": "Private key copied into clipboard",
+    "error": "Password seem incorrect, please double check!"
   },
   "add-image": {
     "title": "छवि जोड़ें",
     "text-label": "छवि पाठ",
-    "link-label": "छवि लिंक"
+    "link-label": "छवि लिंक",
+    "validation-text": "टेक्स्ट आवश्यक है",
+    "validation-image": "छवि की आवश्यकता है।"
   },
   "add-image-mobile": {
     "title": "छवि जोड़ें",
@@ -905,7 +984,9 @@
   "add-link": {
     "title": "लिंक जोड़ें",
     "text-label": "टेक्स्ट",
-    "link-label": "https://"
+    "link-label": "https://",
+    "validation-text": "टेक्स्ट आवश्यक है",
+    "validation-link": "लिंक आवश्यक है।"
   },
   "scroll-to-top": {
     "title": "शीर्ष तक स्क्रॉल करें"
@@ -1000,5 +1081,61 @@
     "delete-comment-with-vote": "वोटों के साथ एक सामग्री नहीं हटा सकते।",
     "comment-cashout": "सामग्री कैशआउट।",
     "paid-out-post-forbidden": "सशुल्क सामग्री के लिए मतदान उपलब्ध नहीं है।"
+  },
+  "landing-page": {
+    "welcome-text": "इसेंसी में आपका स्वागत है!",
+    "what-is-ecency": "ब्लॉकचैन-आधारित सोशल नेटवर्क",
+    "powered-by-hive": "हाइव द्वारा संचालित",
+    "get-started": "शुरू हो जाओ",
+    "earn-money": "पैसे कमाएँ",
+    "earn-money-block-chain-based": "ब्लॉकचैन-आधारित सोशल नेटवर्क, ",
+    "join-us": "हमसे-जुड़ें",
+    "various-digital-tokens": " और विभिन्न डिजिटल टोकन अर्जित करें, दूसरों को पुरस्कृत करें और एक पुरस्कृत समुदाय का निर्माण करें।",
+    "read-more": "और पढ़ें",
+    "true-ownership": "सच्चा स्वामित्व",
+    "true-ownership-desc": "इसेंसी वेब 3.0 के लिए अगली पीढ़ी का सोशल नेटवर्क है। ब्लॉकचेन तकनीक आपको बिना किसी सेंसरशिप या प्रतिबंध के एक वास्तविक मुक्त भाषण देती है। केवल आप ही अपने खाते, सामग्री और समुदायों को नियंत्रित करते हैं।",
+    "decentralization": "विकेन्द्रीकरण",
+    "hive-blockchain": "हाइव ब्लॉकचेन",
+    "decentralization-desc": " कई सामाजिक, गेमिंग और वित्तीय ऐप हैं जिन्हें आप अपने एक ही खाते से एक्सेस कर सकते हैं। विकेंद्रीकृत तरीके से किसी भी अन्य तृतीय पक्ष एप्लिकेशन से अपने सामाजिक नेटवर्क खाते और सामग्री तक पहुंचें।",
+    "open-source": "खुला स्रोत",
+    "open-source-desc": "शामिल हों और वेब 3.0 पर निर्माण टीम का हिस्सा बनें। हम जो कुछ भी बनाते हैं वह ब्लॉकचेन-आधारित और खुला स्रोत है। हम तकनीकी प्रतिभाओं, डेवलपर्स, रचनाकारों और उद्यमियों का स्वागत करते हैं।",
+    "feel-free-join": " शामिल हों और एक साथ निर्माण करें!",
+    "posts": "पोस्टस",
+    "unique-visitors": "अनन्य आगंतुक",
+    "points-distrubuted": "अंक वितरित",
+    "new-users": "नया उपयोगकर्ता",
+    "download-our-application": "हमारा आवेदन डाउनलोड करें",
+    "download-our-application-desc": "एक अनोखे अनुभव की तलाश है? आपके मोबाइल फोन या डेस्कटॉप पर वास्तविक मुक्त भाषण अनुभव वाला सोशल नेटवर्क। ब्लॉकचेन के शक्तिशाली लाभ अब हमेशा आपकी उंगलियों के नीचे हैं।",
+    "download-for-windows": "कंप्यूटर के लिए डाउनलोड करें",
+    "download-for-ios": "IOS के लिए डाउनलोड करें",
+    "download-for-android": "एंड्रॉइड के लिए डाउनलोड करें",
+    "our-history": "हमारा इतिहास",
+    "our-history-p-one": "<b>इसेंसी</b> (पहले एस्टीम) 2016 में शुरू हुआ, संस्थापक <span> <a href=\"/@good-karma\" class=\"push-link\"> @good-karma </a></span> एक मोबाइल एप्लिकेशन को लागू करना शुरू कर दिया है जो आपके इंटरैक्ट करने और ऑनलाइन बनाने, बनाने, संलग्न करने के तरीके में क्रांतिकारी बदलाव लाएगा। समय के साथ कुछ बड़ा होता गया।",
+    "our-history-p-two": "तब से हम वेब 3.0 के लिए निर्माण करना जारी रखते हैं और अपने ब्लॉकचेन-आधारित सोशल नेटवर्क में सुधार करते हैं, यह सुनिश्चित करते हुए कि ऐप्स यथासंभव सुलभ, सुरक्षित और दुनिया में बोली जाने वाली कई भाषाओं में हैं।",
+    "our-vision": "हमारा नज़रिया",
+    "our-vision-p-one": "हम सभी लोगों के लिए एक सुरक्षित और फायदेमंद ब्लॉकचेन अनुभव लाना चाहते हैं। सोशल मीडिया बिना किसी सीमा और सेंसरशिप के, जहां केवल आप ही अपने खाते और अपने समुदायों को नियंत्रित करते हैं। ब्लॉकचेन द्वारा सुरक्षित, लोगों द्वारा संचालित।",
+    "our-vision-p-two": "<b>हमारे मुख्य सिद्धांत</b> : पुरस्कृत समुदायों, सच्चे स्वामित्व, सशक्त रचनाकारों, मुक्त भाषण को लाखों लोगों के हाथों में लाओ।",
+    "our-team": "हमारी टीम",
+    "founder": "संस्थापक",
+    "devops-guru": "देवोप्स मास्टर",
+    "design-guru": "डिजाइन गुरु",
+    "community-contributors": "समुदाय योगदानकर्ता",
+    "blockchain-witnesses": "ब्लॉकचेन गवाह",
+    "about": "हमारे बारे में",
+    "privacy-policy": "प्राइवेसी पोलिसी",
+    "terms-of-service": "सेवा की शर्तें",
+    "faq": "अकसर किये गए सवाल",
+    "discover": "खोजिए",
+    "sign-in": "साइन इन करें",
+    "communities": "समुदाय",
+    "help": "सहायता",
+    "subscribe-us": "हमें सब्सक्राइब करें",
+    "enter-your-email-adress": "अपना ईमेल पता दर्ज करें",
+    "send": "भेजना",
+    "subscribe-paragraph": "विकेंद्रीकृत वेब में क्या हो रहा है, यह जानने के लिए पहले बनें।",
+    "copy-rights": "©२०११ इसेंसी। सर्वाधिकार सुरक्षित।",
+    "success-message-subscribe": "आपके ईमेल खाते पर एक सत्यापन लिंक भेज दिया गया है!",
+    "validation-email": "एक मान्य ईमेल पते की आवश्यक है।",
+    "error-occured": "एक सर्वर त्रुटि हुई है।"
   }
 }

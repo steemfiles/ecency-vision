@@ -1,51 +1,62 @@
 import React from "react";
 import {History} from "history";
+
 import {Global} from "../../store/global/types";
 import {Account} from "../../store/accounts/types";
+
 import BaseComponent from "../base";
 import UserAvatar from "../user-avatar";
 import ProfileLink from "../profile-link"
+
 import {getLeaderboard, LeaderBoardDuration, LeaderBoardItem} from "../../api/private-api";
-import {informationSvg} from "../../img/svg";
+
+import { informationVariantSvg } from "../../img/svg";
 import DropDown from "../dropdown";
-import Tooltip from "../tooltip";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import LinearProgress from "../linear-progress";
+
 import {_t} from "../../i18n";
+
 import _c from "../../util/fix-class-names"
+
 interface Props {
     global: Global;
     history: History;
     addAccount: (data: Account) => void;
 }
+
 interface State {
-    data: LeaderBoardItem[] | any,
+    data: LeaderBoardItem[],
     period: LeaderBoardDuration,
     loading: boolean
 }
+
 export class LeaderBoard extends BaseComponent<Props, State> {
+
     state: State = {
         data: [],
         period: "day",
         loading: true
     }
+
     componentDidMount() {
         this.fetch();
     }
+
     fetch = () => {
         const {period} = this.state;
         this.stateSet({loading: true, data: []});
+
         getLeaderboard(period).then(data => {
-            // @ts-ignore
-            if (data.map) {
-                this.stateSet({data});
-            } else {
-                console.log("Error loading data invalid array in leaderboard:", JSON.stringify(data));
-            }
+            this.stateSet({data});
             this.stateSet({loading: false});
         });
     }
+
     render() {
+
         const {data, period, loading} = this.state;
+
         const menuItems = [
             ...["day", "week", "month"].map((f => {
                 return {
@@ -57,36 +68,52 @@ export class LeaderBoard extends BaseComponent<Props, State> {
                 }
             }))
         ]
+
         const dropDownConfig = {
             history: this.props.history,
             label: '',
             items: menuItems
         };
+
         return (
             <div className={_c(`leaderboard-list ${loading ? "loading" : ""}`)}>
                 <div className="list-header">
                     <div className="list-filter">
-                        {_t('leaderboard.title')} <DropDown {...dropDownConfig} float="left"/>
+                        {_t('leaderboard.title-stars')} <DropDown {...dropDownConfig} float="left"/>
                     </div>
                     <div className="list-title">
                         {_t(`leaderboard.title-${period}`)}
                     </div>
                 </div>
                 {loading && <LinearProgress/>}
-                {data.map && data.length > 0 && (
+                {data.length > 0 && (
                     <div className="list-body">
                         <div className="list-body-header">
                             <span/>
-                            <Tooltip content={_t('leaderboard.header-score-tip')}>
-                            <span className="score">
-                                {informationSvg} {_t('leaderboard.header-score')}
-                            </span>
-                            </Tooltip>
+                            <OverlayTrigger
+                                delay={{ show: 0, hide: 500 }}
+                                key={'bottom'}
+                                placement={'bottom'}
+                                overlay={
+                                    <Tooltip id={`tooltip-${'bottom'}`}>
+                                        {_t('leaderboard.header-score-tip')}
+                                    </Tooltip>
+                                }
+                                >
+                                <div className='d-flex align-items-center'>
+                                    <span className="info-icon mr-1">{informationVariantSvg}</span>
+                                    <span className="score">
+                                        {_t('leaderboard.header-score')}
+                                    </span>
+                                </div>
+                            </OverlayTrigger>
                             <span className="points">
                                {_t('leaderboard.header-reward')}
                             </span>
                         </div>
-                        {data.map((r:{_id: string, count:number, points:string}, i:number) => {
+
+                        {data.map((r, i) => {
+
                             return <div className="list-item" key={i}>
                                 <div className="index">{i + 1}</div>
                                 <div className="avatar">
@@ -113,15 +140,19 @@ export class LeaderBoard extends BaseComponent<Props, State> {
                         })}
                     </div>
                 )}
+
             </div>
         );
     }
 }
+
+
 export default (p: Props) => {
     const props: Props = {
         global: p.global,
         history: p.history,
         addAccount: p.addAccount
     };
+
     return <LeaderBoard {...props} />
 }

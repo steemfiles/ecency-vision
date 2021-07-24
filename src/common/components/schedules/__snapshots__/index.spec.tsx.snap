@@ -70,6 +70,7 @@ exports[`(2) With data 1`] = `
             </div>
             <span
               className="category"
+              title="Moderated community"
             >
               GEMS
             </span>
@@ -85,7 +86,7 @@ exports[`(2) With data 1`] = `
               <img
                 alt="Eget suscipit quam suspendisse"
                 onError={[Function]}
-                src="noimage.png"
+                src="noimage.svg"
               />
             </div>
           </div>
@@ -199,6 +200,7 @@ exports[`(2) With data 1`] = `
             </div>
             <span
               className="category"
+              title="Moderated community"
             >
               GEMS
             </span>
@@ -214,7 +216,7 @@ exports[`(2) With data 1`] = `
               <img
                 alt="Eget suscipit quam suspendisse"
                 onError={[Function]}
-                src="noimage.png"
+                src="noimage.svg"
               />
             </div>
           </div>
@@ -330,6 +332,7 @@ exports[`(2) With data 1`] = `
             </div>
             <span
               className="category"
+              title="Moderated community"
             >
               GEMS
             </span>
@@ -345,7 +348,7 @@ exports[`(2) With data 1`] = `
               <img
                 alt="Eget suscipit quam suspendisse"
                 onError={[Function]}
-                src="noimage.png"
+                src="noimage.svg"
               />
             </div>
           </div>
@@ -464,6 +467,7 @@ exports[`(2) With data 1`] = `
             </div>
             <span
               className="category"
+              title="Moderated community"
             >
               GEMS
             </span>
@@ -485,7 +489,7 @@ exports[`(2) With data 1`] = `
               <img
                 alt="Eget suscipit quam suspendisse"
                 onError={[Function]}
-                src="noimage.png"
+                src="noimage.svg"
               />
             </div>
           </div>

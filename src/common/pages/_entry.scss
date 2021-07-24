@@ -18,6 +18,8 @@
 }
 
 .entry-page {
+  font-family: Georgia, -apple-system, BlinkMacSystemFont, sans-serif;
+
   .the-entry {
     margin: 0 auto 90px auto;
     width: 100%;
@@ -176,8 +178,7 @@
       }
 
       h1.entry-title {
-        font-size: 30px;
-        font-weight: 650;
+        font-size: 42px;
         margin: 16px 0 22px 0;
 
         @media (min-width: $md-break) {
@@ -202,7 +203,7 @@
         height: 40px;
         line-height: 100%;
         margin-bottom: 15px;
-
+        position: relative;
         @media (min-width: $sm-break) {
           font-size: 18px;
         }
@@ -305,7 +306,7 @@
             }
 
             .date {
-              @media (max-width: $sm-break - 1px) {
+              @media (max-width: $xs-break - 1px) {
                 font-size: 90%;
               }
             }
@@ -317,7 +318,7 @@
     .entry-body {
       @include clearfix();
       padding: 0 0 2em 0;
-      font-size: 1.2rem;
+      font-size: 21px;
 
       @include themify(day) {
         color: $tundora;
@@ -346,7 +347,6 @@
 
         .entry-tag {
           border-radius: 25px;
-          color: $white;
           cursor: pointer;
           font-size: 14px;
           line-height: 1em;
@@ -359,17 +359,7 @@
             font-size: 16px;
           }
 
-          @include themify(day) {
-            background-color: $silver;
-          }
-
-          @include themify(night) {
-            background-color: $metallic-blue;
-          }
-
-          &:first-child {
-            background-color: $dark-sky-blue;
-          }
+          @include tag;
         }
       }
 
@@ -405,10 +395,6 @@
               display: block;
             }
           }
-        }
-
-        .date {
-
         }
 
         .author {
