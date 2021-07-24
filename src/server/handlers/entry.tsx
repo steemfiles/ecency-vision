@@ -1,55 +1,56 @@
-import {Request, Response} from "express";
+import { Request, Response } from "express";
 
-import {AppState} from "../../common/store";
-import {Entry} from "../../common/store/entries/types";
+import { AppState } from "../../common/store";
+import { Entry } from "../../common/store/entries/types";
 
 import * as bridgeApi from "../../common/api/bridge";
 
-import {makePreloadedState} from "../state";
+import { makePreloadedState } from "../state";
 
-import {render} from "../template";
+import { render } from "../template";
 
 export default async (req: Request, res: Response) => {
-    const {category, author, permlink} = req.params;
-    let entry: Entry | null = null;
+  const { category, author, permlink } = req.params;
+  let entry: Entry | null = null;
 
-    try {
-        entry = await bridgeApi.getPost(author, permlink);
-    } catch (e) {
-        console.error(`${new Date().toISOString()} ERROR fetching @${author}/${permlink}`);
+  try {
+    entry = await bridgeApi.getPost(author, permlink);
+  } catch (e) {
+    console.error(
+      `${new Date().toISOString()} ERROR fetching @${author}/${permlink}`
+    );
+  }
+
+  let entries = {};
+
+  if (entry) {
+    if (!category) {
+      res.redirect(`/${entry.category}/@${author}/${permlink}`);
+      return;
     }
 
-    let entries = {};
+    entries = {
+      [`__manual__`]: {
+        entries: [entry],
+        error: null,
+        loading: false,
+        hasMore: true,
+      },
+    };
+  }
 
-    if (entry) {
+  const state = await makePreloadedState(req);
 
-        if (!category) {
-            res.redirect(`/${entry.category}/@${author}/${permlink}`);
-            return;
-        }
+  const preLoadedState: AppState = {
+    ...state,
+    global: {
+      ...state.global,
+    },
+    entries: {
+      ...state.entries,
+      ...entries,
+    },
+  };
 
-        entries = {
-            [`__manual__`]: {
-                entries: [entry],
-                error: null,
-                loading: false,
-                hasMore: true,
-            },
-        };
-    }
-
-    const state = await makePreloadedState(req);
-
-    const preLoadedState: AppState = {
-        ...state,
-        global: {
-            ...state.global,
-        },
-        entries: {
-            ...state.entries,
-            ...entries
-        },
-    }
-
-    res.send(render(req, preLoadedState));
+  res.send(render(req, preLoadedState));
 };

@@ -2,107 +2,110 @@ import React from "react";
 
 import Discussion from "./index";
 
-import {Discussion as DiscussionType, SortOrder} from '../../store/discussion/types';
+import {
+  Discussion as DiscussionType,
+  SortOrder,
+} from "../../store/discussion/types";
 
 import renderer from "react-test-renderer";
 
-import {createBrowserHistory, createLocation} from "history";
+import { createBrowserHistory, createLocation } from "history";
 
-import {globalInstance, discussionInstace1, dynamicPropsIntance1, activeUserMaker, communityInstance1, UiInstance} from "../../helper/test-helper";
+import {
+  globalInstance,
+  discussionInstace1,
+  dynamicPropsIntance1,
+  activeUserMaker,
+  communityInstance1,
+  UiInstance,
+} from "../../helper/test-helper";
 
 jest.mock("moment", () => () => ({
-    fromNow: () => "3 days ago",
-    format: (f: string, s: string) => "2020-01-01 23:12:00",
+  fromNow: () => "3 days ago",
+  format: (f: string, s: string) => "2020-01-01 23:12:00",
 }));
 
 const [parent] = discussionInstace1;
 const [, ...replies] = discussionInstace1;
 
 const discussion: DiscussionType = {
-    list: replies,
-    loading: false,
-    error: false,
-    order: SortOrder.trending
-}
+  list: replies,
+  loading: false,
+  error: false,
+  order: SortOrder.trending,
+};
 
 const defProps = {
-    history: createBrowserHistory(),
-    location: createLocation({}),
-    global: globalInstance,
-    dynamicProps: dynamicPropsIntance1,
-    users: [],
-    activeUser: activeUserMaker("foo"),
-    ui: UiInstance,
-    parent,
-    community: null,
-    discussion,
-    hiveEngineTokensProperties: {},
-    addAccount: () => {
-    },
-    setActiveUser: () => {
-    },
-    updateActiveUser: () => {
-    },
-    deleteUser: () => {
-    },
-    fetchDiscussion: () => {
-    },
-    sortDiscussion: () => {
-    },
-    resetDiscussion: () => {
-    },
-    updateReply: () => {
-    },
-    addReply: () => {
-    },
-    deleteReply: () => {
-    },
-    toggleUIProp: () => {
-    }
+  history: createBrowserHistory(),
+  location: createLocation({}),
+  global: globalInstance,
+  dynamicProps: dynamicPropsIntance1,
+  users: [],
+  activeUser: activeUserMaker("foo"),
+  ui: UiInstance,
+  parent,
+  community: null,
+  discussion,
+  hiveEngineTokensProperties: {},
+  addAccount: () => {},
+  setActiveUser: () => {},
+  updateActiveUser: () => {},
+  deleteUser: () => {},
+  fetchDiscussion: () => {},
+  sortDiscussion: () => {},
+  resetDiscussion: () => {},
+  updateReply: () => {},
+  addReply: () => {},
+  deleteReply: () => {},
+  toggleUIProp: () => {},
 };
 
 it("(1) Full render with active user", () => {
-    const component = renderer.create(<Discussion {...defProps} />);
-    expect(component.toJSON()).toMatchSnapshot();
+  const component = renderer.create(<Discussion {...defProps} />);
+  expect(component.toJSON()).toMatchSnapshot();
 });
 
 it("(2) Full render with no active user", () => {
-    const props = {
-        ...defProps,
-        activeUser: null
-    }
-    const component = renderer.create(<Discussion {...props} />);
-    expect(component.toJSON()).toMatchSnapshot();
+  const props = {
+    ...defProps,
+    activeUser: null,
+  };
+  const component = renderer.create(<Discussion {...props} />);
+  expect(component.toJSON()).toMatchSnapshot();
 });
 
 it("(3) With selected item", () => {
-    const props = {
-        ...defProps,
-        location: createLocation({hash: "#@forykw/re-esteemapp-202067t12246786z"}),
-    }
-    const component = renderer.create(<Discussion {...props} />);
-    expect(component.toJSON()).toMatchSnapshot();
+  const props = {
+    ...defProps,
+    location: createLocation({
+      hash: "#@forykw/re-esteemapp-202067t12246786z",
+    }),
+  };
+  const component = renderer.create(<Discussion {...props} />);
+  expect(component.toJSON()).toMatchSnapshot();
 });
 
-
 it("(4) Show mute button, muted comment", () => {
-    let [reply] = replies;
-    reply = {...reply, stats: {hide: false, gray: true, total_votes: 180, flag_weight: 0}}
+  let [reply] = replies;
+  reply = {
+    ...reply,
+    stats: { hide: false, gray: true, total_votes: 180, flag_weight: 0 },
+  };
 
-    const discussion: DiscussionType = {
-        list: [reply, replies[1]],
-        loading: false,
-        error: false,
-        order: SortOrder.trending
-    }
+  const discussion: DiscussionType = {
+    list: [reply, replies[1]],
+    loading: false,
+    error: false,
+    order: SortOrder.trending,
+  };
 
-    const nProps = {
-        ...defProps,
-        discussion,
-        activeUser: activeUserMaker("hive-148441"),
-        community: communityInstance1
-    }
+  const nProps = {
+    ...defProps,
+    discussion,
+    activeUser: activeUserMaker("hive-148441"),
+    community: communityInstance1,
+  };
 
-    const component = renderer.create(<Discussion {...nProps} />);
-    expect(component.toJSON()).toMatchSnapshot();
+  const component = renderer.create(<Discussion {...nProps} />);
+  expect(component.toJSON()).toMatchSnapshot();
 });

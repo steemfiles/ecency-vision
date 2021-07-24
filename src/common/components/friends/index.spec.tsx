@@ -6,7 +6,7 @@ import renderer from "react-test-renderer";
 
 import { createBrowserHistory } from "history";
 
-import {globalInstance} from "../../helper/test-helper";
+import { globalInstance } from "../../helper/test-helper";
 
 jest.mock("../../constants/defaults.json", () => ({
   imageServer: "https://images.ecency.com",

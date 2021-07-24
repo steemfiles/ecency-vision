@@ -1,108 +1,133 @@
-import {Dispatch} from "redux";
+import { Dispatch } from "redux";
 import Cookies from "js-cookie";
-import {AppState} from "../index";
-import {BaseAccount, Account} from "../accounts/types";
-import {Actions, ActionTypes, ActiveUser, UserPoints, LoginAction, LogoutAction, UpdateAction} from "./types";
+import { AppState } from "../index";
+import { BaseAccount, Account } from "../accounts/types";
+import {
+  Actions,
+  ActionTypes,
+  ActiveUser,
+  UserPoints,
+  LoginAction,
+  LogoutAction,
+  UpdateAction,
+} from "./types";
 import * as ls from "../../util/local-storage";
-import {getAccount} from "../../api/hive";
-import {getPoints} from "../../api/private-api";
-import {activeUserMaker} from "../helper";
-import {FullHiveEngineAccount, getAccountHEFull, TokenBalance, is_not_FullHiveEngineAccount, is_FullHiveEngineAccount} from "../../api/hive-engine";
+import { getAccount } from "../../api/hive";
+import { getPoints } from "../../api/private-api";
+import { activeUserMaker } from "../helper";
+import {
+  FullHiveEngineAccount,
+  getAccountHEFull,
+  TokenBalance,
+  is_not_FullHiveEngineAccount,
+  is_FullHiveEngineAccount,
+} from "../../api/hive-engine";
 const load = (): ActiveUser | null => {
-    const name = ls.get("active_user");
-    if (name && ls.get(`user_${name}`)) {
-        return activeUserMaker(name);
-    }
-    return null;
+  const name = ls.get("active_user");
+  if (name && ls.get(`user_${name}`)) {
+    return activeUserMaker(name);
+  }
+  return null;
 };
 export const initialState: ActiveUser | null = null;
-export default (state: ActiveUser | null = initialState, action: Actions): ActiveUser | null => {
-    switch (action.type) {
-        case ActionTypes.LOGIN:
-        case ActionTypes.LOGOUT: {
-            return load();
-        }
-        case ActionTypes.UPDATE: {
-            const {data, points} = action;
-            return Object.assign({}, state, {data, points});
-        }
-        default:
-            return state;
+export default (
+  state: ActiveUser | null = initialState,
+  action: Actions
+): ActiveUser | null => {
+  switch (action.type) {
+    case ActionTypes.LOGIN:
+    case ActionTypes.LOGOUT: {
+      return load();
     }
+    case ActionTypes.UPDATE: {
+      const { data, points } = action;
+      return Object.assign({}, state, { data, points });
+    }
+    default:
+      return state;
+  }
 };
 /* Actions */
-export const setActiveUser = (name: string | null) => async (dispatch: Dispatch) => {
+export const setActiveUser =
+  (name: string | null) => async (dispatch: Dispatch) => {
     if (name) {
-        ls.set("active_user", name);
-        Cookies.set("active_user", name);
-        dispatch(loginAct());
+      ls.set("active_user", name);
+      Cookies.set("active_user", name);
+      dispatch(loginAct());
     } else {
-        ls.remove("active_user");
-        Cookies.remove("active_user");
-        dispatch(logoutAct());
+      ls.remove("active_user");
+      Cookies.remove("active_user");
+      dispatch(logoutAct());
     }
-};
-export const updateActiveUser = (data?: Account) => async (dispatch: Dispatch, getState: () => AppState) => {
-    const {activeUser} = getState();
+  };
+export const updateActiveUser =
+  (data?: Account) => async (dispatch: Dispatch, getState: () => AppState) => {
+    const { activeUser } = getState();
     if (!activeUser) {
-        return;
+      return;
     }
     let uData: Account | undefined = data;
     let tokens: Array<TokenBalance> | null = null;
-    let cuData : FullHiveEngineAccount|BaseAccount;
+    let cuData: FullHiveEngineAccount | BaseAccount;
     if (!uData || is_not_FullHiveEngineAccount(uData)) {
-        const d = {
-                    name: activeUser.username,
-                };
-        try {
-            let HEFA = await getAccountHEFull(activeUser.username, true);
-            if (is_FullHiveEngineAccount(HEFA)) {
-                tokens = HEFA.token_balances;
-                cuData = HEFA;
-            } else {
-                cuData = d;
-            }
-        } catch (e) {
-            cuData = d;
+      const d = {
+        name: activeUser.username,
+      };
+      try {
+        let HEFA = await getAccountHEFull(activeUser.username, true);
+        if (is_FullHiveEngineAccount(HEFA)) {
+          tokens = HEFA.token_balances;
+          cuData = HEFA;
+        } else {
+          cuData = d;
         }
+      } catch (e) {
+        cuData = d;
+      }
     } else {
-        cuData = uData as FullHiveEngineAccount;
-        tokens = cuData.token_balances;
+      cuData = uData as FullHiveEngineAccount;
+      tokens = cuData.token_balances;
     }
     if (cuData && is_FullHiveEngineAccount(cuData))
-        console.log({'fineTrxs:': (cuData as FullHiveEngineAccount).transfer_history});
+      console.log({
+        "fineTrxs:": (cuData as FullHiveEngineAccount).transfer_history,
+      });
     let points: UserPoints;
     try {
-        const r = await getPoints(activeUser.username)
-        points = {
-            points: r.points,
-            uPoints: r.unclaimed_points
-        }
+      const r = await getPoints(activeUser.username);
+      points = {
+        points: r.points,
+        uPoints: r.unclaimed_points,
+      };
     } catch (e) {
-        points = {
-            points: "0.000",
-            uPoints: "0.000"
-        }
+      points = {
+        points: "0.000",
+        uPoints: "0.000",
+      };
     }
     if (is_FullHiveEngineAccount(cuData))
-        dispatch(updateAct(cuData as FullHiveEngineAccount, points, tokens));
-};
+      dispatch(updateAct(cuData as FullHiveEngineAccount, points, tokens));
+  };
 /* Action Creators */
 export const loginAct = (): LoginAction => {
-    return {
-        type: ActionTypes.LOGIN,
-    };
+  return {
+    type: ActionTypes.LOGIN,
+  };
 };
 export const logoutAct = (): LogoutAction => {
-    return {
-        type: ActionTypes.LOGOUT,
-    };
+  return {
+    type: ActionTypes.LOGOUT,
+  };
 };
-export const updateAct = (data: Account, points: UserPoints, tokens: null | Array<TokenBalance> = null): UpdateAction => {
-    return {
-        type: ActionTypes.UPDATE,
-        data,
-        points,
-        hiveEngineBalances: tokens || [],
-    };
+export const updateAct = (
+  data: Account,
+  points: UserPoints,
+  tokens: null | Array<TokenBalance> = null
+): UpdateAction => {
+  return {
+    type: ActionTypes.UPDATE,
+    data,
+    points,
+    hiveEngineBalances: tokens || [],
+  };
 };

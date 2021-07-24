@@ -22,7 +22,6 @@ interface Props extends PageProps {
 }
 
 const AuthorInfoCard = (props: Props) => {
-
   const reputation = accountReputation(props?.entry?.author_reputation);
   const { username } = props?.match?.params;
   const author = username.replace("@", "");
@@ -45,7 +44,6 @@ const AuthorInfoCard = (props: Props) => {
       about: _authorInfo?.about || _authorInfo?.location || "",
     });
   };
-
 
   return (
     <div className="avatar-fixed" id="avatar-fixed">

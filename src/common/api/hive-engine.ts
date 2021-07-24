@@ -7,458 +7,553 @@ import {
     augmentContentWithCrossPost,
 } from './util/CrossPosts';
 */
-import {DISABLE_HIVE, LIQUID_TOKEN_UPPERCASE} from '../../client_config';
-import axios from 'axios';
+import { DISABLE_HIVE, LIQUID_TOKEN_UPPERCASE } from "../../client_config";
+import axios from "axios";
 // @ts-ignore
 import SSC from "sscjs";
-import {HECoarseTransaction, HEFineTransaction} from "../store/transactions/types";
-import {getAccount, getAccounts, getFollowCount, getPost} from "./hive";
-import {AccountFollowStats, BaseAccount, Account, FullAccount} from "../store/accounts/types";
-import {Entry, EntryBeneficiaryRoute, EntryStat, EntryVote} from "../store/entries/types";
-const hiveSsc = new SSC('https://api.hive-engine.com/rpc');
+import {
+  HECoarseTransaction,
+  HEFineTransaction,
+} from "../store/transactions/types";
+import { getAccount, getAccounts, getFollowCount, getPost } from "./hive";
+import {
+  AccountFollowStats,
+  BaseAccount,
+  Account,
+  FullAccount,
+} from "../store/accounts/types";
+import {
+  Entry,
+  EntryBeneficiaryRoute,
+  EntryStat,
+  EntryVote,
+} from "../store/entries/types";
+const hiveSsc = new SSC("https://api.hive-engine.com/rpc");
 export interface TokenStatus {
-    "downvote_weight_multiplier":number;
-    "downvoting_power":number;
-    "earned_mining_token":number;
-    "earned_other_token":number;
-    "earned_staking_token":number;
-    "earned_token":number;
-    "hive":boolean;
-    "last_downvote_time":string;
-    "last_follow_refresh_time":string;
-    "last_post":string;
-    "last_root_post":string;
-    "last_vote_time":string;
-    "last_won_mining_claim":string;
-    "last_won_staking_claim":string;
-    "loki":null|unknown,
-    "muted":boolean;
-    "name":string;
-    "pending_token":number;
-    "precision":number;
-    "staked_mining_power":number;
-    "staked_tokens":number;
-    "symbol":string;
-    "vote_weight_multiplier":number;
-    "voting_power":number;
+  downvote_weight_multiplier: number;
+  downvoting_power: number;
+  earned_mining_token: number;
+  earned_other_token: number;
+  earned_staking_token: number;
+  earned_token: number;
+  hive: boolean;
+  last_downvote_time: string;
+  last_follow_refresh_time: string;
+  last_post: string;
+  last_root_post: string;
+  last_vote_time: string;
+  last_won_mining_claim: string;
+  last_won_staking_claim: string;
+  loki: null | unknown;
+  muted: boolean;
+  name: string;
+  pending_token: number;
+  precision: number;
+  staked_mining_power: number;
+  staked_tokens: number;
+  symbol: string;
+  vote_weight_multiplier: number;
+  voting_power: number;
 }
 export interface UnStake {
-    "_id": number;
-    "account": string;
-    "symbol": string;
-    "quantity": string;
-    "quantityLeft": string;
-    "nextTransactionTimestamp": number;
-    "numberTransactionsLeft": number;
-    "millisecPerPeriod": string;
-    "txID": string;
+  _id: number;
+  account: string;
+  symbol: string;
+  quantity: string;
+  quantityLeft: string;
+  nextTransactionTimestamp: number;
+  numberTransactionsLeft: number;
+  millisecPerPeriod: string;
+  txID: string;
 }
 // Hopefully we can make this dynamic some soon
 const defaultPrices = {
-    'POB': 0,
-    'LEO': 0,
-    'SWAP.BTC': 1,
-    'SWAP.HIVE': 1
+  POB: 0,
+  LEO: 0,
+  "SWAP.BTC": 1,
+  "SWAP.HIVE": 1,
 };
-export async function getPrices(token_list: undefined|Array<string>) : Promise<{[shortCoinName: string]: number /* in Hive */}> {
+export async function getPrices(
+  token_list: undefined | Array<string>
+): Promise<{ [shortCoinName: string]: number /* in Hive */ }> {
+  try {
+    let obj: any = {
+      "SWAP.HIVE": 1,
+    };
     try {
-        let obj : any = {
-            'SWAP.HIVE': 1,
-        };
-        try {
-            // others
-            const others = await hiveSsc.find('market', 'tradesHistory', {
-                'type': 'buy',
-            });
-            for (const other of others) {
-                obj[other.symbol] = parseFloat(other.price);
-            }
-        } catch (e) {
-            console.log(e);
-            // do nothing...
-        }
-        try {
-            if (!obj["POB"]) {
-                const HIVEpPOB = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
-                        'symbol': 'POB',
-                        'type': 'buy',
-                }))[0].price);
-            }
-            if (!obj["LEO"]) {
-                const HIVEpLEO = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
-                        'symbol': 'LEO',
-                        'type': 'buy',
-                }))[0].price);
-            }
-            if (!obj['SWAP.BTC']) {
-                obj['SWAP.BTC'] = parseFloat((await hiveSsc.find('market', 'tradesHistory', {
-                    'symbol': 'SWAP.BTC',
-                    'type': 'buy',
-                }))[0].price);
-            }
-        } catch (e) {
-            // do nothing....
-        }
-        return obj;
+      // others
+      const others = await hiveSsc.find("market", "tradesHistory", {
+        type: "buy",
+      });
+      for (const other of others) {
+        obj[other.symbol] = parseFloat(other.price);
+      }
     } catch (e) {
-        console.log("getPrices are failing:", e.message);
+      console.log(e);
+      // do nothing...
     }
-    return defaultPrices;
+    try {
+      if (!obj["POB"]) {
+        const HIVEpPOB = parseFloat(
+          (
+            await hiveSsc.find("market", "tradesHistory", {
+              symbol: "POB",
+              type: "buy",
+            })
+          )[0].price
+        );
+      }
+      if (!obj["LEO"]) {
+        const HIVEpLEO = parseFloat(
+          (
+            await hiveSsc.find("market", "tradesHistory", {
+              symbol: "LEO",
+              type: "buy",
+            })
+          )[0].price
+        );
+      }
+      if (!obj["SWAP.BTC"]) {
+        obj["SWAP.BTC"] = parseFloat(
+          (
+            await hiveSsc.find("market", "tradesHistory", {
+              symbol: "SWAP.BTC",
+              type: "buy",
+            })
+          )[0].price
+        );
+      }
+    } catch (e) {
+      // do nothing....
+    }
+    return obj;
+  } catch (e) {
+    console.log("getPrices are failing:", e.message);
+  }
+  return defaultPrices;
 }
 interface RawTokenBalance {
-    _id: number,
-    account: string,
-    symbol: string,
-    balance: string,
-    stake: string,
-    pendingUnstake: string,
-    delegationsIn: string,
-    delegationsOut: string,
-    pendingUndelegations: string
+  _id: number;
+  account: string;
+  symbol: string;
+  balance: string;
+  stake: string;
+  pendingUnstake: string;
+  delegationsIn: string;
+  delegationsOut: string;
+  pendingUndelegations: string;
 }
 export interface TokenBalance {
-    _id: number,
-    account: string,
-    symbol: string,
-    balance: number,
-    stake: number,
-    pendingUnstake: number,
-    delegationsIn: number,
-    delegationsOut: number,
-    pendingUndelegations: number
+  _id: number;
+  account: string;
+  symbol: string;
+  balance: number;
+  stake: number;
+  pendingUnstake: number;
+  delegationsIn: number;
+  delegationsOut: number;
+  pendingUndelegations: number;
 }
 export interface CoinDescription {
-    "downvote_weight_multiplier": number;
-    "downvoting_power": number;
-    "earned_mining_token": number;
-    "earned_other_token": number;
-    "earned_staking_token": number;
-    "earned_token": number;
-    "hive": boolean;
-    "last_downvote_time": string;
-    "last_follow_refresh_time": string;
-    "last_post": string;
-    "last_root_post": string;
-    "last_vote_time": string;
-    "last_won_mining_claim": string;
-    "last_won_staking_claim": string;
-    "loki": any|null;
-    "muted": boolean;
-    "name": string;
-    "pending_token": number;
-    "precision": number;
-    "staked_mining_power": number;
-    "staked_tokens": number;
-    "symbol": string;
-    "vote_weight_multiplier": number;
-    "voting_power": number;
+  downvote_weight_multiplier: number;
+  downvoting_power: number;
+  earned_mining_token: number;
+  earned_other_token: number;
+  earned_staking_token: number;
+  earned_token: number;
+  hive: boolean;
+  last_downvote_time: string;
+  last_follow_refresh_time: string;
+  last_post: string;
+  last_root_post: string;
+  last_vote_time: string;
+  last_won_mining_claim: string;
+  last_won_staking_claim: string;
+  loki: any | null;
+  muted: boolean;
+  name: string;
+  pending_token: number;
+  precision: number;
+  staked_mining_power: number;
+  staked_tokens: number;
+  symbol: string;
+  vote_weight_multiplier: number;
+  voting_power: number;
 }
 export interface FullHiveEngineAccount extends FullAccount {
-    follow_stats: AccountFollowStats |undefined;
-    token_balances: Array<TokenBalance>;
-    token_unstakes: Array<UnStake>;
-    token_statuses: {data: {[id: string]:TokenStatus}, hiveData: {[id: string]:TokenStatus} | null};
-    transfer_history: undefined|null|Array<HEFineTransaction>;
-    token_delegations?: any; /* seems to be undefined sometimes */
-    prices: {[id:string]:number};
+  follow_stats: AccountFollowStats | undefined;
+  token_balances: Array<TokenBalance>;
+  token_unstakes: Array<UnStake>;
+  token_statuses: {
+    data: { [id: string]: TokenStatus };
+    hiveData: { [id: string]: TokenStatus } | null;
+  };
+  transfer_history: undefined | null | Array<HEFineTransaction>;
+  token_delegations?: any /* seems to be undefined sometimes */;
+  prices: { [id: string]: number };
 }
 function is_not_FullAccount(account: Account) {
-    return (!account);
+  return !account;
 }
-export function is_not_FullHiveEngineAccount(account :  FullHiveEngineAccount | FullAccount | BaseAccount) {
-    if (is_not_FullAccount(account) || !account["token_balances"] || !account["prices"] || !account["follow_stats"])
-        return true;
-    return false;
+export function is_not_FullHiveEngineAccount(
+  account: FullHiveEngineAccount | FullAccount | BaseAccount
+) {
+  if (
+    is_not_FullAccount(account) ||
+    !account["token_balances"] ||
+    !account["prices"] ||
+    !account["follow_stats"]
+  )
+    return true;
+  return false;
 }
-export function is_FullHiveEngineAccount(account : FullHiveEngineAccount | FullAccount | BaseAccount) {
-    return !is_not_FullHiveEngineAccount(account);
+export function is_FullHiveEngineAccount(
+  account: FullHiveEngineAccount | FullAccount | BaseAccount
+) {
+  return !is_not_FullHiveEngineAccount(account);
 }
-async function callApi(url : string, params: any) {
-    return await axios({
-        url,
-        method: 'GET',
-        params,
+async function callApi(url: string, params: any) {
+  return await axios({
+    url,
+    method: "GET",
+    params,
+  })
+    .then((response) => {
+      return response.data;
     })
-        .then(response => {
-            return response.data;
-        })
-        .catch(err => {
-            console.error(`Could not fetch data, url: ${url}`, JSON.stringify(err));
-            return [];
-        });
+    .catch((err) => {
+      console.error(`Could not fetch data, url: ${url}`, JSON.stringify(err));
+      return [];
+    });
 }
 // Exclude author and curation reward details
-export async function getCoarseTransactions(account: string, limit: number, offset: number = 0) {
-    const transfers : Array<HECoarseTransaction> = await callApi(
-        'https://accounts.hive-engine.com/accountHistory',
-        {
-            account,
-            limit,
-            offset,
-            type: 'user',
-            symbol: LIQUID_TOKEN_UPPERCASE,
-        }
-    );
-    return transfers;
+export async function getCoarseTransactions(
+  account: string,
+  limit: number,
+  offset: number = 0
+) {
+  const transfers: Array<HECoarseTransaction> = await callApi(
+    "https://accounts.hive-engine.com/accountHistory",
+    {
+      account,
+      limit,
+      offset,
+      type: "user",
+      symbol: LIQUID_TOKEN_UPPERCASE,
+    }
+  );
+  return transfers;
 }
 // Include virtual transactions like curation and author reward details.
-export async function getFineTransactions(account : string, limit: number, offset: number)  : Promise<Array<HEFineTransaction>> {
-    const history : Array<HEFineTransaction> = await getScotDataAsync<Array<HEFineTransaction>>('get_account_history', {
-        account,
-        token: LIQUID_TOKEN_UPPERCASE,
-        limit,
-        offset,
-    });
-    return history;
+export async function getFineTransactions(
+  account: string,
+  limit: number,
+  offset: number
+): Promise<Array<HEFineTransaction>> {
+  const history: Array<HEFineTransaction> = await getScotDataAsync<
+    Array<HEFineTransaction>
+  >("get_account_history", {
+    account,
+    token: LIQUID_TOKEN_UPPERCASE,
+    limit,
+    offset,
+  });
+  return history;
 }
-export async function getScotDataAsync<T>(path : string, params : object) : Promise<T> {
-    const x : T = await callApi(`https://scot-api.hive-engine.com/${path}`, params);
-    return x;
+export async function getScotDataAsync<T>(
+  path: string,
+  params: object
+): Promise<T> {
+  const x: T = await callApi(
+    `https://scot-api.hive-engine.com/${path}`,
+    params
+  );
+  return x;
 }
-export async function getScotAccountDataAsync(account: string) : Promise<{ data: { [id: string]: TokenStatus}, hiveData:null|{ [id: string]: TokenStatus} }> {
-    const data = await getScotDataAsync<{ [id: string]: TokenStatus}>(`@${account}`, {});
-    const hiveData = DISABLE_HIVE
-        ? null
-        : await getScotDataAsync<{[id: string]: TokenStatus} >(`@${account}`, { hive: 1 });
-    return { data, hiveData };
+export async function getScotAccountDataAsync(
+  account: string
+): Promise<{
+  data: { [id: string]: TokenStatus };
+  hiveData: null | { [id: string]: TokenStatus };
+}> {
+  const data = await getScotDataAsync<{ [id: string]: TokenStatus }>(
+    `@${account}`,
+    {}
+  );
+  const hiveData = DISABLE_HIVE
+    ? null
+    : await getScotDataAsync<{ [id: string]: TokenStatus }>(`@${account}`, {
+        hive: 1,
+      });
+  return { data, hiveData };
 }
-function mergeContent(content : Entry, tokenPostData : {[id:string]:ScotPost}) {
-    const {he} = content;
-    content.he = Object.assign(he ?? {}, tokenPostData);
-    return content;
+function mergeContent(
+  content: Entry,
+  tokenPostData: { [id: string]: ScotPost }
+) {
+  const { he } = content;
+  content.he = Object.assign(he ?? {}, tokenPostData);
+  return content;
 }
 export const enginifyPost = (post: Entry, observer: string): Promise<Entry> => {
-    const {author, permlink} = post;
-    const scot_data_promise = getScotDataAsync<{[id: string]: ScotPost}>(`@${post.author}/${post.permlink}?hive=1`, {});
-    return scot_data_promise.then(
-        (scotData) => {
-            mergeContent(post, scotData);
-            return post;
-        },
-        (value) => {
-            return post;
-        }
-    ).catch(e => {
-        console.log("enginify failed.");
+  const { author, permlink } = post;
+  const scot_data_promise = getScotDataAsync<{ [id: string]: ScotPost }>(
+    `@${post.author}/${post.permlink}?hive=1`,
+    {}
+  );
+  return scot_data_promise
+    .then(
+      (scotData) => {
+        mergeContent(post, scotData);
         return post;
+      },
+      (value) => {
+        return post;
+      }
+    )
+    .catch((e) => {
+      console.log("enginify failed.");
+      return post;
     });
-}
+};
 export const fetchedHiveEngineTokensProperties = async (
-    r : [HiveEngineTokenInfo,
-        HiveEngineTokenConfig,
-        {[shortCoinName: string]: number /* in Hive */}]) => {
-        const info = r[0] as HiveEngineTokenInfo;
-        const config = r[1] as HiveEngineTokenConfig;
-        const prices = r[2] as {[shortCoinName: string]: number /* in Hive */};
-        const hivePrice = prices["POB"];
-        return {[LIQUID_TOKEN_UPPERCASE]: {info, config, hivePrice}};
-}
-export async function getAccountHEFull(account : string, useHive: boolean) : Promise<FullHiveEngineAccount> {
-    try {
-        let hiveAccount: FullAccount, tokenBalances: Array<object>, tokenUnstakes: Array<UnStake>,
-            tokenStatuses: { data: {[id:string]:TokenStatus}; hiveData: {[id:string]:TokenStatus}| null }, transferHistory: any, tokenDelegations: any;
-        [
-            hiveAccount,
-            tokenBalances,
-            tokenUnstakes,
-            tokenStatuses,
-            transferHistory,
-            tokenDelegations,
-        ] = await Promise.all([
-            getAccount(account),
-            // modified to get all tokens. - by anpigon
-            hiveSsc.find('tokens', 'balances', {
-                account,
-            }),
-            hiveSsc.find('tokens', 'pendingUnstakes', {
-                account,
-                symbol: LIQUID_TOKEN_UPPERCASE,
-            }),
-            getScotAccountDataAsync(account),
-            getFineTransactions(account, 100, 0),
-            hiveSsc.find('tokens', 'delegations', {
-                $or: [{from: account}, {to: account}],
-                symbol: LIQUID_TOKEN_UPPERCASE,
-            }),
-        ]);
-        let modifiedTokenBalances : Array<TokenBalance> = [];
-       // There is no typesafe way to modify the type of something
-       // in place.  You have to do a typecast eventually or participate in
-       // copying.
-       for (const tokenBalance of tokenBalances) {
-           const b = tokenBalance;
-           if (typeof(b['_id']) !== 'number'
-            ||
-               typeof(b['symbol']) !== 'string'
-               ||
-               typeof(b['balance']) !== 'string'
-               ||
-               typeof(b['stake']) !== 'string'
-           )
-               continue;
-           const b2: RawTokenBalance = b as RawTokenBalance;
-           // pass by reference semantics modifies the array.
-           // This is on purpose.
-           const b1: TokenBalance = Object.assign(b2, {
-               "delegationsIn": parseFloat(b2.delegationsIn),
-               "balance": parseFloat(b2.balance),
-               "stake": parseFloat(b2.stake),
-               "delegationsOut": parseFloat(b2.delegationsOut),
-               "pendingUndelegations": parseFloat(b2.pendingUndelegations),
-               "pendingUnstake": parseFloat(b2.pendingUndelegations)
-           });
-           modifiedTokenBalances.push(b1);
-        }
-       // Now tokenBalances is an Array<TokenBalance>.
-        const prices = await getPrices(Object.keys(tokenBalances));
-        let follow_stats: AccountFollowStats | undefined;
-        try {
-            follow_stats = await getFollowCount(account);
-        } catch (e) {
-        }
-        return {...hiveAccount, follow_stats, token_balances: modifiedTokenBalances, token_unstakes: tokenUnstakes,
-            token_statuses: tokenStatuses, transfer_history: transferHistory, token_delegations: tokenDelegations, prices, __loaded: true };
-    } catch (e) {
-        console.log("getAccountHEFull threw an exception");
-        throw e;
+  r: [
+    HiveEngineTokenInfo,
+    HiveEngineTokenConfig,
+    { [shortCoinName: string]: number /* in Hive */ }
+  ]
+) => {
+  const info = r[0] as HiveEngineTokenInfo;
+  const config = r[1] as HiveEngineTokenConfig;
+  const prices = r[2] as { [shortCoinName: string]: number /* in Hive */ };
+  const hivePrice = prices["POB"];
+  return { [LIQUID_TOKEN_UPPERCASE]: { info, config, hivePrice } };
+};
+export async function getAccountHEFull(
+  account: string,
+  useHive: boolean
+): Promise<FullHiveEngineAccount> {
+  try {
+    let hiveAccount: FullAccount,
+      tokenBalances: Array<object>,
+      tokenUnstakes: Array<UnStake>,
+      tokenStatuses: {
+        data: { [id: string]: TokenStatus };
+        hiveData: { [id: string]: TokenStatus } | null;
+      },
+      transferHistory: any,
+      tokenDelegations: any;
+    [
+      hiveAccount,
+      tokenBalances,
+      tokenUnstakes,
+      tokenStatuses,
+      transferHistory,
+      tokenDelegations,
+    ] = await Promise.all([
+      getAccount(account),
+      // modified to get all tokens. - by anpigon
+      hiveSsc.find("tokens", "balances", {
+        account,
+      }),
+      hiveSsc.find("tokens", "pendingUnstakes", {
+        account,
+        symbol: LIQUID_TOKEN_UPPERCASE,
+      }),
+      getScotAccountDataAsync(account),
+      getFineTransactions(account, 100, 0),
+      hiveSsc.find("tokens", "delegations", {
+        $or: [{ from: account }, { to: account }],
+        symbol: LIQUID_TOKEN_UPPERCASE,
+      }),
+    ]);
+    let modifiedTokenBalances: Array<TokenBalance> = [];
+    // There is no typesafe way to modify the type of something
+    // in place.  You have to do a typecast eventually or participate in
+    // copying.
+    for (const tokenBalance of tokenBalances) {
+      const b = tokenBalance;
+      if (
+        typeof b["_id"] !== "number" ||
+        typeof b["symbol"] !== "string" ||
+        typeof b["balance"] !== "string" ||
+        typeof b["stake"] !== "string"
+      )
+        continue;
+      const b2: RawTokenBalance = b as RawTokenBalance;
+      // pass by reference semantics modifies the array.
+      // This is on purpose.
+      const b1: TokenBalance = Object.assign(b2, {
+        delegationsIn: parseFloat(b2.delegationsIn),
+        balance: parseFloat(b2.balance),
+        stake: parseFloat(b2.stake),
+        delegationsOut: parseFloat(b2.delegationsOut),
+        pendingUndelegations: parseFloat(b2.pendingUndelegations),
+        pendingUnstake: parseFloat(b2.pendingUndelegations),
+      });
+      modifiedTokenBalances.push(b1);
     }
+    // Now tokenBalances is an Array<TokenBalance>.
+    const prices = await getPrices(Object.keys(tokenBalances));
+    let follow_stats: AccountFollowStats | undefined;
+    try {
+      follow_stats = await getFollowCount(account);
+    } catch (e) {}
+    return {
+      ...hiveAccount,
+      follow_stats,
+      token_balances: modifiedTokenBalances,
+      token_unstakes: tokenUnstakes,
+      token_statuses: tokenStatuses,
+      transfer_history: transferHistory,
+      token_delegations: tokenDelegations,
+      prices,
+      __loaded: true,
+    };
+  } catch (e) {
+    console.log("getAccountHEFull threw an exception");
+    throw e;
+  }
 }
 export interface HiveEngineTokenInfo {
-    "claimed_token": number;
-    "comment_pending_rshares": number;
-    "comment_reward_pool": number;
-    "enable_automatic_account_claim": boolean;
-    "enable_comment_reward_pool": boolean;
-    "enabled": boolean;
-    "enabled_services": undefined | any;
-    "hive": boolean;
-    "inflation_tools": number;
-    "issued_token": undefined | any;
-    "issuer": string;
-    "last_compute_post_reward_block_num": number;
-    "last_mining_claim_block_num": undefined | any;
-    "last_mining_claim_trx": undefined | any;
-    "last_other_accounts_transfer_block_num": number;
-    "last_processed_mining_claim_block_num": number;
-    "last_processed_staking_claim_block_num": number;
-    "last_reduction_block_num": number;
-    "last_reward_block_num": number;
-    "last_rshares2_decay_time": string; // date
-    "last_staking_claim_block_num": undefined | any;
-    "last_staking_claim_trx": undefined | any;
-    "last_staking_mining_update_block_num": undefined | any;
-    "mining_enabled": boolean;
-    "mining_reward_pool": number;
-    "next_mining_claim_number": number;
-    "next_staking_claim_number": number;
-    "other_reward_pool": number;
-    "pending_rshares": number;
-    "pending_token": number;
-    "precision": number;
-    "reward_pool": undefined | number;
-    "rewards_token": undefined | number;
-    "setup_complete": number;
-    "staked_mining_power": number;
-    "staked_token": number;
-    "staking_enabled": boolean;
-    "staking_reward_pool": number;
-    "start_block_num": number;
-    "start_date": string; // date
-    "symbol": string;
-    "total_generated_token": number;
-    "voting_enabled": boolean;
+  claimed_token: number;
+  comment_pending_rshares: number;
+  comment_reward_pool: number;
+  enable_automatic_account_claim: boolean;
+  enable_comment_reward_pool: boolean;
+  enabled: boolean;
+  enabled_services: undefined | any;
+  hive: boolean;
+  inflation_tools: number;
+  issued_token: undefined | any;
+  issuer: string;
+  last_compute_post_reward_block_num: number;
+  last_mining_claim_block_num: undefined | any;
+  last_mining_claim_trx: undefined | any;
+  last_other_accounts_transfer_block_num: number;
+  last_processed_mining_claim_block_num: number;
+  last_processed_staking_claim_block_num: number;
+  last_reduction_block_num: number;
+  last_reward_block_num: number;
+  last_rshares2_decay_time: string; // date
+  last_staking_claim_block_num: undefined | any;
+  last_staking_claim_trx: undefined | any;
+  last_staking_mining_update_block_num: undefined | any;
+  mining_enabled: boolean;
+  mining_reward_pool: number;
+  next_mining_claim_number: number;
+  next_staking_claim_number: number;
+  other_reward_pool: number;
+  pending_rshares: number;
+  pending_token: number;
+  precision: number;
+  reward_pool: undefined | number;
+  rewards_token: undefined | number;
+  setup_complete: number;
+  staked_mining_power: number;
+  staked_token: number;
+  staking_enabled: boolean;
+  staking_reward_pool: number;
+  start_block_num: number;
+  start_date: string; // date
+  symbol: string;
+  total_generated_token: number;
+  voting_enabled: boolean;
 }
 export interface HiveEngineTokenConfig {
-    allowlist_account: null;
-    author_curve_exponent: number;
-    author_reward_percentage: number;
-    badge_fee: number;
-    beneficiaries_account: string;
-    beneficiaries_reward_percentage: number;
-    cashout_window_days: number;
-    curation_curve_exponent: number;
-    disable_downvoting: boolean;
-    downvote_power_consumption: number;
-    downvote_regeneration_seconds: number;
-    downvote_window_days: number;
-    enable_account_allowlist: null;
-    enable_account_muting: boolean;
-    enable_comment_beneficiaries: boolean;
-    exclude_apps: null;
-    exclude_apps_from_token_beneficiary: null | string;
-    exclude_beneficiaries_accounts: null | string;
-    exclude_tags: null | string;
-    fee_post_account: null | number;
-    fee_post_amount: number;
-    fee_post_exempt_beneficiary_account: string | null;
-    fee_post_exempt_beneficiary_weight: number;
-    hive_community: null | string;
-    hive_enabled: null | boolean;
-    hive_engine_enabled: boolean;
-    issue_token: boolean;
-    json_metadata_app_value: null;
-    json_metadata_key: string;
-    json_metadata_value: string;
-    max_auto_claim_amount: number;
-    miner_tokens: string;
-    mining_pool_claim_number: number;
-    mining_pool_claims_per_year: number;
-    muting_account: null | string;
-    n_daily_posts_muted_accounts: number;
-    other_pool_accounts: string;
-    other_pool_percentage: number;
-    other_pool_send_token_per_year: number;
-    pob_comment_pool_percentage: number;
-    pob_pool_percentage: number;
-    posm_pool_percentage: number;
-    post_reward_curve: string;
-    post_reward_curve_parameter: null | number;
-    promoted_post_account: string;
-    reduction_every_n_block: number;
-    reduction_percentage: number;
-    rewards_token: number;
-    rewards_token_every_n_block: number;
-    staked_reward_percentage: number;
-    staking_pool_claim_number: number;
-    staking_pool_claims_per_year: number;
-    staking_pool_percentage: number;
-    steem_enabled: boolean;
-    steem_engine_enabled: boolean;
-    tag_adding_window_hours: number;
-    token: string;
-    token_account: string;
-    use_staking_circulating_quotent: boolean;
-    vote_power_consumption: number;
-    vote_regeneration_seconds: number;
-    vote_window_days: number;
+  allowlist_account: null;
+  author_curve_exponent: number;
+  author_reward_percentage: number;
+  badge_fee: number;
+  beneficiaries_account: string;
+  beneficiaries_reward_percentage: number;
+  cashout_window_days: number;
+  curation_curve_exponent: number;
+  disable_downvoting: boolean;
+  downvote_power_consumption: number;
+  downvote_regeneration_seconds: number;
+  downvote_window_days: number;
+  enable_account_allowlist: null;
+  enable_account_muting: boolean;
+  enable_comment_beneficiaries: boolean;
+  exclude_apps: null;
+  exclude_apps_from_token_beneficiary: null | string;
+  exclude_beneficiaries_accounts: null | string;
+  exclude_tags: null | string;
+  fee_post_account: null | number;
+  fee_post_amount: number;
+  fee_post_exempt_beneficiary_account: string | null;
+  fee_post_exempt_beneficiary_weight: number;
+  hive_community: null | string;
+  hive_enabled: null | boolean;
+  hive_engine_enabled: boolean;
+  issue_token: boolean;
+  json_metadata_app_value: null;
+  json_metadata_key: string;
+  json_metadata_value: string;
+  max_auto_claim_amount: number;
+  miner_tokens: string;
+  mining_pool_claim_number: number;
+  mining_pool_claims_per_year: number;
+  muting_account: null | string;
+  n_daily_posts_muted_accounts: number;
+  other_pool_accounts: string;
+  other_pool_percentage: number;
+  other_pool_send_token_per_year: number;
+  pob_comment_pool_percentage: number;
+  pob_pool_percentage: number;
+  posm_pool_percentage: number;
+  post_reward_curve: string;
+  post_reward_curve_parameter: null | number;
+  promoted_post_account: string;
+  reduction_every_n_block: number;
+  reduction_percentage: number;
+  rewards_token: number;
+  rewards_token_every_n_block: number;
+  staked_reward_percentage: number;
+  staking_pool_claim_number: number;
+  staking_pool_claims_per_year: number;
+  staking_pool_percentage: number;
+  steem_enabled: boolean;
+  steem_engine_enabled: boolean;
+  tag_adding_window_hours: number;
+  token: string;
+  token_account: string;
+  use_staking_circulating_quotent: boolean;
+  vote_power_consumption: number;
+  vote_regeneration_seconds: number;
+  vote_window_days: number;
 }
 export interface ScotVoteShare {
-    "authorperm": "",
-    "block_num": number;
-    "percent": number;
-    "revoted": any;
-    "rshares": number;
-    "timestamp": string;
-    "token": string;
-    "voter": string;
-    "weight": number;
+  authorperm: "";
+  block_num: number;
+  percent: number;
+  revoted: any;
+  rshares: number;
+  timestamp: string;
+  token: string;
+  voter: string;
+  weight: number;
 }
-async function getAuthorRep(feedData : Array<Entry>, useHive : boolean) {
-    // Disable for now.
-    const authors = Array.from(new Set(feedData.map(d => d.author)));
-    const authorRep : {[username: string] : unknown} = {};
-    if (authors.length === 0) {
-        return authorRep;
-    }
-    (await getAccounts(authors)).forEach(
-        a => {
-            authorRep[a.name] = a.reputation;
-        }
-    );
+async function getAuthorRep(feedData: Array<Entry>, useHive: boolean) {
+  // Disable for now.
+  const authors = Array.from(new Set(feedData.map((d) => d.author)));
+  const authorRep: { [username: string]: unknown } = {};
+  if (authors.length === 0) {
     return authorRep;
+  }
+  (await getAccounts(authors)).forEach((a) => {
+    authorRep[a.name] = a.reputation;
+  });
+  return authorRep;
 }
-async function fetchMissingData(tag : string, feedType : string, state : any, feedData : Array<Entry>) {
-    /*
+async function fetchMissingData(
+  tag: string,
+  feedType: string,
+  state: any,
+  feedData: Array<Entry>
+) {
+  /*
     if (!state.content) {
         state.content = {};
     }
@@ -1069,287 +1164,288 @@ export async function fetchFeedDataAsync(useHive, call_name, args) {
     return { feedData, endOfData, lastValue };
 }
 */
-export async function fetchSnaxBalanceAsync(account : string) {
-    const url = 'https://cdn.snax.one/v1/chain/get_currency_balance';
-    const data = {
-        code: 'snax.token',
-        symbol: 'SNAX',
-        account,
-    };
-    return await axios
-        .post(url, data, {
-            headers: { 'content-type': 'text/plain' },
-        })
-        .then(response => response.data)
-        .catch(err => {
-            console.error(`Could not fetch data, url: ${url}`);
-            return [];
-        });
+export async function fetchSnaxBalanceAsync(account: string) {
+  const url = "https://cdn.snax.one/v1/chain/get_currency_balance";
+  const data = {
+    code: "snax.token",
+    symbol: "SNAX",
+    account,
+  };
+  return await axios
+    .post(url, data, {
+      headers: { "content-type": "text/plain" },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.error(`Could not fetch data, url: ${url}`);
+      return [];
+    });
 }
 export interface ScotPost {
-    "active_votes": Array<ScotVoteShare>,
-    "app": string;
-    "author": string;
-    "author_curve_exponent": number;
-    "author_payout_beneficiaries": string;
-    "authorperm": string;
-    "beneficiaries_payout_value": number;
-    "block": number;
-    "cashout_time": string;
-    "children": number;
-    "created": string;
-    "curator_payout_value": number;
-    "decline_payout": boolean;
-    "desc": string;
-    "hive": boolean;
-    "json_metadata": string;
-    "last_payout": string;
-    "last_update": string;
-    "main_post": boolean;
-    "muted": boolean;
-    "parent_author": "",
-    "parent_permlink": string;
-    "pending_token"?: number;
-    "precision": number;
-    "promoted": number;
-    "score_hot": number;
-    "score_promoted": number;
-    "score_trend": number;
-    "tags": string;
-    "title": string;
-    "token": string;
-    "total_payout_value"?: number;
-    "total_vote_weight": number;
-    "vote_rshares": number;
+  active_votes: Array<ScotVoteShare>;
+  app: string;
+  author: string;
+  author_curve_exponent: number;
+  author_payout_beneficiaries: string;
+  authorperm: string;
+  beneficiaries_payout_value: number;
+  block: number;
+  cashout_time: string;
+  children: number;
+  created: string;
+  curator_payout_value: number;
+  decline_payout: boolean;
+  desc: string;
+  hive: boolean;
+  json_metadata: string;
+  last_payout: string;
+  last_update: string;
+  main_post: boolean;
+  muted: boolean;
+  parent_author: "";
+  parent_permlink: string;
+  pending_token?: number;
+  precision: number;
+  promoted: number;
+  score_hot: number;
+  score_promoted: number;
+  score_trend: number;
+  tags: string;
+  title: string;
+  token: string;
+  total_payout_value?: number;
+  total_vote_weight: number;
+  vote_rshares: number;
 }
 export interface MergedEntry {
-    active_votes: {[tokenName:string]: Array<ScotVoteShare>};
-    "app"?: string;
-    author: string;
-    "author_curve_exponent": {[coinname:string]:number};
-    "author_payout_beneficiaries": string;
-    "authorperm"?: string;
-    author_payout_value: string;
-    author_reputation: number;
-    author_role?: string;
-    author_title?: string;
-    beneficiaries: EntryBeneficiaryRoute[];
-    "beneficiaries_payout_value"?: number;
-    "block"?: number;
-    "cashout_time"?: string;
-    blacklists: string[];
-    body: string;
-    category: string;
-    children: number; // the same for both HE and Hive, right?
-    community?: string;
-    community_title?: string;
-    created: string;
-    curator_payout_value: string;
-    "decline_payout"?: boolean;
-    "desc"?: string;
-    depth: number;
-    "hive": boolean;
-    is_paidout: boolean;
-    json_metadata: string;
-    "last_payout"?: string;
-    "last_update"?: string;
-    "main_post"?: boolean;
-    max_accepted_payout: string;
-    "muted": boolean;
-    net_rshares: number;
-    parent_author?: string;
-    original_entry?: Entry;
-    parent_permlink?: string;
-    payout: number;
-    payout_at: string;
-    pending_payout_value: string;
-    pending_token?: number;
-    percent_hbd: number,
-    permlink: string;
-    post_id: number;
-    "precision"?: number;
-    "score_hot"?: number;
-    "score_promoted"?: number;
-    "score_trend"?: number;
-    "tags"?: string;
-    "token"?: string;
-    "total_payout_value"?: number;
-    "total_vote_weight"?: number;
-    "vote_rshares"?: number;
-    promoted: number;
-    reblogged_by?: string[];
-    replies: any[];
-    stats?: EntryStat;
-    updated: string;
-    url: string;
+  active_votes: { [tokenName: string]: Array<ScotVoteShare> };
+  app?: string;
+  author: string;
+  author_curve_exponent: { [coinname: string]: number };
+  author_payout_beneficiaries: string;
+  authorperm?: string;
+  author_payout_value: string;
+  author_reputation: number;
+  author_role?: string;
+  author_title?: string;
+  beneficiaries: EntryBeneficiaryRoute[];
+  beneficiaries_payout_value?: number;
+  block?: number;
+  cashout_time?: string;
+  blacklists: string[];
+  body: string;
+  category: string;
+  children: number; // the same for both HE and Hive, right?
+  community?: string;
+  community_title?: string;
+  created: string;
+  curator_payout_value: string;
+  decline_payout?: boolean;
+  desc?: string;
+  depth: number;
+  hive: boolean;
+  is_paidout: boolean;
+  json_metadata: string;
+  last_payout?: string;
+  last_update?: string;
+  main_post?: boolean;
+  max_accepted_payout: string;
+  muted: boolean;
+  net_rshares: number;
+  parent_author?: string;
+  original_entry?: Entry;
+  parent_permlink?: string;
+  payout: number;
+  payout_at: string;
+  pending_payout_value: string;
+  pending_token?: number;
+  percent_hbd: number;
+  permlink: string;
+  post_id: number;
+  precision?: number;
+  score_hot?: number;
+  score_promoted?: number;
+  score_trend?: number;
+  tags?: string;
+  token?: string;
+  total_payout_value?: number;
+  total_vote_weight?: number;
+  vote_rshares?: number;
+  promoted: number;
+  reblogged_by?: string[];
+  replies: any[];
+  stats?: EntryStat;
+  updated: string;
+  url: string;
 }
 export interface MergedEntry {
-    active_votes: {[tokenName:string]: Array<ScotVoteShare>};
-    "app"?: string;
-    author: string;
-    "author_curve_exponent": {[coinname:string]:number};
-    "author_payout_beneficiaries": string;
-    "authorperm"?: string;
-    author_payout_value: string;
-    author_reputation: number;
-    author_role?: string;
-    author_title?: string;
-    beneficiaries: EntryBeneficiaryRoute[];
-    "beneficiaries_payout_value"?: number;
-    "block"?: number;
-    "cashout_time"?: string;
-    blacklists: string[];
-    body: string;
-    category: string;
-    children: number; // the same for both HE and Hive, right?
-    community?: string;
-    community_title?: string;
-    created: string;
-    curator_payout_value: string;
-    "decline_payout"?: boolean;
-    "desc"?: string;
-    depth: number;
-    "hive": boolean;
-    is_paidout: boolean;
-    json_metadata: string;
-    "last_payout"?: string;
-    "last_update"?: string;
-    "main_post"?: boolean;
-    max_accepted_payout: string;
-    "muted": boolean;
-    net_rshares: number;
-    parent_author?: string;
-    original_entry?: Entry;
-    parent_permlink?: string;
-    payout: number;
-    payout_at: string;
-    pending_payout_value: string;
-    pending_token?: number;
-    percent_hbd: number,
-    permlink: string;
-    post_id: number;
-    "precision"?: number;
-    "score_hot"?: number;
-    "score_promoted"?: number;
-    "score_trend"?: number;
-    "tags"?: string;
-    "token"?: string;
-    "total_payout_value"?: number;
-    "total_vote_weight"?: number;
-    "vote_rshares"?: number;
-    promoted: number;
-    reblogged_by?: string[];
-    replies: any[];
-    stats?: EntryStat;
-    updated: string;
-    url: string;
+  active_votes: { [tokenName: string]: Array<ScotVoteShare> };
+  app?: string;
+  author: string;
+  author_curve_exponent: { [coinname: string]: number };
+  author_payout_beneficiaries: string;
+  authorperm?: string;
+  author_payout_value: string;
+  author_reputation: number;
+  author_role?: string;
+  author_title?: string;
+  beneficiaries: EntryBeneficiaryRoute[];
+  beneficiaries_payout_value?: number;
+  block?: number;
+  cashout_time?: string;
+  blacklists: string[];
+  body: string;
+  category: string;
+  children: number; // the same for both HE and Hive, right?
+  community?: string;
+  community_title?: string;
+  created: string;
+  curator_payout_value: string;
+  decline_payout?: boolean;
+  desc?: string;
+  depth: number;
+  hive: boolean;
+  is_paidout: boolean;
+  json_metadata: string;
+  last_payout?: string;
+  last_update?: string;
+  main_post?: boolean;
+  max_accepted_payout: string;
+  muted: boolean;
+  net_rshares: number;
+  parent_author?: string;
+  original_entry?: Entry;
+  parent_permlink?: string;
+  payout: number;
+  payout_at: string;
+  pending_payout_value: string;
+  pending_token?: number;
+  percent_hbd: number;
+  permlink: string;
+  post_id: number;
+  precision?: number;
+  score_hot?: number;
+  score_promoted?: number;
+  score_trend?: number;
+  tags?: string;
+  token?: string;
+  total_payout_value?: number;
+  total_vote_weight?: number;
+  vote_rshares?: number;
+  promoted: number;
+  reblogged_by?: string[];
+  replies: any[];
+  stats?: EntryStat;
+  updated: string;
+  url: string;
 }
 export const historicalPOBInfo: HiveEngineTokenInfo = {
-    "claimed_token": 66024178279461,
-    "comment_pending_rshares": 81513634111,
-    "comment_reward_pool": 0,
-    "enable_automatic_account_claim": false,
-    "enable_comment_reward_pool": false,
-    "enabled": true,
-    "enabled_services": null,
-    "hive": false,
-    "inflation_tools": 1,
-    "issued_token": null,
-    "issuer": "proofofbrainio",
-    "last_compute_post_reward_block_num": 54518069,
-    "last_mining_claim_block_num": null,
-    "last_mining_claim_trx": null,
-    "last_other_accounts_transfer_block_num": 0,
-    "last_processed_mining_claim_block_num": 0,
-    "last_processed_staking_claim_block_num": 0,
-    "last_reduction_block_num": 51653521,
-    "last_reward_block_num": 54518069,
-    "last_rshares2_decay_time": "Sat, 05 Jun 2021 15:03:00 GMT",
-    "last_staking_claim_block_num": null,
-    "last_staking_claim_trx": null,
-    "last_staking_mining_update_block_num": null,
-    "mining_enabled": false,
-    "mining_reward_pool": 0,
-    "next_mining_claim_number": 0,
-    "next_staking_claim_number": 0,
-    "other_reward_pool": 0,
-    "pending_rshares": 5463949711220131,
-    "pending_token": -17072321490592,
-    "precision": 8,
-    "reward_pool": 8581158633809,
-    "rewards_token": 1000000000,
-    "setup_complete": 2,
-    "staked_mining_power": 0,
-    "staked_token": 58387881879788,
-    "staking_enabled": false,
-    "staking_reward_pool": 0,
-    "start_block_num": 51653521,
-    "start_date": "Sun, 28 Feb 2021 00:11:39 GMT",
-    "symbol": "POB",
-    "total_generated_token": 66279700000000,
-    "voting_enabled": true
+  claimed_token: 66024178279461,
+  comment_pending_rshares: 81513634111,
+  comment_reward_pool: 0,
+  enable_automatic_account_claim: false,
+  enable_comment_reward_pool: false,
+  enabled: true,
+  enabled_services: null,
+  hive: false,
+  inflation_tools: 1,
+  issued_token: null,
+  issuer: "proofofbrainio",
+  last_compute_post_reward_block_num: 54518069,
+  last_mining_claim_block_num: null,
+  last_mining_claim_trx: null,
+  last_other_accounts_transfer_block_num: 0,
+  last_processed_mining_claim_block_num: 0,
+  last_processed_staking_claim_block_num: 0,
+  last_reduction_block_num: 51653521,
+  last_reward_block_num: 54518069,
+  last_rshares2_decay_time: "Sat, 05 Jun 2021 15:03:00 GMT",
+  last_staking_claim_block_num: null,
+  last_staking_claim_trx: null,
+  last_staking_mining_update_block_num: null,
+  mining_enabled: false,
+  mining_reward_pool: 0,
+  next_mining_claim_number: 0,
+  next_staking_claim_number: 0,
+  other_reward_pool: 0,
+  pending_rshares: 5463949711220131,
+  pending_token: -17072321490592,
+  precision: 8,
+  reward_pool: 8581158633809,
+  rewards_token: 1000000000,
+  setup_complete: 2,
+  staked_mining_power: 0,
+  staked_token: 58387881879788,
+  staking_enabled: false,
+  staking_reward_pool: 0,
+  start_block_num: 51653521,
+  start_date: "Sun, 28 Feb 2021 00:11:39 GMT",
+  symbol: "POB",
+  total_generated_token: 66279700000000,
+  voting_enabled: true,
 };
-export const historicalPOBConfig : HiveEngineTokenConfig = {
-    "allowlist_account": null,
-    "author_curve_exponent": 1,
-    "author_reward_percentage": 50,
-    "badge_fee": -1,
-    "beneficiaries_account": "h@proofofbrainio",
-    "beneficiaries_reward_percentage": 10,
-    "cashout_window_days": 7,
-    "curation_curve_exponent": 1,
-    "disable_downvoting": false,
-    "downvote_power_consumption": 2000,
-    "downvote_regeneration_seconds": 432000,
-    "downvote_window_days": -1,
-    "enable_account_allowlist": null,
-    "enable_account_muting": true,
-    "enable_comment_beneficiaries": true,
-    "exclude_apps": null,
-    "exclude_apps_from_token_beneficiary": "",
-    "exclude_beneficiaries_accounts": "likwid,finex,sct.krwp,h@likwid,h@finex,h@sct.krwp,rewarding.app,h@rewarding.app",
-    "exclude_tags": "actifit,steemhunt,appics,dlike,share2steem",
-    "fee_post_account": null,
-    "fee_post_amount": 0,
-    "fee_post_exempt_beneficiary_account": null,
-    "fee_post_exempt_beneficiary_weight": 0,
-    "hive_community": "hive-150329",
-    "hive_enabled": true,
-    "hive_engine_enabled": true,
-    "issue_token": true,
-    "json_metadata_app_value": null,
-    "json_metadata_key": "tags",
-    "json_metadata_value": "proofofbrain,pob",
-    "max_auto_claim_amount": -1,
-    "miner_tokens": "{}",
-    "mining_pool_claim_number": 0,
-    "mining_pool_claims_per_year": 0,
-    "muting_account": "proofofbrainio",
-    "n_daily_posts_muted_accounts": 0,
-    "other_pool_accounts": "{}",
-    "other_pool_percentage": 0,
-    "other_pool_send_token_per_year": 0,
-    "pob_comment_pool_percentage": 0,
-    "pob_pool_percentage": 100,
-    "posm_pool_percentage": 0,
-    "post_reward_curve": "default",
-    "post_reward_curve_parameter": null,
-    "promoted_post_account": "null",
-    "reduction_every_n_block": 42000000,
-    "reduction_percentage": 50,
-    "rewards_token": 10,
-    "rewards_token_every_n_block": 40,
-    "staked_reward_percentage": 0,
-    "staking_pool_claim_number": 0,
-    "staking_pool_claims_per_year": 0,
-    "staking_pool_percentage": 0,
-    "steem_enabled": false,
-    "steem_engine_enabled": false,
-    "tag_adding_window_hours": 1,
-    "token": "POB",
-    "token_account": "proofofbrainio",
-    "use_staking_circulating_quotent": false,
-    "vote_power_consumption": 200,
-    "vote_regeneration_seconds": 432000,
-    "vote_window_days": 7
+export const historicalPOBConfig: HiveEngineTokenConfig = {
+  allowlist_account: null,
+  author_curve_exponent: 1,
+  author_reward_percentage: 50,
+  badge_fee: -1,
+  beneficiaries_account: "h@proofofbrainio",
+  beneficiaries_reward_percentage: 10,
+  cashout_window_days: 7,
+  curation_curve_exponent: 1,
+  disable_downvoting: false,
+  downvote_power_consumption: 2000,
+  downvote_regeneration_seconds: 432000,
+  downvote_window_days: -1,
+  enable_account_allowlist: null,
+  enable_account_muting: true,
+  enable_comment_beneficiaries: true,
+  exclude_apps: null,
+  exclude_apps_from_token_beneficiary: "",
+  exclude_beneficiaries_accounts:
+    "likwid,finex,sct.krwp,h@likwid,h@finex,h@sct.krwp,rewarding.app,h@rewarding.app",
+  exclude_tags: "actifit,steemhunt,appics,dlike,share2steem",
+  fee_post_account: null,
+  fee_post_amount: 0,
+  fee_post_exempt_beneficiary_account: null,
+  fee_post_exempt_beneficiary_weight: 0,
+  hive_community: "hive-150329",
+  hive_enabled: true,
+  hive_engine_enabled: true,
+  issue_token: true,
+  json_metadata_app_value: null,
+  json_metadata_key: "tags",
+  json_metadata_value: "proofofbrain,pob",
+  max_auto_claim_amount: -1,
+  miner_tokens: "{}",
+  mining_pool_claim_number: 0,
+  mining_pool_claims_per_year: 0,
+  muting_account: "proofofbrainio",
+  n_daily_posts_muted_accounts: 0,
+  other_pool_accounts: "{}",
+  other_pool_percentage: 0,
+  other_pool_send_token_per_year: 0,
+  pob_comment_pool_percentage: 0,
+  pob_pool_percentage: 100,
+  posm_pool_percentage: 0,
+  post_reward_curve: "default",
+  post_reward_curve_parameter: null,
+  promoted_post_account: "null",
+  reduction_every_n_block: 42000000,
+  reduction_percentage: 50,
+  rewards_token: 10,
+  rewards_token_every_n_block: 40,
+  staked_reward_percentage: 0,
+  staking_pool_claim_number: 0,
+  staking_pool_claims_per_year: 0,
+  staking_pool_percentage: 0,
+  steem_enabled: false,
+  steem_engine_enabled: false,
+  tag_adding_window_hours: 1,
+  token: "POB",
+  token_account: "proofofbrainio",
+  use_staking_circulating_quotent: false,
+  vote_power_consumption: 200,
+  vote_regeneration_seconds: 432000,
+  vote_window_days: 7,
 };

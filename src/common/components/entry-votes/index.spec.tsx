@@ -4,7 +4,11 @@ import EntryVotes, { EntryVotesDetail } from "./index";
 import renderer from "react-test-renderer";
 import { createBrowserHistory } from "history";
 
-import { globalInstance, entryInstance1, votesInstance1 } from "../../helper/test-helper";
+import {
+  globalInstance,
+  entryInstance1,
+  votesInstance1,
+} from "../../helper/test-helper";
 
 jest.mock("../../constants/defaults.json", () => ({
   imageServer: "https://images.ecency.com",
@@ -52,7 +56,7 @@ const detailProps = {
   entry: { ...entryInstance1 },
   addAccount: (data: any) => {},
   updateInputDisable: (data: any) => {},
-  searchText: ""
+  searchText: "",
 };
 
 const component = renderer.create(<EntryVotesDetail {...detailProps} />);

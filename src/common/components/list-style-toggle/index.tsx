@@ -37,7 +37,9 @@ export default class ListStyleToggle extends Component<Props> {
     return (
       <Tooltip content={_t("list-style.title")}>
         <span
-          className={_c(`list-style-toggle ${listStyle === ListStyle.grid ? "toggled" : ""}`)}
+          className={_c(
+            `list-style-toggle ${listStyle === ListStyle.grid ? "toggled" : ""}`
+          )}
           onClick={() => {
             this.changeStyle();
           }}

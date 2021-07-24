@@ -17,7 +17,7 @@ it("(1) Default render", () => {
       loading: false,
       error: false,
     },
-    activeUser: activeUserInstance
+    activeUser: activeUserInstance,
   };
 
   const renderer = TestRenderer.create(<TrendingTags {...props} />);
@@ -33,7 +33,7 @@ it("(2) Selected tag", () => {
       loading: false,
       error: false,
     },
-    activeUser: null
+    activeUser: null,
   };
 
   const renderer = TestRenderer.create(<TrendingTags {...props} />);

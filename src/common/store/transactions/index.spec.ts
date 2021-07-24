@@ -1,4 +1,10 @@
-import reducer, { initialState, fetchAct, fetchedAct, fetchErrorAct, resetAct } from "./index";
+import reducer, {
+  initialState,
+  fetchAct,
+  fetchedAct,
+  fetchErrorAct,
+  resetAct,
+} from "./index";
 
 import { Transaction } from "./types";
 

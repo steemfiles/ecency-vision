@@ -52,7 +52,10 @@ export default class WordCount extends Component<Props, State> {
     }
   }
 
-  shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<{}>): boolean {
+  shouldComponentUpdate(
+    nextProps: Readonly<Props>,
+    nextState: Readonly<{}>
+  ): boolean {
     return !isEqual(this.state, nextState);
   }
 

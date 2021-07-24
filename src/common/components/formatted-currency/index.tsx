@@ -21,6 +21,13 @@ export default class FormattedCurrency extends Component<Props> {
 
     const valInCurrency = value * currencyRate;
 
-    return <>{formattedNumber(valInCurrency, { fractionDigits: fixAt, prefix: currencySymbol })}</>;
+    return (
+      <>
+        {formattedNumber(valInCurrency, {
+          fractionDigits: fixAt,
+          prefix: currencySymbol,
+        })}
+      </>
+    );
   }
 }

@@ -1,20 +1,19 @@
-import {useEffect} from 'react';
-import {Global} from '../../store/global/types';
+import { useEffect } from "react";
+import { Global } from "../../store/global/types";
 
 interface Props {
-    global: Global
+  global: Global;
 }
 
 export default (props: Props) => {
-    useEffect(() => {
-        if (['day', 'night'].includes(props.global.theme)) {
-            const body = document.querySelector('body');
-            if (!body) return;
+  useEffect(() => {
+    if (["day", "night"].includes(props.global.theme)) {
+      const body = document.querySelector("body");
+      if (!body) return;
 
-            body.className = `theme-${props.global.theme}`;
-        }
+      body.className = `theme-${props.global.theme}`;
+    }
+  }, [props.global.theme]);
 
-    }, [props.global.theme]);
-
-    return null;
+  return null;
 };

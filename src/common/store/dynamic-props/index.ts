@@ -1,6 +1,12 @@
 import { Dispatch } from "redux";
 
-import { DynamicProps, State, Actions, ActionTypes, FetchedAction } from "./types";
+import {
+  DynamicProps,
+  State,
+  Actions,
+  ActionTypes,
+  FetchedAction,
+} from "./types";
 
 import { getDynamicProps } from "../../api/hive";
 
