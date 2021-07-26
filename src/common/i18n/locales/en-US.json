@@ -646,6 +646,7 @@
     "group-stake-operations": "Stake operations",
     "group-rewards": "Rewards",
     "type-market_sell": "Market Sell",
+    "type-market_buy": "Market Buy",
     "tokens-unstake": "Unstaking tokens",
     "type-tokens_CancelUnstake": "Cancel withdrawal of Stake",
     "type-tokens_unstakeStart": "Started withdrawal from vesting",

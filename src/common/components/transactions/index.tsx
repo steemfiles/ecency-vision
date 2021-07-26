@@ -1,11 +1,7 @@
 import React, { Component } from "react";
-
 import moment from "moment";
-
 import { History } from "history";
-
 import { FormControl } from "react-bootstrap";
-
 import { DynamicProps } from "../../store/dynamic-props/types";
 import {
   OperationGroup,
@@ -13,16 +9,14 @@ import {
   Transactions,
 } from "../../store/transactions/types";
 import { Account } from "../../store/accounts/types";
-
 import LinearProgress from "../linear-progress";
 import EntryLink from "../entry-link";
-
 import parseAsset from "../../helper/parse-asset";
 import parseDate from "../../helper/parse-date";
 import { vestsToHp } from "../../helper/vesting";
 import formattedNumber from "../../util/formatted-number";
-
 import {
+  arrowLeftSvg,
   arrowRightSvg,
   cashCoinSvg,
   cashMultiple,
@@ -38,24 +32,20 @@ import {
   starsSvg,
   ticketSvg,
 } from "../../img/svg";
-
 import { _t } from "../../i18n";
 import { Tsx } from "../../i18n/helper";
 import { HIVE_API_NAME, DOLLAR_API_NAME } from "../../api/hive";
 const HIVE_HUMAN_NAME = "Hive";
 const DOLLAR_HUMAN_NAME = "HBD";
-
 interface RowProps {
   history: History;
   dynamicProps: DynamicProps;
   transaction: Transaction;
 }
-
 export class TransactionRow extends Component<RowProps> {
   render() {
     const { dynamicProps, transaction: tr } = this.props;
     const { hivePerMVests } = dynamicProps;
-
     let flag = false;
     let icon = ticketSvg;
     let numbers = null;
@@ -63,7 +53,6 @@ export class TransactionRow extends Component<RowProps> {
     if (tr.type === "curation_reward") {
       flag = true;
       icon = cashCoinSvg;
-
       const reward = parseAsset(tr.reward);
       if (reward.symbol === "VESTS")
         numbers = (
@@ -74,7 +63,7 @@ export class TransactionRow extends Component<RowProps> {
             )}
           </>
         );
-      else numbers = <>{tr.reward}</>;
+      else numbers = <> {tr.reward}</>;
       details = EntryLink({
         ...this.props,
         entry: {
@@ -85,7 +74,7 @@ export class TransactionRow extends Component<RowProps> {
         children: (
           <span>
             {"@"}
-            {tr.comment_author}/{tr.comment_permlink}
+            {tr.comment_author}/ {tr.comment_permlink}
           </span>
         ),
       });
@@ -100,7 +89,7 @@ export class TransactionRow extends Component<RowProps> {
       const vesting_payout = parseAsset(tr.vesting_payout);
       numbers = (
         <>
-          {tr.he_payout && <span className="number">{tr.he_payout}</span>}
+          {tr.he_payout && <span className="number"> {tr.he_payout}</span>}
           {hbd_payout.amount > 0 && (
             <span className="number">
               {formattedNumber(hbd_payout.amount, { suffix: DOLLAR_API_NAME })}
@@ -131,20 +120,21 @@ export class TransactionRow extends Component<RowProps> {
         children: (
           <span>
             {"@"}
-            {tr.author}/{tr.permlink}
+            {tr.author}/ {tr.permlink}
           </span>
         ),
       });
     }
     if (tr.type === "comment_benefactor_reward") {
       icon = commentSvg;
+      flag = true;
     }
     if (tr.type === "tokens_issue") {
       flag = true;
       icon = cashMultiple;
       numbers = (
         <>
-          <span className="number">{tr.amount}</span>
+          <span className="number"> {tr.amount}</span>
         </>
       );
     }
@@ -155,7 +145,7 @@ export class TransactionRow extends Component<RowProps> {
       const reward_vests = parseAsset(tr.reward_vests);
       numbers = (
         <>
-          {tr.reward_he && <span className="number">{tr.reward_he}</span>}
+          {tr.reward_he && <span className="number"> {tr.reward_he}</span>}
           {reward_hbd.amount > 0 && (
             <span className="number">
               {formattedNumber(reward_hbd.amount, { suffix: DOLLAR_API_NAME })}
@@ -176,7 +166,6 @@ export class TransactionRow extends Component<RowProps> {
         </>
       );
     }
-
     if (
       tr.type === "transfer" ||
       tr.type === "transfer_to_vesting" ||
@@ -185,7 +174,6 @@ export class TransactionRow extends Component<RowProps> {
       flag = true;
       icon =
         tr.type === "transfer_to_vesting" ? powerUpSvg : compareHorizontalSvg;
-
       details = (
         <span>
           {tr.memo ? (
@@ -194,20 +182,18 @@ export class TransactionRow extends Component<RowProps> {
             </>
           ) : null}
           <>
-            <strong>@{tr.from}</strong> -&gt; <strong>@{tr.to}</strong>
+            <strong> @ {tr.from}</strong> -&gt; <strong> @ {tr.to}</strong>
           </>
         </span>
       );
-      numbers = <span className="number">{tr.amount}</span>;
+      numbers = <span className="number"> {tr.amount}</span>;
     }
-
     if (
       tr.type === "recurrent_transfer" ||
       tr.type === "fill_recurrent_transfer"
     ) {
       flag = true;
       icon = compareHorizontalSvg;
-
       details = (
         <span>
           {tr.memo ? (
@@ -225,7 +211,7 @@ export class TransactionRow extends Component<RowProps> {
               </Tsx>
               <br />
               <br />
-              <strong>@{tr.from}</strong> -&gt; <strong>@{tr.to}</strong>
+              <strong> @ {tr.from}</strong> -&gt; <strong> @ {tr.to}</strong>
             </>
           ) : (
             <>
@@ -237,7 +223,7 @@ export class TransactionRow extends Component<RowProps> {
               </Tsx>
               <br />
               <br />
-              <strong>@{tr.from}</strong> -&gt; <strong>@{tr.to}</strong>
+              <strong> @ {tr.from}</strong> -&gt; <strong> @ {tr.to}</strong>
             </>
           )}
         </span>
@@ -247,9 +233,8 @@ export class TransactionRow extends Component<RowProps> {
         const t = parseAsset(tr.amount);
         aam = `${t.amount} ${t.symbol}`;
       }
-      numbers = <span className="number">{aam}</span>;
+      numbers = <span className="number"> {aam}</span>;
     }
-
     if (tr.type === "cancel_transfer_from_savings") {
       flag = true;
       icon = closeSvg;
@@ -265,22 +250,22 @@ export class TransactionRow extends Component<RowProps> {
     if (tr.type === "tokens_CancelUnstake") {
       flag = true;
       icon = closeSvg;
-      numbers = <span className="number">{tr.amount}</span>;
+      numbers = <span className="number"> {tr.amount}</span>;
     }
     if (tr.type === "tokens_unstakeStart") {
       flag = true;
       icon = cashSvg;
-      numbers = <span className="number">{tr.amount}</span>;
+      numbers = <span className="number"> {tr.amount}</span>;
     }
     if (tr.type === "market_placeOrder") {
       flag = true;
       icon = commentSvg;
-      numbers = <span className="number">{tr.quantityLocked}</span>;
+      numbers = <span className="number"> {tr.quantityLocked}</span>;
       if (tr.price)
         details = (
           <>
-            <span>{tr.orderType}</span>{" "}
-            <span className="number">@{tr.price}</span>
+            <span> {tr.orderType}</span>{" "}
+            <span className="number"> @ {tr.price}</span>
           </>
         );
       else details = tr.orderType;
@@ -298,26 +283,22 @@ export class TransactionRow extends Component<RowProps> {
       );
       details = tr.acc ? (
         <span>
-          <strong>@{tr.acc}</strong>
+          <strong> @ {tr.acc}</strong>
         </span>
       ) : null;
     }
-
     if (tr.type === "fill_vesting_withdraw") {
       flag = true;
       icon = powerDownSvg;
-
-      numbers = <span className="number">{tr.deposited}</span>;
-
+      numbers = <span className="number"> {tr.deposited}</span>;
       details = tr.from_account ? (
         <span>
           <strong>
-            @{tr.from_account} -&gt; @{tr.to_account}
+            @ {tr.from_account} -&gt; @ {tr.to_account}
           </strong>
         </span>
       ) : null;
     }
-
     if (tr.type === "fill_order") {
       flag = true;
       icon = reOrderHorizontalSvg;
@@ -327,18 +308,15 @@ export class TransactionRow extends Component<RowProps> {
         </span>
       );
     }
-
     if (tr.type === "limit_order_create") {
       flag = true;
       icon = reOrderHorizontalSvg;
-
       numbers = (
         <span className="number">
           {tr.amount_to_sell} = {tr.min_to_receive}
         </span>
       );
     }
-
     if (tr.type === "producer_reward") {
       flag = true;
       icon = pickAxeSvg;
@@ -354,7 +332,7 @@ export class TransactionRow extends Component<RowProps> {
     if (tr.type === "interest") {
       flag = true;
       icon = cashMultiple;
-      numbers = <span className="number">{tr.interest}</span>;
+      numbers = <span className="number"> {tr.interest}</span>;
     }
     if (tr.type === "fill_convert_request") {
       flag = true;
@@ -368,15 +346,17 @@ export class TransactionRow extends Component<RowProps> {
     if (tr.type === "collateralized_convert") {
       flag = true;
       icon = reOrderHorizontalSvg;
-      numbers = <span className="number">{tr.amount}</span>;
+      numbers = <span className="number"> {tr.amount}</span>;
     }
-    if (tr.type === "market_sell") {
+    if (
+      (tr.type === "market_sell" && (icon = arrowRightSvg)) ||
+      (tr.type === "market_buy" && (icon = arrowLeftSvg))
+    ) {
       flag = true;
-      icon = arrowRightSvg;
       numbers = (
         <>
-          Sold <span className="number">{tr.quote}</span> for{" "}
-          <span className="number">{tr.base}</span>
+          Sold <span className="number"> {tr.quote}</span> for{" "}
+          <span className="number"> {tr.base}</span>
         </>
       );
     }
@@ -395,7 +375,7 @@ export class TransactionRow extends Component<RowProps> {
     if (tr.type === "proposal_pay") {
       flag = true;
       icon = ticketSvg;
-      numbers = <span className="number">{tr.payment}</span>;
+      numbers = <span className="number"> {tr.payment}</span>;
     }
     if (tr.type === "tokens_undelegateDone") {
       flag = true;
@@ -408,19 +388,18 @@ export class TransactionRow extends Component<RowProps> {
     if (tr.type === "tokens_delegate") {
       flag = true;
       icon = arrowRightSvg;
-      details = <span>@{tr.to}</span>;
-      numbers = <span className="number">{tr.amount}</span>;
+      details = <span> @ {tr.to}</span>;
+      numbers = <span className="number"> {tr.amount}</span>;
     }
     if (tr.type === "market_cancel") {
       flag = true;
       icon = commentSvg;
-      details = <span>{tr.orderType}</span>;
-      numbers = <span className="number">{tr.amount}</span>;
+      details = <span> {tr.orderType}</span>;
+      numbers = <span className="number"> {tr.amount}</span>;
     }
     if (tr.type === "comment_payout_update") {
       flag = true;
       icon = starsSvg;
-
       details = EntryLink({
         ...this.props,
         entry: {
@@ -431,18 +410,15 @@ export class TransactionRow extends Component<RowProps> {
         children: (
           <span>
             {"@"}
-            {tr.author}/{tr.permlink}
+            {tr.author}/ {tr.permlink}
           </span>
         ),
       });
     }
-
     if (tr.type === "comment_reward") {
       flag = true;
       icon = cashCoinSvg;
-
       const payout = parseAsset(tr.payout);
-
       numbers = (
         <>
           {payout.amount > 0 && (
@@ -452,7 +428,6 @@ export class TransactionRow extends Component<RowProps> {
           )}
         </>
       );
-
       details = EntryLink({
         ...this.props,
         entry: {
@@ -463,17 +438,15 @@ export class TransactionRow extends Component<RowProps> {
         children: (
           <span>
             {"@"}
-            {tr.author}/{tr.permlink}
+            {tr.author}/ {tr.permlink}
           </span>
         ),
       });
     }
-
     if (tr.type === "collateralized_convert") {
       flag = true;
       icon = exchangeSvg;
       const amount = parseAsset(tr.amount);
-
       numbers = (
         <>
           {amount.amount > 0 && (
@@ -483,7 +456,6 @@ export class TransactionRow extends Component<RowProps> {
           )}
         </>
       );
-
       details = (
         <Tsx
           k="transactions.type-collateralized_convert-detail"
@@ -493,12 +465,9 @@ export class TransactionRow extends Component<RowProps> {
         </Tsx>
       );
     }
-
     if (tr.type === "effective_comment_vote") {
       flag = true;
-
       const payout = parseAsset(tr.pending_payout);
-
       numbers = (
         <>
           {payout.amount > 0 && (
@@ -508,7 +477,6 @@ export class TransactionRow extends Component<RowProps> {
           )}
         </>
       );
-
       details = EntryLink({
         ...this.props,
         entry: {
@@ -519,17 +487,16 @@ export class TransactionRow extends Component<RowProps> {
         children: (
           <span>
             {"@"}
-            {tr.author}/{tr.permlink}
+            {tr.author}/ {tr.permlink}
           </span>
         ),
       });
     }
-
     if (flag) {
       const transDate = parseDate(tr.timestamp);
       return (
         <div className="transaction-list-item">
-          <div className="transaction-icon">{icon}</div>
+          <div className="transaction-icon"> {icon}</div>
           <div className="transaction-title">
             <div className="transaction-name">
               {_t(`transactions.type-${tr.type}`)}
@@ -538,14 +505,14 @@ export class TransactionRow extends Component<RowProps> {
               {moment(transDate).fromNow()}
             </div>
           </div>
-          <div className="transaction-numbers">{numbers}</div>
-          <div className="transaction-details">{details}</div>
+          <div className="transaction-numbers"> {numbers}</div>
+          <div className="transaction-details"> {details}</div>
         </div>
       );
     }
     return (
       <a className="transaction-list-item transaction-list-item-raw">
-        <div className="raw-code">{JSON.stringify(tr)}</div>
+        <div className="raw-code"> {JSON.stringify(tr)}</div>
       </a>
     );
   }
@@ -571,9 +538,9 @@ export class TransactionList extends Component<Props> {
     return (
       <div className="transaction-list">
         <div className="transaction-list-header">
-          <h2>{_t("transactions.title")} </h2>
+          <h2> {_t("transactions.title")} </h2>
           <FormControl as="select" value={group} onChange={this.typeChanged}>
-            <option value="">{_t("transactions.group-all")}</option>
+            <option value=""> {_t("transactions.group-all")}</option>
             {[
               "transfers",
               "market-orders",
@@ -592,7 +559,7 @@ export class TransactionList extends Component<Props> {
           <TransactionRow {...this.props} key={k} transaction={x} />
         ))}
         {!loading && list.length === 0 && (
-          <p className="text-muted empty-list">{_t("g.empty-list")}</p>
+          <p className="text-muted empty-list"> {_t("g.empty-list")}</p>
         )}
       </div>
     );
