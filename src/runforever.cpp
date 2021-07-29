@@ -15,18 +15,24 @@ std::fstream mainserverlog("server.log", std::ofstream::app);
 child * cptr = nullptr;
 bool keep_looping = true;
 
+std::ostream& mainlogline() {
+	return mainserverlog << "[" << getpid() <<  "] ";
+}
+
+
+
 void report_and_continue(int signal) {
-	mainserverlog << "[" << getpid() << "] Caught signal " << signal_names[signal] << std::endl << std::flush;
+	mainlogline() << "Caught signal " << signal_names[signal] << std::endl << std::flush;
 }
 void report_and_exit(int signal) {
 	try {
-		mainserverlog << "[" << getpid() << "] Caught signal " << signal_names[signal] << "." << std::endl;
+		mainlogline() << "Caught signal " << signal_names[signal] << "." << std::endl;
 		if (cptr) {
 			const int cid = cptr->id();
-			mainserverlog << "[" << getpid() << "] Sending sub process (" << cid << ") the TERM signal..." << std::endl;
+			mainlogline() << "Sending sub process (" << cid << ") the TERM signal..." << std::endl;
 			// the kill call ensures the process exists
 			if (kill(cid, SIGTERM) == 0) {
-				mainserverlog << "[" << getpid() << "] waiting for " << cid << " to close..." << std::flush;
+				mainlogline() << "waiting for " << cid << " to close..." << std::flush;
 				cptr->wait();
 			}
 			cptr = nullptr;
@@ -96,17 +102,52 @@ void set_signal_handlers() {
 }
 
 int main() {
-	mainserverlog << "[" << getpid() <<  "] Starting Master Server" << std::endl;
+	bool current_directory_writable;
+	// Check that this program can do everything it needs to do
+	{
+		bool all_checked_files_exist = true;
+		// Some checks
+		for (const char * file_name : {"server.pid", "subserver.pid", "server.log", "subserver.log"
+		                              }
+		    ) {
+			bool file_name_exists = access(file_name, F_OK)==0;
+			all_checked_files_exist = all_checked_files_exist && file_name_exists;
+			if (file_name_exists && access(file_name, W_OK)) {
+				std::cerr << file_name << " exists but is not writable" << std::endl;
+				keep_looping = false;
+			}
+		} // for
+
+		current_directory_writable = access(".", W_OK) == 0;
+
+		if (!all_checked_files_exist) {
+			if (!current_directory_writable) {
+				std::cerr << "Current directory not writable" << std::endl;
+				keep_looping = false;
+			}
+
+		}
+
+		if (access("build/server.js", R_OK)) {
+			std::cerr << "Cannot find build/server.js to run." << std::endl;
+			keep_looping = false;
+		}
+	}
+
+	if (!keep_looping) {
+		exit(0);
+	}
+
+	mainlogline() << "Starting Master Server" << std::endl;
 
 	init_signal_names();
 	set_signal_handlers();
 
+	// Store the server PID.
 	{
 		std::ofstream pidfile("server.pid");
 		pidfile << getpid() << std::endl;
-		pidfile.close();
 	}
-
 
 	cptr = nullptr;
 	try {
@@ -122,17 +163,17 @@ int main() {
 				pidfile << c.id() << std::endl;
 			}
 
-			mainserverlog << "["<< getpid()  << "] Running node build/server.js [" << c.id() << "]" << std::endl;
+			mainlogline() << "Running node build/server.js [" << c.id() << "]" << std::endl;
 			while (keep_looping && c.running()) {
 				while (keep_looping && c.running() && pipe_stream && std::getline(pipe_stream, line) && !line.empty()) {
 					subserverlog << "[" << c.id() << "]" << line << std::endl;
 				}
 			}
 
-			mainserverlog << "The subserver PID is " << (c.running() ? "" : "not ") <<  "running" << std::endl;
+			mainlogline() << "The subserver PID is " << (c.running() ? "" : "not ") <<  "running" << std::endl;
 			sleep(10);
 			c.wait();
-			mainserverlog << "Process " << c.id() << " exited with status " << c.exit_code() << std::endl;
+			mainlogline() << "Process " << c.id() << " exited with status " << c.exit_code() << std::endl;
 			cptr = nullptr;
 		}
 	} catch (const boost::process::process_error& e) {
@@ -142,7 +183,9 @@ int main() {
 		}
 	}
 	cptr = nullptr;
-	unlink("subserver.pid");
-	unlink("server.pid");
-	mainserverlog << "[" << getpid() << "] Exiting Master Server: " << std::endl;
+	if (current_directory_writable) {
+		unlink("subserver.pid");
+		unlink("server.pid");
+	}
+	mainlogline() << "Exiting Master Server" << std::endl;
 }
