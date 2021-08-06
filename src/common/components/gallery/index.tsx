@@ -21,7 +21,7 @@ import { deleteForeverSvg } from "../../img/svg";
 
 import clipboard from "../../util/clipboard";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 import { Global } from "../../store/global/types";
 
 setProxyBase(defaults.imageServer);

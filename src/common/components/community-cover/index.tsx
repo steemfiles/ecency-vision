@@ -12,7 +12,7 @@ import { UI, ToggleType } from "../../store/ui/types";
 import { Community } from "../../store/communities/types";
 import { Subscription } from "../../store/subscriptions/types";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 import { proxifyImageSrc, setProxyBase } from "@ecency/render-helper";
 

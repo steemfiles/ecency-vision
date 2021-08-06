@@ -10,7 +10,7 @@ import { UI, ToggleType } from "../../store/ui/types";
 import EditorToolbar from "../editor-toolbar";
 import LoginRequired from "../login-required";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 import { renderPostBody, setProxyBase } from "@ecency/render-helper";
 

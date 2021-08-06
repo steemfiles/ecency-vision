@@ -52,7 +52,7 @@ import * as keychain from "../helper/keychain";
 
 import { makeHsCode } from "../helper/hive-signer";
 import parseAsset from "../helper/parse-asset";
-import defaults from "../constants/defaults.json";
+import defaults from "../constants/site.json";
 
 import random from "../util/rnd";
 

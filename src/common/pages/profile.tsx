@@ -30,7 +30,7 @@ import {
   LIQUID_TOKEN_UPPERCASE,
   VESTING_TOKEN,
 } from "../../client_config";
-import defaults from "../constants/defaults.json";
+import defaults from "../constants/site.json";
 import _c from "../util/fix-class-names";
 import {
   PageProps,

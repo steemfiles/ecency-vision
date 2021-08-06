@@ -6,7 +6,7 @@ import moment from "moment";
 
 import isEqual from "react-fast-compare";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 import { catchPostImage, setProxyBase } from "@ecency/render-helper";
 

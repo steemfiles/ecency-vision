@@ -14,7 +14,7 @@ import { makePath as makePathProfile } from "../profile-link";
 
 import { _t } from "../../i18n";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 import { lookupAccounts } from "../../api/hive";
 import { getCommunities } from "../../api/bridge";

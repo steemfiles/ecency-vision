@@ -6,7 +6,7 @@ import { diff_match_patch } from "diff-match-patch";
 
 import { Modal, Form, FormControl } from "react-bootstrap";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 import { renderPostBody, setProxyBase } from "@ecency/render-helper";
 

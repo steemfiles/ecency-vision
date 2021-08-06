@@ -29,7 +29,7 @@ import {
 
 import accountReputation from "../../helper/account-reputation";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 import {
   deleteForeverSvg,

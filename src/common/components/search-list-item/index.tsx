@@ -17,7 +17,7 @@ import Tag from "../tag";
 
 import FormattedCurrency from "../formatted-currency";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 import {
   catchPostImage,

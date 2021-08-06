@@ -1,4 +1,4 @@
-import defaults from "../constants/defaults.json";
+import defaults from "../constants/site.json";
 
 export const makeEsteemUrl = (
   cat: string,

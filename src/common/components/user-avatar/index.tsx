@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import { Global } from "../../store/global/types";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 import { proxifyImageSrc } from "@ecency/render-helper";
 
 interface Props {

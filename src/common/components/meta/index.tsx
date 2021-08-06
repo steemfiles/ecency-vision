@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import { Helmet } from "react-helmet";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 interface Props {
   title?: string;

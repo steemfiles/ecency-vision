@@ -7,7 +7,7 @@ import { ActiveUser } from "../../store/active-user/types";
 import { ToggleType, UI } from "../../store/ui/types";
 import { Notifications, WsNotification } from "../../store/notifications/types";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 import { _t } from "../../i18n";
 

@@ -18,7 +18,7 @@ import { _t } from "../../i18n";
 
 import _c from "../../util/fix-class-names";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 setProxyBase(defaults.imageServer);
 

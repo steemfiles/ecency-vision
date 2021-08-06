@@ -3,7 +3,7 @@ import { AppState } from "../common/store";
 import initialState from "../common/store/initial-state";
 import { Global, ListStyle, Theme } from "../common/store/global/types";
 import { activeUserMaker } from "../common/store/helper";
-import defaults from "../common/constants/defaults.json";
+import defaults from "../common/constants/site.json";
 import config from "../config";
 import { getSearchIndexCount, getDynamicProps } from "./helper";
 import { getOperatingSystem } from "../common/util/platform";

@@ -36,7 +36,7 @@ import { _t } from "../../../../common/i18n";
 
 import _c from "../../../../common/util/fix-class-names";
 
-import defaults from "../../../../common/constants/defaults.json";
+import defaults from "../../../../common/constants/site.json";
 
 import routes from "../../../../common/routes";
 

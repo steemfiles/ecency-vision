@@ -85,6 +85,11 @@ need to add the account name to the common config file.
 As the corresponding constant to HIVE_SIGNER_CLIENT_SECRET,
 this should be set to the account username you have at Hive Signer.  Do not use the '@' sign in the username.
 
+###### Edit src/common/constants/site.json
+
+cp defaults.json site.json
+Edit the parameters of site.json
+
 ###### TEST_NET
 
 Set this value to be true if you wish to use the testnet for Hive for testing.  You will have to use the browser with CORS turned off because

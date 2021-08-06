@@ -30,7 +30,7 @@ import _c from "../util/fix-class-names";
 
 import capitalize from "../util/capitalize";
 
-import defaults from "../constants/defaults.json";
+import defaults from "../constants/site.json";
 
 import { appleSvg, desktopSvg, googleSvg } from "../img/svg";
 

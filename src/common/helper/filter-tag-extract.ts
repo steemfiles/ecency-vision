@@ -1,5 +1,5 @@
 import { pathToRegexp } from "path-to-regexp";
-import defaults from "../constants/defaults.json";
+import defaults from "../constants/site.json";
 
 import routes from "../routes";
 

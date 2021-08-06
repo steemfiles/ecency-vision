@@ -49,7 +49,7 @@ const fallbackImage = require("../../img/fallback.png");
 const noImage = require("../../img/noimage.svg");
 const nsfwImage = require("../../img/nsfw.png");
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 import { TokenPropertiesMap } from "../../store/hive-engine-tokens/types";
 
 setProxyBase(defaults.imageServer);

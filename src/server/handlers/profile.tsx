@@ -5,7 +5,7 @@ import { ProfileFilter } from "../../common/store/global/types";
 import { Entry } from "../../common/store/entries/types";
 import { makeGroupKey } from "../../common/store/entries";
 
-import defaults from "../../common/constants/defaults.json";
+import defaults from "../../common/constants/site.json";
 
 import { optimizeEntries } from "../helper";
 

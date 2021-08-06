@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 import { Dispatch } from "redux";
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 import { AppState } from "../index";
 import {
   Actions,

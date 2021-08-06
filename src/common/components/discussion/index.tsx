@@ -6,7 +6,7 @@ import moment from "moment";
 
 import { Button, Form, FormControl } from "react-bootstrap";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 import { renderPostBody, setProxyBase } from "@ecency/render-helper";
 

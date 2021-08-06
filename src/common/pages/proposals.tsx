@@ -10,7 +10,7 @@ import numeral from "numeral";
 
 import moment from "moment";
 
-import defaults from "../constants/defaults.json";
+import defaults from "../constants/site.json";
 
 import {
   renderPostBody,

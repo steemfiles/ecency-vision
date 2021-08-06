@@ -14,7 +14,7 @@ import { Form, FormControl, Button, Spinner, Col, Row } from "react-bootstrap";
 
 import moment, { Moment } from "moment";
 
-import defaults from "../constants/defaults.json";
+import defaults from "../constants/site.json";
 
 import { renderPostBody, setProxyBase } from "@ecency/render-helper";
 

@@ -10,7 +10,7 @@ import {
   votesInstance1,
 } from "../../helper/test-helper";
 
-jest.mock("../../constants/defaults.json", () => ({
+jest.mock("../../constants/site.json", () => ({
   imageServer: "https://images.ecency.com",
 }));
 

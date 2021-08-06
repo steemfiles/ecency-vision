@@ -4,7 +4,7 @@ import RSS from "rss";
 
 import { Entry } from "../../common/store/entries/types";
 
-import defaults from "../../common/constants/defaults.json";
+import defaults from "../../common/constants/site.json";
 
 import {
   catchPostImage,

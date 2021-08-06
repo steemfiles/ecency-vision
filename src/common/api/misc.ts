@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import defaults from "../constants/defaults.json";
+import defaults from "../constants/site.json";
 
 import { apiBase } from "./helper";
 

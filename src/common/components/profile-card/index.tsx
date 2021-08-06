@@ -20,7 +20,7 @@ import accountReputation from "../../helper/account-reputation";
 
 import formattedNumber from "../../util/formatted-number";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 import { votingPower } from "../../api/hive";
 

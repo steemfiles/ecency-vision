@@ -2,7 +2,7 @@ import { Entry } from "../store/entries/types";
 
 import apps from "@hiveio/hivescript/apps.json";
 
-import defaults from "../../common/constants/defaults.json";
+import defaults from "../../common/constants/site.json";
 
 import appName from "./app-name";
 

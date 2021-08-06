@@ -73,7 +73,7 @@ import {
   pageMapStateToProps,
 } from "./common";
 
-import defaults from "../constants/defaults.json";
+import defaults from "../constants/site.json";
 import { TokenPropertiesMap } from "../store/hive-engine-tokens/types";
 import {
   getPrices,

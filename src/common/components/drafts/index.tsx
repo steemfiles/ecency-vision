@@ -24,7 +24,7 @@ import { getDrafts, Draft, deleteDraft } from "../../api/private-api";
 
 import accountReputation from "../../helper/account-reputation";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 import { deleteForeverSvg, pencilOutlineSvg } from "../../img/svg";
 

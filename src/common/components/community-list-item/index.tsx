@@ -19,7 +19,7 @@ import { Global } from "../../store/global/types";
 
 import { makePath } from "../tag";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 import { _t } from "../../i18n";
 

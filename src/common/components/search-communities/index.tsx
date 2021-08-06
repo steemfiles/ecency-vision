@@ -23,7 +23,7 @@ import { _t } from "../../i18n";
 import truncate from "../../util/truncate";
 import formattedNumber from "../../util/formatted-number";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 interface Props {
   history: History;

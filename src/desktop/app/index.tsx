@@ -19,7 +19,7 @@ import initialState from "../../common/store/initial-state";
 
 import App from "../../common/app";
 
-import defaults from "../../common/constants/defaults.json";
+import defaults from "../../common/constants/site.json";
 
 import * as ls from "../../common/util/local-storage";
 

@@ -7,7 +7,7 @@ import { Account } from "../../store/accounts/types";
 import { UI, ToggleType } from "../../store/ui/types";
 import { DynamicProps } from "../../store/dynamic-props/types";
 
-import defaults from "../../constants/defaults.json";
+import defaults from "../../constants/site.json";
 
 import { proxifyImageSrc, setProxyBase } from "@ecency/render-helper";
 
