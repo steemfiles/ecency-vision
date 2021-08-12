@@ -185,7 +185,12 @@ export class Preferences extends BaseComponent<Props, State> {
               </Form.Group>
             </Col>
 
-            {activeUser && activeUser.username && (
+            {
+              false /* Although one should remove dead code rather than commenting out
+              according to many devs, merging with upstream ecency source lends itself better
+            to adding "false &&"*/
+            }
+            {false && activeUser && activeUser.username && (
               <Col lg={6} xl={4}>
                 <Form.Group>
                   <Form.Label>{_t("preferences.referral-link")}</Form.Label>

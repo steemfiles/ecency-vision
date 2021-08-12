@@ -165,7 +165,7 @@
   },
   "nsfw": {
     "reveal": "Mostra questo post",
-    "signup": "<a href=\"/signup\" class=\"push-link\">crea un account</a> per salvare le tue preferenze",
+    "signup": "<a href=\"https://signup.hive.io/\" target=\"signup\" class=\"push-link\">crea un account</a> per salvare le tue preferenze",
     "settings-1": "modifica le tue",
     "settings-2": "preferenze di visualizzazione"
   },

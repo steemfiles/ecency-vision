@@ -185,7 +185,7 @@ const LandingPage = (props: any) => {
               <p>
                 {_t("landing-page.earn-money-block-chain-based")}
                 <span>
-                  <a href="/signup?referral=ecency">
+                  <a href="https://signup.hive.io/" target="signup">
                     {_t("landing-page.join-us")}
                   </a>
                 </span>
@@ -245,7 +245,11 @@ const LandingPage = (props: any) => {
             <div className="text-group">
               <h2>{_t("landing-page.open-source")}</h2>
               <p>{_t("landing-page.open-source-desc")}</p>
-              <a className="no-break" href="/signup?referral=ecency">
+              <a
+                className="no-break"
+                target="signup"
+                href="/https://signup.hive.io/"
+              >
                 {_t("landing-page.feel-free-join")}
               </a>
             </div>

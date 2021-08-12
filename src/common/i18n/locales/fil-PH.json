@@ -165,7 +165,7 @@
   },
   "nsfw": {
     "reveal": "Ipakita ang post na ito",
-    "signup": "<a href=\"/signup\" class=\"push-link\">create an account</a> to save your preferences",
+    "signup": "<a href=\"https://signup.hive.io/\" target=\"signup\" class=\"push-link\">create an account</a> to save your preferences",
     "settings-1": "baguhin ang iyong",
     "settings-2": "display preferences"
   },

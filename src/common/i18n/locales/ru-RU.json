@@ -165,7 +165,7 @@
   },
   "nsfw": {
     "reveal": "Показать этот пост",
-    "signup": "<a href=\"/signup\" class=\"push-link\">создать учетную запись</a> для сохранения ваших предпочтений",
+    "signup": "<a href=\"https://signup.hive.io/\" target=\"signup\" class=\"push-link\">создать учетную запись</a> для сохранения ваших предпочтений",
     "settings-1": "свои настройки",
     "settings-2": "настройки отображения"
   },

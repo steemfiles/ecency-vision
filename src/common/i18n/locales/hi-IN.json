@@ -165,7 +165,7 @@
   },
   "nsfw": {
     "reveal": "इस पोस्ट को प्रकट करें",
-    "signup": "<a href=\"/signup\" class=\"push-link\">create an account</a> अपनी वरीयताओं को बचाने के लिए",
+    "signup": "<a href=\"https://signup.hive.io/\" target=\"signup\" class=\"push-link\">create an account</a> अपनी वरीयताओं को बचाने के लिए",
     "settings-1": "अपने को समायोजित करें",
     "settings-2": "डिस्प्ले प्राथमिकताएं"
   },

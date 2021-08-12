@@ -666,16 +666,7 @@ export class Login extends BaseComponent<LoginProps, State> {
           <p>
             {_t("login.sign-up-text-1")}
             &nbsp;
-            <a
-              href="#"
-              onClick={(e: React.MouseEvent) => {
-                e.preventDefault();
-                this.hide();
-
-                const { history } = this.props;
-                history.push("/signup");
-              }}
-            >
+            <a href="https://signup.hive.io/" target="signup">
               {_t("login.sign-up-text-2")}
             </a>
           </p>

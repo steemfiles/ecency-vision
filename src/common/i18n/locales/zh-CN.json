@@ -165,7 +165,7 @@
   },
   "nsfw": {
     "reveal": "显示此帖子",
-    "signup": "<a href=\"/signup\" class=\"push-link\">创建一个帐户</a> 来保存您的首选项",
+    "signup": "<a href=\"https://signup.hive.io/\" target=\"signup\" class=\"push-link\">创建一个帐户</a> 来保存您的首选项",
     "settings-1": "调整您的",
     "settings-2": "显示首选项"
   },

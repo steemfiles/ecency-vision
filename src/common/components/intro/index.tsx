@@ -33,9 +33,13 @@ const Intro = (props: Props) => {
         <h1 className="intro-sub-header">
           <div className="title">{_t("intro.sub-title")}</div>
           <div className="get-started">
-            <Link to="/signup" className="btn btn-primary">
+            <a
+              className="btn btn-primary"
+              href="https://signup.hive.io/"
+              target="signup"
+            >
               {_t("intro.c2a")}
-            </Link>
+            </a>
           </div>
         </h1>
       </div>

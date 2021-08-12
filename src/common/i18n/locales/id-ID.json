@@ -165,7 +165,7 @@
   },
   "nsfw": {
     "reveal": "Hapus postingan ini",
-    "signup": "<a href=\"/signup\" class=\"push-link\">buatlah sebuah akun</a> untuk menyimpan preferensi Anda",
+    "signup": "<a href=\"https://signup.hive.io/\" target=\"signup\" class=\"push-link\">buatlah sebuah akun</a> untuk menyimpan preferensi Anda",
     "settings-1": "sesuaikan Anda",
     "settings-2": "tampilkan preferensi"
   },

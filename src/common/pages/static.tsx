@@ -98,121 +98,127 @@ class AboutPage extends Component<PageProps> {
             <div className="down-cloud" />
           </div>
 
-          <div className="downloads" id="downloads">
-            <h2 className="downloads-title">Downloads</h2>
-            <div className="downloads-text">
-              Enjoy Ecency for iPhone, iPad and Android, as well as PC, Mac or
-              Linux devices:
+          {false && (
+            <div className="downloads" id="downloads">
+              <h2 className="downloads-title">Downloads</h2>
+              <div className="downloads-text">
+                Enjoy Ecency for iPhone, iPad and Android, as well as PC, Mac or
+                Linux devices:
+              </div>
+              <div className="download-buttons">
+                <a
+                  className="download-button btn-desktop"
+                  target="_blank"
+                  href="https://github.com/ecency/ecency-vision/releases"
+                  rel="noopener noreferrer"
+                >
+                  DESKTOP
+                </a>
+                <a
+                  className="download-button btn-ios"
+                  target="_blank"
+                  href="https://ios.ecency.com"
+                  rel="noopener noreferrer"
+                >
+                  IOS
+                </a>
+                <a
+                  className="download-button btn-android"
+                  target="_blank"
+                  href="https://android.ecency.com"
+                  rel="noopener noreferrer"
+                >
+                  ANDROID
+                </a>
+              </div>
             </div>
-            <div className="download-buttons">
-              <a
-                className="download-button btn-desktop"
-                target="_blank"
-                href="https://github.com/ecency/ecency-vision/releases"
-                rel="noopener noreferrer"
-              >
-                DESKTOP
-              </a>
-              <a
-                className="download-button btn-ios"
-                target="_blank"
-                href="https://ios.ecency.com"
-                rel="noopener noreferrer"
-              >
-                IOS
-              </a>
-              <a
-                className="download-button btn-android"
-                target="_blank"
-                href="https://android.ecency.com"
-                rel="noopener noreferrer"
-              >
-                ANDROID
-              </a>
-            </div>
-          </div>
+          )}
 
-          <div className="faq">
-            <h2 className="faq-title">{_t("static.about.faq-title")}</h2>
-            <div className="faq-links">
-              {faqKeys.slice(0, 4).map((x) => {
-                return (
-                  <p key={x}>
-                    <a className="faq-link" href={`/faq#${x}`}>
-                      {_t(`static.faq.${x}-header`)}
-                    </a>
-                  </p>
-                );
-              })}
-              <p>
-                <Link to="/faq">{_t("static.about.faqs")}</Link>
-              </p>
+          {false && (
+            <div className="faq">
+              <h2 className="faq-title">{_t("static.about.faq-title")}</h2>
+              <div className="faq-links">
+                {faqKeys.slice(0, 4).map((x) => {
+                  return (
+                    <p key={x}>
+                      <a className="faq-link" href={`/faq#${x}`}>
+                        {_t(`static.faq.${x}-header`)}
+                      </a>
+                    </p>
+                  );
+                })}
+                <p>
+                  <Link to="/faq">{_t("static.about.faqs")}</Link>
+                </p>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="contacts">
-            <h2 className="contacts-title">
-              {_t("static.about.contact-title")}
-            </h2>
-            <div className="contacts-links">
-              <a
-                className="contacts-link"
-                target="_blank"
-                href="https://ecency.com/@good-karma"
-                rel="noopener noreferrer"
-              >
-                {blogSvg} {_t("static.about.contact-blog")}
-              </a>
-              <a
-                className="contacts-link"
-                target="_blank"
-                href="https://ecency.com/@ecency"
-                rel="noopener noreferrer"
-              >
-                {newsSvg} {_t("static.about.contact-news")}
-              </a>
-              <a
-                className="contacts-link"
-                target="_blank"
-                href="mailto:info@esteem.app?subject=Feedback"
-                rel="noopener noreferrer"
-              >
-                {mailSvg} {_t("static.about.contact-email")}
-              </a>
-              <a
-                className="contacts-link"
-                target="_blank"
-                href="https://twitter.com/esteem_app"
-                rel="noopener noreferrer"
-              >
-                {twitterSvg} Twitter
-              </a>
-              <a
-                className="contacts-link"
-                target="_blank"
-                href="https://github.com/ecency"
-                rel="noopener noreferrer"
-              >
-                {githubSvg} Github
-              </a>
-              <a
-                className="contacts-link"
-                target="_blank"
-                href="https://t.me/ecency"
-                rel="noopener noreferrer"
-              >
-                {telegramSvg} Telegram
-              </a>
-              <a
-                className="contacts-link"
-                target="_blank"
-                href="https://discord.me/ecency"
-                rel="noopener noreferrer"
-              >
-                {discordSvg} Discord
-              </a>
+          {false && (
+            <div className="contacts">
+              <h2 className="contacts-title">
+                {_t("static.about.contact-title")}
+              </h2>
+              <div className="contacts-links">
+                <a
+                  className="contacts-link"
+                  target="_blank"
+                  href="https://ecency.com/@good-karma"
+                  rel="noopener noreferrer"
+                >
+                  {blogSvg} {_t("static.about.contact-blog")}
+                </a>
+                <a
+                  className="contacts-link"
+                  target="_blank"
+                  href="https://ecency.com/@ecency"
+                  rel="noopener noreferrer"
+                >
+                  {newsSvg} {_t("static.about.contact-news")}
+                </a>
+                <a
+                  className="contacts-link"
+                  target="_blank"
+                  href="mailto:info@esteem.app?subject=Feedback"
+                  rel="noopener noreferrer"
+                >
+                  {mailSvg} {_t("static.about.contact-email")}
+                </a>
+                <a
+                  className="contacts-link"
+                  target="_blank"
+                  href="https://twitter.com/esteem_app"
+                  rel="noopener noreferrer"
+                >
+                  {twitterSvg} Twitter
+                </a>
+                <a
+                  className="contacts-link"
+                  target="_blank"
+                  href="https://github.com/ecency"
+                  rel="noopener noreferrer"
+                >
+                  {githubSvg} Github
+                </a>
+                <a
+                  className="contacts-link"
+                  target="_blank"
+                  href="https://t.me/ecency"
+                  rel="noopener noreferrer"
+                >
+                  {telegramSvg} Telegram
+                </a>
+                <a
+                  className="contacts-link"
+                  target="_blank"
+                  href="https://discord.me/ecency"
+                  rel="noopener noreferrer"
+                >
+                  {discordSvg} Discord
+                </a>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </>
     );
@@ -279,11 +285,15 @@ class ContributePage extends Component<PageProps> {
 
         <div className="app-content static-page contribute-page">
           <div className="static-content">
-            <h1 className="page-title">Contribute to Esteem</h1>
+            <h1 className="page-title">Contribute to Proof of Brain</h1>
             <p>
-              Esteem is a decentralized platform which rewards contributors.
-              Content on platform is 100% user generated. You can{" "}
-              <a href="https://esteem.app/signup">
+              Proof of Brain is a decentralized platform which rewards
+              contributors. Content on platform is 100% user generated. You can{" "}
+              <a
+                className="btn btn-primary"
+                href="https://signup.hive.io/"
+                target="signup"
+              >
                 signup to get your own account
               </a>{" "}
               and start earning cryptocurrency. If you do not mind for rewards,

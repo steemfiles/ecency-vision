@@ -165,7 +165,7 @@
   },
   "nsfw": {
     "reveal": "Paljasta julkaisu",
-    "signup": "<a href=\"/signup\" class=\"push-link\">luo tili</a> tallentaaksesi asetuksesi",
+    "signup": "<a href=\"https://signup.hive.io/\" target=\"signup\" class=\"push-link\">luo tili</a> tallentaaksesi asetuksesi",
     "settings-1": "määrittele",
     "settings-2": "ulkoasuasetukset"
   },

@@ -165,7 +165,7 @@
   },
   "nsfw": {
     "reveal": "Sampoh pos nyoe",
-    "signup": "<a href=\"/signup\" class=\"push-link\">peugoet saboh akun</a> untuk tasimpan pilihan",
+    "signup": "<a href=\"https://signup.hive.io/\" target=\"signup\" class=\"push-link\">peugoet saboh akun</a> untuk tasimpan pilihan",
     "settings-1": "adjust your",
     "settings-2": "display preferences"
   },

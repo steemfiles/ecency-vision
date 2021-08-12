@@ -442,9 +442,13 @@ export class NavBar extends Component<Props, State> {
                   {_t("g.login")}
                 </Button>
 
-                <Link className="btn btn-primary" to="/signup">
+                <a
+                  className="btn btn-primary"
+                  href="https://signup.hive.io/"
+                  target="signup"
+                >
                   {_t("g.signup")}
-                </Link>
+                </a>
               </div>
             )}
 
