@@ -21,6 +21,7 @@ import {
   Notifications,
 } from "../../../../common/store/notifications/types";
 import { DynamicProps } from "../../../../common/store/dynamic-props/types";
+import { hiveSvg } from "../../../../common/img/svg";
 
 import ToolTip from "../../../../common/components/tooltip";
 import Login from "../../../../common/components/login";
@@ -56,7 +57,8 @@ import {
 // why "require" instead "import" ? see: https://github.com/ReactTraining/react-router/issues/6203
 const pathToRegexp = require("path-to-regexp");
 
-const logo = require("../../../../common/img/bluebrain-logo-circle.webp");
+const blueBrainLogo = require("../../../../common/img/bluebrain-logo-circle.webp");
+const hiveLogo = require("../../../../common/img/logo-small-transparent.png");
 
 interface AddressBarProps {
   history: History;
@@ -396,7 +398,12 @@ export class NavBar extends Component<Props, State> {
           <div className="nav-bar-inner">
             <div className="brand">
               <Link to={logoHref}>
-                <img src={logo} className="logo" alt="Logo" />
+                <img src={blueBrainLogo} className="blueBrainLogo" alt="Logo" />
+              </Link>
+            </div>
+            <div className="brand">
+              <Link to={logoHref}>
+                <img src={hiveLogo} className="blueBrainLogo" alt="Logo" />
               </Link>
             </div>
 

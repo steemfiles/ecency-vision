@@ -41,6 +41,7 @@ import {
 } from "../../img/svg";
 
 const logo = require("../../img/bluebrain-logo-circle.webp");
+import { hiveSvg } from "../../img/svg";
 
 interface Props {
   history: History;
@@ -198,18 +199,19 @@ export class NavBar extends Component<Props, State> {
         </div>
         {!smVisible && (
           <div className="nav-bar-sm">
-            <div className="brand">
+            <div
+              style={{ display: "flex", flexDirection: "row" }}
+              className="brand"
+            >
+              <Link to={"/created/hive-150329"}>
+                <img src={logo} className="logo" alt="Logo" />
+              </Link>
               {activeUser !== null ? (
-                <Link to={logoHref}>
-                  <img src={logo} className="logo" alt="Logo" />
+                <Link to={logoHref} className="logo">
+                  {hiveSvg}
                 </Link>
               ) : (
-                <img
-                  src={logo}
-                  className="logo"
-                  alt="Logo"
-                  onClick={this.handleIconClick}
-                />
+                <div onClick={this.handleIconClick}>{hiveSvg}</div>
               )}
             </div>
 
@@ -225,18 +227,19 @@ export class NavBar extends Component<Props, State> {
           )}
         >
           <div className="nav-bar-inner">
-            <div className="brand">
+            <div
+              style={{ display: "flex", flexDirection: "row" }}
+              className="brand"
+            >
+              <Link to={"/created/hive-150329"}>
+                <img src={logo} className="logo" alt="Logo" />
+              </Link>
               {activeUser !== null ? (
-                <Link to={logoHref}>
-                  <img src={logo} className="logo" alt="Logo" />
-                </Link>
+                <Link to={logoHref}>{hiveSvg}</Link>
               ) : (
-                <img
-                  src={logo}
-                  className="logo"
-                  alt="Logo"
-                  onClick={this.handleIconClick}
-                />
+                <div onClick={this.handleIconClick} className="brand">
+                  {hiveSvg}
+                </div>
               )}
             </div>
             {textMenu}
