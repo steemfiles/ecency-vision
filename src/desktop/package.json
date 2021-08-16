@@ -1,12 +1,12 @@
 {
-  "name": "ecency-surfer",
-  "productName": "Ecency",
-  "description": "Ecency desktop application reimagined for Windows, Mac, Linux users, start earning cryptocurrency!",
+  "name": "blue-brain",
+  "productName": "Blue Brain",
+  "description": "Blue Brain desktop application reimagined for Windows, Mac, Linux users, start earning cryptocurrency!",
   "private": false,
-  "author": "Ecency <hello@ecency.com>",
+  "author": "BlueBrain <leprechaun@steemfiles.com>",
   "version": "3.0.18",
-  "copyright": "© 2020, Ecency",
-  "homepage": "https://ecency.com",
+  "copyright": "© 2021, Leprechaun",
+  "homepage": "https://proofofbrain.blog",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
     "build-dll": "cross-env NODE_ENV=development webpack --config ./configs/webpack.config.renderer.dev.dll.babel.js --colors",
@@ -20,8 +20,8 @@
     "publish-all": "yarn build && electron-builder build -wml --publish always"
   },
   "build": {
-    "productName": "Ecency",
-    "appId": "app.esteem.surfer",
+    "productName": "Blue Brain",
+    "appId": "app.blue-brain",
     "files": [
       "dist/",
       "node_modules/",
@@ -96,7 +96,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "ecency",
+        "owner": "steemfiles",
         "repo": "ecency-vision",
         "vPrefixedTagName": false,
         "private": false,

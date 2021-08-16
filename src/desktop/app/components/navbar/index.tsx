@@ -397,13 +397,18 @@ export class NavBar extends Component<Props, State> {
         <div ref={this.nav} className={_c(`nav-bar-electron`)}>
           <div className="nav-bar-inner">
             <div className="brand">
-              <Link to={logoHref}>
-                <img src={blueBrainLogo} className="blueBrainLogo" alt="Logo" />
+              <Link to={"/created/hive-150329"}>
+                <img
+                  src={blueBrainLogo}
+                  className="logo"
+                  width="25%"
+                  alt="Logo"
+                />
               </Link>
             </div>
             <div className="brand">
               <Link to={logoHref}>
-                <img src={hiveLogo} className="blueBrainLogo" alt="Logo" />
+                <img src={hiveLogo} className="logo" width="5%" alt="Logo" />
               </Link>
             </div>
 
