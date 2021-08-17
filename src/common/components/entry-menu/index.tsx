@@ -174,7 +174,7 @@ export class EntryMenu extends BaseComponent<Props, State> {
   copyAddress = () => {
     const { entry } = this.props;
 
-    const u = `https://ecency.com/${entry.category}/@${entry.author}/${entry.permlink}`;
+    const u = `https://www.proofofbrain.blog/${entry.category}/@${entry.author}/${entry.permlink}`;
     clipboard(u);
     success(_t("entry.address-copied"));
   };

@@ -63,9 +63,9 @@ export default class MenuBuilder {
           },
         },
         {
-          label: "About Ecency",
+          label: "About Proof of Brain",
           click: () => {
-            shell.openExternal("https://ecency.com");
+            shell.openExternal("https://proofofbrain.blog");
           },
         },
         { type: "separator" },

@@ -54,7 +54,7 @@ export const render = (req: express.Request, state: AppState) => {
                 {
                   "@context": "https://schema.org",
                   "@type": "WebSite",
-                  "url": "https://ecency.com/",
+                  "url": "https://www.proofofbrain.blog/",
                   "potentialAction": {
                     "@type": "SearchAction",
                     "target": "https://ecency.com/search/?q={search_term_string}",

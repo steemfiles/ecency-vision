@@ -32,8 +32,8 @@ export class DialogContent extends BaseComponent<{}, ContentState> {
       <div className="download-dialog-content">
         <h2 className="downloads-title">Download</h2>
         <div className="downloads-text">
-          Enjoy Ecency for iPhone, iPad and Android, as well as Windows, Mac or
-          Linux devices
+          Enjoy Proof of Brain for iPhone, iPad and Android, as well as Windows,
+          Mac or Linux devices
         </div>
         <div className="download-buttons">
           {os !== "iOS" && os !== "AndroidOS" && os === "WindowsOS" && (

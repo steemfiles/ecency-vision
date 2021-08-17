@@ -173,7 +173,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
     const permlink = createReplyPermlink(entry.author);
 
     const jsonMeta = makeJsonMetaDataReply(
-      entry.json_metadata.tags || ["ecency"],
+      entry.json_metadata.tags || ["proofofbrain"],
       version
     );
 
@@ -238,7 +238,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
       parent_permlink: parentPermlink,
     } = entry;
     const jsonMeta = makeJsonMetaDataReply(
-      entry.json_metadata.tags || ["ecency"],
+      entry.json_metadata.tags || ["proofofbrain"],
       version
     );
 

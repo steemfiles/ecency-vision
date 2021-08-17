@@ -7,7 +7,7 @@ import { MetaData, CommentOptions, RewardType } from "../api/operations";
 import isElectron from "../util/is-electron";
 
 import { BeneficiaryRoute } from "../api/operations";
-
+import { APP_DOMAIN } from "../../client_config";
 const permlinkRnd = () => (Math.random() + 1).toString(16).substring(2);
 
 export const createPermlink = (
@@ -91,7 +91,7 @@ export const extractMetaData = (body: string): MetaData => {
 };
 
 export const makeApp = (appVer: string) =>
-  `ecency/${appVer}-${isElectron() ? "surfer" : "vision"}`;
+  isElectron() ? "bluebrain" : `${APP_DOMAIN}/${appVer}`;
 
 export const makeJsonMetaData = (
   meta: MetaData,

@@ -8,7 +8,7 @@ import accountReputation from "./account-reputation";
 import isElectron from "../util/is-electron";
 
 import { version } from "../../../package.json";
-
+import { APP_DOMAIN } from "../../client_config";
 export interface TempEntryProps {
   author: FullAccount;
   permlink: string;
@@ -42,7 +42,7 @@ export default (p: TempEntryProps): Entry => {
     depth: 0,
     is_paidout: false,
     json_metadata: {
-      app: `ecency/${version}-${isElectron() ? "surfer" : "vision"}`,
+      app: `${APP_DOMAIN}/${version}-${isElectron() ? "surfer" : "vision"}`,
       format: "markdown+html",
       tags: p.tags,
     },

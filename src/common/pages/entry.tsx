@@ -267,7 +267,7 @@ class EntryPage extends BaseComponent<Props, State> {
     const { author: parentAuthor, permlink: parentPermlink } = entry;
     const author = activeUser.username;
     const permlink = createReplyPermlink(entry.author);
-    const tags = entry.json_metadata.tags || ["ecency"];
+    const tags = entry.json_metadata.tags || ["proofofbrain"];
 
     const jsonMeta = makeJsonMetaDataReply(tags, version);
 
