@@ -42,7 +42,7 @@ import {
 
 const logo = require("../../img/bluebrain-logo-circle.webp");
 import { hiveSvg } from "../../img/svg";
-
+import site from "../../constants/site.json";
 interface Props {
   history: History;
   location: Location;
@@ -203,7 +203,7 @@ export class NavBar extends Component<Props, State> {
               style={{ display: "flex", flexDirection: "row" }}
               className="brand"
             >
-              <Link to={"/created/hive-150329"}>
+              <Link to={"/created/" + site.communityUsername}>
                 <img src={logo} className="logo" alt="Logo" />
               </Link>
               {activeUser !== null ? (
@@ -231,7 +231,7 @@ export class NavBar extends Component<Props, State> {
               style={{ display: "flex", flexDirection: "row" }}
               className="brand"
             >
-              <Link to={"/created/hive-150329"}>
+              <Link to={"/created/" + site.communityUsername}>
                 <img src={logo} className="logo" alt="Logo" />
               </Link>
               {activeUser !== null ? (

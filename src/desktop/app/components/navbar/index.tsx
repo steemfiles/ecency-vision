@@ -37,7 +37,7 @@ import { _t } from "../../../../common/i18n";
 
 import _c from "../../../../common/util/fix-class-names";
 
-import defaults from "../../../../common/constants/site.json";
+import site from "../../../../common/constants/site.json";
 
 import routes from "../../../../common/routes";
 
@@ -112,8 +112,7 @@ export class AddressBar extends Component<AddressBarProps, AddressBarState> {
     const index = history.index || 0;
 
     const curPath = entries[index]?.pathname || "/";
-    let address =
-      curPath === "/" ? `${defaults.filter}` : curPath.replace("/", "");
+    let address = curPath === "/" ? `${site.filter}` : curPath.replace("/", "");
 
     // persist search string
     if (curPath.startsWith("/search")) {
@@ -397,7 +396,7 @@ export class NavBar extends Component<Props, State> {
         <div ref={this.nav} className={_c(`nav-bar-electron`)}>
           <div className="nav-bar-inner">
             <div className="brand">
-              <Link to={"/created/hive-150329"}>
+              <Link to={"/created/" + site.communityUsername}>
                 <img
                   src={blueBrainLogo}
                   className="logo"
