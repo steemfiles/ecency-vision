@@ -13,6 +13,11 @@ export const APP_ICON = "weedcash";
 // vars. client should read $STM_Config, server should read config package.
 export const APP_URL = "https://www.weedcash.network";
 export const APP_DOMAIN = "www.weedcash.network";
+
+// the Hive user in charge of this particular website.
+export const APP_ADMIN_HIVE = "good-karma";
+export const APP_ADMIN_EMAIL = "info@ecency.com";
+
 // max num of tags. if unset, default is 10. This is due to previous hardcoded number.
 export const APP_MAX_TAG = 10;
 export const SCOT_TAG = "weedcash";

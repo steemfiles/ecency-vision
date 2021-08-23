@@ -1,4 +1,27 @@
 import express from "express";
+import site from "./common/constants/site.json";
+import defaults from "./common/constants/defaults.json";
+let missing_keys = [];
+for (const key in defaults) {
+  if (site[key] === undefined) {
+    missing_keys.push(key);
+  }
+}
+
+if (missing_keys.length > 0) {
+  console.log("Missing keys in common/constants/site.json: ");
+  for (const key of missing_keys) {
+    console.log(key);
+  }
+  process.exit(0);
+}
+
+const acceptable_filters = ["hot", "trending", "created"];
+if (!acceptable_filters.includes(site.filter)) {
+  console.log(
+    "filter key should be one of " + JSON.stringify(acceptable_filters)
+  );
+}
 
 let app = require("./server").default;
 

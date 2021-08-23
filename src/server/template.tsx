@@ -57,7 +57,7 @@ export const render = (req: express.Request, state: AppState) => {
                   "url": "https://www.proofofbrain.blog/",
                   "potentialAction": {
                     "@type": "SearchAction",
-                    "target": "https://ecency.com/search/?q={search_term_string}",
+                    "target": "https://www.proofofbrain.blog/search?q={search_term_string}",
                     "query-input": "required name=search_term_string"
                   }
                 }

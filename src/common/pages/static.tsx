@@ -10,6 +10,12 @@ import NavBar from "../components/navbar/index";
 import NavBarElectron from "../../desktop/app/components/navbar";
 import ScrollToTop from "../components/scroll-to-top";
 import Contributors from "../components/contributors";
+import {
+  APP_ADMIN_HIVE,
+  APP_ADMIN_EMAIL,
+  APP_NAME,
+  APP_URL,
+} from "../../client_config";
 
 import {
   PageProps,
@@ -30,7 +36,6 @@ import {
   discordSvg,
 } from "../img/svg";
 import { apiBase } from "../api/helper";
-
 const faqKeys = [
   "what-is-ecency",
   "what-is-difference",
@@ -44,7 +49,6 @@ const faqKeys = [
   "what-is-points",
   "where-tokens-come",
   "how-promotion-work",
-  "how-boosting-work",
   "can-guest-post",
   "can-link-post",
   "source-label",
@@ -53,7 +57,6 @@ const faqKeys = [
   "when-claim-rewards",
   "how-dhf-work",
   "what-are-rc",
-  "how-boost-account",
   "what-spam-abuse",
 ];
 
@@ -134,7 +137,7 @@ class AboutPage extends Component<PageProps> {
             </div>
           )}
 
-          {false && (
+          {
             <div className="faq">
               <h2 className="faq-title">{_t("static.about.faq-title")}</h2>
               <div className="faq-links">
@@ -152,7 +155,7 @@ class AboutPage extends Component<PageProps> {
                 </p>
               </div>
             </div>
-          )}
+          }
 
           {false && (
             <div className="contacts">
@@ -163,58 +166,10 @@ class AboutPage extends Component<PageProps> {
                 <a
                   className="contacts-link"
                   target="_blank"
-                  href="https://ecency.com/@good-karma"
+                  href={APP_URL + "/@" + APP_ADMIN_HIVE}
                   rel="noopener noreferrer"
                 >
                   {blogSvg} {_t("static.about.contact-blog")}
-                </a>
-                <a
-                  className="contacts-link"
-                  target="_blank"
-                  href="https://ecency.com/@ecency"
-                  rel="noopener noreferrer"
-                >
-                  {newsSvg} {_t("static.about.contact-news")}
-                </a>
-                <a
-                  className="contacts-link"
-                  target="_blank"
-                  href="mailto:info@esteem.app?subject=Feedback"
-                  rel="noopener noreferrer"
-                >
-                  {mailSvg} {_t("static.about.contact-email")}
-                </a>
-                <a
-                  className="contacts-link"
-                  target="_blank"
-                  href="https://twitter.com/esteem_app"
-                  rel="noopener noreferrer"
-                >
-                  {twitterSvg} Twitter
-                </a>
-                <a
-                  className="contacts-link"
-                  target="_blank"
-                  href="https://github.com/ecency"
-                  rel="noopener noreferrer"
-                >
-                  {githubSvg} Github
-                </a>
-                <a
-                  className="contacts-link"
-                  target="_blank"
-                  href="https://t.me/ecency"
-                  rel="noopener noreferrer"
-                >
-                  {telegramSvg} Telegram
-                </a>
-                <a
-                  className="contacts-link"
-                  target="_blank"
-                  href="https://discord.me/ecency"
-                  rel="noopener noreferrer"
-                >
-                  {discordSvg} Discord
                 </a>
               </div>
             </div>
@@ -562,7 +517,7 @@ class PrivacyPage extends Component<PageProps> {
             <h2>CONTACT INFORMATION.</h2>
             <p>
               We welcome your comments or questions about this Policy, and you
-              may contact us at: <code>info@ecency.com</code>.
+              may contact us at: <code>leprechaun@steemfiles.om</code>.
             </p>
             <h2>CHANGES TO THIS PRIVACY POLICY.</h2>
             <p>
@@ -616,7 +571,7 @@ class PrivacyPage extends Component<PageProps> {
               required to inform you of the legal bases of our processing of
               your personal information, which are described in the table below.
               If you have questions about the legal bases under which we process
-              your personal information, contact us at info@ecency.com.
+              your personal information, contact us at {APP_ADMIN_EMAIL}.
             </p>
             <h4>Processing Purpose</h4>
             <h4>Legal Basis</h4>
@@ -635,7 +590,7 @@ class PrivacyPage extends Component<PageProps> {
             <p>
               Where our use of your personal information is based upon your
               consent, you have the right to withdraw it anytime in the manner
-              indicated in the Service or by contacting us at info@ecency.com
+              indicated in the Service or by contacting us at {APP_ADMIN_EMAIL}
             </p>
             <h4>Use for New Purposes</h4>
             <p>
@@ -682,8 +637,8 @@ class PrivacyPage extends Component<PageProps> {
               your rights.
             </p>
             <p>
-              You can submit these requests by email to info@ecency.com. We may
-              request specific information from you to help us confirm your
+              You can submit these requests by email to {APP_ADMIN_EMAIL}. We
+              may request specific information from you to help us confirm your
               identity and process your request. Applicable law may require or
               permit us to decline your request. If we decline your request, we
               will tell you why, subject to legal restrictions. If you would
@@ -951,25 +906,27 @@ class TosPage extends Component<PageProps> {
             </p>
             <h2>4. Trademark Policy</h2>
             <p>
-              "Ecency", the Ecency logo and any other product or service names,
-              logos or slogans that may appear on Ecency are trademarks of
-              Ecency and may not be copied, imitated or used, in whole or in
+              {APP_NAME}, the {APP_NAME} logo and any other product or service
+              names, logos or slogans that may appear on {APP_NAME} are
+              trademarks of
+              {APP_NAME} and may not be copied, imitated or used, in whole or in
               part, without our prior written permission. You may not use any
-              metatags or other "hidden text" utilizing "Ecency" or any other
-              name, trademark or product or service name of Ecency without our
-              prior written permission. In addition, the look and feel of
-              Ecency, including, without limitation, all page headers, custom
-              graphics, button icons and scripts, constitute the service mark,
-              trademark or trade dress of Ecency and may not be copied, imitated
-              or used, in whole or in part, without our prior written
-              permission. All other trademarks, registered trademarks, product
-              names and company names or logos mentioned or used on Ecency are
-              the property of their respective owners and may not be copied,
-              imitated or used, in whole or in part, without the permission of
-              the applicable trademark holder. Reference to any products,
-              services, processes or other information by name, trademark,
-              manufacturer, supplier or otherwise does not constitute or imply
-              endorsement, sponsorship or recommendation by Ecency.
+              metatags or other "hidden text" utilizing "{APP_NAME}" or any
+              other name, trademark or product or service name of {APP_NAME}{" "}
+              without our prior written permission. In addition, the look and
+              feel of
+              {APP_NAME}, including, without limitation, all page headers,
+              custom graphics, button icons and scripts, constitute the service
+              mark, trademark or trade dress of {APP_NAME} and may not be
+              copied, imitated or used, in whole or in part, without our prior
+              written permission. All other trademarks, registered trademarks,
+              product names and company names or logos mentioned or used on{" "}
+              {APP_NAME} are the property of their respective owners and may not
+              be copied, imitated or used, in whole or in part, without the
+              permission of the applicable trademark holder. Reference to any
+              products, services, processes or other information by name,
+              trademark, manufacturer, supplier or otherwise does not constitute
+              or imply endorsement, sponsorship or recommendation by {APP_NAME}.
             </p>
             <h2>5. Assumption of Risk, Limitations on Liability.</h2>
             <p>
@@ -1283,7 +1240,7 @@ class TosPage extends Component<PageProps> {
             </p>
             <p>Copyright Agent</p>
             <p>
-              <code>info@ecency.com</code>
+              <code>{APP_ADMIN_EMAIL}</code>
             </p>
             <p>Please send our Copyright Agent the following information:</p>
             <p>
@@ -1451,7 +1408,7 @@ class TosPage extends Component<PageProps> {
             <h2>23. Contact Information</h2>
             <p>
               Notices to this site’s operators should be directed to{" "}
-              <code>info@ecency.com</code>.
+              <code>{APP_ADMIN_EMAIL}</code>.
             </p>
           </div>
         </div>
