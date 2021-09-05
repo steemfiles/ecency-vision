@@ -667,7 +667,13 @@ const LandingPage = (props: any) => {
       <h2>{site.title}</h2>
       <p>{site.description}</p>
       Read{" "}
-      <a href={site.landingPage}>the Beginner's Guide to Proof of Brain.</a>
+      <h2>
+        <a href={site.landingPage}>The Beginner's Guide to Proof of Brain.</a>
+      </h2>
+      <hr />
+      <h2>
+        <a href="/covid-19/@leprechaun/covid-19-information">Covid-19 Guide</a>
+      </h2>
     </div>
   );
 };
