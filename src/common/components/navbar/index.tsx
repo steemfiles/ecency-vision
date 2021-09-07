@@ -180,17 +180,6 @@ export class NavBar extends Component<Props, State> {
       this.props?.location?.pathname?.startsWith("/created") ||
       this.props?.location?.pathname?.startsWith("/trending");
 
-    const textMenu = (
-      <div className="text-menu">
-        <Link className="menu-item" to="/discover">
-          {_t("navbar.discover")}
-        </Link>
-        <Link className="menu-item" to="/communities">
-          {_t("navbar.communities")}
-        </Link>
-      </div>
-    );
-
     return (
       <>
         {floating && <div className="nav-bar-rep" />}
@@ -214,8 +203,6 @@ export class NavBar extends Component<Props, State> {
                 <div onClick={this.handleIconClick}>{hiveSvg}</div>
               )}
             </div>
-
-            {textMenu}
           </div>
         )}
         <div
@@ -242,7 +229,6 @@ export class NavBar extends Component<Props, State> {
                 </div>
               )}
             </div>
-            {textMenu}
             <div className="flex-spacer" />
             {(step !== 1 || transparentVerify) && (
               <div className="search-bar">{Search({ ...this.props })}</div>
