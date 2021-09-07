@@ -41,6 +41,8 @@ import {
 } from "../../img/svg";
 
 const logo = require("../../img/bluebrain-logo-circle.webp");
+const hiveLogo = require("../../img/hiveLogo.png");
+
 import { hiveSvg } from "../../img/svg";
 import site from "../../constants/site.json";
 interface Props {
@@ -197,10 +199,12 @@ export class NavBar extends Component<Props, State> {
               </Link>
               {activeUser !== null ? (
                 <Link to={logoHref} className="logo">
-                  {hiveSvg}
+                  <img src={hiveLogo} className="logo" width="5%" alt="Logo" />
                 </Link>
               ) : (
-                <div onClick={this.handleIconClick}>{hiveSvg}</div>
+                <div onClick={this.handleIconClick}>
+                  <img src={hiveLogo} className="logo" width="5%" alt="Logo" />
+                </div>
               )}
             </div>
           </div>
@@ -222,10 +226,18 @@ export class NavBar extends Component<Props, State> {
                 <img src={logo} className="logo" alt="Logo" />
               </Link>
               {activeUser !== null ? (
-                <Link to={logoHref}>{hiveSvg}</Link>
+                <Link to={logoHref}>
+                  {" "}
+                  <img src={hiveLogo} className="logo" width="5%" alt="Logo" />
+                </Link>
               ) : (
                 <div onClick={this.handleIconClick} className="brand">
-                  {hiveSvg}
+                  <img
+                    src={hiveLogo}
+                    className="logo"
+                    width="100%"
+                    alt="Logo"
+                  />
                 </div>
               )}
             </div>

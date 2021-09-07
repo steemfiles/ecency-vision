@@ -58,7 +58,7 @@ import {
 const pathToRegexp = require("path-to-regexp");
 
 const blueBrainLogo = require("../../../../common/img/bluebrain-logo-circle.webp");
-const hiveLogo = require("../../../../common/img/logo-small-transparent.png");
+const hiveLogo = require("../../../../common/img/hiveLogo.png");
 
 interface AddressBarProps {
   history: History;
