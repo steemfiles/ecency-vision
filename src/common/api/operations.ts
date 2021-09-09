@@ -543,7 +543,7 @@ export const transferToSavingsHot = (
     },
   ];
   const params: Parameters = {
-    callback: `${document.location.href}/@${from}/wallet`,
+    callback: `${document.location.protocol}//${document.location.host}/@${from}/hive`,
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -821,6 +821,7 @@ export const createDelegateVestingSharesOp = (
     ];
   }
 };
+
 export const delegateVestingShares = (
   delegator: string,
   key: PrivateKey,
@@ -834,6 +835,7 @@ export const delegateVestingShares = (
   );
   return hiveClient.broadcast.sendOperations([op], key);
 };
+
 export const delegateVestingSharesHot = (
   delegator: string,
   delegatee: string,
@@ -867,6 +869,110 @@ export const delegateVestingSharesKc = (
   );
   return keychain.broadcast(delegator, [op], "Active");
 };
+
+export const undelegateHiveEngineStakedAssetJSON = (
+  delegator: string,
+  delegatee: string,
+  quantity: string,
+  currency: string
+) => {
+  const json = JSON.stringify({
+    // is it always 'tokens'?
+    contractName: "tokens",
+    contractAction: "undelegate",
+    contractPayload: {
+      symbol: currency,
+      from: delegatee,
+      quantity,
+    },
+  });
+  return json;
+};
+
+export const createUndelegateVestingSharesOp = (
+  delegator: string,
+  delegatee: string,
+  quantity: string,
+  currency: string
+): Operation => {
+  quantity = quantity.replace(/,/g, "");
+  if (currency === "VESTS") {
+    return [
+      "delegate_vesting_shares",
+      {
+        delegator,
+        delegatee,
+        vesting_shares: quantity,
+      },
+    ];
+  } else {
+    const json = undelegateHiveEngineStakedAssetJSON(
+      delegator,
+      delegatee,
+      quantity,
+      currency
+    );
+    return [
+      "custom_json",
+      {
+        id: "ssc-mainnet-hive",
+        required_auths: [delegator],
+        required_posting_auths: [],
+        json,
+      },
+    ];
+  }
+};
+
+export const undelegateVestingShares = (
+  delegator: string,
+  key: PrivateKey,
+  delegatee: string,
+  quantity: string,
+  currency: string
+): Promise<TransactionConfirmation> => {
+  const op: Operation = createUndelegateVestingSharesOp(
+    delegator,
+    delegatee,
+    quantity,
+    currency
+  );
+  return hiveClient.broadcast.sendOperations([op], key);
+};
+
+export const undelegateVestingSharesHot = (
+  delegator: string,
+  delegatee: string,
+  quantity: string,
+  currency: string
+) => {
+  const op: Operation = createUndelegateVestingSharesOp(
+    delegator,
+    delegatee,
+    quantity,
+    currency
+  );
+  const params: Parameters = {
+    callback: `${document.location.protocol}//${document.location.host}/@${delegator}/hive`,
+  };
+  return hs.sendOperation(op, params, () => {});
+};
+
+export const undelegateVestingSharesKc = (
+  delegator: string,
+  delegatee: string,
+  quantity: string,
+  currency: string
+) => {
+  const op: Operation = createUndelegateVestingSharesOp(
+    delegator,
+    delegatee,
+    quantity,
+    currency
+  );
+  return keychain.broadcast(delegator, [op], "Active");
+};
+
 export const createStopWithdrawVestingOp = (
   account: string,
   txId: string

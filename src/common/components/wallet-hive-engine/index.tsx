@@ -24,7 +24,7 @@ import BaseComponent from "../base";
 import Tooltip from "../tooltip";
 import FormattedCurrency from "../formatted-currency";
 import TransactionList from "../transactions";
-import DelegatedVesting from "../delegated-vesting";
+import DelegatedVesting from "../delegated-vesting-hive-engine";
 import ReceivedVesting from "../received-vesting";
 import DropDown from "../dropdown";
 import Transfer, { TransferMode, TransferAsset } from "../transfer";
@@ -683,7 +683,13 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                     </div>
                     {balances.delegationsOut > 0 && (
                       <div className="amount amount-passive delegated-shares">
-                        <Tooltip content={_t("wallet.hive-power-delegated")}>
+                        <Tooltip
+                          content={_t(
+                            "wallet." +
+                              this.props.aPICoinName +
+                              "-power-delegated"
+                          )}
+                        >
                           <span
                             className="amount-btn"
                             onClick={this.toggleDelegatedList}
@@ -707,7 +713,13 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                       if (global.usePrivate) {
                         return (
                           <div className="amount amount-passive received-shares">
-                            <Tooltip content={_t("wallet.hive-power-received")}>
+                            <Tooltip
+                              content={_t(
+                                "wallet." +
+                                  this.props.aPICoinName +
+                                  "-power-received"
+                              )}
+                            >
                               <span
                                 className="amount-btn"
                                 onClick={this.toggleReceivedList}
@@ -720,7 +732,13 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                       }
                       return (
                         <div className="amount amount-passive received-shares">
-                          <Tooltip content={_t("wallet.hive-power-received")}>
+                          <Tooltip
+                            content={_t(
+                              "wallet." +
+                                this.props.aPICoinName +
+                                "-power-received"
+                            )}
+                          >
                             <span className="amount">{strReceived}</span>
                           </Tooltip>
                         </div>

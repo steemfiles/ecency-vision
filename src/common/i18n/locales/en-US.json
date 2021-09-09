@@ -464,6 +464,8 @@
     "tests": "TESTS",
     "hive-description": "HIVE are tradeable tokens that may be transferred at anytime.HIVE can be converted to Hive Power in a process called powering up.",
     "POB-description": "Proof of Brain are tradeable tokens that may be transferred at anytime.  POB can be staked in a process called powering up.",
+    "POB-power-delegated": "Delegated Brain Power",
+    "POB-power-received": "Received Brain Power",
     "hive-power": "HIVE POWER",
     "test-power": "TEST POWER",
     "hive-power-description": "Hive Power are influence tokens that earn more power for holding long term and voting on posts. The more Hive Power one holds, the more one can influence other’s rewards and earn rewards for accurate voting.",

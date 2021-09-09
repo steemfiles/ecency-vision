@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN } from "../../../client_config";
 import { History } from "history";
 import { Modal } from "react-bootstrap";
 import { Global } from "../../store/global/types";
@@ -14,9 +15,9 @@ import KeyOrHotDialog from "../key-or-hot-dialog";
 import { error } from "../feedback";
 import { DelegatedVestingShare, getVestingDelegations } from "../../api/hive";
 import {
-  delegateVestingShares,
-  delegateVestingSharesHot,
-  delegateVestingSharesKc,
+  undelegateVestingShares,
+  undelegateVestingSharesHot,
+  undelegateVestingSharesKc,
   formatError,
 } from "../../api/operations";
 import { _t } from "../../i18n";
@@ -24,6 +25,16 @@ import { vestsToHp } from "../../helper/vesting";
 import parseAsset from "../../helper/parse-asset";
 import formattedNumber from "../../util/formatted-number";
 import _c from "../../util/fix-class-names";
+
+interface HEDelegation {
+  created: number; // of ms since 1970
+  from: string; // username
+  quantity: string; // "100.00000000"
+  symbol: string;
+  to: string;
+  updated: number;
+}
+
 interface Props {
   history: History;
   global: Global;
@@ -34,14 +45,18 @@ interface Props {
   addAccount: (data: Account) => void;
   setSigningKey: (key: string) => void;
   onHide: () => void;
+  updateActiveUser: (data?: Account) => void;
 }
-export interface State {
+
+interface State {
   loading: boolean;
   inProgress: boolean;
-  data: DelegatedVestingShare[];
+  data: HEDelegation[];
   hideList: boolean;
 }
-export class List extends BaseComponent<Props, State> {
+
+// This is a stub.
+export class ListHE extends BaseComponent<Props, State> {
   state: State = {
     loading: false,
     inProgress: false,
@@ -49,31 +64,36 @@ export class List extends BaseComponent<Props, State> {
     hideList: false,
   };
   componentDidMount() {
-    this.fetch().then();
+    const { account } = this.props;
+    try {
+      const token_delegations: HEDelegation[] | undefined =
+        account["token_delegations"];
+      const { name } = account;
+      if (!token_delegations) {
+        this.fetch().then();
+        return;
+      }
+      const delegated: HEDelegation[] = token_delegations.filter(
+        (d) => d.from == name && d.symbol == LIQUID_TOKEN_UPPERCASE
+      );
+
+      this.stateSet({ data: delegated });
+    } catch {}
   }
   fetch = () => {
-    const { account } = this.props;
-    this.stateSet({ loading: true });
-    return getVestingDelegations(account.name, "", 250)
-      .then((r) => {
-        if (!r.map) {
-          console.log("Error loading data invalid array:", JSON.stringify(r));
-          return;
-        }
-        const sorted = r.sort((a, b) => {
-          return (
-            parseAsset(b.vesting_shares).amount -
-            parseAsset(a.vesting_shares).amount
-          );
-        });
-        this.stateSet({ data: sorted });
-      })
-      .finally(() => this.stateSet({ loading: false }));
+    return new Promise<void>(function (
+      myResolve: () => void,
+      myReject: () => void
+    ) {
+      myResolve(); // when successful
+    });
   };
+
   render() {
-    const { loading, data, hideList, inProgress } = this.state;
-    const { dynamicProps, activeUser, account } = this.props;
+    const { loading, hideList, inProgress, data } = this.state;
+    const { dynamicProps, activeUser, account, updateActiveUser } = this.props;
     const { hivePerMVests } = dynamicProps;
+
     if (loading) {
       return (
         <div className="delegated-vesting-content">
@@ -95,8 +115,7 @@ export class List extends BaseComponent<Props, State> {
               <div className="empty-list">{_t("g.empty-list")}</div>
             )}
             {data.map((x) => {
-              const vestingShares = parseAsset(x.vesting_shares).amount;
-              const { delegatee: username } = x;
+              const { symbol, quantity, to: username } = x;
               const deleteBtn =
                 activeUser && activeUser.username === account.name
                   ? KeyOrHotDialog({
@@ -112,34 +131,33 @@ export class List extends BaseComponent<Props, State> {
                         this.stateSet({ hideList: !hideList });
                       },
                       onKey: (key) => {
-                        this.stateSet({ inProgress: true });
-                        delegateVestingShares(
-                          activeUser.username,
-                          key,
-                          username,
-                          "0.000000 VESTS"
-                        )
-                          .then(() => this.fetch())
-                          .catch((err) => error(formatError(err)))
-                          .finally(() => this.stateSet({ inProgress: false }));
+                        error(
+                          "Cannot use keys to Undelegate Hive Engine.  Use Hive Keychain"
+                        );
                       },
                       onHot: () => {
-                        delegateVestingSharesHot(
-                          activeUser.username,
-                          username,
-                          "0.000000 VESTS"
+                        error(
+                          "Cannot use Hive Signer to Undelegate Hive Engine tokens.  Use Hive Keychain"
                         );
                       },
                       onKc: () => {
                         this.stateSet({ inProgress: true });
-                        delegateVestingSharesKc(
+                        undelegateVestingSharesKc(
                           activeUser.username,
                           username,
-                          "0.000000 VESTS"
+                          quantity,
+                          symbol
                         )
-                          .then(() => this.fetch())
+                          .then(() => {
+                            this.stateSet({
+                              data: data.filter((y) => y.to !== x.to),
+                            });
+                            updateActiveUser(activeUser.data);
+                          })
                           .catch((err) => error(formatError(err)))
-                          .finally(() => this.stateSet({ inProgress: false }));
+                          .finally(() => {
+                            this.stateSet({ inProgress: false });
+                          });
                       },
                     })
                   : null;
@@ -153,7 +171,7 @@ export class List extends BaseComponent<Props, State> {
                         <>
                           {UserAvatar({
                             ...this.props,
-                            username: x.delegatee,
+                            username: x.to,
                             size: "small",
                           })}
                         </>
@@ -170,12 +188,9 @@ export class List extends BaseComponent<Props, State> {
                     </div>
                   </div>
                   <div className="item-extra">
-                    <Tooltip content={x.vesting_shares}>
+                    <Tooltip content={x.quantity}>
                       <span>
-                        {formattedNumber(
-                          vestsToHp(vestingShares, hivePerMVests),
-                          { suffix: "HP" }
-                        )}
+                        {formattedNumber(x.quantity, { suffix: x.symbol })}
                       </span>
                     </Tooltip>
                     {deleteBtn}
@@ -189,17 +204,18 @@ export class List extends BaseComponent<Props, State> {
     );
   }
 }
-export default class DelegatedVesting extends Component<Props> {
+
+export default class DelegatedVestingHE extends Component<Props> {
   render() {
     const { onHide } = this.props;
     return (
       <>
         <Modal onHide={onHide} show={true} centered={true} animation={false}>
           <Modal.Header closeButton={true}>
-            <Modal.Title>{_t("delegated-vesting.title")}</Modal.Title>
+            <Modal.Title>{VESTING_TOKEN}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <List {...this.props} />
+            <ListHE {...this.props} />
           </Modal.Body>
         </Modal>
       </>
