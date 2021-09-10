@@ -841,21 +841,18 @@ export const delegateVestingSharesHot = (
   delegatee: string,
   vestingShares: string
 ) => {
-  if (!/[0-9]+(.[0-9]+)? [A-Z][A-Z0-9]+/.test(vestingShares)) {
-    throw new Error("Invalid vestingShares Amount specified");
-  }
-  const op: Operation = [
-    "delegate_vesting_shares",
-    {
-      delegator,
-      delegatee,
-      vesting_shares: vestingShares,
-    },
-  ];
+  const op: Operation = createDelegateVestingSharesOp(
+    delegator,
+    delegatee,
+    vestingShares
+  );
+  const parts = vestingShares.split(/ /);
+  const currency = parts[parts.length - 1];
+  const quantity = parts[0].replace(/,/g, "");
   const params: Parameters = {
-    callback: `${document.location.href}/@${delegator}/wallet`,
+    callback: document.location.href,
   };
-  return hs.sendOperation(op, params, () => {});
+  return hs.sendOperation(op, params, console.log);
 };
 export const delegateVestingSharesKc = (
   delegator: string,
