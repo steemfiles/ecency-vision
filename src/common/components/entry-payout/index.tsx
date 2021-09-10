@@ -264,8 +264,10 @@ export class EntryPayout extends Component<Props> {
             if (tokenAmount && hivePrice && base && quote)
               totalPayout += (tokenAmount * hivePrice * base) / quote;
             else
-              console.log("values:", { tokenAmount, hivePrice, base, quote });
-            console.log({ totalPayout });
+              console.log(
+                "skipping adding because one of these values is falsy:",
+                { tokenAmount, hivePrice, base, quote }
+              );
           }
         }
     }

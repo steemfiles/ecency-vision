@@ -16,7 +16,7 @@ export default (
   if (options) {
     opts = { ...opts, ...options };
   }
-  console.log({ value, fractionDigits: opts.fractionDigits });
+  //console.log({ value, fractionDigits: opts.fractionDigits });
   const { prefix, suffix } = opts;
   const fractionDigits = opts.fractionDigits || 0;
   let out: string = "";
@@ -25,39 +25,39 @@ export default (
 
     const unity = Math.pow(10, fractionDigits);
     let satoshis: number = Math.round(unity * value);
-    console.log({ satoshis, out });
+    //console.log({ satoshis, out });
     while (satoshis != 0 && out.length < fractionDigits) {
       out = (satoshis % 10) + out;
       satoshis /= 10;
       satoshis = Math.floor(satoshis);
-      console.log({ satoshis, out });
+      //console.log({ satoshis, out });
     }
     if (satoshis == 0) {
       while (out.length < fractionDigits) out = "0" + out;
-      console.log({ satoshis, out });
+      //console.log({ satoshis, out });
     }
     // out.length==opts.fracitionDigits
     if (out !== "") {
       out = "." + out;
-      console.log({ satoshis, out });
+      //console.log({ satoshis, out });
     }
     if (satoshis == 0) {
       out = "0" + out;
-      console.log({ satoshis, out });
+      //console.log({ satoshis, out });
     }
 
     while (satoshis) {
       out = (satoshis % 10) + out;
       satoshis /= 10;
       satoshis = Math.floor(satoshis);
-      console.log({ satoshis, out });
+      //console.log({ satoshis, out });
     }
   } else {
     value = value.replace(",", "");
     const m = value.match(RegExp(/\d+(\.\d+)?/));
     out = m ? m[0] : "NaN";
     if (out === "NaN") {
-      console.log("Value passed in was:", { value });
+      //console.log("Value passed in was:", { value });
     }
   }
   // add commas before and after the decimal point for readability
@@ -89,6 +89,6 @@ export default (
   }
   if (prefix) out = prefix + " " + out;
   if (suffix) out += " " + suffix;
-  console.log({ out });
+  //console.log({ out });
   return out;
 };
