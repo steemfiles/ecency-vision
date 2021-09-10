@@ -55,7 +55,6 @@ interface State {
   hideList: boolean;
 }
 
-// This is a stub.
 export class ListHE extends BaseComponent<Props, State> {
   state: State = {
     loading: false,
@@ -88,7 +87,6 @@ export class ListHE extends BaseComponent<Props, State> {
       myResolve(); // when successful
     });
   };
-
   render() {
     const { loading, hideList, inProgress, data } = this.state;
     const { dynamicProps, activeUser, account, updateActiveUser } = this.props;
@@ -131,9 +129,24 @@ export class ListHE extends BaseComponent<Props, State> {
                         this.stateSet({ hideList: !hideList });
                       },
                       onKey: (key) => {
-                        error(
-                          "Cannot use keys to Undelegate Hive Engine.  Use Hive Keychain"
-                        );
+                        this.stateSet({ inProgress: true });
+                        undelegateVestingShares(
+                          activeUser.username,
+                          key,
+                          username,
+                          quantity,
+                          symbol
+                        )
+                          .then((TxC) => {
+                            this.stateSet({
+                              data: data.filter((y) => y.to != x.to),
+                            });
+                            updateActiveUser(activeUser.data);
+                          })
+                          .catch((err) => error(formatError(err)))
+                          .finally(() => {
+                            this.setState({ inProgress: false });
+                          });
                       },
                       onHot: () => {
                         error(
