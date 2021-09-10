@@ -953,7 +953,7 @@ export const undelegateVestingSharesHot = (
     currency
   );
   const params: Parameters = {
-    callback: `${document.location.protocol}//${document.location.host}/@${delegator}/hive`,
+    callback: `${document.location.protocol}//${document.location.host}/@${delegator}/wallet`,
   };
   return hs.sendOperation(op, params, () => {});
 };

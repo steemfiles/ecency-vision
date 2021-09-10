@@ -141,16 +141,19 @@ export class ListHE extends BaseComponent<Props, State> {
                             this.stateSet({
                               data: data.filter((y) => y.to != x.to),
                             });
-                            updateActiveUser(activeUser.data);
                           })
                           .catch((err) => error(formatError(err)))
                           .finally(() => {
                             this.setState({ inProgress: false });
+                            updateActiveUser(activeUser.data);
                           });
                       },
                       onHot: () => {
-                        error(
-                          "Cannot use Hive Signer to Undelegate Hive Engine tokens.  Use Hive Keychain"
+                        undelegateVestingSharesHot(
+                          activeUser.username,
+                          username,
+                          quantity,
+                          symbol
                         );
                       },
                       onKc: () => {
@@ -165,11 +168,11 @@ export class ListHE extends BaseComponent<Props, State> {
                             this.stateSet({
                               data: data.filter((y) => y.to !== x.to),
                             });
-                            updateActiveUser(activeUser.data);
                           })
                           .catch((err) => error(formatError(err)))
                           .finally(() => {
                             this.stateSet({ inProgress: false });
+                            updateActiveUser(activeUser.data);
                           });
                       },
                     })
