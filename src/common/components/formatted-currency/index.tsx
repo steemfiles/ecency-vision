@@ -18,7 +18,6 @@ export default class FormattedCurrency extends Component<Props> {
     const { currencyRate, currencySymbol } = global;
 
     const valInCurrency = value * currencyRate;
-    console.log(currencySymbol);
 
     return (
       <>

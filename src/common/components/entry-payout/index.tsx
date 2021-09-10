@@ -231,31 +231,43 @@ export class EntryPayout extends Component<Props> {
     const curatorPayout = parseAsset(entry.curator_payout_value).amount;
     const maxPayout = parseAsset(entry.max_accepted_payout).amount;
     let totalPayout = pendingPayout + authorPayout + curatorPayout;
-    //console.log({he, hiveEngineTokensProperties}, "in entry-payout/index");
+    console.log({ totalPayout });
     if (he && hiveEngineTokensProperties) {
-      for (const token in he) {
-        //console.log({token});
-        let tokenProperties: TokenInfoConfigPair;
-        if (!(tokenProperties = hiveEngineTokensProperties[token])) continue;
-        const postTokenRewardInfo = he[token];
-        const tokenInfo = tokenProperties.info;
-        const tokenConfig = tokenProperties.config;
-        let hivePrice: number = tokenProperties.hivePrice || 0;
-        if (token === "POB") {
-          //console.log({tokenInfo, tokenConfig, postTokenRewardInfo});
+      for (const token in he)
+        if (hiveEngineTokensProperties[token] && he[token]) {
+          //console.log({token});
+          const tokenProperties: TokenInfoConfigPair =
+            hiveEngineTokensProperties[token];
+          const postTokenRewardInfo = he[token];
+          const tokenInfo = tokenProperties.info;
+          const tokenConfig = tokenProperties.config;
+          let hivePrice: number = tokenProperties.hivePrice || 0;
+          if (token === "POB") {
+            //console.log({tokenInfo, tokenConfig, postTokenRewardInfo});
+          }
+          let complete_payout_value: number =
+            (postTokenRewardInfo &&
+              (postTokenRewardInfo.pending_token ||
+                postTokenRewardInfo.total_payout_value)) ||
+            0;
+          if (complete_payout_value > 0 && hivePrice) {
+            const tokenAmount =
+              complete_payout_value *
+              Math.pow(10, -postTokenRewardInfo.precision);
+            try {
+              console.log(
+                tokenAmount,
+                // @ts-ignore
+                hiveEngineTokensProperties[token].info.symbol
+              );
+            } catch (e) {}
+            if (tokenAmount && hivePrice && base && quote)
+              totalPayout += (tokenAmount * hivePrice * base) / quote;
+            else
+              console.log("values:", { tokenAmount, hivePrice, base, quote });
+            console.log({ totalPayout });
+          }
         }
-        let complete_payout_value: number =
-          postTokenRewardInfo.pending_token ||
-          postTokenRewardInfo.total_payout_value ||
-          0;
-        if (complete_payout_value > 0 && hivePrice) {
-          const tokenAmount =
-            complete_payout_value *
-            Math.pow(10, -postTokenRewardInfo.precision);
-          //console.log(tokenAmount,hiveEngineTokensProperties[token].info.symbol);
-          totalPayout += (tokenAmount * hivePrice * base) / quote;
-        }
-      }
     }
     const payoutLimitHit = totalPayout >= maxPayout;
     const shownPayout =
@@ -267,6 +279,7 @@ export class EntryPayout extends Component<Props> {
         </Popover.Content>
       </Popover>
     );
+    console.log({ shownPayout });
     return (
       <OverlayTrigger
         trigger={["hover", "focus"]}
