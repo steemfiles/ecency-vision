@@ -119,12 +119,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     this.fetchConvertingAmount();
     this.fetchHETransactions(account.name, "");
   }
-  keepTransaction(group?: OperationGroup | "", tx: Transaction) {
-    // @ts-ignore
-    if (!group || group === "") {
-      return true;
-    }
-    console.log({ group });
+  keepTransaction(group?: OperationGroup | "", tx: Transaction): boolean {
     switch (group) {
       case "transfers":
         return [
@@ -157,14 +152,12 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
           .split(/,/)
           .includes(tx.type);
     }
-    // @ts-ignore
     return false;
   }
   compareTransactions(a: Transaction, b: Transaction) {
     return a.timestamp > b.timestamp ? -1 : 1;
   }
   handleFineTransactions(fts: Array<HEFineTransaction>) {
-    console.log("handleFineTransactions called.");
     const { transactions } = this.state;
     const { list } = transactions;
     const ntxs = [...HEFineTransactionToHiveTransactions(fts), ...list]
@@ -199,15 +192,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     }
     const { transactions } = this.state;
     try {
-      console.log("H");
-      const txs: Array<Transaction> = cts.map((t) =>
-        HEToHTransaction(t)
-      ); /*cts.filter( x => !["market_cancel", "market_sell", "market_placeOrder", "tokens_unstakeStart",
-				"tokens_cancelUnstake", "tokens_delegate",
-				"tokens_stake", "tokens_undelegateDone",  "tokens_undelegateStart"].includes(x.operation) ).map( x => {
-					return HEToHTransaction(x);
-				}).filter(x => x != null);*/
-      console.log("E");
+      const txs: Array<Transaction> = cts.map((t) => HEToHTransaction(t));
       const { list, group } = transactions;
       const ftxs: Array<Transaction> = [...txs, ...list]
         .filter(this.keepTransaction.bind(this, group))
@@ -215,9 +200,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
       this.stateSet({
         transactions: { list: ftxs, loading: false, group: transactions.group },
       });
-      console.log("R");
     } catch (e) {
-      console.log(e);
       this.stateSet({
         transactions: {
           list: transactions.list,
@@ -234,15 +217,13 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     this.stateSet({
       transactions: { list: [], loading: true, group: group || "" },
     });
-    // @ts-ignore
-    if (!group || group === "" || group === "rewards")
+    if (group === "rewards")
       getFineTransactions(name, group === "rewards" ? 200 : 10, 0)
         .then(this.handleFineTransactions.bind(this))
         .catch((e) => {
           console.log(e);
         });
-    // @ts-ignore
-    if (!group || group === "" || group !== "rewards")
+    else
       getCoarseTransactions(name, 300, 0).then(
         this.handleCoarseTransactions.bind(this, group ? group : "")
       );
