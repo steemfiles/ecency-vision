@@ -1040,7 +1040,7 @@ export const withdrawVestingHot = (
 ) => {
   const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
   const params: Parameters = {
-    callback: `${document.location.href}/@${account}/wallet`,
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, fn);
 };

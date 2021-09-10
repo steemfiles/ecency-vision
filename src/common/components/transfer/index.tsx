@@ -1325,7 +1325,7 @@ export class Transfer extends BaseComponent<Props, State> {
                 hSBroken:
                   (LIQUID_TOKEN_UPPERCASE === this.props.asset ||
                     VESTING_TOKEN === this.props.asset) &&
-                  (mode === "power-up" || mode === "power-down"),
+                  mode === "power-up",
               })}
               <p className="text-center">
                 <a
