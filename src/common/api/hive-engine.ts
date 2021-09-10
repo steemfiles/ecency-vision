@@ -62,7 +62,7 @@ export interface UnStake {
   quantity: string;
   quantityLeft: string;
   nextTransactionTimestamp: number;
-  numberTransactionsLeft: number;
+  numberTransactionsLeft: string;
   millisecPerPeriod: string;
   txID: string;
 }

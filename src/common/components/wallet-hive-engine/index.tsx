@@ -752,10 +752,27 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                               content={_t("wallet.next-power-down-amount")}
                             >
                               <span>
-                                {formattedNumber(token_unstake.quantity, {
-                                  prefix: "-",
-                                  suffix: this.props.aPICoinName,
-                                })}
+                                {(() => {
+                                  try {
+                                    const numberTransactionsLeft: number =
+                                      parseFloat(
+                                        token_unstake.numberTransactionsLeft
+                                      );
+                                    const quantityLeft: number = parseFloat(
+                                      token_unstake.quantityLeft
+                                    );
+                                    return formattedNumber(
+                                      numberTransactionsLeft / quantityLeft,
+                                      {
+                                        prefix: "-",
+                                        suffix: this.props.aPICoinName,
+                                        fractionDigits: 8,
+                                      }
+                                    );
+                                  } catch (e) {
+                                    return "Error in calculations...";
+                                  }
+                                })()}
                               </span>
                             </Tooltip>
                           </div>

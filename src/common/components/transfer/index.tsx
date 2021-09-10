@@ -988,7 +988,7 @@ export class Transfer extends BaseComponent<Props, State> {
                       amount: formattedNumber(
                         (
                           parseFloat(pob_unstake.quantityLeft) /
-                          pob_unstake.numberTransactionsLeft
+                          parseFloat(pob_unstake.numberTransactionsLeft)
                         ).toFixed(8),
                         { fractionDigits: 8, suffix: "POB" }
                       ),
