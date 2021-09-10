@@ -252,7 +252,7 @@ export class EntryPayout extends Component<Props> {
           const tokenAmount =
             complete_payout_value *
             Math.pow(10, -postTokenRewardInfo.precision);
-          //console.log(tokenAmount,"POB");
+          //console.log(tokenAmount,hiveEngineTokensProperties[token].info.symbol);
           totalPayout += (tokenAmount * hivePrice * base) / quote;
         }
       }

@@ -11,20 +11,19 @@ interface Props {
 }
 
 export default class FormattedCurrency extends Component<Props> {
-  public static defaultProps: Partial<Props> = {
-    fixAt: 2,
-  };
+  public static defaultProps: Partial<Props> = {};
 
   render() {
     const { global, value, fixAt } = this.props;
     const { currencyRate, currencySymbol } = global;
 
     const valInCurrency = value * currencyRate;
+    console.log(currencySymbol);
 
     return (
       <>
         {formattedNumber(valInCurrency, {
-          fractionDigits: fixAt,
+          fractionDigits: fixAt ?? currencySymbol === "฿" ? 6 : 2,
           prefix: currencySymbol,
         })}
       </>
