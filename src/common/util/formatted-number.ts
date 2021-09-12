@@ -22,7 +22,9 @@ export default (
   let out: string = "";
   if (typeof value == "number") {
     // builtin format is buggy when using numbers smaller than 1e-6.
-
+    if (isNaN(value)) {
+      return "NaN";
+    }
     const unity = Math.pow(10, fractionDigits);
     let satoshis: number = Math.round(unity * value);
     //console.log({ satoshis, out });
@@ -53,6 +55,8 @@ export default (
       //console.log({ satoshis, out });
     }
   } else {
+    if (value === "NaN")
+      return value;
     value = value.replace(",", "");
     const m = value.match(RegExp(/\d+(\.\d+)?/));
     out = m ? m[0] : "NaN";
