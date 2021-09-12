@@ -31,9 +31,13 @@ export default (
       return "NaN";
     }
     const unity = Math.pow(10, fractionDigits);
-    let satoshis: number = Math.round(unity * value) * (value >= 0.0 ? 1 : -1);
-    if (value < 0 && satoshis > 0) {
+    if (value < 0) {
       addNegativeSignFlag = true;
+    }
+    let satoshis: number =
+      Math.round(unity * value) * (addNegativeSignFlag ? -1 : 1);
+    if (satoshis == 0) {
+      addNegativeSignFlag = false;
     }
     if (debugLog) console.log({ satoshis, out });
     while (satoshis != 0 && out.length < fractionDigits) {
