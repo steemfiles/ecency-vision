@@ -8,6 +8,7 @@ export default (
   value: number | string,
   options: Options | undefined = undefined
 ) => {
+  let addNegativeSignFlag : boolean = false;
   let opts: Options = {
     fractionDigits: 3,
     prefix: "",
@@ -22,9 +23,11 @@ export default (
   let out: string = "";
   if (typeof value == "number") {
     // builtin format is buggy when using numbers smaller than 1e-6.
-
+    if (isNaN(value)) {
+      return "NaN";
+    }
     const unity = Math.pow(10, fractionDigits);
-    let satoshis: number = Math.round(unity * value);
+    let satoshis: number = Math.round(unity * value) * ((value >= 0.0) ? 1 : -1);
     //console.log({ satoshis, out });
     while (satoshis != 0 && out.length < fractionDigits) {
       out = (satoshis % 10) + out;
@@ -52,12 +55,24 @@ export default (
       satoshis = Math.floor(satoshis);
       //console.log({ satoshis, out });
     }
+    
+    if (value < 0.0 && satoshis > 0) {
+      addNegativeSignFlag = true;
+    }
+    
   } else {
+    if (value === "NaN") {
+      return value;
+    }
     value = value.replace(",", "");
-    const m = value.match(RegExp(/\d+(\.\d+)?/));
+    const m = value.match(RegExp(/-?\d+(\.\d+)?/));
     out = m ? m[0] : "NaN";
     if (out === "NaN") {
       //console.log("Value passed in was:", { value });
+    }
+    if (out.charAt(0) == '-') {
+      addNegativeSignFlag = true;
+      out = out.slice(1);
     }
   }
   // add commas before and after the decimal point for readability
@@ -86,6 +101,9 @@ export default (
   }
   if (out.charAt(out.length - 1) === ".") {
     out = out.slice(0, out.length - 1);
+  }
+  if (addNegativeSignFlag) {
+      out = "-" + out;
   }
   if (prefix) out = prefix + " " + out;
   if (suffix) out += " " + suffix;
