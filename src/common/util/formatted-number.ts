@@ -8,7 +8,8 @@ export default (
   value: number | string,
   options: Options | undefined = undefined
 ) => {
-  let addNegativeSignFlag : boolean = false;
+  let debugLog = false;
+  let addNegativeSignFlag: boolean = false;
   let opts: Options = {
     fractionDigits: 3,
     prefix: "",
@@ -17,7 +18,10 @@ export default (
   if (options) {
     opts = { ...opts, ...options };
   }
-  //console.log({ value, fractionDigits: opts.fractionDigits });
+  if (value < 0) {
+    debugLog = true;
+  }
+  if (debugLog) console.log({ value, fractionDigits: opts.fractionDigits });
   const { prefix, suffix } = opts;
   const fractionDigits = opts.fractionDigits || 0;
   let out: string = "";
@@ -27,39 +31,37 @@ export default (
       return "NaN";
     }
     const unity = Math.pow(10, fractionDigits);
-    let satoshis: number = Math.round(unity * value) * ((value >= 0.0) ? 1 : -1);
-    //console.log({ satoshis, out });
+    let satoshis: number = Math.round(unity * value) * (value >= 0.0 ? 1 : -1);
+    if (value < 0 && satoshis > 0) {
+      addNegativeSignFlag = true;
+    }
+    if (debugLog) console.log({ satoshis, out });
     while (satoshis != 0 && out.length < fractionDigits) {
       out = (satoshis % 10) + out;
       satoshis /= 10;
       satoshis = Math.floor(satoshis);
-      //console.log({ satoshis, out });
+      if (debugLog) console.log({ satoshis, out });
     }
     if (satoshis == 0) {
       while (out.length < fractionDigits) out = "0" + out;
-      //console.log({ satoshis, out });
+      if (debugLog) console.log({ satoshis, out });
     }
     // out.length==opts.fracitionDigits
     if (out !== "") {
       out = "." + out;
-      //console.log({ satoshis, out });
+      if (debugLog) console.log({ satoshis, out });
     }
     if (satoshis == 0) {
       out = "0" + out;
-      //console.log({ satoshis, out });
+      if (debugLog) console.log({ satoshis, out });
     }
 
     while (satoshis) {
       out = (satoshis % 10) + out;
       satoshis /= 10;
       satoshis = Math.floor(satoshis);
-      //console.log({ satoshis, out });
+      if (debugLog) console.log({ satoshis, out });
     }
-    
-    if (value < 0.0 && satoshis > 0) {
-      addNegativeSignFlag = true;
-    }
-    
   } else {
     if (value === "NaN") {
       return value;
@@ -68,9 +70,9 @@ export default (
     const m = value.match(RegExp(/-?\d+(\.\d+)?/));
     out = m ? m[0] : "NaN";
     if (out === "NaN") {
-      //console.log("Value passed in was:", { value });
+      if (debugLog) console.log("Value passed in was:", { value });
     }
-    if (out.charAt(0) == '-') {
+    if (out.charAt(0) == "-") {
       addNegativeSignFlag = true;
       out = out.slice(1);
     }
@@ -103,10 +105,10 @@ export default (
     out = out.slice(0, out.length - 1);
   }
   if (addNegativeSignFlag) {
-      out = "-" + out;
+    out = "-" + out;
   }
   if (prefix) out = prefix + " " + out;
   if (suffix) out += " " + suffix;
-  //console.log({ out });
+  if (debugLog) console.log({ out });
   return out;
 };
