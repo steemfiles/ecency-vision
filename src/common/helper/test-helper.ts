@@ -149,6 +149,7 @@ export const globalInstance: Global = {
   intro: true,
   currency: "usd",
   currencyRate: 1,
+  currencyPrecision: 3,
   currencySymbol: "$",
   lang: "en-US",
   searchIndexCount: 10000000,

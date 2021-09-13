@@ -52,6 +52,7 @@ export interface Global {
   intro: boolean;
   currency: string;
   currencyRate: number;
+  currencyPrecision: number;
   currencySymbol: string;
   lang: string;
   searchIndexCount: number;
@@ -110,6 +111,7 @@ export interface CurrencySetAction {
   type: ActionTypes.CURRENCY_SET;
   currency: string;
   currencyRate: number;
+  currencyPrecision: number;
   currencySymbol: string;
 }
 

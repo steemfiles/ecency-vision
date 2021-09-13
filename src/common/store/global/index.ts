@@ -34,6 +34,8 @@ export const initialState: Global = {
   intro: true,
   currency: defaults && defaults.currency && defaults.currency.currency,
   currencyRate: defaults && defaults.currency && defaults.currency.rate,
+  currencyPrecision:
+    defaults && defaults.currency && defaults.currency.precision,
   currencySymbol: defaults && defaults.currency && defaults.currency.symbol,
   lang: "en-US",
   searchIndexCount: 0,
@@ -80,8 +82,15 @@ export default (state: Global = initialState, action: Actions): Global => {
       return { ...state, notifications: true };
     }
     case ActionTypes.CURRENCY_SET: {
-      const { currency, currencyRate, currencySymbol } = action;
-      return { ...state, currency, currencyRate, currencySymbol };
+      const { currency, currencyRate, currencyPrecision, currencySymbol } =
+        action;
+      return {
+        ...state,
+        currency,
+        currencyRate,
+        currencyPrecision,
+        currencySymbol,
+      };
     }
     case ActionTypes.LANG_SET: {
       const { lang } = action;
@@ -211,10 +220,24 @@ export const setCurrencyAct = (
   currencyRate: number,
   currencySymbol: string
 ): CurrencySetAction => {
+  console.log(currencyRate, currency + "/$");
+  const currencyPrecision = (() => {
+    if (!currencyRate) return 8;
+
+    let RoughPrecision = Math.round(-Math.log10(currencyRate)) + 3;
+    if (RoughPrecision < 0) {
+      return 0;
+    }
+
+    return RoughPrecision;
+  })();
+
+  console.log({ currencyPrecision });
   return {
     type: ActionTypes.CURRENCY_SET,
     currency,
     currencyRate,
+    currencyPrecision,
     currencySymbol,
   };
 };

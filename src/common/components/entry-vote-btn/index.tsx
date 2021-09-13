@@ -617,6 +617,7 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
     } = this.state;
     const {
       entry: { post_id },
+      global,
     } = this.props;
 
     return (
@@ -634,7 +635,7 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
                 <FormattedCurrency
                   {...this.props}
                   value={this.estimate(upSliderVal)}
-                  fixAt={3}
+                  fixAt={global.currencyPrecision}
                 />
               </div>
               <div className="slider slider-up">
