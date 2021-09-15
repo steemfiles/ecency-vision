@@ -21,8 +21,6 @@ import SubmitContainer from "./pages/submit";
 import SignUpContainer from "./pages/sign-up";
 import NotFound from "./components/404";
 
-import Tracker from "./tracker";
-
 import {
   AboutPageContainer,
   GuestPostPageContainer,
@@ -39,7 +37,6 @@ import routes from "./routes";
 const App = () => {
   return (
     <>
-      <Tracker />
       <Switch>
         <Route
           exact={true}
