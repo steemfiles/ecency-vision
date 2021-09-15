@@ -5,6 +5,7 @@
   "currency": {
     "currency": "hbd",
     "rate": 1,
+    "precision": 3,
     "symbol": "$"
   },
   "locale": "en-US",

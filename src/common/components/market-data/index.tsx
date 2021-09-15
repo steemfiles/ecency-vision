@@ -187,7 +187,7 @@ export class Market extends BaseComponent<Props, State> {
 
 export default class MarketData extends Component {
   render() {
-    const fromTs = moment().subtract(2, "days").format("X");
+    const fromTs = moment().subtract(2, "years").format("X");
     const toTs = moment().format("X");
 
     return (
@@ -199,7 +199,15 @@ export default class MarketData extends Component {
           </Tsx>
         </div>
         <Market
-          label="HIVE"
+          label="BTC/USD last two years"
+          coin="bitcoin"
+          vsCurrency="usd"
+          fromTs={fromTs}
+          toTs={toTs}
+          formatter="0.000$"
+        />
+        <Market
+          label="HIVE/USD last two years"
           coin="hive"
           vsCurrency="usd"
           fromTs={fromTs}
@@ -207,7 +215,7 @@ export default class MarketData extends Component {
           formatter="0.000$"
         />
         <Market
-          label="HBD"
+          label="HBD/USD last two years"
           coin="hive_dollar"
           vsCurrency="usd"
           fromTs={fromTs}
@@ -215,16 +223,16 @@ export default class MarketData extends Component {
           formatter="0.000$"
         />
         <Market
-          label="XMR"
-          coin="monero"
+          label="DASH/USD last two years"
+          coin="dash"
           vsCurrency="usd"
           fromTs={fromTs}
           toTs={toTs}
           formatter=",$"
         />
         <Market
-          label="ADA"
-          coin="ada"
+          label="LTC/USD last two years"
+          coin="litecoin"
           vsCurrency="usd"
           fromTs={fromTs}
           toTs={toTs}
