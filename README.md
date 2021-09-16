@@ -11,7 +11,7 @@ Fast, simple and clean source code with Reactjs + Typescript.
 - [Production version][ecency_vision] - master branch
 - [Alpha version][ecency_alpha] - development branch
 
-## Desktop app
+## Ecency has a similar Desktop app (but is not Hive Engine aware!)
 
 Please check latest version on [Release page][ecency_release] or [Ecency link][ecency_desktop].
 
@@ -21,7 +21,8 @@ Please check latest version on [Release page][ecency_release] or [Ecency link][e
 
 ## Developers
 
-Feel free to test it out and submit improvements and pull requests.
+Feel free to test it out and submit improvements and pull requests.  
+Please run pre-commit-hook.sh before committing
 
 ### Build instructions
 
