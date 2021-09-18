@@ -1,5 +1,5 @@
 import {
-  HETokenUnstake,
+  HETokensUnstake,
   TokensUnstake,
   HEFineTransaction,
   HEAuthorReward,

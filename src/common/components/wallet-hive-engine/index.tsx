@@ -152,7 +152,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
           .split(/,/)
           .includes(tx.type);
     }
-    return false;
+    return true;
   }
   compareTransactions(a: Transaction, b: Transaction) {
     return a.timestamp > b.timestamp ? -1 : 1;

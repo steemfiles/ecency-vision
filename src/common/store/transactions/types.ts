@@ -39,14 +39,14 @@ export interface HECoarseBaseTransaction {
   // POB for Proof of Brain
   symbol: string;
 }
-export interface HETokenUnstake extends HECoarseBaseTransaction {
+export interface HETokensUnstake extends HECoarseBaseTransaction {
   account: string;
   operation: "tokens_unstake";
   quantity: nAACRS;
 }
-export interface TokenUnstake extends BaseTransaction {
+export interface TokensUnstake extends BaseTransaction {
+  type: "tokens_unstake";
   account: string;
-  operation: "tokens_unstake";
   amount: aAAS;
 }  
 export interface CollateralizedConvert extends BaseTransaction {
@@ -456,6 +456,7 @@ export interface EffectiveCommentVote extends BaseTransaction {
   weight: number;
 }
 export type Transaction =
+  | TokensUnstake
   | CurationReward
   | AuthorReward
   | CommentBenefactor
@@ -501,7 +502,7 @@ export interface Transactions {
   group: OperationGroup | "";
 }
 export type HECoarseTransaction =
-  | HETokenUnStake
+  | HETokensUnstake
   | HETokensIssue
   | HEUnstakeStart
   | HETokensTransfer
