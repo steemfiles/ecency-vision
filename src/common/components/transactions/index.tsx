@@ -129,6 +129,15 @@ export class TransactionRow extends Component<RowProps> {
       icon = commentSvg;
       flag = true;
     }
+    if (tr.type === "tokens_unstake") {
+      flag = true;
+      icon = cashMultiple;
+      numbers = (
+        <>
+        <span className="number">{tr.amount}</span>
+        </>
+      );
+    }
     if (tr.type === "tokens_issue") {
       flag = true;
       icon = cashMultiple;

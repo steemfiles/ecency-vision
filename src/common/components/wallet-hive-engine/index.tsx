@@ -148,7 +148,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
       case "market-orders":
         return tx.type.startsWith("market_") || tx.type === "fill_order";
       case "stake-operations":
-        return "tokens_stake,withdraw_vesting,return_vesting_delegation,tokens_unstakeStart,tokens_CancelUnstake,tokens_undelegateDone,tokens_delegate,tokens_undelegateStart,"
+        return "tokens_stake,withdraw_vesting,return_vesting_delegation,tokens_unstakeStart,tokens_CancelUnstake,tokens_unstake,tokens_undelegateDone,tokens_delegate,tokens_undelegateStart,"
           .split(/,/)
           .includes(tx.type);
     }
