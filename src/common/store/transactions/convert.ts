@@ -1,4 +1,6 @@
 import {
+  HETokenUnstake,
+  TokensUnstake,
   HEFineTransaction,
   HEAuthorReward,
   HECurationReward,
@@ -105,6 +107,15 @@ export function HEB2B(t: HECoarseBaseTransaction): {
     timestamp: d.toISOString().split(".")[0],
   };
   return ret;
+}
+export function HEToHTokensUnstake(x: HETokensUnstake): TokensUnstake {
+  const t: TokensUnstake = {
+    type: "tokens_unstake",
+    ...HEB2B(x),
+    amount: FormattedNumber(x.quantity, { suffix: x.symbol }),
+    account: x.account,
+  };
+  return t;
 }
 export function HEToHTransfer(x: HETokensTransfer): Transfer {
   const t: Transfer = {
@@ -216,6 +227,8 @@ function HEToHMarketCancel(t: HEMarketCancel): MarketCancel {
 }
 export function HEToHTransaction(t: HECoarseTransaction): Transaction {
   switch (t.operation) {
+    case "tokens_unstake":
+      return HEToHTokensUnstake(t);
     case "tokens_transfer":
       return HEToHTransfer(t);
     case "tokens_issue":

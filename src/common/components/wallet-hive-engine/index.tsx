@@ -176,6 +176,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         (x) =>
           ![
             "market_cancel",
+            "market_buy",
             "market_sell",
             "market_placeOrder",
             "tokens_unstakeStart",
@@ -184,6 +185,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
             "tokens_cancelUnstake",
             "tokens_delegate",
             "tokens_stake",
+            "tokens_unstake",
             "tokens_undelegateDone",
             "tokens_undelegateStart",
           ].includes(x.operation)
