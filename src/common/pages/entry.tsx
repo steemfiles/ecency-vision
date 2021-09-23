@@ -80,6 +80,7 @@ import {
   getScotDataAsync,
   HiveEngineTokenConfig,
   HiveEngineTokenInfo,
+  ScotPost,
 } from "../api/hive-engine";
 import { LIQUID_TOKEN_UPPERCASE } from "../../client_config";
 import { setHiveEngineTokensProperties } from "../store/global";
@@ -380,17 +381,12 @@ class EntryPage extends BaseComponent<Props, State> {
     const isComment = !!entry.parent_author;
 
     const { activeUser } = this.props;
-
-    const ownEntry = activeUser && activeUser.username === entry.author;
-    const isHidden = entry?.net_rshares < 0;
-    const isMuted =
-      entry?.stats?.gray &&
-      entry?.net_rshares >= 0 &&
-      entry?.author_reputation >= 0;
-    const isLowReputation =
-      entry?.stats?.gray &&
-      entry?.net_rshares >= 0 &&
-      entry?.author_reputation < 0;
+    const ownEntry : boolean = (activeUser && activeUser.username === entry.author) || false;
+    const tokenScotPost : ScotPost | null = (entry?.he && entry?.he[LIQUID_TOKEN_UPPERCASE]) || null;
+    const isHidden : boolean = (tokenScotPost && tokenScotPost.pending_token === 0 && tokenScotPost.active_votes.length > 0) || false;
+    // There is no list of muted user in neither the info or the config of the token...
+    const isMuted : boolean = (entry?.he && entry?.he[LIQUID_TOKEN_UPPERCASE].muted) || false;
+    const isLowReputation = false;
 
     //  Meta config
     const url = entryCanonical(entry) || "";
