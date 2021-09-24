@@ -231,7 +231,6 @@ export class EntryPayout extends Component<Props> {
     const curatorPayout = parseAsset(entry.curator_payout_value).amount;
     const maxPayout = parseAsset(entry.max_accepted_payout).amount;
     let totalPayout = pendingPayout + authorPayout + curatorPayout;
-    console.log({ totalPayout });
     if (he && hiveEngineTokensProperties) {
       for (const token in he)
         if (hiveEngineTokensProperties[token] && he[token]) {
@@ -254,13 +253,6 @@ export class EntryPayout extends Component<Props> {
             const tokenAmount =
               complete_payout_value *
               Math.pow(10, -postTokenRewardInfo.precision);
-            try {
-              console.log(
-                tokenAmount,
-                // @ts-ignore
-                hiveEngineTokensProperties[token].info.symbol
-              );
-            } catch (e) {}
             if (tokenAmount && hivePrice && base && quote)
               totalPayout += (tokenAmount * hivePrice * base) / quote;
             else
@@ -281,7 +273,6 @@ export class EntryPayout extends Component<Props> {
         </Popover.Content>
       </Popover>
     );
-    console.log({ shownPayout });
     return (
       <OverlayTrigger
         trigger={["hover", "focus"]}

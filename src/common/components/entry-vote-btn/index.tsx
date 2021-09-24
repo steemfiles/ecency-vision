@@ -196,7 +196,6 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
         const liquid_token_balances = tokens_balances.find(
           (tB) => tB.symbol === LIQUID_TOKEN_UPPERCASE
         );
-        console.log("tokens_statuses.hiveData: ", tokens_statuses.hiveData);
         if (tokens_statuses.hiveData) {
           const liquid_token_statuses =
             tokens_statuses.hiveData[LIQUID_TOKEN_UPPERCASE];
@@ -236,7 +235,7 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
       const voteInfoHash = value1[1];
       let voteInfo: VoteInfo;
       if (!voteInfoHash || !(voteInfo = voteInfoHash[LIQUID_TOKEN_UPPERCASE])) {
-        console.log("Not setting Hive Engine parameters:", {
+        console.error("Not setting Hive Engine parameters:", {
           voteInfoHash,
           account,
           info,
@@ -245,17 +244,6 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
         });
         return;
       }
-      console.log(
-        "AccountInfo:",
-        activeUser.data,
-        "TokenInfo:",
-        info,
-        "config:",
-        config,
-        "post:",
-        post,
-        { voteInfo }
-      );
       setState({
         account: activeUser.data as FullHiveEngineAccount,
         tokenEntryMap: post,
@@ -368,18 +356,15 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
       if (account["token_balances"]) {
         if (account["token_balances"].length)
           token_balances = account["token_balances"];
-        console.log("token balances 1:", account["token_balances"]);
       }
       if (activeUser) {
         if (activeUser.hiveEngineBalances.length)
           token_balances = activeUser.hiveEngineBalances;
-        console.log("token balances 2:", activeUser.hiveEngineBalances);
       }
       const liquid_balance = token_balances.find(
         (tB) => tB.symbol === LIQUID_TOKEN_UPPERCASE
       );
       //console.log(this.state.account);
-      console.log(scotData, cashout_time, cashout_active);
       //if (!cashout_active) {
       // bailing out here because the post is not eligible for rewards at all.
       //return 0;
@@ -400,58 +385,30 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
           this.props.tokenInfo.pending_token
         )
       ) {
-        console.log(
-          "Returning early",
-          "reward_pool:",
-          !!this.props.tokenInfo.reward_pool,
-          "pending_rshares:",
-          !!this.props.tokenInfo.pending_rshares,
-          "precision:",
-          !!this.props.tokenInfo.precision,
-          "pending_token:",
-          !!this.props.tokenInfo.pending_token,
-          "currentVP:",
-          currentVp
-        );
-        if (!this.state.tokenEntryMap) {
-          console.log("tokenEntryMap:", false);
-        } else {
-          console.log(
-            "tokenEntryMap.POB",
-            this.state.tokenEntryMap[LIQUID_TOKEN_UPPERCASE]
-          );
-        }
         return dollarValueFromHive;
       }
-      console.log("account Info:", this.state.account);
-      console.log("token Info:", this.props.tokenInfo);
       const usersFullUpVoteRShares =
         (this.props.tokenInfo.pending_rshares /
           this.props.tokenInfo.staked_token) *
         (liquid_balance.stake +
           liquid_balance.delegationsIn -
           liquid_balance.delegationsOut); // .staked_tokens;
-      console.log(usersFullUpVoteRShares);
       const applyRewardsCurve = this.applyRewardsCurve.bind(this);
       const active_votes: Array<ScotVoteShare> = this.state.tokenEntryMap[
         LIQUID_TOKEN_UPPERCASE
       ]
         ? this.state.tokenEntryMap[LIQUID_TOKEN_UPPERCASE].active_votes
         : [];
-      console.log({ active_votes });
       const rsharesTotal = active_votes
         .map((x) => x.rshares)
         .reduce((x, y) => x + y, 0);
-      console.log("rshares total ", rsharesTotal);
       const scotDenominator = this.state.scotDenominator;
       pendingTokenPayoutBeforeVote = applyRewardsCurve(rsharesTotal);
       if (scotDenominator === 0) {
         // should never happen unless there are bugs outside.
-        console.log("scotDenominator set wrong");
+        console.error("Error:scotDenominator set wrong");
         return dollarValueFromHive;
       }
-      console.log(scotData);
-      console.log({ pendingTokenPayoutBeforeVote });
       if (scotData) {
         // This data is available only when a post has been voted on by someone staking the
         // Hive token.
@@ -474,12 +431,6 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
           ? pendingTokenPayoutBeforeVote
           : scot_total_author_payout + scot_total_curator_payout;
       }
-      console.log("pending token to post:", {
-        payout,
-        pendingTokenPayoutBeforeVote,
-        scot_total_author_payout,
-      });
-      console.log(this.props.tokenInfo);
       const vote_weight_multiplier = this.state.voteInfo.vote_weight_multiplier;
       const down_vote_weight_multiplier =
         this.state.voteInfo.downvote_weight_multiplier;
@@ -487,21 +438,21 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
         ? vote_weight_multiplier
         : down_vote_weight_multiplier;
       // need computation for VP. Start with rough estimate.
-      console.log({ percent, multiplier });
+      //console.log({ percent, multiplier });
       const rshares =
         usersFullUpVoteRShares *
         Math.min(multiplier * percent, 10000) *
         currentVp *
         100;
-      console.log({ rshares: rshares, rsharesTotal });
+      //console.log({ rshares: rshares, rsharesTotal });
       // Token values
       const newValue = applyRewardsCurve(rsharesTotal + rshares);
-      console.log("new POB rewards:", pendingTokenPayoutBeforeVote, newValue);
+      //console.log("new POB rewards:", pendingTokenPayoutBeforeVote, newValue);
       const valueEst = newValue - pendingTokenPayoutBeforeVote;
-      console.log(tokenPriceInHive, "HIVE/POB", base / quote, "$/HIVE");
+      //console.log(tokenPriceInHive, "HIVE/POB", base / quote, "$/HIVE");
       dollarValueFromPOB = (valueEst * tokenPriceInHive * base) / quote;
     }
-    console.log("global.HETP:", global.hiveEngineTokensProperties);
+    //console.log("global.HETP:", global.hiveEngineTokensProperties);
     return dollarValueFromHive + dollarValueFromPOB;
   };
 
@@ -851,7 +802,6 @@ export class EntryVoteBtn extends BaseComponent<Props, State> {
       }
     }
     if (EntryVoteBtn.lastLoad + 10000 < new Date().getTime()) {
-      console.log("Loading new HE parameters");
       Promise.all([
         getScotDataAsync<HiveEngineTokenInfo>("info", {
           token: LIQUID_TOKEN_UPPERCASE,

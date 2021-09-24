@@ -116,8 +116,6 @@ export default (state: Global = initialState, action: Actions): Global => {
       } catch (e) {
         console.log("Error loading new HE");
       }
-      console.log("Returning Hive Engine data");
-      console.log({ hiveEngineTokensProperties: NewHETP });
       return { ...state, hiveEngineTokensProperties: NewHETP };
     }
     default:
@@ -220,7 +218,6 @@ export const setCurrencyAct = (
   currencyRate: number,
   currencySymbol: string
 ): CurrencySetAction => {
-  console.log(currencyRate, currency + "/$");
   const currencyPrecision = (() => {
     if (!currencyRate) return 8;
 
@@ -232,7 +229,6 @@ export const setCurrencyAct = (
     return RoughPrecision;
   })();
 
-  console.log({ currencyPrecision });
   return {
     type: ActionTypes.CURRENCY_SET,
     currency,

@@ -88,10 +88,6 @@ export const updateActiveUser =
       cuData = uData as FullHiveEngineAccount;
       tokens = cuData.token_balances;
     }
-    if (cuData && is_FullHiveEngineAccount(cuData))
-      console.log({
-        "fineTrxs:": (cuData as FullHiveEngineAccount).transfer_history,
-      });
     let points: UserPoints;
     try {
       const r = await getPoints(activeUser.username);
