@@ -81,7 +81,7 @@ export const makePreloadedState = async (
         });
       }
     } else {
-      console.log("No tokens stored.  Loading tokens Properties.");
+      console.log("No token property information stored.  Loading tokens properties...");
       tokensInfos = await getScotDataAsync<{
         [coinname: string]: HiveEngineTokenInfo;
       }>("info", {});
