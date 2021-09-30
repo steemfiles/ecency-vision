@@ -39,6 +39,14 @@ export interface HECoarseBaseTransaction {
   // POB for Proof of Brain
   symbol: string;
 }
+export interface HEMarketCloseOrder extends HECoarseBaseTransaction {
+  operation: "market_closeOrder";
+  orderType: "sell" | "buy";
+}
+export interface MarketCloseOrder extends BaseTransaction {
+  type: "market_closeOrder";
+  orderType: "sell" | "buy";
+}
 export interface HETokensUnstake extends HECoarseBaseTransaction {
   account: string;
   operation: "tokens_unstake";
@@ -471,6 +479,7 @@ export interface EffectiveCommentVote extends BaseTransaction {
   weight: number;
 }
 export type Transaction =
+  | MarketCloseOrder
   | TokensUnstake
   | CurationReward
   | AuthorReward
@@ -518,6 +527,7 @@ export interface Transactions {
   group: OperationGroup | "";
 }
 export type HECoarseTransaction =
+  | HEMarketCloseOrder
   | HETokensUnstake
   | HETokensIssue
   | HEUnstakeStart

@@ -3,6 +3,7 @@ import moment from "moment";
 import { History } from "history";
 import { FormControl } from "react-bootstrap";
 import { DynamicProps } from "../../store/dynamic-props/types";
+import { Link } from "react-router-dom";
 import {
   OperationGroup,
   Transaction,
@@ -362,9 +363,21 @@ export class TransactionRow extends Component<RowProps> {
       icon = reOrderHorizontalSvg;
       numbers = <span className="number"> {tr.amount}</span>;
     }
+    if (tr.type === "market_closeOrder") {
+      console.log(tr);
+      flag = true;
+      if (tr.orderType == "sell") {
+        icon = arrowRightSvg;
+      } else {
+        icon = arrowLeftSvg;
+      }
+      details = <><a target={"blockexplorer"} href={"https://hiveblockexplorer.com/tx/" + tr.trx_id}>
+           orderID: {tr.orderType}
+      </a></>;
+    }
     if (
-      (tr.type === "market_sell" && (icon = arrowRightSvg)) ||
-      (tr.type === "market_buy" && (icon = arrowLeftSvg))
+      ((tr.type === "market_sell") && (icon = arrowRightSvg)) ||
+      ((tr.type === "market_buy") && (icon = arrowLeftSvg))
     ) {
       flag = true;
       numbers = (

@@ -282,6 +282,12 @@ export function HEToHTransaction(t: HECoarseTransaction): Transaction|null {
         to: t.to,
         amount: FormattedNumber(t.quantity, { suffix: t.symbol }),
       };
+    case "market_closeOrder":
+      return {
+        type:"market_closeOrder",
+        orderType: t.orderType,
+        ...HEB2B(t)
+      };
     case "market_buy":
       return {
         type: "market_buy",
@@ -292,7 +298,7 @@ export function HEToHTransaction(t: HECoarseTransaction): Transaction|null {
         quote: FormattedNumber(t.quantityHive, { suffix: t.symbol }),
       };
   } // switch
-  console.log(t);
+  console.log("unhandled type:", t.operation, t);
   //throw Error("Unhandled type:" + t.operation);
   return null;
 }
