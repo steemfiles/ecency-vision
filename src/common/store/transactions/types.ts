@@ -256,7 +256,9 @@ export interface MarketCancel extends BaseTransaction {
 }
 export interface HETokensUndelegateDone extends HECoarseBaseTransaction {
   operation: "tokens_undelegateDone";
-  quantity: string;
+  num: number;
+  trx_id: string;
+  account: string;
 }
 export interface HETokensDelegate extends HECoarseBaseTransaction {
   operation: "tokens_delegate";

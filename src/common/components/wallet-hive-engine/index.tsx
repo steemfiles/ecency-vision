@@ -130,25 +130,19 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
           "proposal-pay",
           "cancel_transfer_from_savings",
           "producer_reward",
-          "tokens_issue",
           "claim_reward_balance",
         ].includes(tx.type);
       case "interests":
         return tx.type === "interest";
-      case "stake-operations":
-        return [
-          "tokens_CancelUnstake",
-          "tokens_undelegateDone",
-          "tokens_delegate",
-          "tokens_unstakeStart",
-          "return_vesting_delegation",
-        ].includes(tx.type);
       case "rewards":
-        return tx.type.endsWith("_reward");
+        return tx.type.endsWith("_reward") || tx.type == "tokens_issue";
       case "market-orders":
         return tx.type.startsWith("market_") || tx.type === "fill_order";
       case "stake-operations":
-        return "tokens_stake,withdraw_vesting,return_vesting_delegation,tokens_unstakeStart,tokens_CancelUnstake,tokens_unstake,tokens_undelegateDone,tokens_delegate,tokens_undelegateStart,"
+        return ("transfer_to_saving,withdraw_vesting,tokens_unstakeDone,tokens_stake,withdraw_vesting," + 
+        "return_vesting_delegation,tokens_unstakeStart,tokens_CancelUnstake," + 
+        "tokens_unstake,tokens_undelegateDone,tokens_delegate," + 
+        "tokens_undelegateStart")
           .split(/,/)
           .includes(tx.type);
     }
@@ -171,36 +165,18 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     group?: OperationGroup | "",
     cts: Array<HECoarseTransaction>
   ) {
-    {
-      const utxes = cts.filter(
-        (x) =>
-          ![
-            "market_cancel",
-            "market_buy",
-            "market_sell",
-            "market_placeOrder",
-            "tokens_unstakeStart",
-            "tokens_transfer",
-            "tokens_issue",
-            "tokens_cancelUnstake",
-            "tokens_delegate",
-            "tokens_stake",
-            "tokens_unstake",
-            "tokens_undelegateDone",
-            "tokens_undelegateStart",
-          ].includes(x.operation)
-      );
-      if (utxes.length) console.log("coarse trxes with unknown type", utxes);
-    }
     const { transactions } = this.state;
     try {
-      const txs: Array<Transaction> = cts.map((t) => HEToHTransaction(t));
+      const txs: Array<Transaction> = cts.map((t) => HEToHTransaction(t))
+      .filter(x => x != null)
+      // @ts-ignore      
+      .filter(this.keepTransaction.bind(this, transactions.group));
       const { list } = transactions;
       this.stateSet({
         transactions: { list: txs, loading: false, group: transactions.group },
       });
     } catch (e) {
-      error("Coding exception");
+      error("Unknown transaction type error.");
       console.log(e);
       this.stateSet({
         transactions: {
@@ -225,7 +201,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
           console.log(e);
         });
     else
-      getCoarseTransactions(name, 30, 0).then(
+      getCoarseTransactions(name, 400, 0).then(
         this.handleCoarseTransactions.bind(this, group ? group : "")
       );
   };

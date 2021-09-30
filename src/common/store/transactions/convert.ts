@@ -238,7 +238,7 @@ function HEToHMarketCancel(t: HEMarketCancel): MarketCancel {
     amount: FormattedNumber(quantityReturned, { suffix: t.symbol }),
   };
 }
-export function HEToHTransaction(t: HECoarseTransaction): Transaction {
+export function HEToHTransaction(t: HECoarseTransaction): Transaction|null {
   switch (t.operation) {
     case "tokens_unstake":
       return HEToHTokensUnstake(t);
@@ -293,5 +293,6 @@ export function HEToHTransaction(t: HECoarseTransaction): Transaction {
       };
   } // switch
   console.log(t);
-  throw Error("Unhandled type:" + t.operation);
+  //throw Error("Unhandled type:" + t.operation);
+  return null;
 }

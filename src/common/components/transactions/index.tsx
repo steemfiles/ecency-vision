@@ -394,6 +394,7 @@ export class TransactionRow extends Component<RowProps> {
     if (tr.type === "tokens_undelegateDone") {
       flag = true;
       icon = arrowRightSvg;
+      details = <span> trx_id {tr.trx_id}</span>;
     }
     if (tr.type === "tokens_undelegateStart") {
       flag = true;
