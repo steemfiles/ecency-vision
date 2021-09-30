@@ -195,14 +195,13 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     const { transactions } = this.state;
     try {
       const txs: Array<Transaction> = cts.map((t) => HEToHTransaction(t));
-      const { list, group } = transactions;
-      const ftxs: Array<Transaction> = [...txs, ...list]
-        .filter(this.keepTransaction.bind(this, group))
-        .sort(this.compareTransactions);
+      const { list } = transactions;
       this.stateSet({
-        transactions: { list: ftxs, loading: false, group: transactions.group },
+        transactions: { list: txs, loading: false, group: transactions.group },
       });
     } catch (e) {
+      error("Coding exception");
+      console.log(e);
       this.stateSet({
         transactions: {
           list: transactions.list,
@@ -226,7 +225,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
           console.log(e);
         });
     else
-      getCoarseTransactions(name, 300, 0).then(
+      getCoarseTransactions(name, 30, 0).then(
         this.handleCoarseTransactions.bind(this, group ? group : "")
       );
   };

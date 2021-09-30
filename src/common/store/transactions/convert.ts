@@ -1,4 +1,6 @@
 import {
+  HEUnstakeDone,
+  UnstakeDone,
   HETokensUnstake,
   TokensUnstake,
   HEFineTransaction,
@@ -154,13 +156,13 @@ export function HEToHMarketSell(
   het: HEMarketSell,
   fractionDigits: number = 8
 ): MarketSell {
-  const { account, to, quantitySteem, quantityTokens } = het;
+  const { account, to, quantityHive, quantityTokens } = het;
   return {
     type: "market_sell",
     ...HEB2B(het),
     account,
     to,
-    base: FormattedNumber(het.quantitySteem, {
+    base: FormattedNumber(het.quantityHive, {
       fractionDigits: 3,
       suffix: HIVE_HUMAN_NAME,
     }),
@@ -176,6 +178,17 @@ export function HEToHUnstakeStart(
 ): UnstakeStart {
   return {
     type: "tokens_unstakeStart",
+    ...HEB2B(t),
+    account: t.account,
+    amount: FormattedNumber(t.quantity, { fractionDigits, suffix: t.symbol }),
+  };
+}
+export function HEToHUnstakeDone(
+  t: HEUnstakeDone,
+  fractionDigits = 8
+): UnstakeDone {
+  return {
+    type: "tokens_unstakeDone",
     ...HEB2B(t),
     account: t.account,
     amount: FormattedNumber(t.quantity, { fractionDigits, suffix: t.symbol }),
@@ -215,8 +228,8 @@ export function HEToHMarketPlaceOrder(t: HEMarketPlaceOrder): MarketPlaceOrder {
 }
 function HEToHMarketCancel(t: HEMarketCancel): MarketCancel {
   const { orderId, orderType, account, quantityReturned } = t;
-            validateOrderType(orderType);
-                          return {
+  validateOrderType(orderType);
+  return {
     type: "market_cancel",
     ...HEB2B(t),
     account,
@@ -239,6 +252,8 @@ export function HEToHTransaction(t: HECoarseTransaction): Transaction {
       return HEToHMarketSell(t);
     case "tokens_unstakeStart":
       return HEToHUnstakeStart(t);
+    case "tokens_unstakeDone":
+      return HEToHUnstakeDone(t);
     case "tokens_cancelUnstake":
       return HEToHCancelUnstake(t);
     case "market_placeOrder":
@@ -273,8 +288,8 @@ export function HEToHTransaction(t: HECoarseTransaction): Transaction {
         ...HEB2B(t),
         account: t.account,
         from: t.from,
-        base: FormattedNumber(t.quantitySteem, { suffix: t.symbol }),
-        quote: FormattedNumber(t.quantitySteem, { suffix: t.symbol }),
+        base: FormattedNumber(t.quantityHive, { suffix: t.symbol }),
+        quote: FormattedNumber(t.quantityHive, { suffix: t.symbol }),
       };
   } // switch
   console.log(t);

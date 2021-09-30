@@ -134,7 +134,7 @@ export class TransactionRow extends Component<RowProps> {
       icon = cashMultiple;
       numbers = (
         <>
-        <span className="number">{tr.amount}</span>
+          <span className="number">{tr.amount}</span>
         </>
       );
     }
@@ -262,6 +262,11 @@ export class TransactionRow extends Component<RowProps> {
       numbers = <span className="number"> {tr.amount}</span>;
     }
     if (tr.type === "tokens_unstakeStart") {
+      flag = true;
+      icon = cashSvg;
+      numbers = <span className="number"> {tr.amount}</span>;
+    }
+    if (tr.type === "tokens_unstakeDone") {
       flag = true;
       icon = cashSvg;
       numbers = <span className="number"> {tr.amount}</span>;

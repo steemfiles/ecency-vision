@@ -48,7 +48,7 @@ export interface TokensUnstake extends BaseTransaction {
   type: "tokens_unstake";
   account: string;
   amount: aAAS;
-}  
+}
 export interface CollateralizedConvert extends BaseTransaction {
   type: "collateralized_convert";
   owner: string;
@@ -148,8 +148,8 @@ export interface Interest extends BaseTransaction {
   owner: string;
   interest: string;
 }
-export interface FillConvertRequest extends BaseTransaction {
-  type: "fill_convert_request";
+export interface FillConvertUnstakeStartRequest extends BaseTransaction {
+  type: "fill_convertUnstakeStart_request";
   amount_in: string;
   amount_out: string;
 }
@@ -170,7 +170,7 @@ export interface MarketSell extends BaseTransaction {
 }
 export interface HEMarketSell extends HECoarseBaseTransaction {
   operation: "market_sell";
-  quantitySteem: nAACRS;
+  quantityHive: nAACRS;
   quantityTokens: nAACRS;
   account: string;
   to: string;
@@ -199,6 +199,19 @@ export interface UnstakeStart extends BaseTransaction {
   type: "tokens_unstakeStart";
   account: string;
   amount: aAAS;
+}
+export interface UnstakeDone extends BaseTransaction {
+  type: "tokens_unstakeDone";
+  account: string;
+  amount: aAAS;
+}
+export interface HEUnstakeDone extends HECoarseBaseTransaction {
+  operation: "tokens_unstakeDone";
+  account: string;
+  quantity: nAACRS;
+  symbol: string;
+  timestamp: number;
+  transactionId: string;
 }
 export interface HETokensTransfer extends HECoarseBaseTransaction {
   operation: "tokens_transfer";
@@ -270,7 +283,7 @@ export interface HEMarketBuy extends HECoarseBaseTransaction {
   operation: "market_buy";
   account: string;
   from: string;
-  quantitySteem: nAACRS;
+  quantityHive: nAACRS;
   quantityTokens: nAACRS;
   symbol: string;
 }
@@ -482,6 +495,7 @@ export type Transaction =
   | MarketPlaceOrder
   | CancelUnstake
   | UnstakeStart
+  | UnstakeDone
   | MarketSell
   | TokensIssue
   | CollateralizedConvert
@@ -505,6 +519,7 @@ export type HECoarseTransaction =
   | HETokensUnstake
   | HETokensIssue
   | HEUnstakeStart
+  | HEUnstakeDone
   | HETokensTransfer
   | HETokensCancelUnstake
   | HEMarketSell
