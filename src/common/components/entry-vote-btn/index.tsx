@@ -390,7 +390,7 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
       const usersFullUpVoteRShares =
         (this.props.tokenInfo.pending_rshares /
           this.props.tokenInfo.staked_token) *
-        (liquid_balance.stake +
+        (liquid_balance===undefined ? 0 : liquid_balance.stake +
           liquid_balance.delegationsIn -
           liquid_balance.delegationsOut); // .staked_tokens;
       const applyRewardsCurve = this.applyRewardsCurve.bind(this);
