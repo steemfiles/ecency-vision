@@ -1,9 +1,18 @@
 import numeral from "numeral";
 interface Options {
+  maximumFractionDigits?: number;
   fractionDigits?: number;
   prefix?: string;
   suffix?: string;
 }
+function count0s(s: string) {
+  let counter = 0;
+  for (const c of s) {
+    if (c == '0') ++counter;
+  }
+  return counter;
+}
+
 export default (
   value: number | string,
   options: Options | undefined = undefined
@@ -11,6 +20,7 @@ export default (
   let debugLog = false;
   let addNegativeSignFlag: boolean = false;
   let opts: Options = {
+    maximumFractionDigits: 3,
     fractionDigits: 3,
     prefix: "",
     suffix: "",
@@ -23,14 +33,15 @@ export default (
   }
   if (debugLog) console.log({ value, fractionDigits: opts.fractionDigits });
   const { prefix, suffix } = opts;
-  const fractionDigits = opts.fractionDigits || 0;
+  const maximumFractionDigits : number = opts.maximumFractionDigits || opts.fractionDigits || 0;
+  const mandatoryFractionDigits = opts.fractionDigits || 0;
   let out: string = "";
   if (typeof value == "number") {
     // builtin format is buggy when using numbers smaller than 1e-6.
     if (isNaN(value)) {
       return "NaN";
     }
-    const unity = Math.pow(10, fractionDigits);
+    const unity = Math.pow(10, maximumFractionDigits);
     if (value < 0) {
       addNegativeSignFlag = true;
     }
@@ -40,14 +51,14 @@ export default (
       addNegativeSignFlag = false;
     }
     if (debugLog) console.log({ satoshis, out });
-    while (satoshis != 0 && out.length < fractionDigits) {
+    while (satoshis != 0 && out.length < maximumFractionDigits) {
       out = (satoshis % 10) + out;
       satoshis /= 10;
       satoshis = Math.floor(satoshis);
       if (debugLog) console.log({ satoshis, out });
     }
     if (satoshis == 0) {
-      while (out.length < fractionDigits) out = "0" + out;
+      while (out.length < maximumFractionDigits) out = "0" + out;
       if (debugLog) console.log({ satoshis, out });
     }
     // out.length==opts.fracitionDigits
@@ -100,10 +111,14 @@ export default (
     }
   }
   while (
-    decimal_location < out.length &&
+    decimal_location < out.length && 
+    count0s(out.slice(decimal_location)) > mandatoryFractionDigits &&
     ",0".indexOf(out.charAt(out.length - 1)) != -1
   ) {
     out = out.slice(0, out.length - 1);
+  }
+  if (out.charAt(out.length-1) === ',') {
+    out = out.slice(0, out.length-1);
   }
   if (out.charAt(out.length - 1) === ".") {
     out = out.slice(0, out.length - 1);

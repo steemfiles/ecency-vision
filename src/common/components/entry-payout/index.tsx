@@ -112,7 +112,7 @@ export class EntryPayoutDetail extends Component<Props> {
                 Math.pow(10, -postTokenRewardInfo.precision || 0);
               breakdownPayout.push(
                 formattedNumber(tokenAmount, {
-                  fractionDigits: postTokenRewardInfo.precision,
+                  maximumFractionDigits: postTokenRewardInfo.precision,
                   suffix: token,
                 })
               );

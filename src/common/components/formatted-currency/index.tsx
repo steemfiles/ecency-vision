@@ -22,7 +22,7 @@ export default class FormattedCurrency extends Component<Props> {
     return (
       <>
         {formattedNumber(valInCurrency, {
-          fractionDigits: fixAt ?? ((currencySymbol === "฿") ? 6 : 2),
+          maximumFractionDigits: fixAt ?? ((currencySymbol === "฿") ? 6 : 2),
           prefix: currencySymbol,
         })}
       </>

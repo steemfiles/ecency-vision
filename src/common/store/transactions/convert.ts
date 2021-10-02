@@ -49,7 +49,7 @@ export const HEFineTransactionToHiveTransactions = (
             comment_permlink: x.permlink,
             curator: x.account,
             reward: FormattedNumber(x.int_amount * Math.pow(10, -x.precision), {
-              fractionDigits: x.precision,
+              maximumFractionDigits: x.precision,
               suffix: x.token,
             }),
           };
@@ -65,7 +65,7 @@ export const HEFineTransactionToHiveTransactions = (
             permlink: x.permlink,
             he_payout: FormattedNumber(
               x.int_amount * Math.pow(10, -x.precision),
-              { fractionDigits: x.precision, suffix: x.token }
+              { maximumFractionDigits: x.precision, suffix: x.token }
             ),
             hbd_payout: "0",
             hive_payout: "0",
@@ -200,8 +200,8 @@ export function HEToHCancelUnstake(t: HECancelUnstake): CancelUnstake {
     ...HEB2B(t),
     unstakeTxID: t.unstakeTxID,
     amount: FormattedNumber(t.quantityReturned, {
-      fractionDigits: 8,
-      suffix: "POB",
+      maximumFractionDigits: 8,
+      suffix: t.symbol,
     }),
   };
 }
@@ -221,7 +221,7 @@ export function HEToHMarketPlaceOrder(t: HEMarketPlaceOrder): MarketPlaceOrder {
       : price,
     quantityLocked: FormattedNumber(quantityLocked, {
       fractionDigits: 8,
-      suffix: "POB",
+      suffix: t.symbol,
     }),
   };
   return ret;
