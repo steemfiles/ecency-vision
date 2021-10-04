@@ -27,6 +27,9 @@ import { TokenPropertiesMap } from "../hive-engine-tokens/types";
 import { HEActionTypes, HEActions } from "../hive-engine-tokens/types";
 import { includeInfoConfigsAction } from "../hive-engine-tokens";
 export const initialState: Global = {
+  negotiatedLanguages: ["en-US"], // must contain only the codes found in langOptions from common/i18n/index.ts
+  acceptLanguage: [{ languageCode: "en-US", priority: 1 }],
+  acceptableLanguage: { "en-US": true, en: true },
   filter: AllFilter[defaults.filter],
   tag: "",
   theme: Theme[defaults.theme],

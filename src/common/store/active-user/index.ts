@@ -56,7 +56,9 @@ export const setActiveUser =
       dispatch(loginAct());
     } else {
       ls.remove("active_user");
+      ls.remove("lang");
       Cookies.remove("active_user");
+      Cookies.remove("lang");
       dispatch(logoutAct());
     }
   };

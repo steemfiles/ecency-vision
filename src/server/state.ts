@@ -1,7 +1,13 @@
 import express from "express";
+import moment from "moment";
 import { AppState } from "../common/store";
 import initialState from "../common/store/initial-state";
-import { Global, ListStyle, Theme } from "../common/store/global/types";
+import {
+  Global,
+  ListStyle,
+  Theme,
+  LanguageSpec,
+} from "../common/store/global/types";
 import { activeUserMaker } from "../common/store/helper";
 import site from "../common/constants/site.json";
 import defaults from "../common/constants/defaults.json";
@@ -16,6 +22,8 @@ import {
 } from "../common/api/hive-engine";
 import { LIQUID_TOKEN_UPPERCASE } from "../client_config";
 import { TokenPropertiesMap } from "../common/store/hive-engine-tokens/types";
+import { langOptions } from "../common/i18n";
+
 const five_minutes = 300000;
 const ten_minutes = 600000;
 let storedHiveEngineTokensProperties: TokenPropertiesMap;
@@ -27,6 +35,67 @@ let lastStore: Date;
 export const makePreloadedState = async (
   req: express.Request
 ): Promise<AppState> => {
+  /* 
+  
+  req.headers['accept-language'] is the accept-language header which looks like
+  the following:
+  
+  'en,en-US;q=0.9,es-AR;q=0.8,es;q=0.7'
+  
+  Although Brave sorts this in decending order, this is not a standard behavior.
+  So it must be sorted here.
+  
+  */
+  let acceptableLanguage: { [languageCode: string]: boolean } = {};
+  let negotiatedLanguages: Array<string> = [];
+  const rawAcceptLanguage =
+    (req && req.headers && req.headers["accept-language"]) || "";
+  const acceptLanguage = rawAcceptLanguage
+    .split(/;/)
+    .map((languages_priority_pair_string) => {
+      const languages_priority_vector =
+        languages_priority_pair_string.split(/,/);
+      let priority: number = 1;
+      let lang_struct_vector: Array<LanguageSpec> = [];
+      for (const language of languages_priority_vector) {
+        const new_priority = language.split(/=/);
+        if (new_priority.length > 1 && new_priority[0] === "q") {
+          priority = parseFloat(new_priority[1]);
+        }
+      }
+      for (const languageCode of languages_priority_vector) {
+        const new_priority = languageCode.split(/=/);
+        if (new_priority.length === 1 || new_priority[0] !== "q") {
+          acceptableLanguage[languageCode] = true;
+          lang_struct_vector.push({ priority, languageCode });
+        }
+      }
+      return lang_struct_vector;
+    })
+    .flat()
+    .filter(function (lang_struct: LanguageSpec) {
+      for (const availableLanguage of langOptions) {
+        if (
+          lang_struct.languageCode.split(/-/)[0] ==
+          availableLanguage.code.split(/-/)[0]
+        ) {
+          if (!negotiatedLanguages.includes(availableLanguage.code)) {
+            negotiatedLanguages.push(availableLanguage.code);
+          }
+          return (acceptableLanguage[availableLanguage.code.split(/-/)[0]] =
+            acceptableLanguage[availableLanguage.code] =
+              true);
+        }
+      }
+      return false;
+    })
+    .sort(function (a: LanguageSpec, b: LanguageSpec) {
+      return b.priority - a.priority;
+    });
+  if (negotiatedLanguages.length === 0) {
+    negotiatedLanguages.push("en-US");
+  }
+  console.log({ rawAcceptLanguage, negotiatedLanguages });
   const _c = (k: string): any => req.cookies[k];
   const activeUser = _c("active_user") || null;
   const theme =
@@ -41,6 +110,7 @@ export const makePreloadedState = async (
   let hiveEngineTokensProperties: TokenPropertiesMap =
     storedHiveEngineTokensProperties;
   let tokensInfos, tokensConfigs, prices;
+
   try {
     if (
       storedHiveEngineTokensProperties &&
@@ -81,7 +151,9 @@ export const makePreloadedState = async (
         });
       }
     } else {
-      console.log("No token property information stored.  Loading tokens properties...");
+      console.log(
+        "No token property information stored.  Loading tokens properties..."
+      );
       tokensInfos = await getScotDataAsync<{
         [coinname: string]: HiveEngineTokenInfo;
       }>("info", {});
@@ -125,6 +197,11 @@ export const makePreloadedState = async (
   }
   const globalState: Global = {
     ...initialState.global,
+    negotiatedLanguages,
+    acceptLanguage: acceptLanguage.length
+      ? acceptLanguage
+      : [{ languageCode: "en-US", priority: 1 }],
+    acceptableLanguage,
     // @ts-ignore
     hiveEngineTokensProperties,
     theme: Theme[theme],

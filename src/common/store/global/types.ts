@@ -30,6 +30,11 @@ export enum ProfileFilter {
   replies = "replies",
 }
 
+export interface LanguageSpec {
+  languageCode: string;
+  priority: number;
+}
+
 // TODO: Find a proper way to merge EntryFilter and ProfileFilter
 export enum AllFilter {
   trending = "trending",
@@ -45,6 +50,32 @@ export enum AllFilter {
 }
 
 export interface Global {
+  // The member negotiatedLanguage expresses the product of the language negotiation.
+  // It contains only language code strings found in LangOptions found in '../../i18n'.
+  // The best is first, the one with the lowest score is last.  The negotation happens
+  // using the HTTP headers sent by the user agent.
+
+  // The negotation process is written in a way that on purpose doesn't take into
+  // account that a user may rather read things in one country's Spanish or
+  // anothers. If you have Spanish Spanish as the last resort but prefer Argentine
+  // Spanish over English in your headers, the negotiation process will leave you
+  // with Spanish Spanish. It is done this way because it seems more likely that
+  // you may have some non-Spain set, and it makes more sense to me that this gives
+  // you Spanish Spanish rather than going to the English default.
+
+  negotiatedLanguages: Array<string>;
+
+  // The member acceptLanguage is the accepted languages from the client. The array
+  // is sorted as best language first and always contains the generic language only
+  // codes next to the first instance of a locale that contains that language. The
+  // generic language code is the normally two letter abbreviation for the
+  // language.  This is derived from the accept-language header sent by the user
+  // agent.
+  acceptLanguage: Array<LanguageSpec>;
+
+  // Hash to lookup whether a language is acceptable for the user. This is derived
+  // from the accept-language header sent by the user agent.
+  acceptableLanguage: { [langaugeCode: string]: boolean };
   filter: EntryFilter | ProfileFilter | AllFilter;
   tag: string;
   theme: Theme;

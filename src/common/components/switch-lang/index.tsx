@@ -27,10 +27,18 @@ interface Props {
 export class SwitchLang extends Component<Props> {
   render() {
     const { global, setLang } = this.props;
-
+    const { negotiatedLanguages } = global;
+    const languageFromHeader = negotiatedLanguages[0] || "en-US";
     const languageFromLS = ls && ls.get("lang");
-    const lang =
-      languageFromLS !== null ? languageFromLS.slice(0, 2).toUpperCase() : "EN";
+    const lang = (languageFromLS !== null ? languageFromLS : languageFromHeader)
+      .split(/-/)[0]
+      .toUpperCase();
+    if (languageFromLS === null && lang != "EN") {
+      i18n.changeLanguage(languageFromHeader).then(() => {
+        setLang(languageFromHeader);
+        ls.remove("lang");
+      });
+    }
 
     const langMenuConfig = {
       history: this.props.history,

@@ -142,6 +142,12 @@ export const UiInstance: UI = {
 };
 
 export const globalInstance: Global = {
+  negotiatedLanguages: ["en-US"],
+  acceptLanguage: [
+    { languageCode: "en-US", priority: 1 },
+    { languageCode: "en", priority: 1 },
+  ],
+  acceptableLanguage: { "en-US": true, en: true },
   filter: EntryFilter.hot,
   tag: "",
   theme: Theme.day,
