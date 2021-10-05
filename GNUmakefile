@@ -1,5 +1,5 @@
 COMPILE_FLAGS=-std=c++17 -I /usr/local/src/boost_1_76_0
-LINK_FLAGS=-std=c++17 -L /usr/local/src/boost_1_76_0/stage/lib  -lboost_thread -lboost_system -lpthread
+LINK_FLAGS=-std=c++17 -L /usr/local/src/boost_1_76_0/stage/lib  -lboost_thread -lboost_system -lpthread -lboost_chrono
 
 debug: runforever-dbg
 

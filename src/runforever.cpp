@@ -20,13 +20,25 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <sys/time.h>
 
+const char * rfc_2822_format = "%a, %d %b %Y %T %z";
 const char * RUNFOREVER_MANAGER_VERSION_STRING = "Runforever Manager/0.0";
 const bool verbose = false;
 namespace beast = boost::beast;     // from <boost/beast.hpp>
 namespace http = beast::http;       // from <boost/beast/http.hpp>
 namespace net = boost::asio;        // from <boost/asio.hpp>
 using tcp = net::ip::tcp;           // from <boost/asio/ip/tcp.hpp>
+using namespace boost::process;
+
+std::map<int, std::string> signal_names;
+std::fstream mainserverlog("server.log", std::ofstream::app);
+child * cptr = nullptr;
+bool keep_looping = true;
+bool restart_subserver = false;
+char datetime_string[200] = "";
+
+
 // Performs an HTTP GET and prints the response
 bool connect_to_subserver()
 {
@@ -77,54 +89,33 @@ bool connect_to_subserver()
 			return false;
 }
 
-
-
-
-using namespace boost::process;
-
-std::map<int, std::string> signal_names;
-std::fstream mainserverlog("server.log", std::ofstream::app);
-child * cptr = nullptr;
-bool keep_looping = true;
-bool restart_subserver = false;
-
-std::ostream& mainlogline() {
-	return mainserverlog << "[" << getpid() <<  "] ";
+std::ostream& mainserverlogline() {
+	int cid;
+	mainserverlog << "[" << getpid();
+	if (!strcmp(datetime_string,"")) {
+		// not set yet?
+		time_t t;
+		struct tm *tmp;
+		
+		(t = time(NULL)) != ((time_t)-1) &&
+		(tmp = localtime(&t)) != NULL &&		    	
+		(strftime(datetime_string, sizeof(datetime_string), rfc_2822_format, tmp) != 0);		
+	}
+	mainserverlog << "; " << datetime_string;
+	return mainserverlog << "] ";
 }
-
-
 
 void report_and_continue(int signal) {
-	mainlogline() << "Caught signal " << signal_names[signal] << std::endl << std::flush;
+	mainserverlogline() << "Caught signal " << signal_names[signal] << "." << std::endl;
 }
-void report_and_exit(int signal) {
-	try {
-		mainlogline() << "Caught signal " << signal_names[signal] << "." << std::endl;
-		if (cptr) {
-			const int cid = cptr->id();
-			mainlogline() << "Sending sub process (" << cid << ") the TERM signal..." << std::endl;
-			// the kill call ensures the process exists
-			if (kill(cid, SIGTERM) == 0) {
-				mainlogline() << "waiting for " << cid << " to close..." << std::flush;
-				cptr->wait();
-			}
-			cptr = nullptr;
-			mainserverlog << "closed...";
-		}
-		mainserverlog << "  Exiting." << std::endl;
-		keep_looping = false;
-	} catch (...) {
-	
-	}
-	exit(0);
-}
+
 void set_to_exit(int signal) {
-	if (cptr) {
+	mainserverlogline() << "Caught signal " << signal_names[signal] << "." << std::endl;
+	if (cptr) {	
 		kill(cptr->id(), SIGTERM);
 	}
 	keep_looping = false;
 }
-
 
 void init_signal_names() {
 	signal_names[SIGABRT] = "SIGABRT";
@@ -167,25 +158,49 @@ void init_signal_names() {
 	signal_names[SIGWINCH] = "SIGWINCH";
 }
 
-void set_signal_handlers() {
-	signal(SIGBUS, report_and_exit);
-	// Don't install handlers for the following signals
-	// because it is used by the process library:
-	// SIGCLD
-	signal(SIGHUP, report_and_continue);
-	signal(SIGTERM, report_and_exit);
-}
-
 // These are and should only be used in the forward_log thread...
 ipstream * pipe_stream_ptr = nullptr;
 std::ofstream subserverlog; 
 void forward_log() {
+	time_t t;
+	struct tm *tmp;
+	
 	std::string line;
-	while (true) {
-		while (keep_looping && pipe_stream_ptr && *pipe_stream_ptr && std::getline(*pipe_stream_ptr, line) && !line.empty()) {
-			subserverlog << "[" << cptr->id() << "]" << line << std::endl;
+	while (keep_looping) {
+		boost::this_thread::yield();
+		boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
+		if (keep_looping && pipe_stream_ptr && *pipe_stream_ptr && std::getline(*pipe_stream_ptr, line) && !line.empty()) {
+			subserverlog << "[" << cptr->id() << "; " << datetime_string << "] " << line << std::endl;
 		}
-		
+	}
+}
+
+void keep_time() {
+	time_t t;
+	struct tm *tmp;
+	t = time(NULL);
+	// start on the the new second boundary --- just to be exact in time.
+	while (t == time(NULL)) {
+		boost::this_thread::sleep_for(boost::chrono::milliseconds(1));
+	}
+	while (keep_looping) {
+		if ((t = time(NULL)) != ((time_t)-1)) {
+			
+			(tmp = localtime(&t)) != NULL &&		    	
+			(strftime(datetime_string, sizeof(datetime_string), rfc_2822_format, tmp) != 0);
+			
+			// resynchronize every 30 minutes
+			if (t % 1'800 == 0) {
+				// In tests time would drift 0.3 ms/s.
+				// So a half hour of waiting a second will only leave us 0.5 s off the correct mark.
+				struct timeval tv;
+				struct timezone tz;
+				gettimeofday(&tv, &tz);
+				boost::this_thread::sleep_for(boost::chrono::microseconds(1'000'000-tv.tv_usec));
+				continue;
+			}
+		}
+		boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
 	}
 }
 
@@ -194,7 +209,7 @@ void check_connectivity() {
 		if (restart_subserver || connect_to_subserver()) {
 			restart_subserver = true;
 		}
-		sleep(3);
+		boost::this_thread::sleep_for(boost::chrono::seconds(3));
 	}
 }
 
@@ -227,16 +242,23 @@ int main() {
 			keep_looping = false;
 		}
 	}
-
+	
 	if (!keep_looping) {
 		exit(0);
 	}
+	
+	boost::thread keeping_time(keep_time);
 
-	mainlogline() << "Starting Manager" << std::endl;
+	mainserverlogline() << "Starting Manager" << std::endl;
 
 	init_signal_names();
-	set_signal_handlers();
 
+	// Block certain signals for this process
+	signal(SIGBUS, set_to_exit);
+	signal(SIGHUP, report_and_continue);
+	signal(SIGINT, set_to_exit);
+	signal(SIGTERM, set_to_exit);
+	
 	// Store the server PID.
 	{
 		std::ofstream pidfile("server.pid");
@@ -245,24 +267,27 @@ int main() {
 
 	cptr = nullptr;
 	while (keep_looping) {
+		boost::this_thread::yield();
 		try {
 			std::string line;
 
 			current_directory_writable = access(".", W_OK) == 0;
 			subserverlog.open("subserver.log", std::fstream::app);
 			pipe_stream_ptr = new ipstream();
+
 			child c("node build/server.js", std_out > *pipe_stream_ptr);
+			
 			cptr = &c;
 			{
 				std::ofstream pidfile("subserver.pid");
 				pidfile << c.id() << std::endl;
 			}
 
-			mainlogline() << "Running node build/server.js [" << c.id() << "]" << std::endl;
+			mainserverlogline() << "Running node build/server.js [" << c.id() << "]" << std::endl;
 			boost::thread log_forwarding(forward_log);
 			int col = 0;
 			while (keep_looping && c.running() && !restart_subserver) {
-				sleep(5);
+				boost::this_thread::sleep_for(boost::chrono::seconds(5));
 				if (verbose){
 					for (int k = 0; k < col; ++k) 
 						std::cerr << " ";
@@ -271,35 +296,43 @@ int main() {
 					col = col % 10;
 				}
 				if (connect_to_subserver()) {
-					mainlogline() << "Could not get a page from subserver" << std::endl;
+					mainserverlogline() << "Could not get a page from subserver" << std::endl;
 					restart_subserver = true;
 				}
 			}
 			// what happened
 			if (!keep_looping) {
-				mainlogline() << "Manager process closing" << std::endl;
+				mainserverlogline() << "Manager process closing" << std::endl;
 			} else if (!c.running()) {
-				mainlogline() << "Subserver process closed" << std::endl;
+				mainserverlogline() << "Subserver process closed" << std::endl;
 			} else {
-				mainlogline() << "Restarting subserver process" << std::endl;
+				mainserverlogline() << "Restarting subserver process" << std::endl;
 			}
 			if (c.running()) {
-				mainlogline() << "Sending the subserver the TERM signal" << std::endl;
-				kill(c.id(), SIGTERM);
+				mainserverlogline() << "Sending the subserver the TERM signal..." << std::flush;
+				if (kill(c.id(), SIGTERM)) {
+					mainserverlog << "failed with " << strerror(errno);
+				} else {
+					mainserverlog << "done";
+				}
+				mainserverlog << "." << std::endl;
 			}
 			log_forwarding.interrupt();
-			mainlogline() << "The subserver PID is " << (c.running() ? "" : "not ") <<  "running" << std::endl;
-			sleep(5);
-			if (c.running()) {
-				mainlogline() << "Sending the subserver the KILL signal" << std::endl;
-				kill(c.id(), SIGKILL);
+			mainserverlogline() << "The subserver (PID " << c.id() << ") is " << (c.running() ? "" : "not ") <<  "running" << std::endl;
+			boost::this_thread::sleep_for(boost::chrono::seconds(10));
+			mainserverlogline() << "Sending the subserver the KILL signal..." << std::flush;
+			if (kill(c.id(), SIGKILL) != 0) {
+				mainserverlog << "failed with " << strerror(errno) << std::endl;
+			} else {
+				mainserverlog << "done";
 			}
+			mainserverlog << '.' << std::endl;
 			c.wait();
-			mainlogline() << "Process " << c.id() << " exited with status " << c.exit_code() << std::endl;
+			mainserverlogline() << "Process " << c.id() << " exited with status " << c.exit_code() << std::endl;
 			restart_subserver = false;
 			cptr = nullptr;
 		} catch (const boost::process::process_error& e) {
-			mainlogline() << "Process exception: " << e.what() << ".  Code:" << e.code() << std::endl;
+			mainserverlogline() << "Process exception: " << e.what() << ".  Code:" << e.code() << std::endl;
 		}
 		subserverlog.close();
 	} // while
@@ -308,5 +341,5 @@ int main() {
 		unlink("subserver.pid");
 		unlink("server.pid");
 	}
-	mainlogline() << "Exiting Master Server" << std::endl;
+	mainserverlogline() << "Exiting Master Server" << std::endl;
 }
