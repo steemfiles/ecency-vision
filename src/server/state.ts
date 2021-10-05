@@ -48,13 +48,13 @@ export const makePreloadedState = async (
   */
   let acceptableLanguage: { [languageCode: string]: boolean } = {};
   let negotiatedLanguages: Array<string> = [];
-  const rawAcceptLanguage =
+  const rawAcceptLanguage = 
     (req && req.headers && req.headers["accept-language"]) || "";
   const acceptLanguage = rawAcceptLanguage
     .split(/;/)
     .map((languages_priority_pair_string) => {
       const languages_priority_vector =
-        languages_priority_pair_string.split(/,/);
+        languages_priority_pair_string.split(/, */);
       let priority: number = 1;
       let lang_struct_vector: Array<LanguageSpec> = [];
       for (const language of languages_priority_vector) {
@@ -95,7 +95,10 @@ export const makePreloadedState = async (
   if (negotiatedLanguages.length === 0) {
     negotiatedLanguages.push("en-US");
   }
-  console.log({ rawAcceptLanguage, negotiatedLanguages });
+  // only log human requests.
+  if (rawAcceptLanguage !== '') {
+    console.log({ rawAcceptLanguage, negotiatedLanguages });
+  }
   const _c = (k: string): any => req.cookies[k];
   const activeUser = _c("active_user") || null;
   const theme =
