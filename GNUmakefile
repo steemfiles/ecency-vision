@@ -10,6 +10,11 @@ runforever.o: src/runforever.cpp
 
 runforever-dbg.o: src/runforever.cpp
 	g++ src/runforever.cpp -ggdb -c -o runforever-dbg.o  $(COMPILE_FLAGS)
+
+listenlog-dbg.o: src/listenlog.cpp
+	g++ src/listenlog.cpp -ggdb -c -o listenlog-dbg.o  $(COMPILE_FLAGS)
+	
+	
 	
 runforever: runforever.o
 	g++ runforever.o -o runforever $(LINK_FLAGS) -static
@@ -22,5 +27,8 @@ syntax:
 
 runforever-dbg: runforever-dbg.o
 	g++ -ggdb runforever-dbg.o -o runforever-dbg  $(LINK_FLAGS) -static
+	
+listenlog-dbg: listenlog-dbg.o
+	g++ -ggdb listenlog-dbg.o -o listenlog-dbg  $(LINK_FLAGS) -static
 	
 .PHONY: syntax production default
