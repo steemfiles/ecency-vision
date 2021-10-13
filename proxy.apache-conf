@@ -1,0 +1,21 @@
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+<VirtualHost *:80>
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/html
+	StrictHostCheck OFF
+	RewriteEngine  on
+	
+    <LocationMatch ^/search-api/.*>
+    	Header set "Content-Type" "application/json"
+	</LocationMatch>
+
+    ProxyPass /search-api/search http://127.0.0.1:2999/search
+    ProxyPassReverse /search-api/search http://127.0.0.1:2999/search
+    	
+    ProxyPass / http://127.0.0.1:3000/
+    ProxyPassReverse / http://127.0.0.1:3000/
+
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+
