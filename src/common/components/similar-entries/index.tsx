@@ -107,27 +107,30 @@ export class SimilarEntries extends BaseComponent<Props, State> {
       const query = this.buildQuery(entry);
       search(query, "newest", "0", undefined, undefined)
         .then((r) => {
-          const rawEntries: SearchResult[] = r.results.filter(
-            (r) => r.permlink !== permlink
-          );
-
-          let entries: SearchResult[] = [];
-
-          rawEntries.forEach((x) => {
-            if (entries.find((y) => y.author === x.author) === undefined) {
-              entries.push(x);
+          try {
+            const rawEntries: SearchResult[] = r.results.filter(
+              (r) => r.permlink !== permlink
+            );
+  
+            let entries: SearchResult[] = [];
+  
+            rawEntries.forEach((x) => {
+              if (entries.find((y) => y.author === x.author) === undefined) {
+                entries.push(x);
+              }
+            });
+            if (entries.length < limit) {
+              this.setState((state) => ({
+                retry: state.retry - 1,
+              }));
+              this.fetch();
+            } else {
+              entries = entries.slice(0, limit);
             }
-          });
-          if (entries.length < limit) {
-            this.setState((state) => ({
-              retry: state.retry - 1,
-            }));
-            this.fetch();
-          } else {
-            entries = entries.slice(0, limit);
+  
+            this.stateSet({ entries });
+          } catch (e) {
           }
-
-          this.stateSet({ entries });
         })
         .finally(() => {
           this.stateSet({
