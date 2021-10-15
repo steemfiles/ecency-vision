@@ -238,19 +238,27 @@ export class SearchComment extends BaseComponent<Props, State> {
     this.stateSet({ inProgress: true });
     search(q, sort, hideLow_, since, scrollId_)
       .then((r) => {
-        let newResults: SearchResult[];
+        try {
+          let newResults: SearchResult[];
 
-        if (limit) {
-          newResults = r.results.slice(0, limit);
-        } else {
-          newResults = [...results, ...r.results];
+          if (limit) {
+            newResults = r.results.slice(0, limit);
+          } else {
+            newResults = [...results, ...r.results];
+          }
+
+          this.stateSet({
+            hits: r.hits,
+            results: newResults,
+            scrollId: r.scroll_id || "",
+          });
+        } catch (e) {
+          this.stateSet({
+            hits: 0,
+            results: [],
+            scrollId: "",
+          });
         }
-
-        this.stateSet({
-          hits: r.hits,
-          results: newResults,
-          scrollId: r.scroll_id || "",
-        });
       })
       .finally(() => {
         this.stateSet({
