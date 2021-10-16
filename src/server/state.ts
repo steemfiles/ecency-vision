@@ -96,29 +96,33 @@ export const makePreloadedState = async (
     .sort(function (a: LanguageSpec, b: LanguageSpec) {
       return b.priority - a.priority;
     });
+
   if (search_requests_allowed == undefined) {
     if (process.env["SEARCH_API_ADDR"] && process.env["SEARCH_API_SECRET"]) {
       try {
-        const SEP: Promise<{ data?: { message?: string } }> = axios.post(
+        const SEP: Promise<{ data?: { message?: string } }> = axios.get(
           process.env["SEARCH_API_ADDR"] + "/state",
-          {},
           { headers: { Authorization: process.env["SEARCH_API_SECRET"] } }
         );
         const r = await SEP;
-        if (r && r.data && r["data"]["message"]) {
+        if (!r || !r.data) {
+          search_requests_allowed = 0;
+        } else if (r["data"]["message"]) {
           console.log(r.data.message);
           search_requests_allowed = 0;
         } else {
-          search_requests_allowed = r["request_limit"] - r["request_count"];
+          search_requests_allowed =
+            r.data["request_limit"] - r.data["request_count"];
         }
       } catch (e) {
         search_requests_allowed = 0;
-        console.log("Exception thrown determining search count");
+        console.log("Exception thrown determining search count", e);
       }
     } else {
       search_requests_allowed = 0;
     }
   }
+
   console.log(search_requests_allowed, " searches will be allowed");
   if (negotiatedLanguages.length === 0) {
     negotiatedLanguages.push("en-US");
