@@ -1,5 +1,7 @@
 import express from "express";
 import moment from "moment";
+import axios from "axios";
+
 import { AppState } from "../common/store";
 import initialState from "../common/store/initial-state";
 import {
@@ -32,6 +34,8 @@ let storedConfigs: Array<HiveEngineTokenConfig> = [];
 let storedPrices: { [id: string]: number } = {};
 let fetchingPrices: boolean = false;
 let lastStore: Date;
+let search_requests_allowed: undefined | number = undefined;
+
 export const makePreloadedState = async (
   req: express.Request
 ): Promise<AppState> => {
@@ -48,7 +52,7 @@ export const makePreloadedState = async (
   */
   let acceptableLanguage: { [languageCode: string]: boolean } = {};
   let negotiatedLanguages: Array<string> = [];
-  const rawAcceptLanguage = 
+  const rawAcceptLanguage =
     (req && req.headers && req.headers["accept-language"]) || "";
   const acceptLanguage = rawAcceptLanguage
     .split(/;/)
@@ -92,11 +96,35 @@ export const makePreloadedState = async (
     .sort(function (a: LanguageSpec, b: LanguageSpec) {
       return b.priority - a.priority;
     });
+  if (search_requests_allowed == undefined) {
+    if (process.env["SEARCH_API_ADDR"] && process.env["SEARCH_API_SECRET"]) {
+      try {
+        const SEP: Promise<{ data?: { message?: string } }> = axios.post(
+          process.env["SEARCH_API_ADDR"] + "/state",
+          {},
+          { headers: { Authorization: process.env["SEARCH_API_SECRET"] } }
+        );
+        const r = await SEP;
+        if (r && r.data && r["data"]["message"]) {
+          console.log(r.data.message);
+          search_requests_allowed = 0;
+        } else {
+          search_requests_allowed = r["request_limit"] - r["request_count"];
+        }
+      } catch (e) {
+        search_requests_allowed = 0;
+        console.log("Exception thrown determining search count");
+      }
+    } else {
+      search_requests_allowed = 0;
+    }
+  }
+  console.log(search_requests_allowed, " searches will be allowed");
   if (negotiatedLanguages.length === 0) {
     negotiatedLanguages.push("en-US");
   }
   // only log human requests.
-  if (rawAcceptLanguage !== '') {
+  if (rawAcceptLanguage !== "") {
     console.log({ rawAcceptLanguage, negotiatedLanguages });
   }
   const _c = (k: string): any => req.cookies[k];
@@ -200,6 +228,7 @@ export const makePreloadedState = async (
   }
   const globalState: Global = {
     ...initialState.global,
+    search_requests_allowed,
     negotiatedLanguages,
     acceptLanguage: acceptLanguage.length
       ? acceptLanguage

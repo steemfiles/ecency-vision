@@ -79,6 +79,7 @@
   "search": {
     "placeholder": "Search",
     "placeholder-count": "Search {{n}} posts",
+    "placeholder-communities": "Search communities",
     "header-tag": "Tags",
     "header-account": "Users",
     "header-community": "Communities"

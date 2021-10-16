@@ -91,14 +91,17 @@ export class Search extends BaseComponent<Props, State> {
 
   render() {
     const { global } = this.props;
+    const { search_requests_allowed } = global;
+
     const { query } = this.state;
 
-    const placeholder =
-      global.searchIndexCount > 0
+    const placeholder = search_requests_allowed
+      ? global.searchIndexCount > 0
         ? _t("search.placeholder-count", {
             n: numeral(global.searchIndexCount).format("0,0"),
           })
-        : _t("search.placeholder");
+        : _t("search.placeholder")
+      : _t("search.placeholder-communities");
 
     return (
       <>

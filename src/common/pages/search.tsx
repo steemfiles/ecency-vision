@@ -57,6 +57,7 @@ class SearchPage extends SearchBase {
     };
 
     const { global } = this.props;
+    const { search_requests_allowed } = global;
 
     return (
       <>
@@ -68,14 +69,20 @@ class SearchPage extends SearchBase {
             })
           : NavBar({ ...this.props })}
         <div className="app-content search-page">
-          <div className="search-main">
-            <SearchComment {...this.props} limit={8} />
-          </div>
-          <div className="search-side">
-            <SearchPeople {...this.props} />
+          {search_requests_allowed ? (
+            <>
+              <div className="search-main">
+                <SearchComment {...this.props} limit={8} />
+              </div>
+              <div className="search-side">
+                <SearchPeople {...this.props} />
+                <SearchCommunities {...this.props} />
+                <SearchTopics {...this.props} />
+              </div>
+            </>
+          ) : (
             <SearchCommunities {...this.props} />
-            <SearchTopics {...this.props} />
-          </div>
+          )}
         </div>
       </>
     );

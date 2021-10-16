@@ -96,6 +96,7 @@ export interface Global {
   isMobile: boolean;
   usePrivate: boolean;
   hiveEngineTokensProperties?: TokenPropertiesMap;
+  search_requests_allowed: undefined | number;
 }
 
 export enum ActionTypes {

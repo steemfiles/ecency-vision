@@ -51,6 +51,7 @@ export const initialState: Global = {
   isMobile: false,
   usePrivate: true,
   hiveEngineTokensProperties: {},
+  search_requests_allowed: 0,
 };
 export default (state: Global = initialState, action: Actions): Global => {
   switch (action.type) {

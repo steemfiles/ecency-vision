@@ -167,6 +167,7 @@ export const globalInstance: Global = {
   nsfw: false,
   newVersion: null,
   usePrivate: true,
+  search_requests_allowed: 1,
 };
 
 export const TrendingTagsInstance: TrendingTags = {
