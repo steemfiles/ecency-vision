@@ -16,32 +16,53 @@ if (domain_name === "") {
 const server = http
   .createServer(function (req, lres) {
     // 2 - creating server
-    //console.log(req);
     const refererURL = new URL(
       (req && req.headers && req.headers.referer) || ""
     );
     const q = refererURL.searchParams.get("q");
-
+    const addr =
+      process.env["SEARCH_API_ADDR"].slice(
+        0,
+        process.env["SEARCH_API_ADDR"].length - 1
+      ) + req.url;
     console.log("Got request to this HTTP server.", req.url, refererURL.search);
     let params: { [id: string]: string } = {};
     refererURL.searchParams.forEach((value, name) => {
       params[name] = value;
     });
-    axios
-      .post(process.env["SEARCH_API_ADDR"] + "search", params, {
-        headers: { Authorization: process.env["SEARCH_API_SECRET"] },
-      })
-      .then(
-        function (response) {
-          lres.writeHead(200, { "Content-Type": "application/json" });
-          lres.write(JSON.stringify(response.data));
-          lres.end();
-        },
-        function (error) {
-          console.log(error);
-          lres.end();
-        }
-      );
+    if (req.url === "/search") {
+      axios
+        .post(addr, params, {
+          headers: { Authorization: process.env["SEARCH_API_SECRET"] },
+        })
+        .then(
+          function (response) {
+            lres.writeHead(200, { "Content-Type": "application/json" });
+            lres.write(JSON.stringify(response.data));
+            lres.end();
+          },
+          function (error) {
+            console.log(error);
+            lres.end();
+          }
+        );
+    } else {
+      axios
+        .post(addr, params, {
+          headers: { Authorization: process.env["SEARCH_API_SECRET"] },
+        })
+        .then(
+          function (response) {
+            lres.writeHead(200, { "Content-Type": "application/json" });
+            lres.write(JSON.stringify(response.data));
+            lres.end();
+          },
+          function (error) {
+            console.log(error);
+            lres.end();
+          }
+        );
+    }
   })
   .on("error", (e) => {
     console.error(e);

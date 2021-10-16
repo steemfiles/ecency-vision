@@ -12,6 +12,12 @@
     ProxyPass /search-api/search http://127.0.0.1:2999/search
     ProxyPassReverse /search-api/search http://127.0.0.1:2999/search
     	
+    ProxyPass /search-api/search-account http://127.0.0.1:2999/search-account
+    ProxyPassReverse /search-api/search-account http://127.0.0.1:2999/search-account
+    	
+    ProxyPass /search-api/search-tag http://127.0.0.1:2999/search-tag
+    ProxyPassReverse /search-api/search-tag http://127.0.0.1:2999/search-tag
+    	
     ProxyPass / http://127.0.0.1:3000/
     ProxyPassReverse / http://127.0.0.1:3000/
 
