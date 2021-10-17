@@ -15,15 +15,14 @@ export default class FormattedCurrency extends Component<Props> {
 
   render() {
     const { global, value, fixAt } = this.props;
-    const { currencyRate, currencySymbol, currencyPrecision} = global;
+    const { currencyRate, currencySymbol, currencyPrecision } = global;
 
     const valInCurrency = value * currencyRate;
 
     return (
       <>
         {formattedNumber(valInCurrency, {
-          mandatoryFractionDigits: fixAt ?? currencyPrecision,
-          maximumFractionDigits: fixAt ?? currencyPrecision,
+          fractionDigits: fixAt ?? currencyPrecision,
           prefix: currencySymbol,
         })}
       </>

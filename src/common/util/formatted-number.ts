@@ -23,7 +23,7 @@ export default (
   value: number | string,
   options: Options | undefined = undefined
 ) => {
-  let debugLog = false;
+  const debugLog = false;
   let addNegativeSignFlag: boolean = false;
   let opts: Options = {
     maximumFractionDigits: 3,
@@ -33,9 +33,6 @@ export default (
   };
   if (options) {
     opts = { ...opts, ...options };
-  }
-  if (value == 14.264) {
-    debugLog = true;
   }
   if (debugLog) console.log({ value, fractionDigits: opts.fractionDigits });
   const { prefix, suffix } = opts;
@@ -126,7 +123,7 @@ export default (
     console.log(out);
   }
   while (
-    decimal_location < out.length && 
+    decimal_location < out.length &&
     count0s(out.slice(decimal_location)) > mandatoryFractionDigits &&
     ",0".indexOf(out.charAt(out.length - 1)) != -1
   ) {
