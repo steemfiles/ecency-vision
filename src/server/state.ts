@@ -35,6 +35,40 @@ let storedPrices: { [id: string]: number } = {};
 let fetchingPrices: boolean = false;
 let lastStore: Date;
 let search_requests_allowed: undefined | number = undefined;
+const one_hundred_fifty_minutes = 15 * ten_minutes;
+
+const fetch_search_requests_allowed = async (): void =>{
+  console.log("fetching search requests allowed...");
+  if (process.env["SEARCH_API_ADDR"] && process.env["SEARCH_API_SECRET"]) {
+    try {
+      const SEP: Promise<{ data?: { message?: string } }> = axios.get(
+        process.env["SEARCH_API_ADDR"] + "/state",
+        { headers: { Authorization: process.env["SEARCH_API_SECRET"] } }
+      );
+      const r = await SEP;
+      if (!r || !r.data) {
+        search_requests_allowed = 0;
+      } else if (r["data"]["message"]) {
+        console.log(r.data.message);
+        search_requests_allowed = 0;
+      } else {
+        search_requests_allowed =
+          r.data["request_limit"] - r.data["request_count"];
+      }
+    } catch (e) {
+      search_requests_allowed = 0;
+      console.log("Exception thrown determining search count", e);
+    }
+  } else {
+    search_requests_allowed = 0;
+  }
+  console.log(search_requests_allowed, "requests allowed.");
+
+}
+
+
+setInterval(fetch_search_requests_allowed, one_hundred_fifty_minutes);
+
 
 export const makePreloadedState = async (
   req: express.Request
@@ -98,29 +132,7 @@ export const makePreloadedState = async (
     });
 
   if (search_requests_allowed == undefined) {
-    if (process.env["SEARCH_API_ADDR"] && process.env["SEARCH_API_SECRET"]) {
-      try {
-        const SEP: Promise<{ data?: { message?: string } }> = axios.get(
-          process.env["SEARCH_API_ADDR"] + "/state",
-          { headers: { Authorization: process.env["SEARCH_API_SECRET"] } }
-        );
-        const r = await SEP;
-        if (!r || !r.data) {
-          search_requests_allowed = 0;
-        } else if (r["data"]["message"]) {
-          console.log(r.data.message);
-          search_requests_allowed = 0;
-        } else {
-          search_requests_allowed =
-            r.data["request_limit"] - r.data["request_count"];
-        }
-      } catch (e) {
-        search_requests_allowed = 0;
-        console.log("Exception thrown determining search count", e);
-      }
-    } else {
-      search_requests_allowed = 0;
-    }
+    fetch_search_requests_allowed();
   }
 
   console.log(search_requests_allowed, " searches will be allowed");
