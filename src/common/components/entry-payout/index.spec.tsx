@@ -16,8 +16,8 @@ jest.mock("moment", () => () => ({
 
 it("(1) Default render", () => {
   const props = {
-    global: { ...globalInstance },
-    dynamicProps: { ...dynamicPropsIntance1 },
+    global: { ...globalInstance, currencyPrecision: 2, },
+    dynamicProps: { ...dynamicPropsIntance1},
     entry: {
       ...entryInstance1,
       ...{

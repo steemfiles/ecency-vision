@@ -8,7 +8,7 @@ exports[`(1) Default render 1`] = `
   onMouseOut={[Function]}
   onMouseOver={[Function]}
 >
-  $ 14.26
+  $ 14.264
 </div>
 `;
 
@@ -242,6 +242,6 @@ exports[`(5) Default with max payout 1`] = `
   onMouseOut={[Function]}
   onMouseOver={[Function]}
 >
-  $ 10.00
+  $ 10.000
 </div>
 `;
