@@ -13,6 +13,12 @@ function count0s(s: string) {
   return counter;
 }
 
+function max(a : number,b : number) {
+  if (a > b)
+    return a;
+  return b;
+}
+
 export default (
   value: number | string,
   options: Options | undefined = undefined
@@ -28,20 +34,23 @@ export default (
   if (options) {
     opts = { ...opts, ...options };
   }
-  if (value < 0) {
+  if (value == 14.264) {
     debugLog = true;
   }
   if (debugLog) console.log({ value, fractionDigits: opts.fractionDigits });
   const { prefix, suffix } = opts;
-  const maximumFractionDigits : number = opts.maximumFractionDigits || opts.fractionDigits || 0;
   const mandatoryFractionDigits = opts.fractionDigits || 0;
+  const maximumFractionDigits : number = opts.maximumFractionDigits || opts.fractionDigits || 0;
+  if (debugLog) {
+    console.log({maximumFractionDigits, mandatoryFractionDigits, value});
+  }
   let out: string = "";
   if (typeof value == "number") {
     // builtin format is buggy when using numbers smaller than 1e-6.
     if (isNaN(value)) {
       return "NaN";
     }
-    const unity = Math.pow(10, maximumFractionDigits);
+    const unity = Math.pow(10, max(maximumFractionDigits, mandatoryFractionDigits));
     if (value < 0) {
       addNegativeSignFlag = true;
     }
@@ -51,7 +60,7 @@ export default (
       addNegativeSignFlag = false;
     }
     if (debugLog) console.log({ satoshis, out });
-    while (satoshis != 0 && out.length < maximumFractionDigits) {
+    while (satoshis != 0 && ((out.length < maximumFractionDigits) || (out.length < mandatoryFractionDigits))) {
       out = (satoshis % 10) + out;
       satoshis /= 10;
       satoshis = Math.floor(satoshis);
@@ -99,6 +108,9 @@ export default (
       decimal_location = i;
     }
   }
+  if (debugLog) {
+    console.log(out);
+  }
   if (decimal_location + 3 <= out.length) {
     for (let j = decimal_location + 4; j < out.length; j += 4) {
       out = out.slice(0, j) + "," + out.slice(j);
@@ -110,12 +122,18 @@ export default (
       ++decimal_location;
     }
   }
+  if (debugLog) {
+    console.log(out);
+  }
   while (
     decimal_location < out.length && 
     count0s(out.slice(decimal_location)) > mandatoryFractionDigits &&
     ",0".indexOf(out.charAt(out.length - 1)) != -1
   ) {
     out = out.slice(0, out.length - 1);
+  }
+  if (debugLog) {
+    console.log(out);
   }
   if (out.charAt(out.length-1) === ',') {
     out = out.slice(0, out.length-1);

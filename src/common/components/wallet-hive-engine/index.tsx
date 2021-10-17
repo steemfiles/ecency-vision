@@ -119,7 +119,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     this.fetchConvertingAmount();
     this.fetchHETransactions(account.name, "");
   }
-  keepTransaction(group?: OperationGroup | "", tx: Transaction): boolean {
+  keepTransaction(group: OperationGroup | "", tx: Transaction): boolean {
     switch (group) {
       case "transfers":
         return [
@@ -162,7 +162,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     });
   }
   handleCoarseTransactions(
-    group?: OperationGroup | "",
+    group: OperationGroup | "",
     cts: Array<HECoarseTransaction>
   ) {
     const { transactions } = this.state;
@@ -317,7 +317,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                   (time_interval_length / 1000) * counter +
                   "s"
               );
-              getScotDataAsync<{ [aPICoinName]: TokenStatus }>(
+              getScotDataAsync<{ [aPICoinName:string] : TokenStatus }>(
                 `@${account.name}`,
                 { hive: 1, token: aPICoinName }
               ).then((tokenStatuses) => {
