@@ -22,6 +22,7 @@ export default class FormattedCurrency extends Component<Props> {
     return (
       <>
         {formattedNumber(valInCurrency, {
+          mandatoryFractionDigits: fixAt ?? currencyPrecision,
           maximumFractionDigits: fixAt ?? currencyPrecision,
           prefix: currencySymbol,
         })}
