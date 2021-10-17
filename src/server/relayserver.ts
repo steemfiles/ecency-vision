@@ -20,11 +20,16 @@ const server = http
       (req && req.headers && req.headers.referer) || ""
     );
     const q = refererURL.searchParams.get("q");
-    const addr =
-      process.env["SEARCH_API_ADDR"].slice(
-        0,
-        process.env["SEARCH_API_ADDR"].length - 1
-      ) + req.url;
+    
+     
+    const addr : string = (() : string => {
+        const search_api_addr = process.env["SEARCH_API_ADDR"] || '';
+        if (search_api_addr.length > 0 && search_api_addr.substr(-1) == '/') {
+          return search_api_addr.slice(0, search_api_addr.length-1);
+        } else {
+          return search_api_addr;
+        }
+    })() + req.url;
     console.log("Got request to this HTTP server.", req.url, refererURL.search);
     let params: { [id: string]: string } = {};
     refererURL.searchParams.forEach((value, name) => {
