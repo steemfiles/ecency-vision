@@ -238,7 +238,7 @@ function HEToHMarketCancel(t: HEMarketCancel): MarketCancel {
     amount: FormattedNumber(quantityReturned, { suffix: t.symbol }),
   };
 }
-export function HEToHTransaction(t: HECoarseTransaction): Transaction|null {
+export function HEToHTransaction(t: HECoarseTransaction): Transaction | null {
   switch (t.operation) {
     case "tokens_unstake":
       return HEToHTokensUnstake(t);
@@ -284,9 +284,9 @@ export function HEToHTransaction(t: HECoarseTransaction): Transaction|null {
       };
     case "market_closeOrder":
       return {
-        type:"market_closeOrder",
+        type: "market_closeOrder",
         orderType: t.orderType,
-        ...HEB2B(t)
+        ...HEB2B(t),
       };
     case "market_buy":
       return {

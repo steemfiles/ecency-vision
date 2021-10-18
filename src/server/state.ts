@@ -37,7 +37,7 @@ let lastStore: Date;
 let search_requests_allowed: undefined | number = undefined;
 const one_hundred_fifty_minutes = 15 * ten_minutes;
 
-const fetch_search_requests_allowed = async (): void =>{
+const fetch_search_requests_allowed = async (): void => {
   console.log("fetching search requests allowed...");
   if (process.env["SEARCH_API_ADDR"] && process.env["SEARCH_API_SECRET"]) {
     try {
@@ -63,12 +63,10 @@ const fetch_search_requests_allowed = async (): void =>{
     search_requests_allowed = 0;
   }
   console.log(search_requests_allowed, "requests allowed.");
-
-}
+};
 
 fetch_search_requests_allowed();
 setInterval(fetch_search_requests_allowed, one_hundred_fifty_minutes);
-
 
 export const makePreloadedState = async (
   req: express.Request
@@ -88,7 +86,7 @@ export const makePreloadedState = async (
   let negotiatedLanguages: Array<string> = [];
   const headers = (req && req.headers) || {};
   const rawAcceptLanguage = headers["accept-language"] || "";
-  const userAgent = headers['user-agent'] || "";
+  const userAgent = headers["user-agent"] || "";
   const acceptLanguage = rawAcceptLanguage
     .split(/;/)
     .map((languages_priority_pair_string) => {
@@ -137,7 +135,12 @@ export const makePreloadedState = async (
   }
   // only log human requests.
   if (rawAcceptLanguage !== "" && userAgent !== "") {
-    console.log({ rawAcceptLanguage, negotiatedLanguages, userAgent, search_requests_allowed });
+    console.log({
+      rawAcceptLanguage,
+      negotiatedLanguages,
+      userAgent,
+      search_requests_allowed,
+    });
   }
   const _c = (k: string): any => req.cookies[k];
   const activeUser = _c("active_user") || null;

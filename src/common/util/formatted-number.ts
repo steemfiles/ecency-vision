@@ -8,14 +8,13 @@ interface Options {
 function count0s(s: string) {
   let counter = 0;
   for (const c of s) {
-    if (c == '0') ++counter;
+    if (c == "0") ++counter;
   }
   return counter;
 }
 
-function max(a : number,b : number) {
-  if (a > b)
-    return a;
+function max(a: number, b: number) {
+  if (a > b) return a;
   return b;
 }
 
@@ -37,9 +36,10 @@ export default (
   if (debugLog) console.log({ value, fractionDigits: opts.fractionDigits });
   const { prefix, suffix } = opts;
   const mandatoryFractionDigits = opts.fractionDigits || 0;
-  const maximumFractionDigits : number = opts.maximumFractionDigits || opts.fractionDigits || 0;
+  const maximumFractionDigits: number =
+    opts.maximumFractionDigits || opts.fractionDigits || 0;
   if (debugLog) {
-    console.log({maximumFractionDigits, mandatoryFractionDigits, value});
+    console.log({ maximumFractionDigits, mandatoryFractionDigits, value });
   }
   let out: string = "";
   if (typeof value == "number") {
@@ -47,7 +47,10 @@ export default (
     if (isNaN(value)) {
       return "NaN";
     }
-    const unity = Math.pow(10, max(maximumFractionDigits, mandatoryFractionDigits));
+    const unity = Math.pow(
+      10,
+      max(maximumFractionDigits, mandatoryFractionDigits)
+    );
     if (value < 0) {
       addNegativeSignFlag = true;
     }
@@ -57,7 +60,11 @@ export default (
       addNegativeSignFlag = false;
     }
     if (debugLog) console.log({ satoshis, out });
-    while (satoshis != 0 && ((out.length < maximumFractionDigits) || (out.length < mandatoryFractionDigits))) {
+    while (
+      satoshis != 0 &&
+      (out.length < maximumFractionDigits ||
+        out.length < mandatoryFractionDigits)
+    ) {
       out = (satoshis % 10) + out;
       satoshis /= 10;
       satoshis = Math.floor(satoshis);
@@ -132,8 +139,8 @@ export default (
   if (debugLog) {
     console.log(out);
   }
-  if (out.charAt(out.length-1) === ',') {
-    out = out.slice(0, out.length-1);
+  if (out.charAt(out.length - 1) === ",") {
+    out = out.slice(0, out.length - 1);
   }
   if (out.charAt(out.length - 1) === ".") {
     out = out.slice(0, out.length - 1);
