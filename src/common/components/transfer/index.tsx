@@ -1322,10 +1322,7 @@ export class Transfer extends BaseComponent<Props, State> {
                 onKc: this.signKs,
                 // power-ups, maybe power-downs are broken for Hive Siger for HE tokens but delegations and undelegations
                 // for HE tokens are just fine..  Quietly hide the Hive Signer option in these circumstances,
-                hSBroken:
-                  (LIQUID_TOKEN_UPPERCASE === this.props.asset ||
-                    VESTING_TOKEN === this.props.asset) &&
-                  mode === "power-up",
+                hSBroken: false,
               })}
               <p className="text-center">
                 <a

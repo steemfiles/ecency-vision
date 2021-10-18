@@ -713,6 +713,7 @@ export const createTransferToVestingOp = (
   const parts = amount.split(/ /);
   const currency = parts[parts.length - 1];
   const quantity = parts[0].replace(/,/g, "");
+  console.log(from, to, amount);
   if (currency === HIVE_API_NAME) {
     return [
       "transfer_to_vesting",
@@ -758,14 +759,11 @@ export const transferToVestingHot = (
   to: string,
   amount: string
 ) => {
+  console.log(from, to, amount);
   const params: Parameters = {
-    callback: `${document.location.href}/@${from}/wallet`,
+    callback: document.location.href,
   };
   const op: Operation = createTransferToVestingOp(from, to, amount);
-  if (op[0] === "custom_json") {
-    Error("Hive Signer cannot be used for Staking Hive Engine Tokens");
-    return;
-  }
   return hs.sendOperation(op, params, () => {});
 };
 export const transferToVestingKc = (
