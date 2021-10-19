@@ -16,7 +16,15 @@ var server = http
     // 2 - creating server
     var refererURL = new URL((req && req.headers && req.headers.referer) || "");
     var q = refererURL.searchParams.get("q");
-    var addr = process.env["SEARCH_API_ADDR"].slice(0, process.env["SEARCH_API_ADDR"].length - 1) + req.url;
+    var addr = (function () {
+        var search_api_addr = process.env["SEARCH_API_ADDR"] || "";
+        if (search_api_addr.length > 0 && search_api_addr.substr(-1) == "/") {
+            return search_api_addr.slice(0, search_api_addr.length - 1);
+        }
+        else {
+            return search_api_addr;
+        }
+    })() + req.url;
     console.log("Got request to this HTTP server.", req.url, refererURL.search);
     var params = {};
     refererURL.searchParams.forEach(function (value, name) {
