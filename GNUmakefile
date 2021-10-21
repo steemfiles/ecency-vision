@@ -30,5 +30,8 @@ runforever-dbg: runforever-dbg.o
 	
 listenlog-dbg: listenlog-dbg.o
 	g++ -ggdb listenlog-dbg.o -o listenlog-dbg  $(LINK_FLAGS) -static
+
+clean:
+	rm *.o
 	
-.PHONY: syntax production default
+.PHONY: syntax production clean default

@@ -21,6 +21,8 @@
 #include <iostream>
 #include <string>
 #include <sys/time.h>
+#include <functional>
+#include <memory>
 
 const char * rfc_2822_format = "%a, %d %b %Y %T %z";
 const char * RUNFOREVER_MANAGER_VERSION_STRING = "Runforever Manager/0.0";
@@ -34,13 +36,41 @@ using namespace boost::process;
 std::map<int, std::string> signal_names;
 std::fstream mainserverlog("server.log", std::ofstream::app);
 child * cptr = nullptr;
-bool keep_looping = true;
+bool both_running = false, keep_looping = true;
 bool restart_subserver = false;
 char datetime_string[200] = "";
 
+// Performs an HTTP GET and prints the response
+bool connect_to_search_server()
+{
+		auto const host = "127.0.0.1";
+		auto const port = "2999";
+		auto const target = "/ping";
+		const int version = 11;
+		boost::system::error_code ec;
+	
+		// The io_context is required for all I/O
+		net::io_context ioc;
+	
+		// These objects perform our I/O
+		tcp::resolver resolver(ioc);
+		beast::tcp_stream stream(ioc);
+	
+		// Look up the domain name
+		auto const results = resolver.resolve(host, port);
+	
+		// Make the connection on the IP address we get from a lookup
+		stream.connect(results, ec);		
+		if (ec)
+			return true;
+	
+		// Gracefully close the socket
+		stream.socket().shutdown(tcp::socket::shutdown_both, ec);		
+		return false;
+}
 
 // Performs an HTTP GET and prints the response
-bool connect_to_subserver()
+bool connect_to_page_server()
 {
 		auto const host = "127.0.0.1";
 		auto const port = "3000";
@@ -62,30 +92,30 @@ bool connect_to_subserver()
 		stream.connect(results, ec);		
 		if (ec)
 			return true;
-	    
+	
 		// Set up an HTTP GET request message
 		http::request<http::string_body> req{http::verb::get, target, version};
 		req.set(http::field::host, host);
 		req.set(http::field::user_agent, RUNFOREVER_MANAGER_VERSION_STRING);
-	    
+	
 		// Send the HTTP request to the remote host
 		http::write(stream, req);
-	    
+	
 		// This buffer is used for reading and must be persisted
 		beast::flat_buffer buffer;
-	    
+	
 		// Declare a container to hold the response
 		http::response<http::dynamic_body> res;
-	    
+	
 		// Receive the HTTP response
 		http::read(stream, buffer, res);
 				
 		// Gracefully close the socket
 		stream.socket().shutdown(tcp::socket::shutdown_both, ec);
-        
+
 		if (ec)
 			return true;
-		else 
+		else
 			return false;
 }
 
@@ -110,11 +140,17 @@ void report_and_continue(int signal) {
 }
 
 void set_to_exit(int signal) {
+	report_and_continue(signal);
 	mainserverlogline() << "Caught signal " << signal_names[signal] << "." << std::endl;
 	if (cptr) {	
 		kill(cptr->id(), SIGTERM);
 	}
 	keep_looping = false;
+}
+
+void report_and_set_process_closed(int signal) {
+	report_and_continue(signal);
+	both_running = false;
 }
 
 void init_signal_names() {
@@ -159,20 +195,34 @@ void init_signal_names() {
 }
 
 // These are and should only be used in the forward_log thread...
-ipstream * pipe_stream_ptr = nullptr;
-std::ofstream subserverlog; 
-void forward_log() {
+ipstream *page_server_pipe_stream = nullptr, *search_server_pipe_stream = nullptr;
+std::ofstream subserverlog, searchserverlog;
+child * page_server_ptr, * search_server_ptr;
+void forward_log(ipstream& ps, std::ostream& log, const boost::process::child* cptr) {
 	time_t t;
 	struct tm *tmp;
 	
 	std::string line;
-	while (keep_looping) {
+	char c;
+	while (both_running) {
 		boost::this_thread::yield();
-		boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
-		if (keep_looping && pipe_stream_ptr && *pipe_stream_ptr && std::getline(*pipe_stream_ptr, line) && !line.empty()) {
-			subserverlog << "[" << cptr->id() << "; " << datetime_string << "] " << line << std::endl;
+		try {
+			boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
+			if (keep_looping && ps && std::getline(ps, line) && !line.empty()) {
+				log << "[" << cptr->id() << "; " << datetime_string << "] " << line << std::endl;
+			}
+		} catch (...) {
+			
 		}
 	}
+}
+
+void forward_page_log(){
+	forward_log(*page_server_pipe_stream, subserverlog, page_server_ptr);
+}
+
+void forward_search_log() {
+	forward_log(*search_server_pipe_stream, searchserverlog, search_server_ptr);
 }
 
 void keep_time() {
@@ -206,12 +256,29 @@ void keep_time() {
 
 void check_connectivity() {
 	while (keep_looping) {
-		if (restart_subserver || connect_to_subserver()) {
+		if (restart_subserver || connect_to_page_server()) {
 			restart_subserver = true;
 		}
 		boost::this_thread::sleep_for(boost::chrono::seconds(3));
 	}
 }
+
+const char * search_server_cmd="node src/server/relayserver.js";
+const char * page_server_cmd="node build/server.js";
+
+class pidfile {
+	char const * filename;
+public:
+	pidfile(char const * const p_filename, pid_t const p_id) : filename(p_filename) {
+		std::ofstream fs(p_filename);
+		fs << p_id << std::endl;
+		fs.close();
+	}
+	
+	~pidfile(){
+		unlink(filename);
+	}
+};
 
 int main() {
 	bool current_directory_writable = access(".", W_OK) == 0;
@@ -241,6 +308,11 @@ int main() {
 			std::cerr << "Cannot find build/server.js to run." << std::endl;
 			keep_looping = false;
 		}
+		
+		if (access("src/server/relayserver.js", R_OK)) {
+			std::cerr << "Cannot find src/server/relayserver.js to run." << std::endl;
+			keep_looping = false;
+		}		
 	}
 	
 	if (!keep_looping) {
@@ -258,88 +330,119 @@ int main() {
 	signal(SIGHUP, report_and_continue);
 	signal(SIGINT, set_to_exit);
 	signal(SIGTERM, set_to_exit);
+	signal(SIGABRT, report_and_set_process_closed);
+	pidfile masterserver("manager.pid", getpid());
 	
-	// Store the server PID.
-	{
-		std::ofstream pidfile("server.pid");
-		pidfile << getpid() << std::endl;
-	}
-
-	cptr = nullptr;
-	while (keep_looping) {
+	
+	for (;keep_looping;) {
+		
+		std::cerr << "Checking for errant servers running..." << std::endl;
+		
+		if (!connect_to_search_server()) {
+			std::cerr << "Search server already running.  Close this process and try again" << std::endl;
+			exit(1);
+		}
+		
+		if (!connect_to_page_server()) {
+			std::cerr << "Page server already running.  Close this process and try again" << std::endl;
+			exit(1);
+		}
+		
+		
+		std::cerr << "Check Succeeded" << std::endl;
+		if (page_server_pipe_stream) {
+			delete page_server_pipe_stream;			
+		}
+		page_server_pipe_stream = new ipstream();
+		page_server_ptr = new child(page_server_cmd, std_out > *page_server_pipe_stream);		
+		if (search_server_pipe_stream) {
+			delete search_server_pipe_stream;
+		}
+		search_server_pipe_stream = new ipstream();
+		search_server_ptr = new child(search_server_cmd, std_out > *search_server_pipe_stream);
+		
+		pidfile search_pidfile("search.pid", search_server_ptr->id());
+		pidfile page_pidfile("page.pid", page_server_ptr->id());
+		
+		mainserverlogline() << "Running " << page_server_cmd << " [" << page_server_ptr->id() << "]" << std::endl;
+		mainserverlogline() << "Running " << search_server_cmd << " [" << search_server_ptr->id() << "]" << std::endl;
+		child& page_server = *page_server_ptr;
+		child& search_server = *search_server_ptr;
+		
+		both_running = true;
+		
 		boost::this_thread::yield();
+		std::string line;
+
+		current_directory_writable = access(".", W_OK) == 0;
+		subserverlog.open("subserver.log", std::fstream::app);
+		searchserverlog.open("search.log", std::fstream::app);
+
+		cptr = &page_server;
+
+		boost::thread log_page_forwarding(forward_page_log);
+		boost::thread log_search_forwarding(forward_search_log);
+
+		int col = 0;
 		try {
-			std::string line;
-
-			current_directory_writable = access(".", W_OK) == 0;
-			subserverlog.open("subserver.log", std::fstream::app);
-			pipe_stream_ptr = new ipstream();
-
-			child c("node build/server.js", std_out > *pipe_stream_ptr);
-			
-			cptr = &c;
-			{
-				std::ofstream pidfile("subserver.pid");
-				pidfile << c.id() << std::endl;
-			}
-
-			mainserverlogline() << "Running node build/server.js [" << c.id() << "]" << std::endl;
-			boost::thread log_forwarding(forward_log);
-			int col = 0;
-			while (keep_looping && c.running() && !restart_subserver) {
+			while (both_running) {
 				boost::this_thread::sleep_for(boost::chrono::seconds(5));
 				if (verbose){
-					for (int k = 0; k < col; ++k) 
+					for (int k = 0; k < col; ++k)
 						std::cerr << " ";
 					std::cerr << "X" << std::endl << std::flush;
 					++col;
 					col = col % 10;
 				}
-				if (connect_to_subserver()) {
-					mainserverlogline() << "Could not get a page from subserver" << std::endl;
-					restart_subserver = true;
+				if (
+					
+						(
+							connect_to_search_server() &&
+							(mainserverlogline() << "Could not connect to search subserver" << std::endl)
+						)
+							||						
+						!search_server.running()				
+					) {
+					both_running = false;
+						break;
 				}
-			}
-			// what happened
-			if (!keep_looping) {
-				mainserverlogline() << "Manager process closing" << std::endl;
-			} else if (!c.running()) {
-				mainserverlogline() << "Subserver process closed" << std::endl;
-			} else {
-				mainserverlogline() << "Restarting subserver process" << std::endl;
-			}
-			if (c.running()) {
-				mainserverlogline() << "Sending the subserver the TERM signal..." << std::flush;
-				if (kill(c.id(), SIGTERM)) {
-					mainserverlog << "failed with " << strerror(errno);
-				} else {
-					mainserverlog << "done";
+				if (
+						(
+							connect_to_page_server() &&
+							(mainserverlogline() << "Could not get a page from page subserver" << std::endl) 
+						)
+						|| 
+						!page_server.running()
+					) {
+				both_running = false;
+					break;
 				}
-				mainserverlog << "." << std::endl;
-			}
-			log_forwarding.interrupt();
-			mainserverlogline() << "The subserver (PID " << c.id() << ") is " << (c.running() ? "" : "not ") <<  "running" << std::endl;
-			boost::this_thread::sleep_for(boost::chrono::seconds(10));
-			mainserverlogline() << "Sending the subserver the KILL signal..." << std::flush;
-			if (kill(c.id(), SIGKILL) != 0) {
-				mainserverlog << "failed with " << strerror(errno) << std::endl;
-			} else {
-				mainserverlog << "done";
-			}
-			mainserverlog << '.' << std::endl;
-			c.wait();
-			mainserverlogline() << "Process " << c.id() << " exited with status " << c.exit_code() << std::endl;
-			restart_subserver = false;
-			cptr = nullptr;
+			} // while
 		} catch (const boost::process::process_error& e) {
 			mainserverlogline() << "Process exception: " << e.what() << ".  Code:" << e.code() << std::endl;
 		}
+		kill(page_server.id(), SIGKILL);					
+		page_server.wait();
+		mainserverlogline() << "Process page server  " << page_server.id() << " exited with status " << page_server.exit_code() << std::endl;
+		kill(search_server.id(), SIGKILL);
+		search_server.wait();
+		
+		log_page_forwarding.join();
+		log_search_forwarding.join();
+		
+		mainserverlogline() << "Process search server " << search_server.id() << " exited with status " << page_server.exit_code() << std::endl;
+		
 		subserverlog.close();
-	} // while
-	cptr = nullptr;
-	if (current_directory_writable) {
-		unlink("subserver.pid");
-		unlink("server.pid");
+		searchserverlog.close();
+		
+		page_server_pipe_stream->close();
+		search_server_pipe_stream->close();
+		
+		delete search_server_ptr;
+		delete page_server_ptr;
+	
+		search_server_ptr = page_server_ptr = nullptr;
 	}
+	unlink("manager.pid");
 	mainserverlogline() << "Exiting Master Server" << std::endl;
 }
