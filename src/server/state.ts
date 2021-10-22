@@ -25,10 +25,11 @@ import {
 import { LIQUID_TOKEN_UPPERCASE } from "../client_config";
 import { TokenPropertiesMap } from "../common/store/hive-engine-tokens/types";
 import { langOptions } from "../common/i18n";
-
-const five_minutes = 300000;
-const ten_minutes = 600000;
-let storedHiveEngineTokensProperties: TokenPropertiesMap;
+const thirty_seconds = 30000;
+const one_minute = 60000;
+const five_minutes = 5 * one_minute;
+const ten_minutes = 10 * one_minute;
+let storedHiveEngineTokensProperties: TokenPropertiesMap = {};
 let storedInfos: { [id: string]: HiveEngineTokenInfo } = {};
 let storedConfigs: Array<HiveEngineTokenConfig> = [];
 let storedPrices: { [id: string]: number } = {};
@@ -36,6 +37,9 @@ let fetchingPrices: boolean = false;
 let lastStore: Date;
 let search_requests_allowed: undefined | number = undefined;
 const one_hundred_fifty_minutes = 15 * ten_minutes;
+
+// the normal time between updates of Hive-Engine Properties
+const hive_engine_token_properties_long_update_time = ten_minutes;
 
 const fetch_search_requests_allowed = async (): void => {
   console.log("fetching search requests allowed...");
@@ -68,6 +72,112 @@ const fetch_search_requests_allowed = async (): void => {
 fetch_search_requests_allowed();
 setInterval(fetch_search_requests_allowed, one_hundred_fifty_minutes);
 
+let fetch_interval_handle: any = setInterval(() => {}, 1000000);
+const fetch_hive_engine_token_information =
+  async (): Promise<TokenPropertiesMap> => {
+    let ret = storedHiveEngineTokensProperties;
+    clearInterval(fetch_interval_handle);
+    try {
+      if (ret && ret[LIQUID_TOKEN_UPPERCASE])
+        console.log("Loading tokens properties...");
+      else if (ret)
+        console.log(
+          `No ${LIQUID_TOKEN_UPPERCASE} token information stored.  Loading token properties...`
+        );
+      else
+        console.log(
+          `No token information stored.  Loading token properties...`
+        );
+      const prices: { [id: string]: number } = await getPrices([
+        LIQUID_TOKEN_UPPERCASE,
+      ]);
+      const POBTokenInfos = await getScotDataAsync<HiveEngineTokenInfo>(
+        "info",
+        {
+          token: LIQUID_TOKEN_UPPERCASE,
+        }
+      );
+      const POBTokenConfigs = await getScotDataAsync<HiveEngineTokenConfig>(
+        "config",
+        { token: LIQUID_TOKEN_UPPERCASE }
+      );
+      const tokensInfos = await getScotDataAsync<{
+        [coinname: string]: HiveEngineTokenInfo;
+      }>("info", {});
+      const tokensConfigs = await getScotDataAsync<
+        Array<HiveEngineTokenConfig>
+      >("config", {});
+      tokensInfos["POB"] = POBTokenInfos;
+      tokensConfigs.push(POBTokenConfigs);
+      if (tokensInfos && tokensConfigs && prices) {
+        for (const config of tokensConfigs) {
+          const token = config.token;
+          if (!tokensInfos[token] || !prices[token]) {
+            //console.log("Cannot get info or price for ", token);
+            continue;
+          }
+          ret[token] = {
+            info: tokensInfos[token],
+            config,
+            hivePrice: prices[token],
+          };
+        }
+        storedHiveEngineTokensProperties = {
+          ...storedHiveEngineTokensProperties,
+          ...ret,
+        };
+        if (ret[LIQUID_TOKEN_UPPERCASE]) {
+          console.log(
+            new Date(),
+            "scheduling next token property update for",
+            hive_engine_token_properties_long_update_time / one_minute,
+            "minutes from now"
+          );
+          fetch_interval_handle = setInterval(
+            fetch_hive_engine_token_information,
+            hive_engine_token_properties_long_update_time
+          );
+        } else {
+          console.log(
+            new Date(),
+            "scheduling next token property update for thirty seconds from now"
+          );
+          fetch_interval_handle = setInterval(
+            fetch_hive_engine_token_information,
+            thirty_seconds
+          );
+        }
+        console.log(
+          new Date(),
+          "Success loading HiveEngine Tokens Properties from API"
+        );
+      }
+    } catch (e) {
+      console.log(
+        new Date(),
+        "scheduling next token property update for thirty seconds from now"
+      );
+      fetch_interval_handle = setInterval(
+        fetch_hive_engine_token_information,
+        thirty_seconds
+      );
+    }
+    return storedHiveEngineTokensProperties;
+  };
+
+// The interval call wont wait the whole ten minutes, but it wont execute the fetch immediately either.
+// Prices do change throughout the day and it is better to have the data ready before some client makes a request.
+// So it is important to setup the Interval here and the explicit call here.
+
+let loadingHiveTokenInformation: boolean = false;
+if (!loadingHiveTokenInformation) {
+  loadingHiveTokenInformation = true;
+  console.log("Calling FETCH");
+  fetch_hive_engine_token_information().then((x: TokenPropertiesMap) => {
+    console.log("FETCH call succeeded");
+    loadingHiveTokenInformation = false;
+  });
+}
 export const makePreloadedState = async (
   req: express.Request
 ): Promise<AppState> => {
@@ -153,86 +263,20 @@ export const makePreloadedState = async (
       ? _c("list-style")
       : defaults.listStyle;
   const intro = !_c("hide-intro");
+
   let hiveEngineTokensProperties: TokenPropertiesMap =
     storedHiveEngineTokensProperties;
-  let tokensInfos, tokensConfigs, prices;
-
   try {
     if (
       storedHiveEngineTokensProperties &&
       storedHiveEngineTokensProperties[LIQUID_TOKEN_UPPERCASE]
     ) {
-      let newStore: Date;
-      if (
-        lastStore.getTime() + ten_minutes < (newStore = new Date()).getTime() &&
-        !fetchingPrices
-      ) {
-        // It's been five minutes since last update
-        console.log("Pulling new price data", lastStore, newStore);
-        fetchingPrices = true;
-        getPrices(undefined).then((prices) => {
-          try {
-            if (!prices) return;
-            storedPrices = { ...prices, ...storedPrices };
-            for (const token in prices) {
-              let config: HiveEngineTokenConfig | undefined;
-              if (hiveEngineTokensProperties[token]) {
-                hiveEngineTokensProperties[token].hivePrice = prices[token];
-              } else if (
-                storedInfos[token] &&
-                (config = storedConfigs.find((c) => c.token === token))
-              ) {
-                hiveEngineTokensProperties[token] = {
-                  info: storedInfos[token],
-                  config,
-                  hivePrice: prices[token],
-                };
-              }
-            } // for
-            lastStore = new Date();
-          } catch (e) {
-          } finally {
-            fetchingPrices = false;
-          }
-        });
-      }
+      console.log("Token information available.");
     } else {
       console.log(
-        "No token property information stored.  Loading tokens properties..."
+        "No token property information stored.  Loading tokens properties...",
+        Object.keys(storedHiveEngineTokensProperties)
       );
-      tokensInfos = await getScotDataAsync<{
-        [coinname: string]: HiveEngineTokenInfo;
-      }>("info", {});
-      tokensConfigs = await getScotDataAsync<Array<HiveEngineTokenConfig>>(
-        "config",
-        {}
-      );
-      prices = await getPrices(undefined);
-      let ret = storedHiveEngineTokensProperties || {};
-      if (tokensInfos && tokensConfigs && prices) {
-        // cache them all here.
-        storedInfos = tokensInfos;
-        storedConfigs = tokensConfigs;
-        storedPrices = prices;
-        for (const config of tokensConfigs) {
-          const token = config.token;
-          if (!tokensInfos[token] || !prices[token]) {
-            //console.log("Cannot get info or price for ", token);
-            continue;
-          }
-          ret[token] = {
-            info: tokensInfos[token],
-            config,
-            hivePrice: prices[token],
-          };
-        }
-        storedHiveEngineTokensProperties = hiveEngineTokensProperties = ret;
-        if (ret[LIQUID_TOKEN_UPPERCASE]) {
-          lastStore = new Date();
-          console.log({ lastStore });
-        }
-        console.log("Success loading HiveEngine Tokens Properties from API");
-      }
     }
   } catch (e) {
     hiveEngineTokensProperties = {};
