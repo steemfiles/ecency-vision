@@ -38,8 +38,8 @@ exports[`(1) Render 1`] = `
       >
         <a
           className="btn btn-primary"
-          href="https://signup.hive.io/"
-          target="signup"
+          href="/signup"
+          onClick={[Function]}
         >
           Get Started
         </a>

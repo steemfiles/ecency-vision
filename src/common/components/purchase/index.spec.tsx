@@ -21,7 +21,7 @@ jest.mock("../../api/private-api", () => ({
 }));
 
 const defProps = {
-  global: {...globalInstance, currencySymbol: "POINT"}, 
+  global: globalInstance,
   dynamicProps: dynamicPropsIntance1,
   users: [],
   activeUser: {
@@ -48,7 +48,7 @@ const defProps = {
 };
 
 it("(1) Purchase", async () => {
-  const renderer = TestRenderer.create(<Purchase {...defPropsm, asset="POINT"} />);
+  const renderer = TestRenderer.create(<Purchase {...defProps} />);
   await allOver();
   expect(renderer.toJSON()).toMatchSnapshot();
 });
