@@ -3,7 +3,7 @@ import { Community } from "../store/communities/types";
 import { Subscription } from "../store/subscriptions/types";
 import { AccountProfile } from "../store/accounts/types";
 import { enginifyPost } from "./hive-engine";
-import { client as hiveClient } from "./hive";
+import { hiveClient } from "./hive";
 const bridgeApiCall = <T>(endpoint: string, params: {}): Promise<T> =>
   hiveClient.call("bridge", endpoint, params);
 const resolvePost = (post: Entry, observer: string): Promise<Entry> => {

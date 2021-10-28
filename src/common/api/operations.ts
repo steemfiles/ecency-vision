@@ -7,7 +7,7 @@ import {
   CustomJsonOperation,
 } from "@hiveio/dhive";
 import { Parameters } from "hive-uri";
-import { client as hiveClient, HIVE_API_NAME } from "./hive";
+import { hiveClient, HIVE_API_NAME } from "./hive";
 import { Account } from "../store/accounts/types";
 import { usrActivity } from "./private-api";
 import { getAccessToken, getPostingKey } from "../helper/user-token";

@@ -31,7 +31,7 @@ export const HIVE_LANGUAGE_KEY = HIVE_API_NAME.toLowerCase();
 export const HIVE_HUMAN_NAME = TEST_NET ? "Tests" : "Hive";
 export const HIVE_HUMAN_NAME_UPPERCASE = TEST_NET ? "TESTS" : "HIVE";
 export const DOLLAR_HUMAN_NAME = DOLLAR_API_NAME;
-export const client = new Client(SERVERS, {
+export const hiveClient = new Client(SERVERS, {
   timeout: 4000,
   failoverThreshold: 10,
   consoleOnFailover: true,
@@ -80,17 +80,17 @@ export interface Follow {
   what: string[];
 }
 export const getPost = (username: string, permlink: string): Promise<any> =>
-  client.call("condenser_api", "get_content", [username, permlink]);
+  hiveClient.call("condenser_api", "get_content", [username, permlink]);
 export const getActiveVotes = (
   author: string,
   permlink: string
 ): Promise<Vote[]> =>
-  client.database.call("get_active_votes", [author, permlink]);
+  hiveClient.database.call("get_active_votes", [author, permlink]);
 export const getTrendingTags = (
   afterTag: string = "",
   limit: number = 250
 ): Promise<string[]> =>
-  client.database
+  hiveClient.database
     .call("get_trending_tags", [afterTag, limit])
     .then((tags: TrendingTag[]) => {
       return tags
@@ -99,9 +99,9 @@ export const getTrendingTags = (
         .map((x) => x.name);
     });
 export const lookupAccounts = (q: string, limit = 50): Promise<string[]> =>
-  client.database.call("lookup_accounts", [q, limit]);
+  hiveClient.database.call("lookup_accounts", [q, limit]);
 export const getAccounts = (usernames: string[]): Promise<FullAccount[]> => {
-  return client.database
+  return hiveClient.database
     .getAccounts(usernames)
     .then((resp: any[]): FullAccount[] =>
       resp.map((x) => {
@@ -175,14 +175,14 @@ export const getAccountFull = (username: string): Promise<FullAccount> =>
     return { ...account, follow_stats };
   });
 export const getFollowCount = (username: string): Promise<AccountFollowStats> =>
-  client.database.call("get_follow_count", [username]);
+  hiveClient.database.call("get_follow_count", [username]);
 export const getFollowing = (
   follower: string,
   startFollowing: string,
   followType = "blog",
   limit = 100
 ): Promise<Follow[]> =>
-  client.database.call("get_following", [
+  hiveClient.database.call("get_following", [
     follower,
     startFollowing,
     followType,
@@ -194,17 +194,17 @@ export const getFollowers = (
   followType = "blog",
   limit = 100
 ): Promise<Follow[]> =>
-  client.database.call("get_followers", [
+  hiveClient.database.call("get_followers", [
     following,
     startFollowing,
     followType,
     limit,
   ]);
 export const findRcAccounts = (username: string): Promise<RCAccount[]> =>
-  new RCAPI(client).findRCAccounts([username]);
+  new RCAPI(hiveClient).findRCAccounts([username]);
 export const getDynamicGlobalProperties =
   (): Promise<DynamicGlobalProperties> =>
-    client.database.getDynamicGlobalProperties().then((r: any) => ({
+    hiveClient.database.getDynamicGlobalProperties().then((r: any) => ({
       total_vesting_fund_hive:
         r.total_vesting_fund_hive || r.total_vesting_fund_steem,
       total_vesting_shares: r.total_vesting_shares,
@@ -214,7 +214,7 @@ export const getAccountHistory = (
   username: string,
   filters: any[]
 ): Promise<any> => {
-  return client.call("condenser_api", "get_account_history", [
+  return hiveClient.call("condenser_api", "get_account_history", [
     username,
     -1,
     500,
@@ -222,9 +222,9 @@ export const getAccountHistory = (
   ]);
 };
 export const getFeedHistory = (): Promise<FeedHistory> =>
-  client.database.call("get_feed_history");
+  hiveClient.database.call("get_feed_history");
 export const getRewardFund = (): Promise<RewardFund> =>
-  client.database.call("get_reward_fund", ["post"]);
+  hiveClient.database.call("get_reward_fund", ["post"]);
 export const getDynamicProps = async (): Promise<DynamicProps> => {
   const globalDynamic = await getDynamicGlobalProperties();
   const feedHistory = await getFeedHistory();
@@ -252,7 +252,7 @@ export const getVestingDelegations = (
   from: string = "",
   limit: number = 50
 ): Promise<DelegatedVestingShare[]> =>
-  client.database.call("get_vesting_delegations", [username, from, limit]);
+  hiveClient.database.call("get_vesting_delegations", [username, from, limit]);
 export interface Witness {
   total_missed: number;
   url: string;
@@ -272,7 +272,7 @@ export const getWitnessesByVote = (
   from: string = "",
   limit: number = 50
 ): Promise<Witness[]> =>
-  client.call("condenser_api", "get_witnesses_by_vote", [from, limit]);
+  hiveClient.call("condenser_api", "get_witnesses_by_vote", [from, limit]);
 export interface Proposal {
   creator: string;
   daily_pay: {
@@ -291,7 +291,7 @@ export interface Proposal {
   total_votes: string;
 }
 export const getProposals = (): Promise<Proposal[]> =>
-  client
+  hiveClient
     .call("database_api", "list_proposals", {
       start: [-1],
       limit: 200,
@@ -310,7 +310,7 @@ export const getProposalVotes = (
   voter: string = "",
   limit: number = 300
 ): Promise<ProposalVote[]> =>
-  client
+  hiveClient
     .call("condenser_api", "list_proposal_votes", [
       [proposalId, voter],
       limit,
@@ -328,10 +328,10 @@ export interface WithdrawRoute {
   to_account: string;
 }
 export const getWithdrawRoutes = (account: string): Promise<WithdrawRoute[]> =>
-  client.database.call("get_withdraw_routes", [account, "outgoing"]);
+  hiveClient.database.call("get_withdraw_routes", [account, "outgoing"]);
 export const votingPower = (account: FullAccount): number => {
   // @ts-ignore "Account" is compatible with dhive's "ExtendedAccount"
-  const calc = client.rc.calculateVPMana(account);
+  const calc = hiveClient.rc.calculateVPMana(account);
   const { percentage } = calc;
   return percentage / 100;
 };
@@ -368,7 +368,7 @@ export const downVotingPower = (account: FullAccount): number => {
   return rv;
 };
 export const rcPower = (account: RCAccount): number => {
-  const calc = client.rc.calculateRCMana(account);
+  const calc = hiveClient.rc.calculateRCMana(account);
   const { percentage } = calc;
   return percentage / 100;
 };
@@ -382,7 +382,7 @@ export interface ConversionRequest {
 export const getConversionRequests = (
   account: string
 ): Promise<ConversionRequest[]> =>
-  client.database.call("get_conversion_requests", [account]);
+  hiveClient.database.call("get_conversion_requests", [account]);
 export interface CollateralizedConversionRequest {
   collateral_amount: string;
   conversion_date: string;
@@ -394,7 +394,7 @@ export interface CollateralizedConversionRequest {
 export const getCollateralizedConversionRequests = (
   account: string
 ): Promise<CollateralizedConversionRequest[]> =>
-  client.database.call("get_collateralized_conversion_requests", [account]);
+  hiveClient.database.call("get_collateralized_conversion_requests", [account]);
 export interface BlogEntry {
   blog: string;
   entry_id: number;
@@ -406,7 +406,7 @@ export const getBlogEntries = (
   username: string,
   limit: number = 50
 ): Promise<BlogEntry[]> =>
-  client.call("condenser_api", "get_blog_entries", [username, 0, limit]);
+  hiveClient.call("condenser_api", "get_blog_entries", [username, 0, limit]);
 export const HIVE_COLLATERALIZED_CONVERSION_FEE = 0.05;
 export const HIVE_CONVERSION_COLLATERAL_RATIO = 2;
 export interface Price {

@@ -46,7 +46,7 @@ import { getCommunities, getSubscriptions } from "../api/bridge";
 import { formatError, updateCommunity, setUserRole } from "../api/operations";
 import { hsTokenRenew } from "../api/auth-api";
 
-import { client } from "../api/hive";
+import { hiveClient } from "../api/hive";
 
 import * as keychain from "../helper/keychain";
 
@@ -269,7 +269,7 @@ class CommunityCreatePage extends BaseComponent<PageProps, CreateState> {
   _timer: any = null;
 
   componentDidMount() {
-    client.database.getChainProperties().then((r) => {
+    hiveClient.database.getChainProperties().then((r) => {
       const asset = parseAsset(r.account_creation_fee.toString());
       const fee = `${numeral(asset.amount).format("0.000")} ${asset.symbol}`;
       this.stateSet({ fee });
@@ -408,7 +408,7 @@ class CommunityCreatePage extends BaseComponent<PageProps, CreateState> {
     const operation = this.makeOperation(auths, keys.memoKey);
 
     try {
-      await client.broadcast.sendOperations([operation], creatorKey);
+      await hiveClient.broadcast.sendOperations([operation], creatorKey);
     } catch (e) {
       error(formatError(e));
       this.stateSet({ inProgress: false, progress: "" });
