@@ -5,6 +5,7 @@ import {
   TransactionConfirmation,
   AccountUpdateOperation,
   CustomJsonOperation,
+  Client,
 } from "@hiveio/dhive";
 import { Parameters } from "hive-uri";
 import { hiveClient, HIVE_API_NAME } from "./hive";
@@ -108,6 +109,7 @@ const broadcastPostingJSON = (
 };
 const broadcastPostingOperations = (
   username: string,
+  client: Client,
   operations: Operation[]
 ): Promise<TransactionConfirmation> => {
   // With posting private key
@@ -173,7 +175,7 @@ export const comment = (
     const e: Operation = ["comment_options", options];
     opArray.push(e);
   }
-  return broadcastPostingOperations(username, opArray).then((r) => {
+  return broadcastPostingOperations(username, hiveClient, opArray).then((r) => {
     if (point) {
       const t = title ? 100 : 110;
       usrActivity(username, t, r.block_num, r.id).then();
@@ -191,7 +193,7 @@ export const deleteComment = (
     permlink,
   };
   const opArray: Operation[] = [["delete_comment", params]];
-  return broadcastPostingOperations(username, opArray);
+  return broadcastPostingOperations(username, hiveClient, opArray);
 };
 export const vote = (
   username: string,
@@ -206,7 +208,7 @@ export const vote = (
     weight,
   };
   const opArray: Operation[] = [["vote", params]];
-  return broadcastPostingOperations(username, opArray).then(
+  return broadcastPostingOperations(username, hiveClient, opArray).then(
     (r: TransactionConfirmation) => {
       usrActivity(username, 120, r.block_num, r.id).then();
       return r;
@@ -268,7 +270,7 @@ export const claimRewardBalance = (
     reward_vests: rewardVests,
   };
   const opArray: Operation[] = [["claim_reward_balance", params]];
-  return broadcastPostingOperations(username, opArray);
+  return broadcastPostingOperations(username, hiveClient, opArray);
 };
 export const claimRewardBalanceHiveEngineAssetJSON = (
   from: string,
@@ -299,7 +301,7 @@ export const claimHiveEngineRewardBalance = (
     required_posting_auths: [from],
   };
   const opArray: Operation[] = [["custom_json", params]];
-  return broadcastPostingOperations(from, opArray);
+  return broadcastPostingOperations(from, hiveClient, opArray);
 };
 /*
 export const HECustomJSONWithPostingKey = (key: PrivateKey, from:string, json: string): Promise<TransactionConfirmation> => {
@@ -1431,7 +1433,7 @@ export const updateProfile = (
     extensions: [],
   };
   const opArray: Operation[] = [["account_update2", params]];
-  return broadcastPostingOperations(account.name, opArray);
+  return broadcastPostingOperations(account.name, hiveClient, opArray);
 };
 export const grantPostingPermission = (
   key: PrivateKey,
