@@ -54,7 +54,7 @@ exports[`(1) Default render 1`] = `
       />
       <span
         className="date"
-        title="Monday, June 1, 2020 10:53 AM"
+        title="Monday, June 1, 2020 2:53 AM"
       >
         5 days
       </span>
@@ -146,7 +146,7 @@ exports[`(1) Default render 1`] = `
         onMouseOut={[Function]}
         onMouseOver={[Function]}
       >
-        $ 125.10
+        $ 125.095
       </div>
       <div
         className="entry-votes notranslate"
@@ -294,7 +294,7 @@ exports[`(2) Grid view 1`] = `
       />
       <span
         className="date"
-        title="Monday, June 1, 2020 10:53 AM"
+        title="Monday, June 1, 2020 2:53 AM"
       >
         5 days
       </span>
@@ -385,7 +385,7 @@ exports[`(2) Grid view 1`] = `
         onMouseOut={[Function]}
         onMouseOver={[Function]}
       >
-        $ 125.10
+        $ 125.095
       </div>
       <div
         className="entry-votes notranslate"
@@ -533,7 +533,7 @@ exports[`(3) Nsfw 1`] = `
       />
       <span
         className="date"
-        title="Monday, June 1, 2020 10:53 AM"
+        title="Monday, June 1, 2020 2:53 AM"
       >
         5 days
       </span>
@@ -575,14 +575,12 @@ exports[`(3) Nsfw 1`] = `
           Reveal this post
         </a>
          
-         
         or
-         
          
         <span
           dangerouslySetInnerHTML={
             Object {
-              "__html": "<a href=\\"/signup\\" class=\\"push-link\\">create an account</a> to save your preferences",
+              "__html": "<a href=\\"https://signup.hive.io/\\" target=\\"signup\\" class=\\"push-link\\">create an account</a> to save your preferences",
             }
           }
         />
@@ -631,7 +629,7 @@ exports[`(3) Nsfw 1`] = `
         onMouseOut={[Function]}
         onMouseOver={[Function]}
       >
-        $ 125.10
+        $ 125.095
       </div>
       <div
         className="entry-votes notranslate"
@@ -779,7 +777,7 @@ exports[`(4) Nsfw with active user 1`] = `
       />
       <span
         className="date"
-        title="Monday, June 1, 2020 10:53 AM"
+        title="Monday, June 1, 2020 2:53 AM"
       >
         5 days
       </span>
@@ -821,9 +819,7 @@ exports[`(4) Nsfw with active user 1`] = `
           Reveal this post
         </a>
          
-         
         or
-         
          
         adjust your
          
@@ -876,7 +872,7 @@ exports[`(4) Nsfw with active user 1`] = `
         onMouseOut={[Function]}
         onMouseOver={[Function]}
       >
-        $ 125.10
+        $ 125.095
       </div>
       <div
         className="entry-votes notranslate"
@@ -1024,7 +1020,7 @@ exports[`(5) Nsfw but allowed 1`] = `
       />
       <span
         className="date"
-        title="Monday, June 1, 2020 10:53 AM"
+        title="Monday, June 1, 2020 2:53 AM"
       >
         5 days
       </span>
@@ -1116,7 +1112,7 @@ exports[`(5) Nsfw but allowed 1`] = `
         onMouseOut={[Function]}
         onMouseOver={[Function]}
       >
-        $ 125.10
+        $ 125.095
       </div>
       <div
         className="entry-votes notranslate"
@@ -1296,7 +1292,7 @@ exports[`(6) Cross post. Bottom menu 1`] = `
       />
       <span
         className="date"
-        title="Wednesday, March 24, 2021 9:14 PM"
+        title="Wednesday, March 24, 2021 1:14 PM"
       >
         10 months
       </span>
@@ -1388,7 +1384,7 @@ exports[`(6) Cross post. Bottom menu 1`] = `
         onMouseOut={[Function]}
         onMouseOver={[Function]}
       >
-        $ 5.95
+        $ 5.946
       </div>
       <div
         className="entry-votes notranslate"

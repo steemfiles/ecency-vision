@@ -79,7 +79,7 @@ exports[`(1) Default render 1`] = `
             </a>
             <span
               className="date"
-              title="Tuesday, July 7, 2020 9:03 PM"
+              title="Tuesday, July 7, 2020 1:03 PM"
             >
               a month
             </span>
@@ -135,7 +135,7 @@ Integration examples to get started: Esteem/
               href="/ecency/@good-karma/imagehoster-hivesigner-and-condenser-bounty"
               onClick={[Function]}
             >
-              $ 156.26
+              $ 156.262
             </a>
             <a
               className="result-votes"
@@ -222,7 +222,7 @@ Integration examples to get started: Esteem/
             </a>
             <span
               className="date"
-              title="Friday, August 14, 2020 9:57 PM"
+              title="Friday, August 14, 2020 1:57 PM"
             >
               2 months
             </span>
@@ -285,7 +285,7 @@ No beneficiaries, that's right, we are removing 1% beneficiary reward.
               href="/ecency/@ecency/ecency-vision-no-beneficiaries-drafts-gallery-bookmarks"
               onClick={[Function]}
             >
-              $ 154.40
+              $ 154.396
             </a>
             <a
               className="result-votes"
@@ -372,7 +372,7 @@ No beneficiaries, that's right, we are removing 1% beneficiary reward.
             </a>
             <span
               className="date"
-              title="Wednesday, June 17, 2020 3:44 PM"
+              title="Wednesday, June 17, 2020 7:44 AM"
             >
               11 days
             </span>
@@ -425,7 +425,7 @@ No beneficiaries, that's right, we are removing 1% beneficiary reward.
               href="/ecency/@good-karma/from-esteem-search-to-hivesearcher"
               onClick={[Function]}
             >
-              $ 150.91
+              $ 150.911
             </a>
             <a
               className="result-votes"
@@ -512,7 +512,7 @@ No beneficiaries, that's right, we are removing 1% beneficiary reward.
             </a>
             <span
               className="date"
-              title="Friday, July 17, 2020 4:35 PM"
+              title="Friday, July 17, 2020 8:35 AM"
             >
               a month
             </span>
@@ -570,7 +570,7 @@ We are 5 days away from official release of
               href="/ecency/@ecency/ecency-development-update-17-07-2020"
               onClick={[Function]}
             >
-              $ 141.37
+              $ 141.374
             </a>
             <a
               className="result-votes"
@@ -657,7 +657,7 @@ We are 5 days away from official release of
             </a>
             <span
               className="date"
-              title="Thursday, May 21, 2020 2:50 PM"
+              title="Thursday, May 21, 2020 6:50 AM"
             >
               16 days
             </span>
@@ -715,7 +715,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
               href="/hive/@good-karma/open-search-engine-development-and-maintenance"
               onClick={[Function]}
             >
-              $ 141.30
+              $ 141.303
             </a>
             <a
               className="result-votes"
@@ -802,7 +802,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
             </a>
             <span
               className="date"
-              title="Friday, July 10, 2020 9:31 AM"
+              title="Friday, July 10, 2020 1:31 AM"
             >
               a month
             </span>
@@ -858,7 +858,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
               href="/ecency/@ecency/ecency-development-update-09-07-2020"
               onClick={[Function]}
             >
-              $ 140.63
+              $ 140.633
             </a>
             <a
               className="result-votes"
@@ -945,7 +945,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
             </a>
             <span
               className="date"
-              title="Wednesday, July 22, 2020 8:31 PM"
+              title="Wednesday, July 22, 2020 12:31 PM"
             >
               2 months
             </span>
@@ -1002,7 +1002,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
               href="/ecency/@ecency/announcing-ecency-vision"
               onClick={[Function]}
             >
-              $ 117.54
+              $ 117.543
             </a>
             <a
               className="result-votes"
@@ -1089,7 +1089,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
             </a>
             <span
               className="date"
-              title="Saturday, August 1, 2020 7:23 PM"
+              title="Saturday, August 1, 2020 11:23 AM"
             >
               2 months
             </span>
@@ -1153,7 +1153,7 @@ Better onboarding, delegation request for new accounts, new accounts who run out
               href="/ecency/@ecency/ecency-mobile-rebrand-better-onboarding-communities-and-more"
               onClick={[Function]}
             >
-              $ 116.31
+              $ 116.305
             </a>
             <a
               className="result-votes"
@@ -1275,7 +1275,7 @@ exports[`(2) With limit 1`] = `
             </a>
             <span
               className="date"
-              title="Tuesday, July 7, 2020 9:03 PM"
+              title="Tuesday, July 7, 2020 1:03 PM"
             >
               a month
             </span>
@@ -1331,7 +1331,7 @@ Integration examples to get started: Esteem/
               href="/ecency/@good-karma/imagehoster-hivesigner-and-condenser-bounty"
               onClick={[Function]}
             >
-              $ 156.26
+              $ 156.262
             </a>
             <a
               className="result-votes"
@@ -1418,7 +1418,7 @@ Integration examples to get started: Esteem/
             </a>
             <span
               className="date"
-              title="Friday, August 14, 2020 9:57 PM"
+              title="Friday, August 14, 2020 1:57 PM"
             >
               2 months
             </span>
@@ -1481,7 +1481,7 @@ No beneficiaries, that's right, we are removing 1% beneficiary reward.
               href="/ecency/@ecency/ecency-vision-no-beneficiaries-drafts-gallery-bookmarks"
               onClick={[Function]}
             >
-              $ 154.40
+              $ 154.396
             </a>
             <a
               className="result-votes"
@@ -1568,7 +1568,7 @@ No beneficiaries, that's right, we are removing 1% beneficiary reward.
             </a>
             <span
               className="date"
-              title="Wednesday, June 17, 2020 3:44 PM"
+              title="Wednesday, June 17, 2020 7:44 AM"
             >
               11 days
             </span>
@@ -1621,7 +1621,7 @@ No beneficiaries, that's right, we are removing 1% beneficiary reward.
               href="/ecency/@good-karma/from-esteem-search-to-hivesearcher"
               onClick={[Function]}
             >
-              $ 150.91
+              $ 150.911
             </a>
             <a
               className="result-votes"
@@ -1708,7 +1708,7 @@ No beneficiaries, that's right, we are removing 1% beneficiary reward.
             </a>
             <span
               className="date"
-              title="Friday, July 17, 2020 4:35 PM"
+              title="Friday, July 17, 2020 8:35 AM"
             >
               a month
             </span>
@@ -1766,7 +1766,7 @@ We are 5 days away from official release of
               href="/ecency/@ecency/ecency-development-update-17-07-2020"
               onClick={[Function]}
             >
-              $ 141.37
+              $ 141.374
             </a>
             <a
               className="result-votes"
@@ -1853,7 +1853,7 @@ We are 5 days away from official release of
             </a>
             <span
               className="date"
-              title="Thursday, May 21, 2020 2:50 PM"
+              title="Thursday, May 21, 2020 6:50 AM"
             >
               16 days
             </span>
@@ -1911,7 +1911,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
               href="/hive/@good-karma/open-search-engine-development-and-maintenance"
               onClick={[Function]}
             >
-              $ 141.30
+              $ 141.303
             </a>
             <a
               className="result-votes"
@@ -1998,7 +1998,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
             </a>
             <span
               className="date"
-              title="Friday, July 10, 2020 9:31 AM"
+              title="Friday, July 10, 2020 1:31 AM"
             >
               a month
             </span>
@@ -2054,7 +2054,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
               href="/ecency/@ecency/ecency-development-update-09-07-2020"
               onClick={[Function]}
             >
-              $ 140.63
+              $ 140.633
             </a>
             <a
               className="result-votes"
@@ -2141,7 +2141,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
             </a>
             <span
               className="date"
-              title="Wednesday, July 22, 2020 8:31 PM"
+              title="Wednesday, July 22, 2020 12:31 PM"
             >
               2 months
             </span>
@@ -2198,7 +2198,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
               href="/ecency/@ecency/announcing-ecency-vision"
               onClick={[Function]}
             >
-              $ 117.54
+              $ 117.543
             </a>
             <a
               className="result-votes"
@@ -2285,7 +2285,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
             </a>
             <span
               className="date"
-              title="Saturday, August 1, 2020 7:23 PM"
+              title="Saturday, August 1, 2020 11:23 AM"
             >
               2 months
             </span>
@@ -2349,7 +2349,7 @@ Better onboarding, delegation request for new accounts, new accounts who run out
               href="/ecency/@ecency/ecency-mobile-rebrand-better-onboarding-communities-and-more"
               onClick={[Function]}
             >
-              $ 116.31
+              $ 116.305
             </a>
             <a
               className="result-votes"
@@ -2481,7 +2481,7 @@ exports[`(3) Hide show more button 1`] = `
             </a>
             <span
               className="date"
-              title="Tuesday, July 7, 2020 9:03 PM"
+              title="Tuesday, July 7, 2020 1:03 PM"
             >
               a month
             </span>
@@ -2537,7 +2537,7 @@ Integration examples to get started: Esteem/
               href="/ecency/@good-karma/imagehoster-hivesigner-and-condenser-bounty"
               onClick={[Function]}
             >
-              $ 156.26
+              $ 156.262
             </a>
             <a
               className="result-votes"
@@ -2624,7 +2624,7 @@ Integration examples to get started: Esteem/
             </a>
             <span
               className="date"
-              title="Friday, August 14, 2020 9:57 PM"
+              title="Friday, August 14, 2020 1:57 PM"
             >
               2 months
             </span>
@@ -2687,7 +2687,7 @@ No beneficiaries, that's right, we are removing 1% beneficiary reward.
               href="/ecency/@ecency/ecency-vision-no-beneficiaries-drafts-gallery-bookmarks"
               onClick={[Function]}
             >
-              $ 154.40
+              $ 154.396
             </a>
             <a
               className="result-votes"
@@ -2774,7 +2774,7 @@ No beneficiaries, that's right, we are removing 1% beneficiary reward.
             </a>
             <span
               className="date"
-              title="Wednesday, June 17, 2020 3:44 PM"
+              title="Wednesday, June 17, 2020 7:44 AM"
             >
               11 days
             </span>
@@ -2827,7 +2827,7 @@ No beneficiaries, that's right, we are removing 1% beneficiary reward.
               href="/ecency/@good-karma/from-esteem-search-to-hivesearcher"
               onClick={[Function]}
             >
-              $ 150.91
+              $ 150.911
             </a>
             <a
               className="result-votes"
@@ -2914,7 +2914,7 @@ No beneficiaries, that's right, we are removing 1% beneficiary reward.
             </a>
             <span
               className="date"
-              title="Friday, July 17, 2020 4:35 PM"
+              title="Friday, July 17, 2020 8:35 AM"
             >
               a month
             </span>
@@ -2972,7 +2972,7 @@ We are 5 days away from official release of
               href="/ecency/@ecency/ecency-development-update-17-07-2020"
               onClick={[Function]}
             >
-              $ 141.37
+              $ 141.374
             </a>
             <a
               className="result-votes"
@@ -3059,7 +3059,7 @@ We are 5 days away from official release of
             </a>
             <span
               className="date"
-              title="Thursday, May 21, 2020 2:50 PM"
+              title="Thursday, May 21, 2020 6:50 AM"
             >
               16 days
             </span>
@@ -3117,7 +3117,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
               href="/hive/@good-karma/open-search-engine-development-and-maintenance"
               onClick={[Function]}
             >
-              $ 141.30
+              $ 141.303
             </a>
             <a
               className="result-votes"
@@ -3204,7 +3204,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
             </a>
             <span
               className="date"
-              title="Friday, July 10, 2020 9:31 AM"
+              title="Friday, July 10, 2020 1:31 AM"
             >
               a month
             </span>
@@ -3260,7 +3260,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
               href="/ecency/@ecency/ecency-development-update-09-07-2020"
               onClick={[Function]}
             >
-              $ 140.63
+              $ 140.633
             </a>
             <a
               className="result-votes"
@@ -3347,7 +3347,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
             </a>
             <span
               className="date"
-              title="Wednesday, July 22, 2020 8:31 PM"
+              title="Wednesday, July 22, 2020 12:31 PM"
             >
               2 months
             </span>
@@ -3404,7 +3404,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
               href="/ecency/@ecency/announcing-ecency-vision"
               onClick={[Function]}
             >
-              $ 117.54
+              $ 117.543
             </a>
             <a
               className="result-votes"
@@ -3491,7 +3491,7 @@ Right now, Search engine is used by all major frontends, Hive.blog, Peakd.com an
             </a>
             <span
               className="date"
-              title="Saturday, August 1, 2020 7:23 PM"
+              title="Saturday, August 1, 2020 11:23 AM"
             >
               2 months
             </span>
@@ -3555,7 +3555,7 @@ Better onboarding, delegation request for new accounts, new accounts who run out
               href="/ecency/@ecency/ecency-mobile-rebrand-better-onboarding-communities-and-more"
               onClick={[Function]}
             >
-              $ 116.31
+              $ 116.305
             </a>
             <a
               className="result-votes"

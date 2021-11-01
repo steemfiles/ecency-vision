@@ -7,6 +7,7 @@ Object {
   "data": Object {
     "name": "foo",
   },
+  "hiveEngineBalances": Array [],
   "points": Object {
     "points": "0.000",
     "uPoints": "0.000",
@@ -91,6 +92,7 @@ Object {
       "weight_threshold": 1,
     },
     "posting_json_metadata": "{\\"profile\\":{\\"name\\":\\"Talha B.\\",\\"about\\":\\"Founder @runkod, Software Developer @ecency, Lifelong Learner\\",\\"cover_image\\":\\"https://images.ecency.com/DQmTsFJJV7gXpsHNatEWz1vgzykaM4WByxAgLMzWshmXNrj/cover.jpg\\",\\"profile_image\\":\\"https://images.ecency.com/DQmV2J1oAUoKxjyJQTu3TcZfGxDr5fzajMGhHEd1e1GALca/ben.jpg\\",\\"website\\":\\"https://github.com/talhasch\\",\\"location\\":\\"Istanbul\\",\\"version\\":2}}",
+    "prices": Object {},
     "profile": Object {
       "about": "Founder @runkod, Software Developer @ecency, Lifelong Learner",
       "cover_image": "https://images.ecency.com/DQmTsFJJV7gXpsHNatEWz1vgzykaM4WByxAgLMzWshmXNrj/cover.jpg",
@@ -115,6 +117,14 @@ Object {
     "savings_balance": "1.000 HIVE",
     "savings_hbd_balance": "0.002 HBD",
     "to_withdraw": "87017000000",
+    "token_balances": Array [],
+    "token_delegations": undefined,
+    "token_statuses": Object {
+      "data": Object {},
+      "hiveData": Object {},
+    },
+    "token_unstakes": Array [],
+    "transfer_history": null,
     "vesting_shares": "151590.952150 VESTS",
     "vesting_withdraw_rate": "0.000000 VESTS",
     "voting_manabar": Object {
@@ -129,6 +139,7 @@ Object {
       "gtg",
     ],
   },
+  "hiveEngineBalances": Array [],
   "points": Object {
     "points": "0.100",
     "uPoints": "0.200",

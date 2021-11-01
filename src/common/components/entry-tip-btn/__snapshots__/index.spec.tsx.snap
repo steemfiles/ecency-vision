@@ -173,10 +173,10 @@ exports[`(2) Dialog 1`] = `
               HBD
             </a>
             <a
-              className="asset selected"
+              className="asset "
               onClick={[Function]}
             >
-              POINT
+              POB
             </a>
           </div>
         </div>
@@ -201,7 +201,7 @@ exports[`(2) Dialog 1`] = `
               className="balance-num"
               onClick={[Function]}
             >
-              200.000
+              200
                
               POINT
             </span>

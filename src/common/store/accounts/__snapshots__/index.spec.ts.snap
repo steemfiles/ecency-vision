@@ -2,30 +2,12 @@
 
 exports[`1- default state 1`] = `Array []`;
 
-exports[`2- addAct - should add account 1`] = `
-Array [
-  Object {
-    "name": "user1",
-  },
-]
-`;
+exports[`2- addAct - should add account 1`] = `Array []`;
 
-exports[`3- addAct - should add account 1`] = `
-Array [
-  Object {
-    "name": "user1",
-  },
-  Object {
-    "name": "user2",
-  },
-]
-`;
+exports[`3- addAct - should add account 1`] = `Array []`;
 
 exports[`4- addAct - should update account 1`] = `
 Array [
-  Object {
-    "name": "user2",
-  },
   Object {
     "__loaded": true,
     "active": Object {
@@ -100,6 +82,7 @@ Array [
       "weight_threshold": 1,
     },
     "posting_json_metadata": "{\\"profile\\":{\\"name\\":\\"Talha B.\\",\\"about\\":\\"Founder @runkod, Software Developer @ecency, Lifelong Learner\\",\\"cover_image\\":\\"https://images.ecency.com/DQmTsFJJV7gXpsHNatEWz1vgzykaM4WByxAgLMzWshmXNrj/cover.jpg\\",\\"profile_image\\":\\"https://images.ecency.com/DQmV2J1oAUoKxjyJQTu3TcZfGxDr5fzajMGhHEd1e1GALca/ben.jpg\\",\\"website\\":\\"https://github.com/talhasch\\",\\"location\\":\\"Istanbul\\",\\"version\\":2}}",
+    "prices": Object {},
     "profile": Object {
       "about": "Founder @runkod, Software Developer @ecency, Lifelong Learner",
       "cover_image": "https://images.ecency.com/DQmTsFJJV7gXpsHNatEWz1vgzykaM4WByxAgLMzWshmXNrj/cover.jpg",
@@ -124,6 +107,14 @@ Array [
     "savings_balance": "1.000 HIVE",
     "savings_hbd_balance": "0.002 HBD",
     "to_withdraw": "87017000000",
+    "token_balances": Array [],
+    "token_delegations": undefined,
+    "token_statuses": Object {
+      "data": Object {},
+      "hiveData": Object {},
+    },
+    "token_unstakes": Array [],
+    "transfer_history": null,
     "vesting_shares": "151590.952150 VESTS",
     "vesting_withdraw_rate": "0.000000 VESTS",
     "voting_manabar": Object {

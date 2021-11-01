@@ -251,7 +251,7 @@ exports[`(2) Should switch to transfer 1`] = `
               className="asset "
               onClick={[Function]}
             >
-              POINT
+              POB
             </a>
           </div>
         </div>

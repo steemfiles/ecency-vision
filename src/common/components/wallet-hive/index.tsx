@@ -110,6 +110,8 @@ export class WalletHive extends BaseComponent<Props, State> {
       this.stateSet({ converting });
     });
 
+    // typescript broken here.
+    // @ts-ignore
     getCollateralizedConversionRequests(account.name).then((rs) => {
       let collaterializedConverting = 0;
       for (const r of rs) {

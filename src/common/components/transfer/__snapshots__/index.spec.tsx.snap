@@ -133,7 +133,7 @@ exports[`(1) Transfer HIVE (1) Step 1 1`] = `
               onChange={[Function]}
               placeholder="amount"
               type="text"
-              value="0.001"
+              value=""
             />
           </div>
           <div
@@ -155,7 +155,7 @@ exports[`(1) Transfer HIVE (1) Step 1 1`] = `
               className="asset "
               onClick={[Function]}
             >
-              POINT
+              POB
             </a>
           </div>
         </div>
@@ -324,9 +324,7 @@ exports[`(1) Transfer HIVE (2) Step 2 1`] = `
         <div
           className="amount"
         >
-          0.001
-           
-          HIVE
+          NaN HIVE
         </div>
         
       </div>
@@ -516,7 +514,7 @@ exports[`(1) Transfer HIVE (4) Step 4 1`] = `
         className="success"
         dangerouslySetInnerHTML={
           Object {
-            "__html": "<span class=\\"amount\\">0.001 HIVE</span> transferred from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
+            "__html": "<span class=\\"amount\\"> HIVE</span> transferred from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
           }
         }
       />
@@ -681,7 +679,7 @@ exports[`(2) Transfer HBD (1) Step 1 1`] = `
               onChange={[Function]}
               placeholder="amount"
               type="text"
-              value="0.001"
+              value=""
             />
           </div>
           <div
@@ -703,7 +701,7 @@ exports[`(2) Transfer HBD (1) Step 1 1`] = `
               className="asset "
               onClick={[Function]}
             >
-              POINT
+              POB
             </a>
           </div>
         </div>
@@ -872,9 +870,7 @@ exports[`(2) Transfer HBD (2) Step 2 1`] = `
         <div
           className="amount"
         >
-          0.001
-           
-          HBD
+          NaN HBD
         </div>
         <div
           className="memo"
@@ -947,7 +943,7 @@ exports[`(2) Transfer HBD (4) Step 4 1`] = `
         className="success"
         dangerouslySetInnerHTML={
           Object {
-            "__html": "<span class=\\"amount\\">0.001 HBD</span> transferred from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
+            "__html": "<span class=\\"amount\\"> HBD</span> transferred from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
           }
         }
       />
@@ -1112,7 +1108,7 @@ exports[`(3) Transfer POINT (1) Step 1 1`] = `
               onChange={[Function]}
               placeholder="amount"
               type="text"
-              value="0.001"
+              value=""
             />
           </div>
           <div
@@ -1131,10 +1127,10 @@ exports[`(3) Transfer POINT (1) Step 1 1`] = `
               HBD
             </a>
             <a
-              className="asset selected"
+              className="asset "
               onClick={[Function]}
             >
-              POINT
+              POB
             </a>
           </div>
         </div>
@@ -1159,7 +1155,7 @@ exports[`(3) Transfer POINT (1) Step 1 1`] = `
               className="balance-num"
               onClick={[Function]}
             >
-              10.000
+              10
                
               POINT
             </span>
@@ -1303,9 +1299,7 @@ exports[`(3) Transfer POINT (2) Step 2 1`] = `
         <div
           className="amount"
         >
-          0.001
-           
-          POINT
+          NaN POINT
         </div>
         
       </div>
@@ -1374,7 +1368,7 @@ exports[`(3) Transfer POINT (4) Step 4 1`] = `
         className="success"
         dangerouslySetInnerHTML={
           Object {
-            "__html": "<span class=\\"amount\\">0.001 POINT</span> transferred from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
+            "__html": "<span class=\\"amount\\"> POINT</span> transferred from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
           }
         }
       />
@@ -1539,7 +1533,7 @@ exports[`(4) Transfer to Savings - HBD (1) Step 1 1`] = `
               onChange={[Function]}
               placeholder="amount"
               type="text"
-              value="0.001"
+              value=""
             />
           </div>
           <div
@@ -1627,7 +1621,7 @@ exports[`(4) Transfer to Savings - HBD (1) Step 1 1`] = `
         >
           <button
             className="btn btn-primary"
-            disabled={false}
+            disabled={true}
             onClick={[Function]}
             type="button"
           >
@@ -1724,9 +1718,7 @@ exports[`(4) Transfer to Savings - HBD (2) Step 2 1`] = `
         <div
           className="amount"
         >
-          0.001
-           
-          HBD
+          NaN HBD
         </div>
         
       </div>
@@ -1795,7 +1787,7 @@ exports[`(4) Transfer to Savings - HBD (4) Step 4 1`] = `
         className="success"
         dangerouslySetInnerHTML={
           Object {
-            "__html": "<span class=\\"amount\\">0.001 HBD</span> transferred from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
+            "__html": "<span class=\\"amount\\"> HBD</span> transferred from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
           }
         }
       />
@@ -1960,7 +1952,7 @@ exports[`(5) Withdraw Savings - HIVE (1) Step 1 1`] = `
               onChange={[Function]}
               placeholder="amount"
               type="text"
-              value="0.001"
+              value=""
             />
           </div>
           <div
@@ -2048,7 +2040,7 @@ exports[`(5) Withdraw Savings - HIVE (1) Step 1 1`] = `
         >
           <button
             className="btn btn-primary"
-            disabled={false}
+            disabled={true}
             onClick={[Function]}
             type="button"
           >
@@ -2145,9 +2137,7 @@ exports[`(5) Withdraw Savings - HIVE (2) Step 2 1`] = `
         <div
           className="amount"
         >
-          0.001
-           
-          HIVE
+          NaN HIVE
         </div>
         
       </div>
@@ -2216,7 +2206,7 @@ exports[`(5) Withdraw Savings - HIVE (4) Step 4 1`] = `
         className="success"
         dangerouslySetInnerHTML={
           Object {
-            "__html": "<span class=\\"amount\\">0.001 HIVE</span> transferred from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
+            "__html": "<span class=\\"amount\\"> HIVE</span> transferred from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
           }
         }
       />
@@ -2341,7 +2331,7 @@ exports[`(6) Convert (1) Step 1 1`] = `
               onChange={[Function]}
               placeholder="amount"
               type="text"
-              value="0.001"
+              value=""
             />
           </div>
         </div>
@@ -2381,7 +2371,7 @@ exports[`(6) Convert (1) Step 1 1`] = `
         >
           <button
             className="btn btn-primary"
-            disabled={false}
+            disabled={true}
             onClick={[Function]}
             type="button"
           >
@@ -2454,9 +2444,7 @@ exports[`(6) Convert (2) Step 2 1`] = `
         <div
           className="amount"
         >
-          0.001
-           
-          HBD
+          NaN HBD
         </div>
         
       </div>
@@ -2525,7 +2513,7 @@ exports[`(6) Convert (4) Step 4 1`] = `
         className="success"
         dangerouslySetInnerHTML={
           Object {
-            "__html": "<span class=\\"amount\\">0.001 HBD</span> converted",
+            "__html": "<span class=\\"amount\\"> HBD</span> converted",
           }
         }
       />
@@ -2690,8 +2678,24 @@ exports[`(7) Power up (1) Step 1 1`] = `
               onChange={[Function]}
               placeholder="amount"
               type="text"
-              value="0.001"
+              value=""
             />
+          </div>
+          <div
+            className="asset-switch"
+          >
+            <a
+              className="asset selected"
+              onClick={[Function]}
+            >
+              HIVE
+            </a>
+            <a
+              className="asset "
+              onClick={[Function]}
+            >
+              POB
+            </a>
           </div>
         </div>
       </div>
@@ -2730,7 +2734,7 @@ exports[`(7) Power up (1) Step 1 1`] = `
         >
           <button
             className="btn btn-primary"
-            disabled={false}
+            disabled={true}
             onClick={[Function]}
             type="button"
           >
@@ -2827,9 +2831,7 @@ exports[`(7) Power up (2) Step 2 1`] = `
         <div
           className="amount"
         >
-          0.001
-           
-          HIVE
+          NaN HIVE
         </div>
         
       </div>
@@ -2898,7 +2900,7 @@ exports[`(7) Power up (4) Step 4 1`] = `
         className="success"
         dangerouslySetInnerHTML={
           Object {
-            "__html": "<span class=\\"amount\\">0.001 HIVE</span> staked from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
+            "__html": "<span class=\\"amount\\"> HIVE</span> staked from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
           }
         }
       />
@@ -3063,8 +3065,24 @@ exports[`(8) Delegate (1) Step 1 1`] = `
               onChange={[Function]}
               placeholder="amount"
               type="text"
-              value="0.001"
+              value=""
             />
+          </div>
+          <div
+            className="asset-switch"
+          >
+            <a
+              className="asset selected"
+              onClick={[Function]}
+            >
+              HP
+            </a>
+            <a
+              className="asset "
+              onClick={[Function]}
+            >
+              Brain Power
+            </a>
           </div>
         </div>
       </div>
@@ -3088,7 +3106,7 @@ exports[`(8) Delegate (1) Step 1 1`] = `
               className="balance-num"
               onClick={[Function]}
             >
-              3.182
+              3.183
                
               HP
             </span>
@@ -3205,14 +3223,12 @@ exports[`(8) Delegate (2) Step 2 1`] = `
         <div
           className="amount"
         >
-          0.001
-           
-          HP
+          NaN HP
         </div>
         <div
           className="amount-vests"
         >
-          1.946443 VESTS
+          0.000,000 VESTS
         </div>
         
       </div>
@@ -3281,7 +3297,7 @@ exports[`(8) Delegate (4) Step 4 1`] = `
         className="success"
         dangerouslySetInnerHTML={
           Object {
-            "__html": "<span class=\\"amount\\">0.001 HP</span> delegated from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
+            "__html": "<span class=\\"amount\\"> HP</span> delegated from <span class=\\"from-user\\">foo</span> to <span class=\\"to-user\\">bar</span>",
           }
         }
       />
@@ -3409,6 +3425,22 @@ exports[`(9) Power down (1) Step 1 1`] = `
               value="2.000"
             />
           </div>
+          <div
+            className="asset-switch"
+          >
+            <a
+              className="asset selected"
+              onClick={[Function]}
+            >
+              HP
+            </a>
+            <a
+              className="asset "
+              onClick={[Function]}
+            >
+              Brain Power
+            </a>
+          </div>
         </div>
       </div>
       
@@ -3431,7 +3463,7 @@ exports[`(9) Power down (1) Step 1 1`] = `
               className="balance-num"
               onClick={[Function]}
             >
-              3.182
+              3.183
                
               HP
             </span>
@@ -3529,14 +3561,12 @@ exports[`(9) Power down (2) Step 2 1`] = `
         <div
           className="amount"
         >
-          2.000
-           
-          HP
+          2.000 HP
         </div>
         <div
           className="amount-vests"
         >
-          3892.887237 VESTS
+          3,892.887,238 VESTS
         </div>
         
       </div>
@@ -3675,7 +3705,7 @@ exports[`(10) Powering down (1) Step 1 1`] = `
       </p>
       <p>
          
-        The next power down is in 5 days, 269.941 HIVE
+        The next power down is in 5 days, 269.942 HIVE
       </p>
       <p>
         <button

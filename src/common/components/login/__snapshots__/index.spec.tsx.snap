@@ -7,7 +7,7 @@ Array [
   >
     <img
       alt="Logo"
-      src="logo-circle.svg"
+      src="bluebrain-logo-circle.webp"
     />
     <h2>
       Welcome back!
@@ -94,8 +94,8 @@ Array [
     Don't have an account?
      
     <a
-      href="#"
-      onClick={[Function]}
+      href="https://signup.hive.io/"
+      target="signup"
     >
       Sign up now!
     </a>
@@ -282,8 +282,8 @@ Array [
     Don't have an account?
      
     <a
-      href="#"
-      onClick={[Function]}
+      href="https://signup.hive.io/"
+      target="signup"
     >
       Sign up now!
     </a>
@@ -479,7 +479,7 @@ Array [
   >
     <img
       alt="Logo"
-      src="logo-circle.svg"
+      src="bluebrain-logo-circle.webp"
     />
     <h2>
       Welcome back!
@@ -582,8 +582,8 @@ Array [
     Don't have an account?
      
     <a
-      href="#"
-      onClick={[Function]}
+      href="https://signup.hive.io/"
+      target="signup"
     >
       Sign up now!
     </a>

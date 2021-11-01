@@ -2,21 +2,37 @@
 
 exports[`1- default state 1`] = `
 Object {
+  "acceptLanguage": Array [
+    Object {
+      "languageCode": "en-US",
+      "priority": 1,
+    },
+  ],
+  "acceptableLanguage": Object {
+    "en": true,
+    "en-US": true,
+  },
   "canUseWebp": false,
   "currency": "hbd",
+  "currencyPrecision": 3,
   "currencyRate": 1,
   "currencySymbol": "$",
   "filter": "hot",
   "hasKeyChain": false,
+  "hiveEngineTokensProperties": Object {},
   "intro": true,
   "isElectron": false,
   "isMobile": false,
   "lang": "en-US",
   "listStyle": "row",
+  "negotiatedLanguages": Array [
+    "en-US",
+  ],
   "newVersion": null,
   "notifications": true,
   "nsfw": false,
   "searchIndexCount": 0,
+  "search_requests_allowed": 0,
   "tag": "",
   "theme": "day",
   "usePrivate": true,
@@ -25,21 +41,37 @@ Object {
 
 exports[`2- location change. should change filter and tag 1`] = `
 Object {
+  "acceptLanguage": Array [
+    Object {
+      "languageCode": "en-US",
+      "priority": 1,
+    },
+  ],
+  "acceptableLanguage": Object {
+    "en": true,
+    "en-US": true,
+  },
   "canUseWebp": false,
   "currency": "hbd",
+  "currencyPrecision": 3,
   "currencyRate": 1,
   "currencySymbol": "$",
   "filter": "trending",
   "hasKeyChain": false,
+  "hiveEngineTokensProperties": Object {},
   "intro": true,
   "isElectron": false,
   "isMobile": false,
   "lang": "en-US",
   "listStyle": "row",
+  "negotiatedLanguages": Array [
+    "en-US",
+  ],
   "newVersion": null,
   "notifications": true,
   "nsfw": false,
   "searchIndexCount": 0,
+  "search_requests_allowed": 0,
   "tag": "bitcoin",
   "theme": "day",
   "usePrivate": true,
@@ -48,21 +80,37 @@ Object {
 
 exports[`3- theme change 1`] = `
 Object {
+  "acceptLanguage": Array [
+    Object {
+      "languageCode": "en-US",
+      "priority": 1,
+    },
+  ],
+  "acceptableLanguage": Object {
+    "en": true,
+    "en-US": true,
+  },
   "canUseWebp": false,
   "currency": "hbd",
+  "currencyPrecision": 3,
   "currencyRate": 1,
   "currencySymbol": "$",
   "filter": "trending",
   "hasKeyChain": false,
+  "hiveEngineTokensProperties": Object {},
   "intro": true,
   "isElectron": false,
   "isMobile": false,
   "lang": "en-US",
   "listStyle": "row",
+  "negotiatedLanguages": Array [
+    "en-US",
+  ],
   "newVersion": null,
   "notifications": true,
   "nsfw": false,
   "searchIndexCount": 0,
+  "search_requests_allowed": 0,
   "tag": "bitcoin",
   "theme": "night",
   "usePrivate": true,
@@ -71,21 +119,37 @@ Object {
 
 exports[`4- hide intro 1`] = `
 Object {
+  "acceptLanguage": Array [
+    Object {
+      "languageCode": "en-US",
+      "priority": 1,
+    },
+  ],
+  "acceptableLanguage": Object {
+    "en": true,
+    "en-US": true,
+  },
   "canUseWebp": false,
   "currency": "hbd",
+  "currencyPrecision": 3,
   "currencyRate": 1,
   "currencySymbol": "$",
   "filter": "trending",
   "hasKeyChain": false,
+  "hiveEngineTokensProperties": Object {},
   "intro": false,
   "isElectron": false,
   "isMobile": false,
   "lang": "en-US",
   "listStyle": "row",
+  "negotiatedLanguages": Array [
+    "en-US",
+  ],
   "newVersion": null,
   "notifications": true,
   "nsfw": false,
   "searchIndexCount": 0,
+  "search_requests_allowed": 0,
   "tag": "bitcoin",
   "theme": "night",
   "usePrivate": true,
@@ -94,21 +158,37 @@ Object {
 
 exports[`5- list style change 1`] = `
 Object {
+  "acceptLanguage": Array [
+    Object {
+      "languageCode": "en-US",
+      "priority": 1,
+    },
+  ],
+  "acceptableLanguage": Object {
+    "en": true,
+    "en-US": true,
+  },
   "canUseWebp": false,
   "currency": "hbd",
+  "currencyPrecision": 3,
   "currencyRate": 1,
   "currencySymbol": "$",
   "filter": "trending",
   "hasKeyChain": false,
+  "hiveEngineTokensProperties": Object {},
   "intro": false,
   "isElectron": false,
   "isMobile": false,
   "lang": "en-US",
   "listStyle": "grid",
+  "negotiatedLanguages": Array [
+    "en-US",
+  ],
   "newVersion": null,
   "notifications": true,
   "nsfw": false,
   "searchIndexCount": 0,
+  "search_requests_allowed": 0,
   "tag": "bitcoin",
   "theme": "night",
   "usePrivate": true,
@@ -117,22 +197,37 @@ Object {
 
 exports[`6- Has keychain act 1`] = `
 Object {
+  "acceptLanguage": Array [
+    Object {
+      "languageCode": "en-US",
+      "priority": 1,
+    },
+  ],
+  "acceptableLanguage": Object {
+    "en": true,
+    "en-US": true,
+  },
   "canUseWebp": false,
   "currency": "hbd",
+  "currencyPrecision": 3,
   "currencyRate": 1,
   "currencySymbol": "$",
   "filter": "trending",
-  "hiveEngineTokensProperties": Object {},
   "hasKeyChain": true,
+  "hiveEngineTokensProperties": Object {},
   "intro": false,
   "isElectron": false,
   "isMobile": false,
   "lang": "en-US",
   "listStyle": "grid",
+  "negotiatedLanguages": Array [
+    "en-US",
+  ],
   "newVersion": null,
   "notifications": true,
   "nsfw": false,
   "searchIndexCount": 0,
+  "search_requests_allowed": 0,
   "tag": "bitcoin",
   "theme": "night",
   "usePrivate": true,
@@ -141,22 +236,37 @@ Object {
 
 exports[`7- Mute notifications act 1`] = `
 Object {
+  "acceptLanguage": Array [
+    Object {
+      "languageCode": "en-US",
+      "priority": 1,
+    },
+  ],
+  "acceptableLanguage": Object {
+    "en": true,
+    "en-US": true,
+  },
   "canUseWebp": false,
   "currency": "hbd",
+  "currencyPrecision": 3,
   "currencyRate": 1,
   "currencySymbol": "$",
   "filter": "trending",
-    "hiveEngineTokensProperties": Object {},
   "hasKeyChain": true,
+  "hiveEngineTokensProperties": Object {},
   "intro": false,
   "isElectron": false,
   "isMobile": false,
   "lang": "en-US",
   "listStyle": "grid",
+  "negotiatedLanguages": Array [
+    "en-US",
+  ],
   "newVersion": null,
   "notifications": false,
   "nsfw": false,
   "searchIndexCount": 0,
+  "search_requests_allowed": 0,
   "tag": "bitcoin",
   "theme": "night",
   "usePrivate": true,
@@ -165,22 +275,37 @@ Object {
 
 exports[`8- Unmute notifications act 1`] = `
 Object {
+  "acceptLanguage": Array [
+    Object {
+      "languageCode": "en-US",
+      "priority": 1,
+    },
+  ],
+  "acceptableLanguage": Object {
+    "en": true,
+    "en-US": true,
+  },
   "canUseWebp": false,
   "currency": "hbd",
+  "currencyPrecision": 3,
   "currencyRate": 1,
   "currencySymbol": "$",
   "filter": "trending",
-  "hiveEngineTokensProperties": Object {},
   "hasKeyChain": true,
+  "hiveEngineTokensProperties": Object {},
   "intro": false,
   "isElectron": false,
   "isMobile": false,
   "lang": "en-US",
   "listStyle": "grid",
+  "negotiatedLanguages": Array [
+    "en-US",
+  ],
   "newVersion": null,
   "notifications": true,
   "nsfw": false,
   "searchIndexCount": 0,
+  "search_requests_allowed": 0,
   "tag": "bitcoin",
   "theme": "night",
   "usePrivate": true,
@@ -189,22 +314,37 @@ Object {
 
 exports[`9- Set lang act 1`] = `
 Object {
+  "acceptLanguage": Array [
+    Object {
+      "languageCode": "en-US",
+      "priority": 1,
+    },
+  ],
+  "acceptableLanguage": Object {
+    "en": true,
+    "en-US": true,
+  },
   "canUseWebp": false,
   "currency": "hbd",
+  "currencyPrecision": 3,
   "currencyRate": 1,
   "currencySymbol": "$",
   "filter": "trending",
-  "hiveEngineTokensProperties": Object {},
   "hasKeyChain": true,
+  "hiveEngineTokensProperties": Object {},
   "intro": false,
   "isElectron": false,
   "isMobile": false,
   "lang": "tr-TR",
   "listStyle": "grid",
+  "negotiatedLanguages": Array [
+    "en-US",
+  ],
   "newVersion": null,
   "notifications": true,
   "nsfw": false,
   "searchIndexCount": 0,
+  "search_requests_allowed": 0,
   "tag": "bitcoin",
   "theme": "night",
   "usePrivate": true,
@@ -213,22 +353,37 @@ Object {
 
 exports[`10- Set nsfw act 1`] = `
 Object {
+  "acceptLanguage": Array [
+    Object {
+      "languageCode": "en-US",
+      "priority": 1,
+    },
+  ],
+  "acceptableLanguage": Object {
+    "en": true,
+    "en-US": true,
+  },
   "canUseWebp": false,
   "currency": "hbd",
+  "currencyPrecision": 3,
   "currencyRate": 1,
   "currencySymbol": "$",
   "filter": "trending",
-  "hiveEngineTokensProperties": Object {},
   "hasKeyChain": true,
+  "hiveEngineTokensProperties": Object {},
   "intro": false,
   "isElectron": false,
   "isMobile": false,
   "lang": "tr-TR",
   "listStyle": "grid",
+  "negotiatedLanguages": Array [
+    "en-US",
+  ],
   "newVersion": null,
   "notifications": true,
   "nsfw": true,
   "searchIndexCount": 0,
+  "search_requests_allowed": 0,
   "tag": "bitcoin",
   "theme": "night",
   "usePrivate": true,

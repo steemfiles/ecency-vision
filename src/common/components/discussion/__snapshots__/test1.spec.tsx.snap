@@ -174,7 +174,7 @@ exports[`(1) Full render with active user 1`] = `
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.00
+              $ 0.000
             </div>
             <div
               className="entry-votes notranslate"
@@ -314,7 +314,7 @@ exports[`(1) Full render with active user 1`] = `
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.00
+              $ 0.000
             </div>
             <div
               className="entry-votes notranslate"
@@ -456,7 +456,7 @@ exports[`(1) Full render with active user 1`] = `
                   onMouseOut={[Function]}
                   onMouseOver={[Function]}
                 >
-                  $ 0.00
+                  $ 0.000
                 </div>
                 <div
                   className="entry-votes notranslate"
@@ -598,7 +598,7 @@ exports[`(1) Full render with active user 1`] = `
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.03
+              $ 0.031
             </div>
             <div
               className="entry-votes notranslate"
@@ -740,7 +740,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.00
+              $ 0.000
             </div>
             <div
               className="entry-votes notranslate"
@@ -880,7 +880,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.03
+              $ 0.032
             </div>
             <div
               className="entry-votes notranslate"
@@ -1021,7 +1021,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.03
+              $ 0.032
             </div>
             <div
               className="entry-votes notranslate"
@@ -1162,7 +1162,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.08
+              $ 0.075
             </div>
             <div
               className="entry-votes notranslate"
@@ -1303,7 +1303,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.08
+              $ 0.077
             </div>
             <div
               className="entry-votes notranslate"
@@ -1549,7 +1549,7 @@ exports[`(3) With selected item 1`] = `
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.00
+              $ 0.000
             </div>
             <div
               className="entry-votes notranslate"
@@ -1689,7 +1689,7 @@ exports[`(3) With selected item 1`] = `
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.00
+              $ 0.000
             </div>
             <div
               className="entry-votes notranslate"
@@ -1831,7 +1831,7 @@ exports[`(3) With selected item 1`] = `
                   onMouseOut={[Function]}
                   onMouseOver={[Function]}
                 >
-                  $ 0.00
+                  $ 0.000
                 </div>
                 <div
                   className="entry-votes notranslate"
@@ -1973,7 +1973,7 @@ exports[`(3) With selected item 1`] = `
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.03
+              $ 0.031
             </div>
             <div
               className="entry-votes notranslate"
@@ -2115,7 +2115,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.00
+              $ 0.000
             </div>
             <div
               className="entry-votes notranslate"
@@ -2255,7 +2255,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.03
+              $ 0.032
             </div>
             <div
               className="entry-votes notranslate"
@@ -2396,7 +2396,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.03
+              $ 0.032
             </div>
             <div
               className="entry-votes notranslate"
@@ -2537,7 +2537,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.08
+              $ 0.075
             </div>
             <div
               className="entry-votes notranslate"
@@ -2678,7 +2678,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.08
+              $ 0.077
             </div>
             <div
               className="entry-votes notranslate"
@@ -2964,7 +2964,7 @@ exports[`(4) Show mute button, muted comment 1`] = `
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              $ 0.00
+              $ 0.000
             </div>
             <div
               className="entry-votes notranslate"

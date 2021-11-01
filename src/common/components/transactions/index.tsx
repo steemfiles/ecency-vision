@@ -390,14 +390,16 @@ export class TransactionRow extends Component<RowProps> {
     if (tr.type === "return_vesting_delegation") {
       flag = true;
       icon = arrowRightSvg;
-      numbers = (
-        <>
-          {formattedNumber(
-            vestsToHp(parseAsset(tr.vesting_shares).amount, hivePerMVests),
-            { suffix: "HP" }
-          )}
-        </>
-      );
+      if (tr.vesting_shares) {
+        numbers = (
+          <>
+            {formattedNumber(
+              vestsToHp(parseAsset(tr.vesting_shares).amount, hivePerMVests),
+              { suffix: "HP" }
+            )}
+          </>
+        );
+      }
     }
     if (tr.type === "proposal_pay") {
       flag = true;

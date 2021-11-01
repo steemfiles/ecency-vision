@@ -88,7 +88,7 @@ exports[`(1) Default render. 1`] = `
           <span
             className="all-pay"
           >
-            51.1k HBD
+            51.1k undefined
           </span>
           <span
             className="daily-pay"
@@ -96,7 +96,6 @@ exports[`(1) Default render. 1`] = `
             (
             Daily 70.0
              
-            HBD
             )
           </span>
         </div>
@@ -261,7 +260,7 @@ exports[`(2) Return proposal. 1`] = `
           <span
             className="all-pay"
           >
-            51.1k HBD
+            51.1k undefined
           </span>
           <span
             className="daily-pay"
@@ -269,7 +268,6 @@ exports[`(2) Return proposal. 1`] = `
             (
             Daily 70.0
              
-            HBD
             )
           </span>
         </div>
