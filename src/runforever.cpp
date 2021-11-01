@@ -32,14 +32,14 @@ namespace http = beast::http;       // from <boost/beast/http.hpp>
 namespace net = boost::asio;        // from <boost/asio.hpp>
 using tcp = net::ip::tcp;           // from <boost/asio/ip/tcp.hpp>
 using namespace boost::process;
-
+using namespace std;
 std::map<int, std::string> signal_names;
 std::fstream mainserverlog("server.log", std::ofstream::app);
 child * cptr = nullptr;
 bool both_running = false, keep_looping = true;
 bool restart_subserver = false;
 char datetime_string[200] = "";
-
+bool verbose_threads = true;
 // Performs an HTTP GET and prints the response
 bool connect_to_search_server()
 {
@@ -154,8 +154,6 @@ void report_and_set_process_closed(int signal) {
 }
 
 void init_signal_names() {
-	signal_names[SIGABRT] = "SIGABRT";
-	signal_names[SIGALRM] = "SIGALRM";
 	signal_names[SIGBUS] = "SIGBUS";
 	signal_names[SIGCHLD] = "SIGCHLD";
 	signal_names[SIGCLD] = "SIGCLD";
@@ -168,7 +166,6 @@ void init_signal_names() {
 	signal_names[SIGINT] = "SIGINT";
 	signal_names[SIGIO] = "SIGIO";
 	signal_names[SIGIOT] = "SIGIOT";
-	signal_names[SIGKILL] = "SIGKILL";
 	//signal_names[SIGLOST] = "SIGLOST";
 	signal_names[SIGPIPE] = "SIGPIPE";
 	signal_names[SIGPOLL] = "SIGPOLL";
@@ -192,6 +189,12 @@ void init_signal_names() {
 	signal_names[SIGXCPU] = "SIGXCPU";
 	signal_names[SIGXFSZ] = "SIGXFSZ";
 	signal_names[SIGWINCH] = "SIGWINCH";
+
+
+	signal_names[SIGABRT] = "SIGABRT";
+	signal_names[SIGALRM] = "SIGALRM";
+	signal_names[SIGKILL] = "SIGKILL";
+
 }
 
 // These are and should only be used in the forward_log thread...
@@ -205,6 +208,9 @@ void forward_log(ipstream& ps, std::ostream& log, const boost::process::child* c
 	std::string line;
 	char c;
 	while (both_running) {
+		if (verbose_threads)
+			cerr << "forwarding log" << endl;
+		
 		boost::this_thread::yield();
 		try {
 			boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
@@ -234,6 +240,9 @@ void keep_time() {
 		boost::this_thread::sleep_for(boost::chrono::milliseconds(1));
 	}
 	while (keep_looping) {
+		if (verbose_threads)
+			cerr << "keeping time..." << endl;
+		
 		if ((t = time(NULL)) != ((time_t)-1)) {
 			
 			(tmp = localtime(&t)) != NULL &&		    	
@@ -279,6 +288,47 @@ public:
 		unlink(filename);
 	}
 };
+
+void mind_page_server(child ** child_ptr_ptr) {
+	while (keep_looping && both_running) {
+		if (verbose_threads)
+			cerr << "minding page server" << endl;
+		
+		if (connect_to_page_server()) {
+			mainserverlogline() << "Could not get a page from page subserver" << std::endl;
+			break;
+		}
+		
+		if (!(*child_ptr_ptr)->running()) {
+			break;
+		}
+		
+		boost::this_thread::sleep_for(boost::chrono::seconds(1));
+	}
+	both_running = false;
+}
+
+void mind_search_server(child ** child_ptr_ptr) {
+	while (keep_looping && both_running && *child_ptr_ptr != nullptr) {
+		if (verbose_threads)
+			cerr << "minding search server" << endl;
+		child& search_server = **child_ptr_ptr;
+		boost::this_thread::sleep_for(boost::chrono::seconds(5));
+		if (connect_to_search_server()) {
+			mainserverlogline() << "Could not connect to search subserver" << std::endl;
+			break;
+		}
+		
+		if (!search_server.running()) {
+			break;
+		}
+		
+		boost::this_thread::sleep_for(boost::chrono::seconds(1));
+		
+	}
+	
+	both_running = false;
+}
 
 int main() {
 	bool current_directory_writable = access(".", W_OK) == 0;
@@ -380,43 +430,15 @@ int main() {
 
 		cptr = &page_server;
 
-		boost::thread log_page_forwarding(forward_page_log);
+		boost::thread log_page_forwarding([&](){forward_log(*page_server_pipe_stream, subserverlog, page_server_ptr);});
 		boost::thread log_search_forwarding(forward_search_log);
+		boost::thread minding_search_server([&](){mind_search_server(&search_server_ptr);});
+		boost::thread minding_page_server([&](){mind_page_server(&page_server_ptr);});
 
 		int col = 0;
 		try {
 			while (both_running) {
 				boost::this_thread::sleep_for(boost::chrono::seconds(5));
-				if (verbose){
-					for (int k = 0; k < col; ++k)
-						std::cerr << " ";
-					std::cerr << "X" << std::endl << std::flush;
-					++col;
-					col = col % 10;
-				}
-				if (
-					
-						(
-							connect_to_search_server() &&
-							(mainserverlogline() << "Could not connect to search subserver" << std::endl)
-						)
-							||						
-						!search_server.running()				
-					) {
-					both_running = false;
-						break;
-				}
-				if (
-						(
-							connect_to_page_server() &&
-							(mainserverlogline() << "Could not get a page from page subserver" << std::endl) 
-						)
-						|| 
-						!page_server.running()
-					) {
-				both_running = false;
-					break;
-				}
 			} // while
 		} catch (const boost::process::process_error& e) {
 			mainserverlogline() << "Process exception: " << e.what() << ".  Code:" << e.code() << std::endl;
