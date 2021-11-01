@@ -47,9 +47,10 @@ export default (
     if (isNaN(value)) {
       return "NaN";
     }
+    const digitsTry = max(maximumFractionDigits, mandatoryFractionDigits);
     const unity = Math.pow(
       10,
-      max(maximumFractionDigits, mandatoryFractionDigits)
+      digitsTry
     );
     if (value < 0) {
       addNegativeSignFlag = true;
@@ -71,7 +72,7 @@ export default (
       if (debugLog) console.log({ satoshis, out });
     }
     if (satoshis == 0) {
-      while (out.length < maximumFractionDigits) out = "0" + out;
+      while (out.length < digitsTry) out = "0" + out;
       if (debugLog) console.log({ satoshis, out });
     }
     // out.length==opts.fracitionDigits
