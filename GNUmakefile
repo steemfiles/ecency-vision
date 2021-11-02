@@ -1,9 +1,9 @@
 COMPILE_FLAGS=-std=c++17 -I /usr/local/src/boost_1_76_0
 LINK_FLAGS=-std=c++17 -L /usr/local/src/boost_1_76_0/stage/lib  -lboost_thread -lboost_system -lpthread -lboost_chrono
 
-debug: runforever-dbg .servers-build/relayserver.js
+debug: runforever-dbg .servers-build/relayserver.js .servers-build/promoter.js
 
-production: .servers-build/runforever .servers-build/runforever-dyn .servers-build/relayserver.js
+production: .servers-build/runforever .servers-build/runforever-dyn .servers-build/relayserver.js .servers-build/promoter.js
 
 runforever.o: src/runforever.cpp
 	g++ src/runforever.cpp -c $(COMPILE_FLAGS)
@@ -31,6 +31,9 @@ listenlog-dbg: listenlog-dbg.o
 
 .servers-build/relayserver.js: src/server/relayserver.ts
 	tsc --OutDir .servers-build src/server/relayserver.ts
+	
+.servers-build/promoter.js: src/server/promoter.ts
+	tsc --OutDir .servers-build src/server/promoter.ts
 
 clean:
 	rm *.o runforever-dbg 

@@ -24,9 +24,13 @@
 #include <functional>
 #include <memory>
 
+const char * page_server_cmd="node build/server.js";
+const std::string primary_search_location =  ".servers-build/relayserver.js";
+const std::string secondary_search_location = "src/server/relayserver.js";
 const char * rfc_2822_format = "%a, %d %b %Y %T %z";
 const char * RUNFOREVER_MANAGER_VERSION_STRING = "Runforever Manager/0.0";
 const bool verbose = false;
+
 namespace beast = boost::beast;     // from <boost/beast.hpp>
 namespace http = beast::http;       // from <boost/beast/http.hpp>
 namespace net = boost::asio;        // from <boost/asio.hpp>
@@ -273,7 +277,6 @@ void check_connectivity() {
 }
 std::string search_server_location;
 std::string search_server_cmd;
-const char * page_server_cmd="node build/server.js";
 
 class pidfile {
 	char const * filename;
@@ -359,9 +362,9 @@ int main() {
 			keep_looping = false;
 		}
 		
-		if (access((search_server_location="servers-build/relayserver.js").c_str(), R_OK)
+		if (access((search_server_location=primary_search_location).c_str(), R_OK)
 			&&
-		   access((search_server_location="src/server/relayserver.js").c_str(), R_OK) 
+		   access((search_server_location=secondary_search_location).c_str(), R_OK) 
 			
 			
 			) {
