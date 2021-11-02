@@ -89,6 +89,8 @@ import {
   pageMapStateToProps,
 } from "./common";
 
+import { VESTING_TOKEN, LIQUID_TOKEN } from "../../client_config";
+
 interface PostBase {
   title: string;
   tags: string[];
@@ -1046,7 +1048,30 @@ class SubmitPage extends BaseComponent<Props, State> {
                     <div className="container">
                       <Form.Group as={Row}>
                         <Form.Label column={true} sm="3">
-                          {_t("submit.reward")}
+                          Proof of Brain {_t("submit.reward")}
+                        </Form.Label>
+                        <Col sm="9">
+                          <Form.Control
+                            as="select"
+                            value={reward}
+                            onChange={this.rewardChanged}
+                          >
+                            <option value="default">
+                              {_t("submit.reward-pob")}
+                            </option>
+                            <option value="dp">{_t("submit.reward-dp")}</option>
+                          </Form.Control>
+                          <Form.Text muted={true}>
+                            {_t("submit.reward-hint", {
+                              liquid: LIQUID_TOKEN,
+                              staked: VESTING_TOKEN,
+                            })}
+                          </Form.Text>
+                        </Col>
+                      </Form.Group>
+                      <Form.Group as={Row}>
+                        <Form.Label column={true} sm="3">
+                          {hiveApi.HIVE_HUMAN_NAME + " " + _t("submit.reward")}
                         </Form.Label>
                         <Col sm="9">
                           <Form.Control
@@ -1061,7 +1086,10 @@ class SubmitPage extends BaseComponent<Props, State> {
                             <option value="dp">{_t("submit.reward-dp")}</option>
                           </Form.Control>
                           <Form.Text muted={true}>
-                            {_t("submit.reward-hint", {liquid: hiveApi.HIVE_HUMAN_NAME, staked: hiveApi.HIVE_HUMAN_NAME})}
+                            {_t("submit.reward-hint", {
+                              liquid: hiveApi.HIVE_HUMAN_NAME,
+                              staked: hiveApi.HIVE_HUMAN_NAME,
+                            })}
                           </Form.Text>
                         </Col>
                       </Form.Group>
