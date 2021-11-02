@@ -73,7 +73,6 @@ export const HEFineTransactionToHiveTransactions = (
           };
           return z;
         }
-        console.log("Unknown fine transaction type: ", type, x);
         return {
           type: "curation_reward",
           num: 9,

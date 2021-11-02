@@ -190,7 +190,6 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
   fetchHETransactions = (name: string, group?: OperationGroup | "") => {
     const { transactions } = this.state;
     const { list } = transactions;
-    console.log("fetchHETransactions called.");
     this.stateSet({
       transactions: { list: [], loading: true, group: group || "" },
     });

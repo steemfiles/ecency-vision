@@ -207,7 +207,9 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
             console.log({ tokenEntryMap });
             setState({ tokenEntryMap: tokenEntryMap });
           });
-          setState({ voteInfo: liquid_token_statuses, scotDenominator });
+          if (liquid_token_statuses) {
+            setState({ voteInfo: liquid_token_statuses, scotDenominator });
+          }
         }
       }
     } catch (e) {}
@@ -325,11 +327,6 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
       this.state.voteInfo
     ) {
       const currentVp = this.state.voteInfo.voting_power / 100;
-      console.log({
-        userVotingPower,
-        currentVp,
-        "voteInfo.voting_power": this.state.voteInfo.voting_power,
-      });
       let pendingTokenPayoutBeforeVote = 0;
       let scot_total_author_payout = 0;
       let scot_total_curator_payout = 0;
@@ -418,11 +415,6 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
           (scotData["total_payout_value"] || 0) / scotDenominator;
         scot_token_bene_payout =
           (scotData["beneficiaries_payout_value"] || 0) / scotDenominator;
-        console.log({
-          scot_total_curator_payout,
-          scot_total_author_payout,
-          scot_token_bene_payout,
-        });
         //omoted = scotData['promoted'] || 0;
         //cline_payout = !!scotData['decline_payout'];
         scot_total_author_payout -= scot_total_curator_payout;
