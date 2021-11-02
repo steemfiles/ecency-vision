@@ -29,8 +29,8 @@ import { vestsToHp } from "../../helper/vesting";
 import {
   getAccount,
   getConversionRequests,
-  getCollateralizedConversionRequests,
 } from "../../api/hive";
+import {getCollateralizedConversionRequests} from "../../api/hive";
 
 import { claimRewardBalance, formatError } from "../../api/operations";
 
@@ -110,8 +110,7 @@ export class WalletHive extends BaseComponent<Props, State> {
       this.stateSet({ converting });
     });
 
-    // typescript broken here.
-    // @ts-ignore
+    // I don't see this not being a function here...
     getCollateralizedConversionRequests(account.name).then((rs) => {
       let collaterializedConverting = 0;
       for (const r of rs) {

@@ -16,6 +16,7 @@ import {
 } from "../../helper/test-helper";
 import { StaticRouter } from "react-router-dom";
 import { FullAccount } from "../../store/accounts/types";
+import { getConversionRequests } from "../../api/hive";
 
 jest.mock("moment", () => () => ({
   fromNow: () => "in 5 days",
