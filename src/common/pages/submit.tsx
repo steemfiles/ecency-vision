@@ -1061,7 +1061,7 @@ class SubmitPage extends BaseComponent<Props, State> {
                             <option value="dp">{_t("submit.reward-dp")}</option>
                           </Form.Control>
                           <Form.Text muted={true}>
-                            {_t("submit.reward-hint")}
+                            {_t("submit.reward-hint", {liquid: hiveApi.HIVE_HUMAN_NAME, staked: hiveApi.HIVE_HUMAN_NAME})}
                           </Form.Text>
                         </Col>
                       </Form.Group>
