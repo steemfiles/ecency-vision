@@ -3,7 +3,7 @@ LINK_FLAGS=-std=c++17 -L /usr/local/src/boost_1_76_0/stage/lib  -lboost_thread -
 
 debug: runforever-dbg
 
-production: runforever runforever-dyn
+production: servers-build/runforever servers-build/runforever-dyn
 
 runforever.o: src/runforever.cpp
 	g++ src/runforever.cpp -c $(COMPILE_FLAGS)
@@ -16,11 +16,11 @@ listenlog-dbg.o: src/listenlog.cpp
 	
 	
 	
-runforever: runforever.o
-	g++ runforever.o -o runforever $(LINK_FLAGS) -static
+servers-build/runforever: runforever.o 
+	g++ runforever.o -o servers-build/runforever $(LINK_FLAGS) -static
 
-runforever-dyn: runforever.o
-	g++ runforever.o -o runforever-dyn $(LINK_FLAGS)
+servers-build/runforever-dyn: runforever.o 
+	g++ runforever.o -o servers-build/runforever-dyn $(LINK_FLAGS)
 
 syntax:
 	g++ -fsyntax-only src/runforever.cpp $(COMPILE_FLAGS)
@@ -30,8 +30,9 @@ runforever-dbg: runforever-dbg.o
 	
 listenlog-dbg: listenlog-dbg.o
 	g++ -ggdb listenlog-dbg.o -o listenlog-dbg  $(LINK_FLAGS) -static
+	
 
 clean:
-	rm *.o
+	rm *.o runforever-dbg 
 	
 .PHONY: syntax production clean default

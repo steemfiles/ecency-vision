@@ -271,8 +271,8 @@ void check_connectivity() {
 		boost::this_thread::sleep_for(boost::chrono::seconds(3));
 	}
 }
-
-const char * search_server_cmd="node src/server/relayserver.js";
+std::string search_server_location;
+std::string search_server_cmd;
 const char * page_server_cmd="node build/server.js";
 
 class pidfile {
@@ -359,9 +359,16 @@ int main() {
 			keep_looping = false;
 		}
 		
-		if (access("src/server/relayserver.js", R_OK)) {
-			std::cerr << "Cannot find src/server/relayserver.js to run." << std::endl;
+		if (access((search_server_location="servers-build/relayserver.js").c_str(), R_OK)
+			&&
+		   access((search_server_location="src/server/relayserver.js").c_str(), R_OK) 
+			
+			
+			) {
+			std::cerr << "Cannot find build/relayserver.js or src/server/relayserver.js to run." << std::endl;
 			keep_looping = false;
+		} else {
+			search_server_cmd = "node " + search_server_location;
 		}		
 	}
 	
