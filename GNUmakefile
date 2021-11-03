@@ -33,7 +33,7 @@ listenlog-dbg: listenlog-dbg.o
 	tsc --OutDir .servers-build src/server/relayserver.ts
 	
 .servers-build/promoter.js: src/server/promoter.ts
-	tsc --OutDir .servers-build src/server/promoter.ts
+	tsc --OutDir .servers-build  src/server/promoter.ts
 
 clean:
 	rm *.o runforever-dbg 
