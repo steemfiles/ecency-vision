@@ -357,7 +357,7 @@ export const transferHot = (
     },
   ];
   const params: Parameters = {
-    callback: `${document.location.href}/@${from}/wallet`,
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -545,7 +545,7 @@ export const transferToSavingsHot = (
     },
   ];
   const params: Parameters = {
-    callback: `${document.location.protocol}//${document.location.host}/@${from}/hive`,
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -594,7 +594,7 @@ export const collateralizedConvertHot = (
     },
   ];
   const params: Parameters = {
-    callback: `${document.location.href}/@${owner}/wallet`,
+    callback: document.location.href,
   };
   hs.sendOperation(op, params, () => {});
 };
@@ -634,7 +634,7 @@ export const convertHot = (owner: string, amount: string) => {
     },
   ];
   const params: Parameters = {
-    callback: `${document.location.href}/@${owner}/wallet`,
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -685,7 +685,7 @@ export const transferFromSavingsHot = (
     },
   ];
   const params: Parameters = {
-    callback: `${document.location.href}/@${from}/wallet`,
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -950,7 +950,7 @@ export const undelegateVestingSharesHot = (
     currency
   );
   const params: Parameters = {
-    callback: `${document.location.protocol}//${document.location.host}/@${delegator}/wallet`,
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -1083,7 +1083,7 @@ export const cancelWithdrawVesting = (
 export const cancelWithdrawVestingHot = (account: string, txID: string) => {
   const op: Operation = createCancelPowerDownOp(account, txID);
   const params: Parameters = {
-    callback: `${document.location.href}/@${account}/wallet`,
+    callback: ${document.location.href,
   };
   hs.sendOperation(op, params, () => {});
 };
@@ -1125,7 +1125,7 @@ export const setWithdrawVestingRouteHot = (
     },
   ];
   const params: Parameters = {
-    callback: `${document.location.href}/@${from}/wallet`,
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, () => {});
 };
