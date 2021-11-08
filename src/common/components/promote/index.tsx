@@ -16,7 +16,7 @@ import LinearProgress from "../linear-progress";
 import SuggestionList from "../suggestion-list";
 import KeyOrHot from "../key-or-hot";
 import { error } from "../feedback";
-
+import formattedNumber from "../../util/formatted-number";
 import {
   getPromotePrice,
   PromotePrice,
@@ -36,6 +36,9 @@ import { _t } from "../../i18n";
 import _c from "../../util/fix-class-names";
 
 import { checkAllSvg } from "../../img/svg";
+import axios from "axios";
+import { LIQUID_TOKEN as HE_LIQUID_TOKEN } from "../../../client_config";
+import { FullHiveEngineAccount, TokenBalance, is_not_FullHiveEngineAccount } from "../../api/hive-engine";
 
 interface Props {
   global: Global;
@@ -52,25 +55,49 @@ interface State {
   path: string;
   postError: string;
   paths: string[];
-  prices: PromotePrice[];
+  price_rate: null | number;
   duration: number;
   inProgress: boolean;
   step: 1 | 2 | 3;
 }
 
 const pathComponents = (p: string): string[] => p.replace("@", "").split("/");
-
+const getHEBalance = (a : ActiveUser) : number => {
+        let d : FullHiveEngineAccount; 
+        let tba : Array<TokenBalance>;
+        
+        if (is_not_FullHiveEngineAccount(a.data)) {
+          return 0;
+        }
+        d = a.data as FullHiveEngineAccount;
+        tba = d.token_balances;
+        if (tba === undefined) {
+          return 0;
+        } else {
+          const tb : TokenBalance | undefined = tba.find((y : TokenBalance) => y.symbol === 'POB');
+          if (tb) {
+            return tb.balance;
+          } else {
+            return 0;
+          }
+        }
+  };
+  
+const crasis_expensive = 1;
 export class Promote extends BaseComponent<Props, State> {
   state: State = {
     balanceError: "",
     path: "",
     paths: [],
     postError: "",
-    prices: [],
+    price_rate: crasis_expensive,
     duration: 1,
     inProgress: true,
     step: 1,
   };
+  
+
+  
 
   _timer: any = null;
 
@@ -82,35 +109,36 @@ export class Promote extends BaseComponent<Props, State> {
       })
       .then(() => {
         const { entry } = this.props;
-
+        const {price_rate} = this.state;
         if (entry) {
-          this.stateSet({ path: `${entry.author}/${entry.permlink}` });
+          this.stateSet({ path: `${entry.author}/${entry.permlink}`, inProgress: price_rate == crasis_expensive });
         }
       });
   }
 
   componentDidUpdate(prevProps: Readonly<Props>) {
-    if (!isEqual(this.props.activeUser.points, prevProps.activeUser.points)) {
+    if (!isEqual(getHEBalance(this.props.activeUser), getHEBalance(prevProps.activeUser))) {
       this.checkBalance();
     }
   }
 
   init = () => {
     const { activeUser } = this.props;
-
-    return getPromotePrice(activeUser.username)
-      .then((r) => {
-        const prices = r.sort((a, b) => a.duration - b.duration);
-        this.stateSet(
-          { prices, duration: prices[1].duration, inProgress: false },
-          () => {
-            this.checkBalance();
-          }
-        );
-      })
-      .catch(() => {
-        error(_t("g.server-error"));
-      });
+    return axios({
+      url:'/promotion-api/getprice',
+      method: 'GET',
+    })
+    .then((response) => {
+        const {data, statusText} = response;
+        if (statusText === "OK") {
+          const {price_rate} = data;
+          console.log("Setting price_rate to " + price_rate);
+          this.stateSet({ price_rate, inProgress: false });
+        }
+    })
+    .catch(() => {
+      error(_t("g.server-error"));
+    });
   };
 
   durationChanged = (
@@ -152,13 +180,12 @@ export class Promote extends BaseComponent<Props, State> {
 
   checkBalance = () => {
     const { activeUser } = this.props;
-    const { duration } = this.state;
+    const { duration, price_rate } = this.state;
 
-    const { prices } = this.state;
-    const { price } = prices.find((x) => x.duration === duration)!;
+    const price = price_rate * 3600/2;
 
     const balanceError =
-      parseFloat(activeUser.points.points) < price
+      getHEBalance(activeUser) < price
         ? _t("trx-common.insufficient-funds")
         : "";
 
@@ -199,11 +226,10 @@ export class Promote extends BaseComponent<Props, State> {
     }
 
     // Check if the post already promoted
-    const promoted = await getPromotedPost(
-      activeUser.username,
-      author,
-      permlink
-    );
+    const promoted = await axios({
+      url: '/promotion-api/getPromotions',
+      method: 'GET'
+    });
     if (promoted) {
       this.stateSet({
         postError: _t("redeem-common.post-error-exists"),
@@ -268,7 +294,7 @@ export class Promote extends BaseComponent<Props, State> {
   render() {
     const { activeUser } = this.props;
     const {
-      prices,
+      price_rate,
       balanceError,
       path,
       paths,
@@ -279,6 +305,16 @@ export class Promote extends BaseComponent<Props, State> {
     } = this.state;
 
     const canSubmit = !postError && !balanceError && this.isValidPath(path);
+
+    const HE_token_balance = (() => {
+        try {
+          return formattedNumber(getHEBalance(activeUser), 
+      {suffix: HE_LIQUID_TOKEN, fractionDigits: 8});
+        } catch (e) {
+          console.log(e);
+          return "0 POB";
+        }
+    })();
 
     return (
       <div className="promote-dialog-content">
@@ -306,7 +342,7 @@ export class Promote extends BaseComponent<Props, State> {
                     )}
                     plaintext={true}
                     readOnly={true}
-                    value={`${activeUser.points.points} POINTS`}
+                    value={HE_token_balance}
                   />
                   {balanceError && (
                     <Form.Text className="text-danger">
@@ -355,17 +391,26 @@ export class Promote extends BaseComponent<Props, State> {
                     onChange={this.durationChanged}
                     disabled={inProgress}
                   >
-                    {prices.map((p) => {
-                      const { duration: d, price: pr } = p;
-                      const label = `${d} ${
-                        d === 1 ? _t("g.day") : _t("g.days")
-                      } - ${pr} POINTS`;
-                      return (
-                        <option value={p.duration} key={p.duration}>
-                          {label}
-                        </option>
-                      );
-                    })}
+                  {[{duration: 1800, duration_name: "30 minutes"},
+                      {duration: 3600, duration_name: "1 hour"},
+                      {duration: 7200, duration_name: "2 hour"},
+                      {duration: 18000, duration_name: "5 hours"},
+                      {duration: 36000, duration_name: "10 hours"},
+                      {duration: 86400, duration_name: "1 day"},
+                      {duration: 2*86400, duration_name: "2 days"},
+                      {duration: 5*86400, duration_name: "5 days"},
+                      {duration: 7*86400, duration_name: "1 week"},
+                      {duration: 14*86400, duration_name: "2 weeks"},
+                  ].map( d => {
+                      const {duration, duration_name} = d;
+                      const cost = price_rate * duration;
+                      return <option key={duration} value={duration}>
+                       {duration_name}  {formattedNumber(cost, {maximumFractionDigits:8, fractionDigits:0, suffix:'POB'})}
+                      </option>;
+                  } 
+                      )
+                  }
+                      
                   </Form.Control>
                 </Col>
               </Form.Group>

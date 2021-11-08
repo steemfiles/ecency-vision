@@ -359,23 +359,27 @@ export class EntryMenu extends BaseComponent<Props, State> {
       ];
     }
 
+    if (!isComment) {
+      menuItems = [
+        ...menuItems,
+        {
+          label: _t("entry-menu.promote"),
+          onClick:
+            activeUser !== null ? this.togglePromote : this.toggleLoginModal,
+          icon: bullHornSvg,
+        },
+      ];
+    }
+
     if (global.usePrivate && !isComment) {
       menuItems = [
         ...menuItems,
-        ...[
-          {
-            label: _t("entry-menu.promote"),
-            onClick:
-              activeUser !== null ? this.togglePromote : this.toggleLoginModal,
-            icon: bullHornSvg,
-          },
-          {
-            label: _t("entry-menu.boost"),
-            onClick:
-              activeUser !== null ? this.toggleBoost : this.toggleLoginModal,
-            icon: rocketLaunchSvg,
-          },
-        ],
+        {
+          label: _t("entry-menu.boost"),
+          onClick:
+            activeUser !== null ? this.toggleBoost : this.toggleLoginModal,
+          icon: rocketLaunchSvg,
+        },
       ];
     }
 
