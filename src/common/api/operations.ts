@@ -357,7 +357,7 @@ export const transferHot = (
     },
   ];
   const params: Parameters = {
-    callback: document.location.href
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -420,12 +420,6 @@ export const transferHiveEngineAssetKc = (
   memo: string
 ) => {
   const json = transferHiveEngineAssetJSON(from, to, amount, memo);
-  const op = {
-    id: "ssc-mainnet-hive",
-    json,
-    required_auths: [from],
-    required_posting_auths: [],
-  };
   return keychain.customJson(
     from,
     "ssc-mainnet-hive",
@@ -545,7 +539,7 @@ export const transferToSavingsHot = (
     },
   ];
   const params: Parameters = {
-    callback: document.location.href
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -594,7 +588,7 @@ export const collateralizedConvertHot = (
     },
   ];
   const params: Parameters = {
-    callback: document.location.href
+    callback: document.location.href,
   };
   hs.sendOperation(op, params, () => {});
 };
@@ -634,7 +628,7 @@ export const convertHot = (owner: string, amount: string) => {
     },
   ];
   const params: Parameters = {
-    callback: document.location.href
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -685,7 +679,7 @@ export const transferFromSavingsHot = (
     },
   ];
   const params: Parameters = {
-    callback: document.location.href
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -850,7 +844,7 @@ export const delegateVestingSharesHot = (
   const currency = parts[parts.length - 1];
   const quantity = parts[0].replace(/,/g, "");
   const params: Parameters = {
-    callback: document.location.href
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, console.log);
 };
@@ -950,7 +944,7 @@ export const undelegateVestingSharesHot = (
     currency
   );
   const params: Parameters = {
-    callback: document.location.href
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -1040,7 +1034,7 @@ export const withdrawVestingHot = (
 ) => {
   const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
   const params: Parameters = {
-    callback: document.location.href
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, fn);
 };
@@ -1083,7 +1077,7 @@ export const cancelWithdrawVesting = (
 export const cancelWithdrawVestingHot = (account: string, txID: string) => {
   const op: Operation = createCancelPowerDownOp(account, txID);
   const params: Parameters = {
-    callback: document.location.href
+    callback: document.location.href,
   };
   hs.sendOperation(op, params, () => {});
 };
@@ -1125,7 +1119,7 @@ export const setWithdrawVestingRouteHot = (
     },
   ];
   const params: Parameters = {
-    callback: document.location.href
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -1264,61 +1258,45 @@ export const unSubscribe = (
   const json = ["unsubscribe", { community }];
   return broadcastPostingJSON(username, "community", json);
 };
-export const promote = (
-  key: PrivateKey,
+
+export const wrapEngineTransaction = (
   user: string,
-  author: string,
-  permlink: string,
-  duration: number
+  key: PrivateKey,
+  json_string: string
 ): Promise<TransactionConfirmation> => {
-  const json = JSON.stringify({
-    user,
-    author,
-    permlink,
-    duration,
-  });
+  const json_data = JSON.parse(json_string);
   const op = {
-    id: "esteem_promote",
-    json,
+    id: "ssc-mainnet-hive",
+    json: json_string,
     required_auths: [user],
     required_posting_auths: [],
   };
   return hiveClient.broadcast.json(op, key);
 };
-export const promoteHot = (
-  user: string,
-  author: string,
-  permlink: string,
-  duration: number
+export const wrapEngineTransactionKc = (from: string, json_string: string) => {
+  return keychain.customJson(
+    from,
+    "ssc-mainnet-hive",
+    "Active",
+    json_string,
+    "Hive Engine Asset Transfer"
+  );
+};
+export const wrapEngineTransactionHot = (
+  from: string,
+  json_string: string,
+  new_url_path: string
 ) => {
   const params = {
     authority: "active",
-    required_auths: `["${user}"]`,
+    required_auths: `["${from}"]`,
     required_posting_auths: "[]",
-    id: "esteem_promote",
-    json: JSON.stringify({
-      user,
-      author,
-      permlink,
-      duration,
-    }),
+    id: "ssc-mainnet-hive",
+    json: json_string,
   };
-  hotSign("custom-json", params, `@${user}/points`);
+  hotSign("custom-json", params, new_url_path);
 };
-export const promoteKc = (
-  user: string,
-  author: string,
-  permlink: string,
-  duration: number
-) => {
-  const json = JSON.stringify({
-    user,
-    author,
-    permlink,
-    duration,
-  });
-  return keychain.customJson(user, "esteem_promote", "Active", json, "Promote");
-};
+
 export const boost = (
   key: PrivateKey,
   user: string,

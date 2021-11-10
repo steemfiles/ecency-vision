@@ -12,7 +12,7 @@ import { getAccessToken } from "../helper/user-token";
 import { apiBase } from "./helper";
 
 import { AppWindow } from "../../client/window";
-
+import { enginifyPost } from "./hive-engine";
 declare var window: AppWindow;
 
 export interface ReceivedVestingShare {
@@ -572,7 +572,14 @@ export const getPromotedEntries = (): Promise<Entry[]> => {
     return axios
       .get(apiBase(`/private-api/promoted-entries`))
       .then((resp) => resp.data);
+  } else {
+    const e = axios
+      .get(apiBase(`/promotion-api/getPromoted`))
+      .then((resp) => {
+          console.log(resp.data);
+          return resp.data.map( p => enginifyPost({...p, json_metadata: JSON.parse(p.json_metadata)}), 'dan');
+      });
+    console.log(e);
+    return e;
   }
-
-  return new Promise((resolve) => resolve([]));
 };

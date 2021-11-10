@@ -9,9 +9,9 @@
     	Header set "Content-Type" "application/json"
 	</LocationMatch>
 
-  	ProxyPass /promotion-api/ http://127.0.0.1:2998/
+    ProxyPass /promotion-api/ http://127.0.0.1:2998/
     ProxyPassReverse /promotion-api/ http://127.0.0.1:2998/
-	
+    
     ProxyPass /search-api/search http://127.0.0.1:2999/search
     ProxyPassReverse /search-api/search http://127.0.0.1:2999/search
     	

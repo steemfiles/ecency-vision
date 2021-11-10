@@ -25,10 +25,10 @@ import {
 import { searchPath } from "../../api/search-api";
 import { getPost } from "../../api/bridge";
 import {
-  promote,
-  promoteHot,
-  promoteKc,
   formatError,
+  wrapEngineTransaction,
+  wrapEngineTransactionHot,
+  wrapEngineTransactionKc,
 } from "../../api/operations";
 
 import { _t } from "../../i18n";
@@ -38,7 +38,11 @@ import _c from "../../util/fix-class-names";
 import { checkAllSvg } from "../../img/svg";
 import axios from "axios";
 import { LIQUID_TOKEN as HE_LIQUID_TOKEN } from "../../../client_config";
-import { FullHiveEngineAccount, TokenBalance, is_not_FullHiveEngineAccount } from "../../api/hive-engine";
+import {
+  FullHiveEngineAccount,
+  TokenBalance,
+  is_not_FullHiveEngineAccount,
+} from "../../api/hive-engine";
 
 interface Props {
   global: Global;
@@ -55,35 +59,38 @@ interface State {
   path: string;
   postError: string;
   paths: string[];
-  price_rate: null | number;
+  price_rate: undefined | number;
   duration: number;
   inProgress: boolean;
+  txJSON: string | undefined;
   step: 1 | 2 | 3;
 }
 
 const pathComponents = (p: string): string[] => p.replace("@", "").split("/");
-const getHEBalance = (a : ActiveUser) : number => {
-        let d : FullHiveEngineAccount; 
-        let tba : Array<TokenBalance>;
-        
-        if (is_not_FullHiveEngineAccount(a.data)) {
-          return 0;
-        }
-        d = a.data as FullHiveEngineAccount;
-        tba = d.token_balances;
-        if (tba === undefined) {
-          return 0;
-        } else {
-          const tb : TokenBalance | undefined = tba.find((y : TokenBalance) => y.symbol === 'POB');
-          if (tb) {
-            return tb.balance;
-          } else {
-            return 0;
-          }
-        }
-  };
-  
-const crasis_expensive = 1;
+const getHEBalance = (a: ActiveUser): number => {
+  let d: FullHiveEngineAccount;
+  let tba: Array<TokenBalance>;
+
+  if (is_not_FullHiveEngineAccount(a.data)) {
+    return 0;
+  }
+  d = a.data as FullHiveEngineAccount;
+  tba = d.token_balances;
+  if (tba === undefined) {
+    return 0;
+  } else {
+    const tb: TokenBalance | undefined = tba.find(
+      (y: TokenBalance) => y.symbol === "POB"
+    );
+    if (tb) {
+      return tb.balance;
+    } else {
+      return 0;
+    }
+  }
+};
+
+const crasis_expensive = undefined;
 export class Promote extends BaseComponent<Props, State> {
   state: State = {
     balanceError: "",
@@ -91,13 +98,11 @@ export class Promote extends BaseComponent<Props, State> {
     paths: [],
     postError: "",
     price_rate: crasis_expensive,
-    duration: 1,
+    duration: 1800,
     inProgress: true,
     step: 1,
+    txJSON: undefined,
   };
-  
-
-  
 
   _timer: any = null;
 
@@ -109,15 +114,23 @@ export class Promote extends BaseComponent<Props, State> {
       })
       .then(() => {
         const { entry } = this.props;
-        const {price_rate} = this.state;
+        const { price_rate } = this.state;
         if (entry) {
-          this.stateSet({ path: `${entry.author}/${entry.permlink}`, inProgress: price_rate == crasis_expensive });
+          this.stateSet({
+            path: `${entry.author}/${entry.permlink}`,
+            inProgress: price_rate == crasis_expensive,
+          });
         }
       });
   }
 
   componentDidUpdate(prevProps: Readonly<Props>) {
-    if (!isEqual(getHEBalance(this.props.activeUser), getHEBalance(prevProps.activeUser))) {
+    if (
+      !isEqual(
+        getHEBalance(this.props.activeUser),
+        getHEBalance(prevProps.activeUser)
+      )
+    ) {
       this.checkBalance();
     }
   }
@@ -125,27 +138,28 @@ export class Promote extends BaseComponent<Props, State> {
   init = () => {
     const { activeUser } = this.props;
     return axios({
-      url:'/promotion-api/getprice',
-      method: 'GET',
+      url: "/promotion-api/getPrice",
+      method: "GET",
     })
-    .then((response) => {
-        const {data, statusText} = response;
+      .then((response) => {
+        const { data, statusText } = response;
         if (statusText === "OK") {
-          const {price_rate} = data;
-          console.log("Setting price_rate to " + price_rate);
+          const { price_rate } = data;
           this.stateSet({ price_rate, inProgress: false });
         }
-    })
-    .catch(() => {
-      error(_t("g.server-error"));
-    });
+      })
+      .catch(() => {
+        error(_t("g.server-error"));
+      });
   };
 
   durationChanged = (
     e: React.ChangeEvent<typeof FormControl & HTMLInputElement>
   ) => {
     const duration = Number(e.target.value);
-    this.stateSet({ duration }, () => {
+    const balanceError = "";
+    console.log({ duration });
+    this.stateSet({ duration, balanceError }, () => {
       this.checkBalance();
     });
   };
@@ -168,7 +182,7 @@ export class Promote extends BaseComponent<Props, State> {
     this._timer = setTimeout(
       () =>
         searchPath(activeUser.username, path).then((resp) => {
-          this.stateSet({ paths: resp });
+          this.stateSet({ paths: resp, balanceError: "" });
         }),
       500
     );
@@ -182,7 +196,11 @@ export class Promote extends BaseComponent<Props, State> {
     const { activeUser } = this.props;
     const { duration, price_rate } = this.state;
 
-    const price = price_rate * 3600/2;
+    if (price_rate === undefined) {
+      return;
+    }
+
+    const price = (price_rate * 3600) / 2;
 
     const balanceError =
       getHEBalance(activeUser) < price
@@ -203,10 +221,10 @@ export class Promote extends BaseComponent<Props, State> {
 
   next = async () => {
     const { activeUser } = this.props;
-    const { path } = this.state;
+    const { path, duration } = this.state;
 
     const [author, permlink] = pathComponents(path);
-
+    const promoter = activeUser.username ?? "";
     this.stateSet({ inProgress: true });
 
     // Check if post is valid
@@ -225,33 +243,55 @@ export class Promote extends BaseComponent<Props, State> {
       return;
     }
 
+    console.log({ duration, path });
+    const responses = await Promise.all([
+      axios({
+        url: "/promotion-api/getPromoted",
+        method: "GET",
+      }),
+      axios({
+          url: `/promotion-api/getInvoice?time=${duration}&url=@${author}/${permlink}&promoter=${promoter}`,
+          method: "GET",
+      }),
+    ]);
+    
+    //alert("here");
+    
     // Check if the post already promoted
-    const promoted = await axios({
-      url: '/promotion-api/getPromotions',
-      method: 'GET'
-    });
-    if (promoted) {
+    const response1 = responses[0];
+    for (const response of responses) {
+      const { data, statusText } = response;
+      if (statusText !== "OK") {
+        error("Call to Promotion Server returned: " + statusText);
+      }
+    }
+    const promoted = responses[0]["data"]; 
+    if (promoted.includes(`@${author}/${permlink}`)) {
       this.stateSet({
         postError: _t("redeem-common.post-error-exists"),
         inProgress: false,
       });
       return;
     }
-
-    this.stateSet({ inProgress: false, step: 2 });
+    const txJSON = responses[1].data.result;
+    console.log({ txJSON });
+    this.stateSet({ inProgress: false, step: 2, txJSON });
   };
 
   sign = (key: PrivateKey) => {
     const { activeUser } = this.props;
-    const { path, duration } = this.state;
-    const [author, permlink] = pathComponents(path);
+    const { txJSON } = this.state;
 
     this.setState({ inProgress: true });
-    promote(key, activeUser.username, author, permlink, duration)
+    if (txJSON == undefined) {
+      error("No transaction to broadcast");
+      return;
+    }
+    wrapEngineTransaction(activeUser.username, key, txJSON)
       .then(() => {
         this.stateSet({ step: 3 });
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         error(formatError(err));
       })
       .finally(() => {
@@ -261,28 +301,39 @@ export class Promote extends BaseComponent<Props, State> {
 
   signKc = () => {
     const { activeUser } = this.props;
-    const { path, duration } = this.state;
-    const [author, permlink] = pathComponents(path);
+    const { txJSON } = this.state;
 
     this.setState({ inProgress: true });
-    promoteKc(activeUser.username, author, permlink, duration)
-      .then(() => {
-        this.stateSet({ step: 3 });
-      })
-      .catch((err) => {
-        error(formatError(err));
-      })
-      .finally(() => {
-        this.setState({ inProgress: false });
-      });
+    if (txJSON === undefined) {
+      error("No transaction to broadcast");
+    } else {
+      wrapEngineTransactionKc(activeUser.username, txJSON)
+        .then(() => {
+          this.stateSet({ step: 3 });
+        })
+        .catch((err: unknown) => {
+          error(formatError(err));
+        })
+        .finally(() => {
+          this.setState({ inProgress: false });
+        });
+    }
   };
 
   hotSign = () => {
     const { activeUser, onHide } = this.props;
-    const { path, duration } = this.state;
-    const [author, permlink] = pathComponents(path);
+    const { txJSON } = this.state;
 
-    promoteHot(activeUser.username, author, permlink, duration);
+    if (!txJSON) {
+      error("No transaction to broadcast");
+      this.setState({ balanceError: "internal error" });
+      return;
+    }
+    wrapEngineTransactionHot(
+      activeUser.username,
+      txJSON,
+      document.location.pathname.slice(1)
+    );
     onHide();
   };
 
@@ -307,13 +358,15 @@ export class Promote extends BaseComponent<Props, State> {
     const canSubmit = !postError && !balanceError && this.isValidPath(path);
 
     const HE_token_balance = (() => {
-        try {
-          return formattedNumber(getHEBalance(activeUser), 
-      {suffix: HE_LIQUID_TOKEN, fractionDigits: 8});
-        } catch (e) {
-          console.log(e);
-          return "0 POB";
-        }
+      try {
+        return formattedNumber(getHEBalance(activeUser), {
+          suffix: HE_LIQUID_TOKEN,
+          fractionDigits: 8,
+        });
+      } catch (e) {
+        console.log(e);
+        return "0 POB";
+      }
     })();
 
     return (
@@ -391,26 +444,36 @@ export class Promote extends BaseComponent<Props, State> {
                     onChange={this.durationChanged}
                     disabled={inProgress}
                   >
-                  {[{duration: 1800, duration_name: "30 minutes"},
-                      {duration: 3600, duration_name: "1 hour"},
-                      {duration: 7200, duration_name: "2 hour"},
-                      {duration: 18000, duration_name: "5 hours"},
-                      {duration: 36000, duration_name: "10 hours"},
-                      {duration: 86400, duration_name: "1 day"},
-                      {duration: 2*86400, duration_name: "2 days"},
-                      {duration: 5*86400, duration_name: "5 days"},
-                      {duration: 7*86400, duration_name: "1 week"},
-                      {duration: 14*86400, duration_name: "2 weeks"},
-                  ].map( d => {
-                      const {duration, duration_name} = d;
-                      const cost = price_rate * duration;
-                      return <option key={duration} value={duration}>
-                       {duration_name}  {formattedNumber(cost, {maximumFractionDigits:8, fractionDigits:0, suffix:'POB'})}
-                      </option>;
-                  } 
-                      )
-                  }
-                      
+                    {[
+                      { duration: 1800, duration_name: "30 minutes" },
+                      { duration: 3600, duration_name: "1 hour" },
+                      { duration: 7200, duration_name: "2 hour" },
+                      { duration: 18000, duration_name: "5 hours" },
+                      { duration: 36000, duration_name: "10 hours" },
+                      { duration: 86400, duration_name: "1 day" },
+                      { duration: 2 * 86400, duration_name: "2 days" },
+                      { duration: 5 * 86400, duration_name: "5 days" },
+                      { duration: 7 * 86400, duration_name: "1 week" },
+                      { duration: 14 * 86400, duration_name: "2 weeks" },
+                    ].map((d) => {
+                      // @ts-ignore
+                      const { duration, duration_name } = d;
+                      const cost: number | undefined =
+                        price_rate !== undefined && duration !== undefined
+                          ? price_rate * duration
+                          : crasis_expensive;
+                      if (cost === undefined) return <div />;
+                      return (
+                        <option key={duration} value={duration}>
+                          {duration_name}{" "}
+                          {formattedNumber(cost, {
+                            maximumFractionDigits: 8,
+                            fractionDigits: 0,
+                            suffix: "POB",
+                          })}
+                        </option>
+                      );
+                    })}
                   </Form.Control>
                 </Col>
               </Form.Group>

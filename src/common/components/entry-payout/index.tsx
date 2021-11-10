@@ -231,10 +231,12 @@ export class EntryPayout extends Component<Props> {
     const curatorPayout = parseAsset(entry.curator_payout_value).amount;
     const maxPayout = parseAsset(entry.max_accepted_payout).amount;
     let totalPayout = pendingPayout + authorPayout + curatorPayout;
-    if (he && hiveEngineTokensProperties) {
+    try {
+      if (he && hiveEngineTokensProperties) {
       for (const token in he)
         if (hiveEngineTokensProperties[token] && he[token]) {
           //console.log({token});
+          console.log(token);
           const tokenProperties: TokenInfoConfigPair =
             hiveEngineTokensProperties[token];
           const postTokenRewardInfo = he[token];
@@ -262,6 +264,9 @@ export class EntryPayout extends Component<Props> {
               );
           }
         }
+      }
+    } catch (e) {
+      console.log("Error handling HE data");
     }
     const payoutLimitHit = totalPayout >= maxPayout;
     const shownPayout =

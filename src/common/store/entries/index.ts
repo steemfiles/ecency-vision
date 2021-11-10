@@ -23,6 +23,7 @@ import { clone } from "../util";
 import filterTagExtract from "../../helper/filter-tag-extract";
 
 import { getPostsRanked, getAccountPosts } from "../../api/bridge";
+import axios from "axios";
 
 export const makeGroupKey = (what: string, tag: string = ""): string => {
   if (tag) {
@@ -162,6 +163,7 @@ export const fetchEntries =
       start_author = lastEntry.author;
       start_permlink = lastEntry.permlink;
     }
+  
 
     dispatch(fetchAct(groupKey));
 
@@ -180,6 +182,11 @@ export const fetchEntries =
         20,
         observer
       );
+    //} else if (groupKey === '__promoted__')  {
+    //  promise = axios({
+    //    url: "/promotion-api/getPromoted",
+    //    method: "GET",
+    //  });
     } else {
       // trending/tag
       promise = getPostsRanked(
@@ -194,7 +201,12 @@ export const fetchEntries =
 
     promise
       .then((resp) => {
+         console.log({groupKey, resp});
+
         if (resp) {
+          if (groupKey === '__promoted__') {
+            //resp = []; // resp['data'];          
+          }
           dispatch(fetchedAct(groupKey, resp, resp.length >= pageSize));
         } else {
           dispatch(fetchErrorAct(groupKey, "server error"));
@@ -203,7 +215,9 @@ export const fetchEntries =
       .catch((e) => {
         dispatch(fetchErrorAct(groupKey, "network error"));
       });
-  };
+  }
+
+
 
 export const addEntry = (entry: Entry) => (dispatch: Dispatch) => {
   dispatch(fetchedAct("__manual__", [entry], false));
