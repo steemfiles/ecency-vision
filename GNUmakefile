@@ -34,8 +34,9 @@ listenlog-dbg: listenlog-dbg.o
 	
 .servers-build/promoter.js: src/server/promoter.ts
 	rm -f .servers-build/promoter.js
-	./node_modules/.bin/prettier --ignore-unknown --write src/server/promoter.ts
 	tsc --OutDir .servers-build  --resolveJsonModule  --esModuleInterop src/server/promoter.ts
+	./node_modules/.bin/prettier --ignore-unknown --write src/server/promoter.ts
+	touch .servers-build/promoter.js
 	
 clean:
 	rm *.o runforever-dbg 

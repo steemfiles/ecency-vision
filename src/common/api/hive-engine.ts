@@ -7,7 +7,7 @@ import {
     augmentContentWithCrossPost,
 } from './util/CrossPosts';
 */
-import { DISABLE_HIVE, LIQUID_TOKEN_UPPERCASE } from "../../client_config";
+import { LIQUID_TOKEN_UPPERCASE } from "../../client_config";
 import axios from "axios";
 // @ts-ignore
 import SSC from "sscjs";
@@ -278,11 +278,12 @@ export async function getScotAccountDataAsync(account: string): Promise<{
     `@${account}`,
     {}
   );
-  const hiveData = DISABLE_HIVE
-    ? null
-    : await getScotDataAsync<{ [id: string]: TokenStatus }>(`@${account}`, {
-        hive: 1,
-      });
+  const hiveData = await getScotDataAsync<{ [id: string]: TokenStatus }>(
+    `@${account}`,
+    {
+      hive: 1,
+    }
+  );
   return { data, hiveData };
 }
 function mergeContent(

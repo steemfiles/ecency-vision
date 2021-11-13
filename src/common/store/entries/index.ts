@@ -163,7 +163,6 @@ export const fetchEntries =
       start_author = lastEntry.author;
       start_permlink = lastEntry.permlink;
     }
-  
 
     dispatch(fetchAct(groupKey));
 
@@ -182,11 +181,6 @@ export const fetchEntries =
         20,
         observer
       );
-    //} else if (groupKey === '__promoted__')  {
-    //  promise = axios({
-    //    url: "/promotion-api/getPromoted",
-    //    method: "GET",
-    //  });
     } else {
       // trending/tag
       promise = getPostsRanked(
@@ -199,14 +193,10 @@ export const fetchEntries =
       );
     }
 
-    promise
+    return promise
       .then((resp) => {
-         console.log({groupKey, resp});
-
         if (resp) {
-          if (groupKey === '__promoted__') {
-            //resp = []; // resp['data'];          
-          }
+          console.log({ groupKey, resp });
           dispatch(fetchedAct(groupKey, resp, resp.length >= pageSize));
         } else {
           dispatch(fetchErrorAct(groupKey, "server error"));
@@ -215,9 +205,7 @@ export const fetchEntries =
       .catch((e) => {
         dispatch(fetchErrorAct(groupKey, "network error"));
       });
-  }
-
-
+  };
 
 export const addEntry = (entry: Entry) => (dispatch: Dispatch) => {
   dispatch(fetchedAct("__manual__", [entry], false));

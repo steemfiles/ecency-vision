@@ -5,14 +5,15 @@ import {
   ApiNotification,
   NotificationFilter,
 } from "../store/notifications/types";
-import { Entry } from "../store/entries/types";
+import { Entry, validateEntry } from "../store/entries/types";
 
 import { getAccessToken } from "../helper/user-token";
 
 import { apiBase } from "./helper";
 
 import { AppWindow } from "../../client/window";
-import { enginifyPost } from "./hive-engine";
+import { DOLLAR_API_NAME } from "./hive";
+import { enginifyPost, getScotDataAsync } from "./hive-engine";
 declare var window: AppWindow;
 
 export interface ReceivedVestingShare {
@@ -566,7 +567,7 @@ export const commentHistory = (
     .post(apiBase(`/private-api/comment-history`), data)
     .then((resp) => resp.data);
 };
-
+let never_alerted = true;
 export const getPromotedEntries = (): Promise<Entry[]> => {
   if (window.usePrivate) {
     return axios
@@ -576,10 +577,37 @@ export const getPromotedEntries = (): Promise<Entry[]> => {
     const e = axios
       .get(apiBase(`/promotion-api/getPromoted`))
       .then((resp) => {
-          console.log(resp.data);
-          return resp.data.map( p => enginifyPost({...p, json_metadata: JSON.parse(p.json_metadata)}), 'dan');
+        const { status } = resp;
+        if (status === 200 && resp.data) {
+          const { data } = resp;
+          const { status, why } = data;
+          if (status && why) {
+            console.log("cannot fetch promoted:", why);
+          } else if (data.length !== undefined) {
+            const entries = data.map((entry: { [id: string]: any }) => {
+              const fullentry = {
+                author_payout_value: `0.000 HBD`,
+                blacklists: [],
+                is_paidout: false,
+                payout: 0,
+                payout_at: "2019-11-11T07:20:51",
+                post_id: Math.floor(Math.random() * 1000000),
+                updated: entry["created"],
+                ...entry,
+              };
+              validateEntry(fullentry);
+              return fullentry;
+            });
+            return entries;
+            //return resp.data.map( p => enginifyPost({...p, json_metadata: JSON.parse(p.json_metadata)}), 'dan');
+          }
+        }
+        return [];
+      })
+      .catch((e) => {
+        console.log(e);
+        return [];
       });
-    console.log(e);
     return e;
   }
 };

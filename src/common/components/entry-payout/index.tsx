@@ -233,37 +233,36 @@ export class EntryPayout extends Component<Props> {
     let totalPayout = pendingPayout + authorPayout + curatorPayout;
     try {
       if (he && hiveEngineTokensProperties) {
-      for (const token in he)
-        if (hiveEngineTokensProperties[token] && he[token]) {
-          //console.log({token});
-          console.log(token);
-          const tokenProperties: TokenInfoConfigPair =
-            hiveEngineTokensProperties[token];
-          const postTokenRewardInfo = he[token];
-          const tokenInfo = tokenProperties.info;
-          const tokenConfig = tokenProperties.config;
-          let hivePrice: number = tokenProperties.hivePrice || 0;
-          if (token === "POB") {
-            //console.log({tokenInfo, tokenConfig, postTokenRewardInfo});
+        for (const token in he)
+          if (hiveEngineTokensProperties[token] && he[token]) {
+            //console.log({token});
+            const tokenProperties: TokenInfoConfigPair =
+              hiveEngineTokensProperties[token];
+            const postTokenRewardInfo = he[token];
+            const tokenInfo = tokenProperties.info;
+            const tokenConfig = tokenProperties.config;
+            let hivePrice: number = tokenProperties.hivePrice || 0;
+            if (token === "POB") {
+              //console.log({tokenInfo, tokenConfig, postTokenRewardInfo});
+            }
+            let complete_payout_value: number =
+              (postTokenRewardInfo &&
+                (postTokenRewardInfo.pending_token ||
+                  postTokenRewardInfo.total_payout_value)) ||
+              0;
+            if (complete_payout_value > 0 && hivePrice) {
+              const tokenAmount =
+                complete_payout_value *
+                Math.pow(10, -postTokenRewardInfo.precision);
+              if (tokenAmount && hivePrice && base && quote)
+                totalPayout += (tokenAmount * hivePrice * base) / quote;
+              else
+                console.log(
+                  "skipping adding because one of these values is falsy:",
+                  { tokenAmount, hivePrice, base, quote }
+                );
+            }
           }
-          let complete_payout_value: number =
-            (postTokenRewardInfo &&
-              (postTokenRewardInfo.pending_token ||
-                postTokenRewardInfo.total_payout_value)) ||
-            0;
-          if (complete_payout_value > 0 && hivePrice) {
-            const tokenAmount =
-              complete_payout_value *
-              Math.pow(10, -postTokenRewardInfo.precision);
-            if (tokenAmount && hivePrice && base && quote)
-              totalPayout += (tokenAmount * hivePrice * base) / quote;
-            else
-              console.log(
-                "skipping adding because one of these values is falsy:",
-                { tokenAmount, hivePrice, base, quote }
-              );
-          }
-        }
       }
     } catch (e) {
       console.log("Error handling HE data");

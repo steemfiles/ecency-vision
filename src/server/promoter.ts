@@ -5,6 +5,159 @@ import * as http from "http";
 import * as net from "net";
 import axios from "axios";
 
+export function validateEntry(e: any): void {
+  let missing_keys: Array<string> = [];
+  if (e["active_votes"] === undefined) {
+    console.log("Missing key active_votes");
+    missing_keys.push("active_votes");
+  }
+  if (e["author"] === undefined) {
+    console.log("Missing key author");
+    missing_keys.push("author");
+  }
+  if (e["author_payout_value"] === undefined) {
+    console.log("Missing key author_payout_value");
+    missing_keys.push("author_payout_value");
+  }
+  if (e["author_reputation"] === undefined) {
+    console.log("Missing key author_reputation");
+    missing_keys.push("author_reputation");
+  }
+  //if (e["author_role?"] === undefined) {
+  //  console.log("Missing key author_role?");
+  //  missing_keys.push("author_role?");
+  //}
+  //if (e["author_title?"] === undefined) {
+  //  console.log("Missing key author_title?");
+  //  missing_keys.push("author_title?");
+  //}
+  if (e["beneficiaries"] === undefined) {
+    console.log("Missing key beneficiaries");
+    missing_keys.push("beneficiaries");
+  }
+  if (e["blacklists"] === undefined) {
+    console.log("Missing key blacklists");
+    missing_keys.push("blacklists");
+  }
+  if (e["body"] === undefined) {
+    console.log("Missing key body");
+    missing_keys.push("body");
+  }
+  if (e["category"] === undefined) {
+    console.log("Missing key category");
+    missing_keys.push("category");
+  }
+  if (e["children"] === undefined) {
+    console.log("Missing key children");
+    missing_keys.push("children");
+  }
+  //if (e["community?"] === undefined) {
+  //  console.log("Missing key community?");
+  //  missing_keys.push("community?");
+  //}
+  //if (e["community_title?"] === undefined) {
+  //  console.log("Missing key community_title?");
+  //  missing_keys.push("community_title?");
+  //}
+  if (e["created"] === undefined) {
+    console.log("Missing key created");
+    missing_keys.push("created");
+  }
+  if (e["curator_payout_value"] === undefined) {
+    console.log("Missing key curator_payout_value");
+    missing_keys.push("curator_payout_value");
+  }
+  if (e["depth"] === undefined) {
+    console.log("Missing key depth");
+    missing_keys.push("depth");
+  }
+  if (e["is_paidout"] === undefined) {
+    console.log("Missing key is_paidout");
+    missing_keys.push("is_paidout");
+  }
+  if (e["json_metadata"] === undefined) {
+    console.log("Missing key json_metadata");
+    missing_keys.push("json_metadata");
+  }
+  if (e["max_accepted_payout"] === undefined) {
+    console.log("Missing key max_accepted_payout");
+    missing_keys.push("max_accepted_payout");
+  }
+  if (e["net_rshares"] === undefined) {
+    console.log("Missing key net_rshares");
+    missing_keys.push("net_rshares");
+  }
+  //if (e["parent_author?"] === undefined) {
+  //  console.log("Missing key parent_author?");
+  //  missing_keys.push("parent_author?");
+  //}
+  //if (e["parent_permlink?"] === undefined) {
+  //  console.log("Missing key parent_permlink?");
+  //  missing_keys.push("parent_permlink?");
+  //}
+  if (e["payout"] === undefined) {
+    console.log("Missing key payout");
+    missing_keys.push("payout");
+  }
+  if (e["payout_at"] === undefined) {
+    console.log("Missing key payout_at");
+    missing_keys.push("payout_at");
+  }
+  if (e["pending_payout_value"] === undefined) {
+    console.log("Missing key pending_payout_value");
+    missing_keys.push("pending_payout_value");
+  }
+  if (e["percent_hbd"] === undefined) {
+    console.log("Missing key percent_hbd");
+    missing_keys.push("percent_hbd");
+  }
+  if (e["permlink"] === undefined) {
+    console.log("Missing key permlink");
+    missing_keys.push("permlink");
+  }
+  if (e["post_id"] === undefined) {
+    console.log("Missing key post_id");
+    missing_keys.push("post_id");
+  }
+  if (e["promoted"] === undefined) {
+    console.log("Missing key promoted");
+    missing_keys.push("promoted");
+  }
+  //if (e["reblogged_by?"] === undefined) {
+  //  console.log("Missing key reblogged_by?");
+  //  missing_keys.push("reblogged_by?");
+  //}
+  if (e["replies"] === undefined) {
+    console.log("Missing key replies");
+    missing_keys.push("replies");
+  }
+  //  //if (e["stats?"] === undefined) {
+  //  //  console.log("Missing key stats?");
+  //  //  missing_keys.push("stats?");
+  //  //}
+  if (e["title"] === undefined) {
+    console.log("Missing key title");
+    missing_keys.push("title");
+  }
+  if (e["updated"] === undefined) {
+    console.log("Missing key updated");
+    missing_keys.push("updated");
+  }
+  if (e["url"] === undefined) {
+    console.log("Missing key url");
+    missing_keys.push("url");
+  }
+  if (missing_keys.length) {
+    throw Error("Missing keys: " + JSON.stringify(missing_keys));
+  }
+}
+
+export function validateEntries(es: Array<any>) {
+  for (const e of es) {
+    validateEntry(e);
+  }
+}
+
 // examples:
 // select tx,permlink from promotions  where start > now() and now() < end;
 // insert into promotions (tx, permlink, start, end) values ('000000000000000000000000000000000000', '@krishool/save-australia-or-public-health-and-well-being-bill-live-instagram-broadcast', now(), date_add(now(), interval 1000 second));
@@ -155,6 +308,7 @@ interface Block {
               `Insufficient payment: Should have been ${calculated_payment} but was only ${quantity}`
             );
           }
+
           hiveClient
             .call("condenser_api", "get_content", [author, permlink])
             .then((post_data) => {
@@ -214,7 +368,11 @@ if (true) {
       if (url === "/getPrice" || url === "/getprice") {
         res.write(JSON.stringify({ price_rate }) + "\n");
         res.end();
-      } else if (url === "/getPromoted") {
+      } else if (
+        url === "/getPromoted" ||
+        url === "/getpromoted" ||
+        url === "/getPromotions"
+      ) {
         con.query(
           "select data from promotions where start < now()" +
             "and now() < end group by permlink",
@@ -223,9 +381,29 @@ if (true) {
             if (err) {
               res.write(JSON.stringify({ status: "error", err }, null, 2));
             } else {
+              const entries = result.map((row: { [id: string]: string }) => {
+                const e: { [id: string]: any } = JSON.parse(row["data"]);
+                return {
+                  author_payout_value: `0.000 HBD`,
+                  blacklists: [],
+                  is_paidout: false,
+                  payout: 0,
+                  payout_at: "2019-11-11T07:20:51",
+                  post_id: Math.floor(Math.random() * 1000000),
+                  updated: e["created"],
+                  ...e,
+                };
+              });
+              try {
+                validateEntries(entries);
+              } catch (e) {
+                console.log(e);
+                return;
+              }
               res.write(
-                JSON.stringify(result.map((row) => JSON.parse(row["data"]))) +
-                  "\n"
+                JSON.stringify(
+                  result.map((row: { data: string }) => JSON.parse(row["data"]))
+                ) + "\n"
               );
             }
             res.end();
