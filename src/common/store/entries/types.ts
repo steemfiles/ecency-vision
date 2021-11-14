@@ -214,6 +214,16 @@ export function validateEntry(e: { [id: string]: unknown }): void {
   }
 }
 
+export function notAValidEntry(entry: Entry | any): entry is any {
+  try {
+    validateEntry(entry);
+    return false;
+  } catch (error) {
+    // do nothing...    
+  }
+  return true;
+}
+
 export interface EntryGroup {
   entries: Entry[];
   error: string | null;
