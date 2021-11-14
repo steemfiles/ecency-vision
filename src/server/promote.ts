@@ -112,8 +112,8 @@ var con = mysql.createConnection({
   password: process.env["MARIADB_PASSWORD"],
 });
 console.log("Starting");
-const permlink = 'hallazgo-de-un-planeta-que-orbita-a-tres-estrellas';
-const author = 'andresmujica';
+const permlink = process.argv[3];
+const author = process.argv[2];
 const memo_time = 1000;
 hiveSsc
   .stream((err: unknown | null, result: Block | null) => {
@@ -129,28 +129,38 @@ hiveSsc
 
     if (transactions.length == 0) return;
     for (const transaction of transactions) {
-        const { transactionId } = transaction;
-      
-        hiveClient
-          .call("condenser_api", "get_content", [author, permlink])
-          .then((post_data) => {
-              console.log("Got post data");
-              const stmt = con.createQuery("insert into test (val) values (?)",
-                [100],                
-              function (err, result) {
-                if (err) {
-                  console.error("Failed", err);
-                  // should return funds here.
-                } else {
-                  console.log("Accepted");
-                }
-                process.exit();
-              }
-            );
-          })
-          .catch((e) => {
-            console.error("Error:", JSON.stringify(e));
-          });
+      const { transactionId } = transaction;
+
+      const insert_promotion = (post_data: string) => {
+        const post_data_string = JSON.stringify(post_data);                
+        const stmt = con.query(
+          "insert into promotions values (?, ?, ?, ?, now(), date_add(now(), interval ? second), ?)",
+          [
+            blockNumber,
+            transactionId,
+            author,
+            permlink,
+            memo_time,
+            post_data_string
+          ],
+          function (error, result) {
+            if (error) {
+              // should return funds here.
+              console.error(error);
+            } else {
+              console.log("Accepted");
+            }
+            process.exit();
+          }
+        );
+      };
+
+      hiveClient
+        .call("condenser_api", "get_content", [author, permlink])
+        .then(insert_promotion)
+        //.catch((e) => {
+        //  console.error("Error:", JSON.stringify(e));
+        //});
       break;
     } // for
   })

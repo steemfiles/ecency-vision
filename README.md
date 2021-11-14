@@ -66,7 +66,7 @@ create database enginecy;
 connect enginecy
 grant select,insert on enginecy to "webuser"@"localhost"
 create user 'webadmin'@'localhost' identified by '*password*
-create or replace table promotions ( blockNumber int not null, tx char(64) not null primary key, author varchar(16), permlink varchar(256) not null, start datetime not null, end datetime not null, data text not null );
+create or replace table promotions ( blockNumber int not null, tx char(64) not null primary key, author varchar(16), permlink varchar(256) not null, start datetime not null, end datetime not null, data json );
 
 grant insert,select on promotions to 'webuser'@'localhost';
 grant insert,select,delete,update on promotions to 'webadmin'@'localhost';

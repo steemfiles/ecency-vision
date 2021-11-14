@@ -290,7 +290,7 @@ interface Block {
           continue;
         }
         if (!symbol || !to || !quantity || !memo || !memo.match) continue;
-        const matched = memo.match(/promote (.+)\/(.+) for (.+) seconds/);
+        const matched = memo.match(/promote @(.+)\/(.+) for (.+) seconds/);
 
         try {
           if (!matched) {
@@ -309,33 +309,32 @@ interface Block {
             );
           }
 
+          const insert_promotion = (post_data: string) => {
+            const post_data_string = JSON.stringify(post_data);
+            const stmt = con.query(
+              "insert into promotions values (?, ?, ?, ?, now(), date_add(now(), interval ? second), ?)",
+              [
+                blockNumber,
+                transactionId,
+                author,
+                permlink,
+                memo_time,
+                post_data_string,
+              ],
+              function (error, result) {
+                if (error) {
+                  // should return funds here.
+                  console.error(error);
+                } else {
+                  console.log("Accepted");
+                }
+              }
+            );
+          };
+
           hiveClient
             .call("condenser_api", "get_content", [author, permlink])
-            .then((post_data) => {
-              const stmt = con.query(
-                "insert into promotions (blockNumber, tx, author, permlink, start, end, data) values (?, ?, ?, ?, now(), now()+?, ?)",
-                [
-                  blockNumber,
-                  transactionId,
-                  author,
-                  permlink,
-                  memo_time,
-                  JSON.stringify(post_data),
-                ],
-                function (err, result) {
-                  if (err) {
-                    console.error("Failed", err);
-                    // should return funds here.
-                  } else {
-                    console.log("Accepted");
-                  }
-                  process.exit();
-                }
-              );
-            })
-            .catch((e) => {
-              console.error(JSON.stringify(e));
-            });
+            .then(insert_promotion);
         } catch (e) {
           console.error(e.message);
           // should return funds here.
@@ -356,7 +355,6 @@ if (true) {
   const server = http
     .createServer(function (req, res) {
       const { headers, url } = req;
-      console.log(req);
       const { host } = headers;
       const refererURL = new URL("http://127.0.0.1" + url);
       const searchParams = refererURL.searchParams;
@@ -381,30 +379,34 @@ if (true) {
             if (err) {
               res.write(JSON.stringify({ status: "error", err }, null, 2));
             } else {
-              const entries = result.map((row: { [id: string]: string }) => {
-                const e: { [id: string]: any } = JSON.parse(row["data"]);
-                return {
-                  author_payout_value: `0.000 HBD`,
-                  blacklists: [],
-                  is_paidout: false,
-                  payout: 0,
-                  payout_at: "2019-11-11T07:20:51",
-                  post_id: Math.floor(Math.random() * 1000000),
-                  updated: e["created"],
-                  ...e,
-                };
-              });
+              const entries = result
+                .map((row: string) => {
+                  try {
+                    const e = JSON.parse(row["data"]);
+                    return {
+                      author_payout_value: `0.000 HBD`,
+                      blacklists: [],
+                      is_paidout: false,
+                      payout: 0,
+                      payout_at: "2019-11-11T07:20:51",
+                      post_id: Math.floor(Math.random() * 1000000),
+                      updated: e["created"],
+                      ...e,
+                    };
+                  } catch (ex) {
+                    return null;
+                  }
+                })
+                .filter((x: any) => x != null);
+              //res.write(JSON.stringify(entries));
+
               try {
                 validateEntries(entries);
+                res.write(JSON.stringify(entries) + "\n");
               } catch (e) {
                 console.log(e);
-                return;
+                res.write("[]\n");
               }
-              res.write(
-                JSON.stringify(
-                  result.map((row: { data: string }) => JSON.parse(row["data"]))
-                ) + "\n"
-              );
             }
             res.end();
           }
