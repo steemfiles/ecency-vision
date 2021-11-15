@@ -105,7 +105,7 @@ interface Block {
   transactions: Array<Transaction>;
 }
 
-const makeUTF = (s) => {
+const makeUTF = (s: any) => {
   if (typeof s === "string") {
     return Buffer.from(s, "utf8").toString("utf8");
   } else if (typeof s === "object") {
@@ -151,7 +151,7 @@ hiveSsc
         // When the axios parses everything, strings are parsed as if they were
         // ascii: raw bytes.  So non-ascii code points show up as several bytes.
         // These several bytes are considered as if they are separate characters!
-        
+
         // They have to be re-encoded as UTF-8 so that the MYSQL API doesn't try
         // to decode the already utf8 decoded raw bytes, giving an error.
         for (const key in post_data) {
@@ -182,7 +182,6 @@ hiveSsc
           }
         );
       };
-
 
       hiveClient
         .call("condenser_api", "get_content", [author, permlink])
