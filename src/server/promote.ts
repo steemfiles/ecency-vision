@@ -105,6 +105,17 @@ interface Block {
   transactions: Array<Transaction>;
 }
 
+const makeUTF = (s) => {
+  if (typeof s === "string") {
+    return Buffer.from(s, "utf8").toString("utf8");
+  } else if (typeof s === "object") {
+    for (const key in s) {
+      s[key] = makeUTF(s[key]);
+    }
+  }
+  return s;
+};
+
 var con = mysql.createConnection({
   host: "localhost",
   database: "enginecy",
@@ -112,6 +123,11 @@ var con = mysql.createConnection({
   password: process.env["MARIADB_PASSWORD"],
 });
 console.log("Starting");
+
+const when_done = () => {
+  process.exit(0);
+};
+
 const permlink = process.argv[3];
 const author = process.argv[2];
 const memo_time = 1000;
@@ -131,8 +147,20 @@ hiveSsc
     for (const transaction of transactions) {
       const { transactionId } = transaction;
 
-      const insert_promotion = (post_data: string) => {
-        const post_data_string = JSON.stringify(post_data);                
+      const insert_promotion = (post_data: object) => {
+        // When the axios parses everything, strings are parsed as if they were
+        // ascii: raw bytes.  So non-ascii code points show up as several bytes.
+        // These several bytes are considered as if they are separate characters!
+        
+        // They have to be re-encoded as UTF-8 so that the MYSQL API doesn't try
+        // to decode the already utf8 decoded raw bytes, giving an error.
+        for (const key in post_data) {
+          if (typeof post_data[key] === "string") {
+            const raw = Buffer.from(post_data[key], "ascii");
+            post_data[key] = raw.toString("utf8");
+          }
+        }
+        const post_data_string = JSON.stringify(post_data);
         const stmt = con.query(
           "insert into promotions values (?, ?, ?, ?, now(), date_add(now(), interval ? second), ?)",
           [
@@ -141,26 +169,27 @@ hiveSsc
             author,
             permlink,
             memo_time,
-            post_data_string
+            post_data_string,
           ],
           function (error, result) {
             if (error) {
               // should return funds here.
-              console.error(error);
+              console.log("Here", error);
             } else {
               console.log("Accepted");
             }
-            process.exit();
+            when_done();
           }
         );
       };
 
+
       hiveClient
         .call("condenser_api", "get_content", [author, permlink])
-        .then(insert_promotion)
-        //.catch((e) => {
-        //  console.error("Error:", JSON.stringify(e));
-        //});
+        .then(insert_promotion);
+      //.catch((e) => {
+      //  console.error("Error:", JSON.stringify(e));
+      //});
       break;
     } // for
   })
