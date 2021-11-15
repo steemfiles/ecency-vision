@@ -28,7 +28,7 @@ import ToolTip from "../tooltip";
 import Search from "../search";
 import Login from "../login";
 import UserNav from "../user-nav";
-
+import discordLogo from "../../img/discord-logo-transparent-better.png";
 import { _t } from "../../i18n";
 
 import _c from "../../util/fix-class-names";
@@ -240,6 +240,9 @@ export class NavBar extends Component<Props, State> {
                   />
                 </div>
               )}
+              <a href="https://discord.gg/8vBmmtS9ZU" target="discord">
+                 <img src={discordLogo} className="logo" alt="discord" />
+              </a>
             </div>
             <div className="flex-spacer" />
             {(step !== 1 || transparentVerify) && (
