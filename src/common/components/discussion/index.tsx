@@ -41,6 +41,7 @@ import LoginRequired from "../login-required";
 import parseDate from "../../helper/parse-date";
 
 import { _t } from "../../i18n";
+import { Tsx } from "../../i18n/helper";
 
 import { comment, formatError } from "../../api/operations";
 
@@ -66,6 +67,9 @@ interface ItemBodyProps {
   entry: Entry;
   global: Global;
 }
+
+import appName from "../../../common/helper/app-name.ts";
+
 
 export class ItemBody extends Component<ItemBodyProps> {
   shouldComponentUpdate(nextProps: Readonly<ItemBodyProps>): boolean {
@@ -285,6 +289,8 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
     const readMore = entry.children > 0 && entry.depth > 5;
     const showSubList = !readMore && entry.children > 0;
     const canEdit = activeUser && activeUser.username === entry.author;
+    const app = appName(entry.json_metadata.app);
+    const appShort = app.split("/")[0].split(" ")[0];
 
     const canMute =
       activeUser && community
@@ -376,6 +382,11 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
               return (
                 <>
                   <ItemBody global={this.props.global} entry={entry} />
+                  {app && <div className="app" title={app}>
+                    <Tsx k="entry.via-app" args={{ app: appShort }}>
+                      <a href="/faq#source-label" />
+                    </Tsx>
+                  </div>}                  
                   <div className="item-controls">
                     {EntryVoteBtn({
                       ...this.props,
@@ -390,6 +401,8 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
                       ...this.props,
                       entry,
                     })}
+
+                    
                     <a
                       className={_c(`reply-btn ${edit ? "disabled" : ""}`)}
                       onClick={this.toggleReply}
