@@ -21,3 +21,9 @@ dev.sh
 *.marks
 src/client_config.ts
 src/common/constants/site.json
+*#*#
+*.o
+*.pid
+.builds/**/*.*
+.servers-build/**/*.*
+runforever-dbg
