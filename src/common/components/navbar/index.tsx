@@ -28,7 +28,6 @@ import ToolTip from "../tooltip";
 import Search from "../search";
 import Login from "../login";
 import UserNav from "../user-nav";
-import discordLogo from "../../img/discord-logo-transparent-better.png";
 import { _t } from "../../i18n";
 
 import _c from "../../util/fix-class-names";
@@ -42,6 +41,7 @@ import {
 
 const logo = require("../../img/bluebrain-logo-circle.webp");
 const hiveLogo = require("../../img/hiveLogo.png");
+const discordLogo = require("../../img/discord-logo-transparent-better.png");
 
 import { hiveSvg } from "../../img/svg";
 import site from "../../constants/site.json";

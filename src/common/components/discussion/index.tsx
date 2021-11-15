@@ -68,7 +68,7 @@ interface ItemBodyProps {
   global: Global;
 }
 
-import appName from "../../../common/helper/app-name.ts";
+import appName from "../../../common/helper/app-name";
 
 
 export class ItemBody extends Component<ItemBodyProps> {
