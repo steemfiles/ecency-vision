@@ -8,6 +8,7 @@ import * as ls from "../util/local-storage";
 
 export const getUser = (username: string): User | undefined => {
   const raw = ls.get(`user_${username}`);
+
   if (!raw) {
     console.log("User does not exist!");
     setActiveUser(null);

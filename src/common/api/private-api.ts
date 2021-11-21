@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { utils } from "@hiveio/dhive";
 import { PointTransaction } from "../store/points/types";
 import {
   ApiNotification,
@@ -12,8 +12,10 @@ import { getAccessToken } from "../helper/user-token";
 import { apiBase } from "./helper";
 
 import { AppWindow } from "../../client/window";
-
+import { hiveClient, getAccountHistory } from "./hive";
 declare var window: AppWindow;
+
+const ops = { utils };
 
 export interface ReceivedVestingShare {
   delegatee: string;
@@ -126,6 +128,11 @@ export const getNotifications = (
   filter: NotificationFilter | null,
   since: string | null = null
 ): Promise<ApiNotification[]> => {
+  //const social_op_filter = utils.makeBitMaskFilter([
+  //  ops.vote , ops.custom_json, ops.request_account_recovery,
+  //  ops.recover_account, ops.comment
+  //]);
+  //
   const data: { code: string | undefined; filter?: string; since?: string } = {
     code: getAccessToken(username),
   };

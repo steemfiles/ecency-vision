@@ -52,6 +52,17 @@ export const ACCOUNT_OPERATION_GROUPS: Record<OperationGroup, number[]> = {
     ops.liquidity_reward,
     ops.comment_reward,
   ],
+  socials: [
+    ops.vote,
+    ops.custom_json,
+    ops.request_account_recovery,
+    ops.recover_account,
+    ops.change_recovery_account,
+    ops.account_update2,
+    ops.changed_recovery_account,
+    ops.system_warning,
+    ops.comment,
+  ],
 };
 
 const ALL_ACCOUNT_OPERATIONS = [
@@ -131,6 +142,9 @@ export const fetchTransactions =
         break;
       case "rewards":
         filters = utils.makeBitMaskFilter(ACCOUNT_OPERATION_GROUPS["rewards"]);
+        break;
+      case "socials":
+        filters = utils.makeBitMaskFilter(ACCOUNT_OPERATION_GROUPS["socials"]);
         break;
       default:
         filters = utils.makeBitMaskFilter(ALL_ACCOUNT_OPERATIONS); // all

@@ -241,7 +241,7 @@ export class NavBar extends Component<Props, State> {
                 </div>
               )}
               <a href="https://discord.gg/8vBmmtS9ZU" target="discord">
-                 <img src={discordLogo} className="logo" alt="discord" />
+                <img src={discordLogo} className="logo" alt="discord" />
               </a>
             </div>
             <div className="flex-spacer" />
@@ -311,7 +311,7 @@ export class NavBar extends Component<Props, State> {
             )}
           </div>
           {ui.login && <Login {...this.props} />}
-          {global.usePrivate && <NotificationHandler {...this.props} />}
+          <NotificationHandler {...this.props} />
         </div>
       </>
     );

@@ -273,21 +273,18 @@ export default class UserNav extends Component<Props, State> {
           >
             <img width="25px" height="25px" src={logoCircle} />
           </HiveEngineBadge>
-          {global.usePrivate && (
-            <ToolTip content={_t("user-nav.notifications")}>
-              <span
-                className="notifications"
-                onClick={this.toggleNotifications}
-              >
-                {unread > 0 && (
-                  <span className="notifications-badge notranslate">
-                    {unread.toString().length < 3 ? unread : "..."}
-                  </span>
-                )}
-                {global.notifications ? bellSvg : bellOffSvg}
-              </span>
-            </ToolTip>
-          )}
+
+          <ToolTip content={_t("user-nav.notifications")}>
+            <span className="notifications" onClick={this.toggleNotifications}>
+              {unread > 0 && (
+                <span className="notifications-badge notranslate">
+                  {unread.toString().length < 3 ? unread : "..."}
+                </span>
+              )}
+              {global.notifications ? bellSvg : bellOffSvg}
+            </span>
+          </ToolTip>
+
           <DropDown
             {...dropDownConfig}
             float="right"

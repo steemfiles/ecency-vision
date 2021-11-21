@@ -28,3 +28,4 @@ src/common/constants/site.json
 .servers-build/**/*.*
 runforever-dbg
 To_Do.txt
+*.js

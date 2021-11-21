@@ -33,6 +33,7 @@
   "exclude": [
     "node_modules",
     "build",
+    "private-api",
     "scripts",
     "acceptance-tests",
     "webpack",
