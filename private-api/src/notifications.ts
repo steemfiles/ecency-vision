@@ -1,3 +1,5 @@
+const defensive = false;
+
 interface BaseWsNotification {
   source: string;
   target: string;
@@ -180,6 +182,12 @@ export type ApiNotification =
 export function process(rh, rn, username) {
   let notifications: Array<ApiNotification> = [];
   let read : 0|1 = 0;
+  
+  if (defensive && !rh.history) {
+    console.log("abnormally returning early because rh.history is undefined", {rh, rn});
+    return notifications;
+  }
+  
   for (const h of rh.history) {
     //@ts-ignore
     const { op, timestamp } = h[1];
@@ -189,7 +197,7 @@ export function process(rh, rn, username) {
       const { weight, permlink, author, voter } = value;
       if (author != username) continue;
       const vp: ApiVoteNotification = {
-        id: h[0] + "",
+        id: `voter ${voter} voted for ${author}/${permlink} at ${timestamp}`,
         timestamp,
         source: voter,
         read: 0,
@@ -218,7 +226,7 @@ export function process(rh, rn, username) {
       if (username === author) continue;
       try {
         const cp: ApiReplyNotification = {
-          id: h[0] + "",
+          id: `The user ${author} replied with ${author}/${permlink} at ${timestamp}`,
           timestamp,
           source: author,
           read,
@@ -244,7 +252,7 @@ export function process(rh, rn, username) {
       if (username === from) continue;
       const { nai, precision } = amount;
       const tn: ApiTransferNotification = {
-        id: h[0] + "",
+        id: `${from} transfered to ${to} @ ${timestamp}` ,
         timestamp,
         source: from,
         read,
@@ -319,7 +327,7 @@ export function process(rh, rn, username) {
       })();
       const post = false;
       const title = null, img_url = null;
-      const id = JSON.stringify({type, author, account, permlink, ts});
+      const id = `${msg} at ${date}`; 
       const source = account;
       const gk = 'foo';
       const gkf = false;

@@ -11,10 +11,48 @@ export const hiveClient = new Client(["https://api.hive.blog"], {
   consoleOnFailover: true,
 });
 
+const maximumAge = 600000;
 const historyLimit = 99;
 const notificationLimit = 99;
 
-const users: { [id: string]: null | string } = {};
+const users: { [id: string]: null | Array<ApiNotification> } = {};
+
+function fetch(activeUser: string): Promise<Array<ApiNotification>> {
+  return Promise.all([
+    hiveClient.call("account_history_api", "get_account_history", {
+      account: activeUser,
+      limit: historyLimit,
+      start: -1,
+    }),
+    hiveClient.call("bridge", "account_notifications", {
+      account: activeUser,
+      limit: notificationLimit,
+    }),
+  ]).then((results) => {
+    const [rh, rn] = results;
+    const oldNotifications = users[activeUser];
+    const newNotifications = process(rh, rn, activeUser);
+    if (oldNotifications === undefined || oldNotifications.length === 0) {
+      return (users[activeUser] = newNotifications);
+    }
+    if (newNotifications.length === 0) return users[activeUser];
+    const newestOldNotification = oldNotifications[oldNotifications.length - 1];
+    const oldestNewNotification = newNotifications[0];
+    for (
+      let startIndex = newNotifications.length;
+      startIndex > 0;
+      --startIndex
+    ) {
+      if ((newNotifications[startIndex - 1].id = newestOldNotification.id)) {
+        return (users[activeUser] = [
+          ...oldNotifications,
+          ...newNotifications.slice(startIndex),
+        ]);
+      }
+    } // for
+    return (users[activeUser] = [...newNotifications, ...oldNotifications]);
+  });
+}
 
 const server = http
   .createServer(function (req, lres) {
@@ -44,7 +82,6 @@ const server = http
           return;
         }
         const data = JSON.parse(buffer.toString());
-        console.log("User Posted: ", data);
         const { code } = data;
         // should validate this to prevent malicious scripts from mischief.
         lres.setHeader("Content-Type", "application/json;charset=utf-8");
@@ -58,20 +95,22 @@ const server = http
           return __pair[1];
         };
         const activeUser = _c("active_user") || null;
-        Promise.all([
-          hiveClient.call("account_history_api", "get_account_history", {
-            account: activeUser,
-            limit: historyLimit,
-            start: -1,
-          }),
-          hiveClient.call("bridge", "account_notifications", {
-            account: activeUser,
-            limit: notificationLimit,
-          }),
-        ]).then((results) => {
-          const [rh, rn] = results;
-          let notificaitons = process(rh, rn, activeUser);
-
+        let promise: Promise<Array<ApiNotification>>;
+        const oldNotifications = users[activeUser];
+        let x: any;
+        if (
+          oldNotifications &&
+          (x = oldNotifications.length) &&
+          (x = oldNotifications[x]) &&
+          x.ts <= maximumAge
+        ) {
+          promise = new Promise<Array<ApiNotification>>((resolve) => {
+            return resolve(users[activeUser]);
+          });
+        } else {
+          promise = fetch(activeUser);
+        }
+        promise.then((notificaitons) => {
           if (url === "/notifications/unread") {
             const count = notificaitons.filter(
               (n: ApiNotification) => n.read === 0
@@ -89,11 +128,8 @@ const server = http
           } else if (url === "/notifications/mark") {
             const { id } = data;
             notificaitons = notificaitons.map((n) => {
-              if (id) {
-                if (n.id === id) {
-                  n.read = 1;
-                }
-              } else {
+              if (id == undefined || n.id == id) {
+                console.log(`Marked ${n.id} as read`);
                 n.read = 1;
               }
               return n;
