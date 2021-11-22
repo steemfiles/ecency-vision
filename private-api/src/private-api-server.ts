@@ -2,7 +2,7 @@ import * as http from "http";
 import * as net from "net";
 import axios from "axios";
 import { Client } from "@hiveio/dhive";
-import { process, ApiNotification } from "../../private-api/src/notifications";
+import { process, ApiNotification } from "./notifications";
 import { Url, URL, URLSearchParams } from "url";
 
 // If set true, it will avoid pulling new data too often
