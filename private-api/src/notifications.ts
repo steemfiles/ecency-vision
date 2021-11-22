@@ -1,4 +1,12 @@
 const defensive = false;
+export enum NotificationFilter {
+  VOTES = "rvotes",
+  MENTIONS = "mentions",
+  FOLLOWS = "follows",
+  REPLIES = "replies",
+  REBLOGS = "reblogs",
+  TRANSFERS = "transfers",
+}
 
 interface BaseWsNotification {
   source: string;
@@ -179,17 +187,25 @@ export type ApiNotification =
   | ApiInactiveNotification
   | ApiReferralNotification;
 
-export function process(rh, rn, username) {
+export function process(
+  rh: { [id: string]: any },
+  rn: Array<any>,
+  username: string
+) {
   let notifications: Array<ApiNotification> = [];
-  let read : 0|1 = 0;
-  
+  let read: 0 | 1 = 0;
+  let lastReadTime: null | number = null;
   if (defensive && !rh.history) {
-    console.log("abnormally returning early because rh.history is undefined", {rh, rn});
+    console.log("abnormally returning early because rh.history is undefined", {
+      rh,
+      rn,
+    });
     return notifications;
   }
-  
+
   for (const h of rh.history) {
-    //@ts-ignore
+    // the most recent first
+    // @ts-ignore
     const { op, timestamp } = h[1];
     const { type, value } = op;
     const ts = new Date(timestamp).getTime();
@@ -202,7 +218,7 @@ export function process(rh, rn, username) {
         source: voter,
         read: 0,
         ts,
-        gk: "votes",
+        gk: "rvotes",
         gkf: false,
         type: weight === 0 ? "unvote" : "vote",
         voter,
@@ -231,7 +247,7 @@ export function process(rh, rn, username) {
           source: author,
           read,
           ts,
-          gk: "votes",
+          gk: "replies",
           gkf: false,
           type: "reply",
           parent_author,
@@ -252,12 +268,12 @@ export function process(rh, rn, username) {
       if (username === from) continue;
       const { nai, precision } = amount;
       const tn: ApiTransferNotification = {
-        id: `${from} transfered to ${to} @ ${timestamp}` ,
+        id: `${from} transfered to ${to} @ ${timestamp}`,
         timestamp,
         source: from,
         read,
         ts,
-        gk: "votes",
+        gk: NotificationFilter.TRANSFERS,
         gkf: false,
         type: "transfer",
         to,
@@ -273,7 +289,7 @@ export function process(rh, rn, username) {
       notifications.push(tn);
     } else if (type === "custom_json_operation") {
       const { id, json } = value;
-      if (id === "notify") {
+      if (id === "notify" && read === 0) {
         try {
           const payload = JSON.parse(json) as Array<any>;
           if (
@@ -282,12 +298,13 @@ export function process(rh, rn, username) {
             payload[1]?.date
           ) {
             read = 1;
+            lastReadTime = new Date(payload[1].date).getTime();
           }
         } catch (e) {
           // ignored ...
         }
       }
-    } else if (type === 'mention_operation') {
+    } else if (type === "mention_operation") {
       console.log(op);
     } // if
   } // for
@@ -311,48 +328,154 @@ export function process(rh, rn, username) {
   //     }
   //   }
   // }
+  read = 0;
   for (const hn of rn) {
-    const {id, type, date, msg, url} = hn;
-    const ts = (new Date(date)).getTime();
-    
-    if (type === 'mention') {
+    // most recent first
+    const { id, type, date, msg, url } = hn;
+    const ts = new Date(date).getTime();
+
+    //console.log(`${msg} is `, (ts > lastReadTime) ? 'newer' : 'older', 'than the last read time');
+
+    if (lastReadTime !== null && ts < lastReadTime) {
+      read = 1;
+    }
+
+    if (type === "mention") {
       const [discard, author, permlink] = url.split(/[@\/]/);
-      const account = (()=> {
-          let x = /@([^ ]+) /.exec(msg);
-          if (x && x[1]) {
-            return x[1];
-          } else {
-            return null;
-          }
+      const account = (() => {
+        let x = /@([^ ]+) /.exec(msg);
+        if (x && x[1]) {
+          return x[1];
+        } else {
+          return null;
+        }
       })();
+
       const post = false;
-      const title = null, img_url = null;
-      const id = `${msg} at ${date}`; 
+      const title = null,
+        img_url = null;
+      const id = `${msg} at ${date}`;
       const source = account;
-      const gk = 'foo';
+      const gk = "mentions";
       const gkf = false;
-      const mn : ApiMentionNotification = {
-        id,
-        source,        
+      if (account !== null && source !== null) {
+        const mn: ApiMentionNotification = {
+          id,
+          source,
+          read,
+          timestamp: date,
+          ts,
+          gk,
+          gkf,
+          type,
+          author,
+          account,
+          permlink,
+          post,
+          title,
+          img_url,
+        };
+        notifications.unshift(mn);
+      } else {
+        console.error("Could not parse account");
+      }
+    } else if (["follow", "unfollow", "ignore"].includes(type)) {
+      /*{
+        id: 7849626,
+        type: 'follow',
+        score: 30,
+        date: '2021-11-08T20:33:42',
+        msg: '@flamistan followed you',
+        url: '@flamistan'
+      }*/
+
+      const m = /@(.+) followed you/.exec(msg);
+      if (!m) continue;
+      const source = m[1];
+      const follower = source;
+      const following = username;
+      if (m !== null && m.length > 1) {
+        const fn: ApiFollowNotification = {
+          id: msg,
+          source: m[1],
+          read,
+          timestamp: date,
+          ts,
+          gk: "follows",
+          gkf: false,
+          type,
+          follower,
+          following,
+          // I don't really understand what this is for...
+          blog: type === "follow",
+        };
+        notifications.unshift(fn);
+      } else {
+        console.error("unexpected follow message");
+      }
+    } else if (type === "reblog") {
+      /*
+{
+  id: 7849589,
+  type: 'reply',
+  score: 30,
+  date: '2021-11-08T20:33:21',
+  msg: '@flamistan replied to your post',
+  url: '@flamistan/r29t3l'
+}
+{
+  id: 7737952,
+  type: 'reblog',
+  score: 30,
+  date: '2021-11-07T19:27:27',
+  msg: '@riansilva reblogged your post',
+  url: '@leprechaun/time-to-short-or-buy'
+}
+*/
+
+      const account = (() => {
+        const m = /@([^ ]+) /.exec(msg);
+        if (m !== null && m.length > 1) return m[1];
+        else return "";
+      })();
+
+      const [author, permlink] = (() => {
+        const m = /@([^ ]+)\/([^ ]+)/.exec(url);
+        if (m !== null && m.length == 3) {
+          return m.slice(1);
+        } else {
+          return ["", ""];
+        }
+      })();
+
+      const rn: ApiReblogNotification = {
+        id: msg,
+        source: account,
         read,
         timestamp: date,
         ts,
-        gk,
-        gkf,
-        type,
-        author,
+        gk: "reblogs",
+        gkf: false,
+
+        type: "reblog",
         account,
+        author,
         permlink,
-        post,
-        title,
-        img_url,
+        title: null,
+        img_url: null,
       };
-      notifications.unshift(mn);
+      notifications.unshift(rn);
+    } else if (
+      type !== "reply_comment" &&
+      type !== "vote" &&
+      type !== "reply"
+    ) {
+      console.log(hn);
     } // if
   } // for
-  return notifications.sort( (a : ApiNotification, b : ApiNotification) => {
-      return b.ts - a.ts;
-  } );
+  return notifications.sort((a: ApiNotification, b: ApiNotification) => {
+    return b.ts - a.ts;
+  });
 } // fn
 
 export default process;

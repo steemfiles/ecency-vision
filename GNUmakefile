@@ -1,7 +1,7 @@
 COMPILE_FLAGS=-std=c++17 -I /usr/local/src/boost_1_76_0
 LINK_FLAGS=-std=c++17 -L /usr/local/src/boost_1_76_0/stage/lib  -lboost_thread -lboost_system -lpthread -lboost_chrono
 
-debug: runforever-dbg .servers-build/private-api-server.js .servers-build/relayserver.js .servers-build/relayserver.js private-api/build/pull-history-data.js private-api/build/process.js
+debug: runforever-dbg .servers-build/src/server/private-api-server.js .servers-build/relayserver.js .servers-build/relayserver.js private-api/build/pull-history-data.js private-api/build/process.js
 
 production: .servers-build/runforever .servers-build/private-api-server.js .servers-build/runforever-dyn .servers-build/relayserver.js
 
@@ -30,8 +30,8 @@ listenlog-dbg: listenlog-dbg.o
 	g++ -ggdb listenlog-dbg.o -o listenlog-dbg  $(LINK_FLAGS) -static
 
 
-.servers-build/private-api-server.js: src/server/private-api-server.ts
-	rm -f .servers-build/private-api-server.js
+.servers-build/src/server/private-api-server.js: private-api/src/private-api-server.ts private-api/src/notifications.ts
+	rm -f .servers-build/src/server/private-api-server.js
 	tsc --OutDir .servers-build --resolveJsonModule --esModuleInterop src/server/private-api-server.ts
 	
 

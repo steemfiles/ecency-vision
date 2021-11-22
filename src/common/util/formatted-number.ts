@@ -48,10 +48,7 @@ export default (
       return "NaN";
     }
     const digitsTry = max(maximumFractionDigits, mandatoryFractionDigits);
-    const unity = Math.pow(
-      10,
-      digitsTry
-    );
+    const unity = Math.pow(10, digitsTry);
     if (value < 0) {
       addNegativeSignFlag = true;
     }
