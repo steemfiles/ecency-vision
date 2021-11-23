@@ -26,6 +26,8 @@
   "exclude": [
     "node_modules",
     "build",
+    "src/server/getsearchdata.*",
+    "src/server/relayserver.*",
     "scripts",
     "acceptance-tests",
     "webpack",

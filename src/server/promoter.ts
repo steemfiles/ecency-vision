@@ -5,6 +5,8 @@ import * as http from "http";
 import * as net from "net";
 import axios from "axios";
 
+const precision = 8;
+
 export function validateEntry(e: any): void {
   let missing_keys: Array<string> = [];
   if (e["active_votes"] === undefined) {
@@ -208,13 +210,30 @@ export const hiveClient = new Client(MAINNET_SERVERS, {
   addressPrefix: ADDRESS_PREFIX,
   chainId: CHAIN_ID,
 });
+
 export const transferHiveEngineAssetJSON = (
   from: string,
   to: string,
   amount: string,
-  memo: string
+  memo: string,
+  precision: number
 ): string => {
-  const [quantity, token_name] = amount.replace(/,/g, "").split(/ /);
+  let [quantity, token_name] = amount.replace(/,/g, "").split(/ /);
+  const dotLocation = amount.indexOf(".");
+  let new_length = quantity.length;
+  if (dotLocation != -1 && quantity.length > dotLocation + precision) {
+    // the expression is too long to be a well formed number.
+    // Rounding errors sometimes value would be 2* epsilon too big
+    // (https://www3.nd.edu/~zxu2/acms40390F15/Lec-1.2.pdf)
+    quantity = quantity.slice(0, (new_length = dotLocation + 1 + precision));
+  }
+  while (new_length > dotLocation && quantity[new_length - 1] === "0") {
+    --new_length;
+  }
+  if (dotLocation + 1 === new_length) {
+    --new_length;
+  }
+  quantity = quantity.slice(0, new_length);
   const json = JSON.stringify({
     // is it always 'tokens'?
     contractName: "tokens",
@@ -258,6 +277,8 @@ interface Block {
   transactions: Array<Transaction>;
 }
 
+// Watching Hive Engine transaction stream to insert promotions based on valid
+// payments.  Watch out the stream sometimes include invalid transactions.
 {
   hiveSsc
     .stream((err: unknown | null, result: Block | null) => {
@@ -272,6 +293,7 @@ interface Block {
       const { transactions, blockNumber } = result;
 
       if (transactions.length == 0) return;
+
       for (const transaction of transactions) {
         const { action, contract, sender, payload } = transaction;
         if (action != "transfer" || contract != "tokens" || !payload) {
@@ -281,15 +303,39 @@ interface Block {
         const { transactionId } = transaction;
 
         const { symbol, to, quantity, memo } = details;
+        if (!symbol || !to || !quantity || !memo || !memo.match) continue;
+
         if (to !== "proofofbrainblog") {
           //console.info(`payment not meant for proofofbrainblog`);
           continue;
         }
+
         if (symbol != "POB") {
-          console.log(`payment not POB!`);
+          console.log(`payment not in POB!`);
           continue;
         }
-        if (!symbol || !to || !quantity || !memo || !memo.match) continue;
+
+        if (quantity + 0 !== quantity) {
+          console.log("quantity is supposed to be a number not a string");
+          continue;
+        }
+
+        const m = /([0-9]|([1-9][0-9]+))(\.[0-9]+)/.exec(quantity);
+        if (m === null) {
+          console.log(`Non numeric quantity used: '${quantity}'`);
+          continue;
+        }
+
+        const quantity_string = "" + quantity;
+        const dotLocation = quantity_string.indexOf(".");
+        if (
+          dotLocation != -1 &&
+          dotLocation + 1 + precision < quantity_string.length
+        ) {
+          console.log("Invalid amount of POB: " + quantity_string);
+          continue;
+        }
+
         const matched = memo.match(/promote @(.+)\/(.+) for (.+) seconds/);
 
         try {
@@ -297,6 +343,7 @@ interface Block {
             // reject this tx
             throw Error(`Invalid memo: ${memo}`);
           }
+
           const memo_time = parseInt(matched[3]);
           const permlink = matched[2];
           const author = matched[1];
@@ -344,7 +391,8 @@ interface Block {
     .catch(console.error);
 }
 
-if (true) {
+// Public facing HTTP client to respond to webpage front end clients.
+{
   var con = mysql.createConnection({
     host: "localhost",
     database: "enginecy",
@@ -437,6 +485,7 @@ if (true) {
           const url = searchParams.get("url") ?? "0";
           const promoter = searchParams.get("promoter") || "0";
           const currency = "POB";
+          // round up to the next satoshi
           const price_quantity = Math.trunc(-time * price_rate * 1e8) * -1e-8;
 
           if (!promoter || !url || !time) {
@@ -456,11 +505,14 @@ if (true) {
             throw Error("price is too small (rent for more time)");
           }
 
+          // This routine will truncate numbers that contain an extra epsilon
+          // value due to rounding errors.
           const tx_json = transferHiveEngineAssetJSON(
             promoter, // from
             "proofofbrainblog", // to
             price_quantity + " POB", // amount
-            "promote " + url + " for " + time + " seconds" // memo
+            "promote " + url + " for " + time + " seconds", // memo
+            8
           );
           res.write(
             JSON.stringify({ status: "success", result: tx_json }) + "\n"
