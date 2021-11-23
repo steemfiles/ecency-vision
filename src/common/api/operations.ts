@@ -357,11 +357,7 @@ export const transferHot = (
     },
   ];
   const params: Parameters = {
-<<<<<<< HEAD
     callback: document.location.href,
-=======
-    callback: document.location.href
->>>>>>> POB-vision
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -543,11 +539,7 @@ export const transferToSavingsHot = (
     },
   ];
   const params: Parameters = {
-<<<<<<< HEAD
     callback: document.location.href,
-=======
-    callback: document.location.href
->>>>>>> POB-vision
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -596,11 +588,7 @@ export const collateralizedConvertHot = (
     },
   ];
   const params: Parameters = {
-<<<<<<< HEAD
     callback: document.location.href,
-=======
-    callback: document.location.href
->>>>>>> POB-vision
   };
   hs.sendOperation(op, params, () => {});
 };
@@ -640,11 +628,7 @@ export const convertHot = (owner: string, amount: string) => {
     },
   ];
   const params: Parameters = {
-<<<<<<< HEAD
     callback: document.location.href,
-=======
-    callback: document.location.href
->>>>>>> POB-vision
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -860,7 +844,7 @@ export const delegateVestingSharesHot = (
   const currency = parts[parts.length - 1];
   const quantity = parts[0].replace(/,/g, "");
   const params: Parameters = {
-    callback: document.location.href
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, console.log);
 };
@@ -960,11 +944,7 @@ export const undelegateVestingSharesHot = (
     currency
   );
   const params: Parameters = {
-<<<<<<< HEAD
     callback: document.location.href,
-=======
-    callback: document.location.href
->>>>>>> POB-vision
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -1054,7 +1034,7 @@ export const withdrawVestingHot = (
 ) => {
   const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
   const params: Parameters = {
-    callback: document.location.href
+    callback: document.location.href,
   };
   return hs.sendOperation(op, params, fn);
 };
@@ -1097,11 +1077,7 @@ export const cancelWithdrawVesting = (
 export const cancelWithdrawVestingHot = (account: string, txID: string) => {
   const op: Operation = createCancelPowerDownOp(account, txID);
   const params: Parameters = {
-<<<<<<< HEAD
     callback: document.location.href,
-=======
-    callback: document.location.href
->>>>>>> POB-vision
   };
   hs.sendOperation(op, params, () => {});
 };
@@ -1143,11 +1119,7 @@ export const setWithdrawVestingRouteHot = (
     },
   ];
   const params: Parameters = {
-<<<<<<< HEAD
     callback: document.location.href,
-=======
-    callback: document.location.href
->>>>>>> POB-vision
   };
   return hs.sendOperation(op, params, () => {});
 };
