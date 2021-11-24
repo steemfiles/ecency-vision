@@ -36,9 +36,7 @@ private-api/build/private-api-server.js: private-api/src/private-api-server.ts p
 
 private-api/build/process.js: private-api/src/process.ts private-api/src/notifications.ts
 	rm -f private-api/build/process.js
-	C=`tsc --OutDir private-api/build --lib es2021 --resolveJsonModule --esModuleInterop private-api/src/process.ts | wc -l`
-	echo $C
-	sleep 1
+	-tsc --OutDir private-api/build --lib es2021 --resolveJsonModule --esModuleInterop private-api/src/process.ts | dd bs=1 skip=1122 status=none 2>&1
 	
 private-api/build/pull-history-data.js: private-api/src/pull-history-data.ts private-api/src/notifications.ts
 	rm -f private-api/build/pull-history-data.js

@@ -2,6 +2,14 @@ import * as http from "http";
 import * as net from "net";
 import axios from "axios";
 
+if (!process.env["SEARCH_API_SECRET"] || !process.env["SEARCH_API_ADDR"]) {
+  console.log(
+    "Please ensure SEARCH_API_SECRET and SEARCH_API_ADDR " +
+      "environment variables are set"
+  );
+  process.exit(1);
+}
+
 let x: any;
 const domain_name =
   ((x = process.env["SEARCH_API_ADDR"]) &&
@@ -32,42 +40,50 @@ const server = http
       })() + req.url;
     console.log("Got request to this HTTP server.", req.url, refererURL.search);
     let params: { [id: string]: string } = {};
-    refererURL.searchParams.forEach((value, name) => {
-      params[name] = value;
+    let params_string = "";
+    req.on("data", (chunk) => {
+      params_string += chunk;
     });
-    if (req.url === "/search") {
-      axios
-        .post(addr, params, {
-          headers: { Authorization: process.env["SEARCH_API_SECRET"] },
-        })
-        .then(
-          function (response) {
-            lres.writeHead(200, { "Content-Type": "application/json" });
-            lres.write(JSON.stringify(response.data));
-            lres.end();
-          },
-          function (error) {
-            console.log(error);
-            lres.end();
-          }
-        );
-    } else {
-      axios
-        .post(addr, params, {
-          headers: { Authorization: process.env["SEARCH_API_SECRET"] },
-        })
-        .then(
-          function (response) {
-            lres.writeHead(200, { "Content-Type": "application/json" });
-            lres.write(JSON.stringify(response.data));
-            lres.end();
-          },
-          function (error) {
-            console.log(error);
-            lres.end();
-          }
-        );
-    }
+    req.on("end", () => {
+      params = JSON.parse(params_string);
+      if (req.url === "/search") {
+        axios
+          .post(addr, params, {
+            headers: {
+              Authorization: process.env["SEARCH_API_SECRET"] as string,
+            },
+          })
+          .then(
+            function (response) {
+              lres.writeHead(200, { "Content-Type": "application/json" });
+              lres.write(JSON.stringify(response.data));
+              lres.end();
+            },
+            function (error) {
+              console.log(error);
+              lres.end();
+            }
+          );
+      } else {
+        axios
+          .post(addr, params, {
+            headers: {
+              Authorization: process.env["SEARCH_API_SECRET"] as string,
+            },
+          })
+          .then(
+            function (response) {
+              lres.writeHead(200, { "Content-Type": "application/json" });
+              lres.write(JSON.stringify(response.data));
+              lres.end();
+            },
+            function (error) {
+              console.log(error);
+              lres.end();
+            }
+          );
+      }
+    });
   })
   .on("error", (e) => {
     console.error(e);

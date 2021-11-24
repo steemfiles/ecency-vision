@@ -7,7 +7,7 @@ axios
       q: "esteem",
       sort: "newest",
     },
-    { headers: { Authorization: process.env["SEARCH_API_SECRET"] } }
+    { headers: { Authorization: process.env["SEARCH_API_SECRET"] as string } }
   )
   .then(function (response) {
     console.log(response.data);
