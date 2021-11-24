@@ -39,13 +39,13 @@ child * cptr = nullptr;
 bool both_running = false, keep_looping = true;
 bool restart_subserver = false;
 char datetime_string[200] = "";
-bool verbose_threads = true;
+bool verbose_threads = false;
+
+
 // Performs an HTTP GET and prints the response
-bool connect_to_search_server()
+bool connect_to_http_server(const char* port, const char* target)
 {
 		auto const host = "127.0.0.1";
-		auto const port = "2999";
-		auto const target = "/ping";
 		const int version = 11;
 		boost::system::error_code ec;
 	
@@ -67,6 +67,16 @@ bool connect_to_search_server()
 		// Gracefully close the socket
 		stream.socket().shutdown(tcp::socket::shutdown_both, ec);		
 		return false;
+}
+
+bool connect_to_private_api_server() {
+	return connect_to_http_server("2997", "/notifications/unread");
+}
+
+// Performs an HTTP GET and prints the response
+bool connect_to_search_server()
+{
+	return connect_to_http_server("2999", "/ping");
 }
 
 // Performs an HTTP GET and prints the response
@@ -135,6 +145,54 @@ std::ostream& mainserverlogline() {
 	return mainserverlog << "] ";
 }
 
+/*******************************
+ *       Logging               *
+ *******************************/
+ 
+// These are and should only be used in the forward_log thread...
+ipstream *page_server_pipe_stream = nullptr, 
+	*search_server_pipe_stream = nullptr,
+	*private_server_pipe_stream = nullptr;
+std::ofstream subserverlog, searchserverlog, privatelog;
+child * page_server_ptr, * search_server_ptr, * private_server_ptr;
+void forward_log(ipstream& ps, std::ostream& log, const boost::process::child* cptr) {
+	time_t t;
+	struct tm *tmp;
+	
+	std::string line;
+	char c;
+	while (both_running) {
+		if (verbose_threads)
+			cerr << "forwarding log" << endl;
+		
+		boost::this_thread::yield();
+		try {
+			boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
+			if (keep_looping && ps && std::getline(ps, line) && !line.empty()) {
+				log << "[" << cptr->id() << "; " << datetime_string << "] " << line << std::endl;
+			}
+		} catch (...) {
+			
+		}
+	}
+}
+
+void forward_page_log(){
+	forward_log(*page_server_pipe_stream, subserverlog, page_server_ptr);
+}
+
+void forward_search_log() {
+	forward_log(*search_server_pipe_stream, searchserverlog, search_server_ptr);
+}
+
+void forward_private_api_log() {
+	forward_log(*private_server_pipe_stream, privatelog, private_server_ptr);
+}
+
+/*************************************
+ *  Signal Handling                  *
+ *************************************/
+
 void report_and_continue(int signal) {
 	mainserverlogline() << "Caught signal " << signal_names[signal] << "." << std::endl;
 }
@@ -197,39 +255,6 @@ void init_signal_names() {
 
 }
 
-// These are and should only be used in the forward_log thread...
-ipstream *page_server_pipe_stream = nullptr, *search_server_pipe_stream = nullptr;
-std::ofstream subserverlog, searchserverlog;
-child * page_server_ptr, * search_server_ptr;
-void forward_log(ipstream& ps, std::ostream& log, const boost::process::child* cptr) {
-	time_t t;
-	struct tm *tmp;
-	
-	std::string line;
-	char c;
-	while (both_running) {
-		if (verbose_threads)
-			cerr << "forwarding log" << endl;
-		
-		boost::this_thread::yield();
-		try {
-			boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
-			if (keep_looping && ps && std::getline(ps, line) && !line.empty()) {
-				log << "[" << cptr->id() << "; " << datetime_string << "] " << line << std::endl;
-			}
-		} catch (...) {
-			
-		}
-	}
-}
-
-void forward_page_log(){
-	forward_log(*page_server_pipe_stream, subserverlog, page_server_ptr);
-}
-
-void forward_search_log() {
-	forward_log(*search_server_pipe_stream, searchserverlog, search_server_ptr);
-}
 
 void keep_time() {
 	time_t t;
@@ -273,6 +298,7 @@ void check_connectivity() {
 }
 std::string search_server_location;
 std::string search_server_cmd;
+const char * private_server_cmd="node private-api/build/private-api-server.js";
 const char * page_server_cmd="node build/server.js";
 
 class pidfile {
@@ -289,37 +315,17 @@ public:
 	}
 };
 
-void mind_page_server(child ** child_ptr_ptr) {
+void mind_server(child * child_ptr, const char * name,  bool (*connect)()) {
 	while (keep_looping && both_running) {
 		if (verbose_threads)
-			cerr << "minding page server" << endl;
-		
-		if (connect_to_page_server()) {
-			mainserverlogline() << "Could not get a page from page subserver" << std::endl;
-			break;
-		}
-		
-		if (!(*child_ptr_ptr)->running()) {
-			break;
-		}
-		
-		boost::this_thread::sleep_for(boost::chrono::seconds(1));
-	}
-	both_running = false;
-}
-
-void mind_search_server(child ** child_ptr_ptr) {
-	while (keep_looping && both_running && *child_ptr_ptr != nullptr) {
-		if (verbose_threads)
-			cerr << "minding search server" << endl;
-		child& search_server = **child_ptr_ptr;
+			cerr << "minding " << name << " server" << endl;
 		boost::this_thread::sleep_for(boost::chrono::seconds(5));
-		if (connect_to_search_server()) {
-			mainserverlogline() << "Could not connect to search subserver" << std::endl;
+		if ((*connect)()) {
+			mainserverlogline() << "Could not connect to " << name << " subserver" << std::endl;
 			break;
 		}
 		
-		if (!search_server.running()) {
+		if (!child_ptr->running()) {
 			break;
 		}
 		
@@ -329,6 +335,20 @@ void mind_search_server(child ** child_ptr_ptr) {
 	
 	both_running = false;
 }
+
+struct Service {
+	std::string service_name;
+	std::string interpreter;
+	std::string file_name;
+	child ** child_ptr_ptr;
+};
+
+Service privateAPI = {"privateAPI", "node", "private-api/build/private-api-server.js", nullptr};
+
+Service services[1] = { privateAPI };
+
+
+
 
 int main() {
 	bool current_directory_writable = access(".", W_OK) == 0;
@@ -371,7 +391,14 @@ int main() {
 			keep_looping = false;
 		} else {
 			search_server_cmd = "node " + search_server_location;
-		}		
+		}
+		
+		if (access(services[0].file_name.c_str(), R_OK)) {
+			std::cerr << "Cannot find " << services[0].file_name 
+				<< " to run." << std::endl;
+			keep_looping = false;
+		}
+		
 	}
 	
 	if (!keep_looping) {
@@ -395,38 +422,59 @@ int main() {
 	
 	for (;keep_looping;) {
 		
-		std::cerr << "Checking for errant servers running..." << std::endl;
+		std::cerr << "Checking for errant servers running.  ";
 		
-		if (!connect_to_search_server()) {
-			std::cerr << "Search server already running.  Close this process and try again" << std::endl;
-			exit(1);
+		if (!(keep_looping=connect_to_search_server())) {
+			std::cerr << "Search server already running.  ";
 		}
 		
-		if (!connect_to_page_server()) {
-			std::cerr << "Page server already running.  Close this process and try again" << std::endl;
+		if (!(keep_looping&=connect_to_page_server())) {
+			std::cerr << "Page server already running.  ";
+		}
+		
+		if (!(keep_looping&=connect_to_private_api_server())) {
+			std::cerr << "Private API server already running.";
+		}
+		
+		if (!keep_looping) {
+			std::cerr << std::endl;
 			exit(1);
 		}
 		
 		
 		std::cerr << "Check Succeeded" << std::endl;
+	
+		if (private_server_pipe_stream) {
+			delete private_server_pipe_stream;
+		}
+		private_server_pipe_stream = new ipstream();
+		private_server_ptr = new child(private_server_cmd, std_out > *private_server_pipe_stream);
+		
+		
 		if (page_server_pipe_stream) {
 			delete page_server_pipe_stream;			
 		}
 		page_server_pipe_stream = new ipstream();
-		page_server_ptr = new child(page_server_cmd, std_out > *page_server_pipe_stream);		
+		page_server_ptr = new child(page_server_cmd, std_out > *page_server_pipe_stream);
+		
 		if (search_server_pipe_stream) {
 			delete search_server_pipe_stream;
 		}
 		search_server_pipe_stream = new ipstream();
 		search_server_ptr = new child(search_server_cmd, std_out > *search_server_pipe_stream);
 		
+		
+		
 		pidfile search_pidfile("search.pid", search_server_ptr->id());
 		pidfile page_pidfile("page.pid", page_server_ptr->id());
+		pidfile private_pidfile("private.pid", private_server_ptr->id());
 		
 		mainserverlogline() << "Running " << page_server_cmd << " [" << page_server_ptr->id() << "]" << std::endl;
 		mainserverlogline() << "Running " << search_server_cmd << " [" << search_server_ptr->id() << "]" << std::endl;
+		mainserverlogline() << "Running " << private_server_cmd << " [" << private_server_ptr->id() << "]" << std::endl;
 		child& page_server = *page_server_ptr;
 		child& search_server = *search_server_ptr;
+		
 		
 		both_running = true;
 		
@@ -436,46 +484,64 @@ int main() {
 		current_directory_writable = access(".", W_OK) == 0;
 		subserverlog.open("subserver.log", std::fstream::app);
 		searchserverlog.open("search.log", std::fstream::app);
+		privatelog.open("private.log", std::fstream::app);
 
 		cptr = &page_server;
 
 		boost::thread log_page_forwarding([&](){forward_log(*page_server_pipe_stream, subserverlog, page_server_ptr);});
 		boost::thread log_search_forwarding(forward_search_log);
+		boost::thread log_private_forwarding([&](){forward_log(*private_server_pipe_stream, privatelog, private_server_ptr);});
 		
+		
+		mainserverlogline() << "Waiting for servers to start..." << std::flush;
 		boost::this_thread::sleep_for(boost::chrono::seconds(10));
+		mainserverlog << "done." << std::endl;
 		
-		boost::thread minding_search_server([&](){mind_search_server(&search_server_ptr);});
-		boost::thread minding_page_server([&](){mind_page_server(&page_server_ptr);});
-
-		int col = 0;
+		boost::thread minding_search_server([&](){mind_server(search_server_ptr, "search", connect_to_search_server);});
+		boost::thread minding_page_server([&](){mind_server(page_server_ptr, "page", connect_to_page_server);});		
+		boost::thread minding_private_server([&](){mind_server(private_server_ptr, "private", connect_to_private_api_server);});
 		try {
-			while (both_running) {
-				boost::this_thread::sleep_for(boost::chrono::seconds(5));
-			} // while
-		} catch (const boost::process::process_error& e) {
-			mainserverlogline() << "Process exception: " << e.what() << ".  Code:" << e.code() << std::endl;
+			
+			int col = 0;
+			try {
+				while (both_running) {
+					boost::this_thread::sleep_for(boost::chrono::seconds(5));
+				} // while
+			} catch (const boost::process::process_error& e) {
+				mainserverlogline() << "Process exception: " << e.what() << ".  Code:" << e.code() << std::endl;
+			}
+		} catch (boost::wrapexcept<boost::system::system_error>& e) {
+			mainserverlogline() << "Exception caught (boost:system::system_error):" << e.what() << std::endl;
 		}
-		kill(page_server.id(), SIGKILL);					
-		page_server.wait();
-		mainserverlogline() << "Process page server  " << page_server.id() << " exited with status " << page_server.exit_code() << std::endl;
+		kill(page_server_ptr->id(), SIGKILL);					
+		page_server_ptr->wait();
+		mainserverlogline() << "Process page server  " << page_server_ptr->id() << " exited with status " << page_server_ptr->exit_code() << std::endl;
 		kill(search_server.id(), SIGKILL);
 		search_server.wait();
+		kill(private_server_ptr->id(), SIGKILL);
+		private_server_ptr->wait();
+		
 		
 		log_page_forwarding.join();
 		log_search_forwarding.join();
+		log_private_forwarding.join();
 		
 		mainserverlogline() << "Process search server " << search_server.id() << " exited with status " << page_server.exit_code() << std::endl;
+		mainserverlogline() << "Process private server " << private_server_ptr->id() << " exited with status " << private_server_ptr->exit_code() << std::endl;
 		
 		subserverlog.close();
 		searchserverlog.close();
+		privatelog.close();
 		
 		page_server_pipe_stream->close();
 		search_server_pipe_stream->close();
+		private_server_pipe_stream->close();
 		
 		delete search_server_ptr;
 		delete page_server_ptr;
+		delete private_server_ptr;
 	
-		search_server_ptr = page_server_ptr = nullptr;
+		private_server_ptr = search_server_ptr = page_server_ptr = nullptr;
 	}
 	unlink("manager.pid");
 	mainserverlogline() << "Exiting Master Server" << std::endl;
