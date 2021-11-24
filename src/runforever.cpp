@@ -25,8 +25,12 @@
 #include <memory>
 
 const char * page_server_cmd="node build/server.js";
+const char * promoter_server_cmd="node .servers-build/promoter.js";
 const std::string primary_search_location =  ".servers-build/relayserver.js";
 const std::string secondary_search_location = "src/server/relayserver.js";
+
+const std::string cmds[3] = {page_server_cmd, promoter_server_cmd, primary_search_location}; 
+
 const char * rfc_2822_format = "%a, %d %b %Y %T %z";
 const char * RUNFOREVER_MANAGER_VERSION_STRING = "Runforever Manager/0.0";
 const bool verbose = false;
@@ -79,6 +83,56 @@ bool connect_to_page_server()
 		auto const host = "127.0.0.1";
 		auto const port = "3000";
 		auto const target = "/";
+		const int version = 11;
+		boost::system::error_code ec;
+	
+		// The io_context is required for all I/O
+		net::io_context ioc;
+	
+		// These objects perform our I/O
+		tcp::resolver resolver(ioc);
+		beast::tcp_stream stream(ioc);
+	
+		// Look up the domain name
+		auto const results = resolver.resolve(host, port);
+	
+		// Make the connection on the IP address we get from a lookup
+		stream.connect(results, ec);		
+		if (ec)
+			return true;
+	
+		// Set up an HTTP GET request message
+		http::request<http::string_body> req{http::verb::get, target, version};
+		req.set(http::field::host, host);
+		req.set(http::field::user_agent, RUNFOREVER_MANAGER_VERSION_STRING);
+	
+		// Send the HTTP request to the remote host
+		http::write(stream, req);
+	
+		// This buffer is used for reading and must be persisted
+		beast::flat_buffer buffer;
+	
+		// Declare a container to hold the response
+		http::response<http::dynamic_body> res;
+	
+		// Receive the HTTP response
+		http::read(stream, buffer, res);
+				
+		// Gracefully close the socket
+		stream.socket().shutdown(tcp::socket::shutdown_both, ec);
+
+		if (ec)
+			return true;
+		else
+			return false;
+}
+
+// Performs an HTTP GET and prints the response
+bool connect_to_promoter_server()
+{
+		auto const host = "127.0.0.1";
+		auto const port = "2998";
+		auto const target = "/getPromoted";
 		const int version = 11;
 		boost::system::error_code ec;
 	
@@ -203,8 +257,9 @@ void init_signal_names() {
 
 // These are and should only be used in the forward_log thread...
 ipstream *page_server_pipe_stream = nullptr, *search_server_pipe_stream = nullptr;
-std::ofstream subserverlog, searchserverlog;
-child * page_server_ptr, * search_server_ptr;
+ipstream *promoter_server_pipe_stream = nullptr;
+std::ofstream subserverlog, searchserverlog, promoterserverlog;
+child * page_server_ptr, * search_server_ptr, *promoter_server_ptr;
 void forward_log(ipstream& ps, std::ostream& log, const boost::process::child* cptr) {
 	time_t t;
 	struct tm *tmp;
@@ -233,6 +288,10 @@ void forward_page_log(){
 
 void forward_search_log() {
 	forward_log(*search_server_pipe_stream, searchserverlog, search_server_ptr);
+}
+
+void forward_promoter_log() {
+	forward_log(*promoter_server_pipe_stream, promoterserverlog, promoter_server_ptr);
 }
 
 void keep_time() {
@@ -333,6 +392,25 @@ void mind_search_server(child ** child_ptr_ptr) {
 	both_running = false;
 }
 
+void mind_promoter_server(child ** child_ptr_ptr) {
+	while (keep_looping && both_running && child_ptr_ptr != nullptr) {
+		if (verbose_threads)
+			cerr << "minding promoter server" << endl;
+		child& promoter = **child_ptr_ptr;
+		if (connect_to_promoter_server()) {
+			mainserverlogline() << "Could not connect to promoter server" << std::endl;
+		}
+		
+		if (!promoter_server_ptr->running()) {
+			break;
+		}
+		
+		boost::this_thread::sleep_for(boost::chrono::seconds(1));
+	}
+	
+	both_running = false;
+}
+
 int main() {
 	bool current_directory_writable = access(".", W_OK) == 0;
 	// Check that this program can do everything it needs to do
@@ -372,7 +450,13 @@ int main() {
 			keep_looping = false;
 		} else {
 			search_server_cmd = "node " + search_server_location;
-		}		
+		}
+		
+		if (access(".servers-build/promoter.js", R_OK)) {
+			std::cerr << "Cannot find promoter.js to run." << std::endl;
+			keep_looping = false;
+		}
+		
 	}
 	
 	if (!keep_looping) {
@@ -399,17 +483,31 @@ int main() {
 		std::cerr << "Checking for errant servers running..." << std::endl;
 		
 		if (!connect_to_search_server()) {
-			std::cerr << "Search server already running.  Close this process and try again" << std::endl;
-			exit(1);
+			std::cerr << "Search server already running.  Close this process." << std::endl;
+			keep_looping = false;
 		}
 		
 		if (!connect_to_page_server()) {
-			std::cerr << "Page server already running.  Close this process and try again" << std::endl;
+			std::cerr << "Page server already running.  Close this process." << std::endl;
+			keep_looping = false;
+		}
+		
+		if (!connect_to_promoter_server()) {
+			std::cerr << "Promoter server already running.  Close this process." << std::endl;
+			keep_looping = false;
+		}
+		
+		if (!keep_looping) {
 			exit(1);
 		}
 		
 		
 		std::cerr << "Check Succeeded" << std::endl;
+		if (promoter_server_pipe_stream) {
+			delete promoter_server_pipe_stream;
+		}
+		promoter_server_pipe_stream = new ipstream();
+		promoter_server_ptr = new child(promoter_server_cmd, std_out > *promoter_server_pipe_stream);
 		if (page_server_pipe_stream) {
 			delete page_server_pipe_stream;			
 		}
@@ -421,13 +519,17 @@ int main() {
 		search_server_pipe_stream = new ipstream();
 		search_server_ptr = new child(search_server_cmd, std_out > *search_server_pipe_stream);
 		
+		
 		pidfile search_pidfile("search.pid", search_server_ptr->id());
 		pidfile page_pidfile("page.pid", page_server_ptr->id());
+		pidfile promoter_pidfile("promoter.pid", promoter_server_ptr->id());
 		
 		mainserverlogline() << "Running " << page_server_cmd << " [" << page_server_ptr->id() << "]" << std::endl;
 		mainserverlogline() << "Running " << search_server_cmd << " [" << search_server_ptr->id() << "]" << std::endl;
+		mainserverlogline() << "Running " << promoter_server_cmd << " [" << promoter_server_ptr->id() << "]" << std::endl;
 		child& page_server = *page_server_ptr;
 		child& search_server = *search_server_ptr;
+		child& promoter_server_cmd = *promoter_server_ptr;
 		
 		both_running = true;
 		
@@ -437,14 +539,20 @@ int main() {
 		current_directory_writable = access(".", W_OK) == 0;
 		subserverlog.open("subserver.log", std::fstream::app);
 		searchserverlog.open("search.log", std::fstream::app);
-
+		promoterserverlog.open("promoter.log", std::fstream::app);
 		cptr = &page_server;
 
 		boost::thread log_page_forwarding([&](){forward_log(*page_server_pipe_stream, subserverlog, page_server_ptr);});
 		boost::thread log_search_forwarding(forward_search_log);
+		boost::thread log_promoter_forwarding(forward_promoter_log);
+		
+		
+		boost::this_thread::sleep_for(boost::chrono::seconds(10));
+		
 		boost::thread minding_search_server([&](){mind_search_server(&search_server_ptr);});
 		boost::thread minding_page_server([&](){mind_page_server(&page_server_ptr);});
-
+		boost::thread minding_promoter_server([&](){mind_promoter_server(&promoter_server_ptr);});
+		
 		int col = 0;
 		try {
 			while (both_running) {
@@ -458,22 +566,29 @@ int main() {
 		mainserverlogline() << "Process page server  " << page_server.id() << " exited with status " << page_server.exit_code() << std::endl;
 		kill(search_server.id(), SIGKILL);
 		search_server.wait();
+		kill(promoter_server_ptr->id(), SIGKILL);
+		promoter_server_ptr->wait();
 		
 		log_page_forwarding.join();
 		log_search_forwarding.join();
+		log_promoter_forwarding.join();
 		
 		mainserverlogline() << "Process search server " << search_server.id() << " exited with status " << page_server.exit_code() << std::endl;
+		mainserverlogline() << "Process Promoter server " << promoter_server_ptr->id() << " exited with status " << promoter_server_ptr->exit_code() << std::endl;
 		
 		subserverlog.close();
 		searchserverlog.close();
+		promoterserverlog.close();
 		
 		page_server_pipe_stream->close();
 		search_server_pipe_stream->close();
+		promoter_server_pipe_stream->close();
 		
 		delete search_server_ptr;
 		delete page_server_ptr;
+		delete promoter_server_ptr;
 	
-		search_server_ptr = page_server_ptr = nullptr;
+		promoter_server_ptr = search_server_ptr = page_server_ptr = nullptr;
 	}
 	unlink("manager.pid");
 	mainserverlogline() << "Exiting Master Server" << std::endl;
