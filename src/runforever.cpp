@@ -359,13 +359,15 @@ int main() {
 			keep_looping = false;
 		}
 		
-		if (access((search_server_location="servers-build/relayserver.js").c_str(), R_OK)
+		if (access((search_server_location="private-api/build/relayserver.js").c_str(), R_OK)
 			&&
-		   access((search_server_location="src/server/relayserver.js").c_str(), R_OK) 
-			
-			
+		   access((search_server_location=".servers-build/relayserver.js").c_str(), R_OK)
+			&&
+		   access((search_server_location="src/server/relayserver.js").c_str(), R_OK)			
 			) {
-			std::cerr << "Cannot find build/relayserver.js or src/server/relayserver.js to run." << std::endl;
+			std::cerr << "Cannot find private-api/build/relayserver.js, " << 
+				"build/relayserver.js or src/server/relayserver.js to run." << 
+				std::endl;
 			keep_looping = false;
 		} else {
 			search_server_cmd = "node " + search_server_location;
@@ -439,6 +441,9 @@ int main() {
 
 		boost::thread log_page_forwarding([&](){forward_log(*page_server_pipe_stream, subserverlog, page_server_ptr);});
 		boost::thread log_search_forwarding(forward_search_log);
+		
+		boost::this_thread::sleep_for(boost::chrono::seconds(10));
+		
 		boost::thread minding_search_server([&](){mind_search_server(&search_server_ptr);});
 		boost::thread minding_page_server([&](){mind_page_server(&page_server_ptr);});
 
