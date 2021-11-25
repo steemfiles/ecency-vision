@@ -14,14 +14,15 @@ export const hiveClient = new Client(["https://api.hive.blog"], {
   consoleOnFailover: true,
 });
 
-const minimumPeriodBetweenFetches = 4000;
-const historyLimit = 999;
-const notificationLimit = 99;
+const minimumPeriodBetweenFetches = 20000;
+const historyLimit = 15;
+const notificationLimit = 15;
 
 interface User {
   history: Array<unknown>;
   hiveNotifications: Array<unknown>;
   apiNotifications: Array<ApiNotification>;
+  lastFetch: number;
 }
 const users: { [id: string]: null | User } = {};
 const history_numbers: { [id: string]: number } = {};
@@ -61,6 +62,7 @@ function fetch(activeUser: string): Promise<Array<ApiNotification> | null> {
           apiNotifications: oldNotifications
             ? [...oldNotifications.apiNotifications, ...newNotifications]
             : newNotifications,
+          lastFetch: new Date().getTime(),
         };
         return newNotifications;
       })
@@ -147,13 +149,20 @@ const server = http
         if ((x = oldNotifications) && (x = x.apiNotifications) && x.length) {
           lastNotification = x[0];
         }
-
-        if (false) {
+        if (users[activeUser])
+          console.log(new Date().getTime() - users[activeUser].lastFetch);
+        if (
+          users[activeUser] &&
+          new Date().getTime() - users[activeUser].lastFetch <
+            minimumPeriodBetweenFetches
+        ) {
           promise = new Promise<Array<ApiNotification>>((resolve) => {
             return resolve(users[activeUser].apiNotifications ?? []);
           });
+          console.log("Will give cached copy");
         } else {
           promise = fetch(activeUser);
+          console.log("Will fetch");
         }
         const { since, filter } = data;
         promise.then((notificaitons_p: Array<ApiNotification> | null) => {
