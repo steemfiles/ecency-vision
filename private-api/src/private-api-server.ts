@@ -15,8 +15,8 @@ export const hiveClient = new Client(["https://api.hive.blog"], {
 });
 
 const minimumPeriodBetweenFetches = 20000;
-const historyLimit = 15;
-const notificationLimit = 15;
+const historyLimit = 999;
+const notificationLimit = 99;
 
 interface User {
   history: Array<unknown>;
