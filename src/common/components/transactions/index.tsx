@@ -584,7 +584,7 @@ export class TransactionList extends Component<Props> {
               "interests",
               "stake-operations",
               "rewards",
-              "socials",
+              //"socials",
             ].map((x) => (
               <option key={x} value={x}>
                 {_t(`transactions.group-${x}`)}

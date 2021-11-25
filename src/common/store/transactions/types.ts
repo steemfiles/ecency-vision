@@ -520,8 +520,8 @@ export type OperationGroup =
   | "market-orders"
   | "interests"
   | "stake-operations"
-  | "rewards"
-  | "socials";
+  | "rewards";
+//  | "socials";
 export interface Transactions {
   list: Transaction[];
   loading: boolean;
