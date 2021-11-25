@@ -159,7 +159,7 @@ export const getNotifications = (
 export const getUnreadNotificationCount = (
   username: string
 ): Promise<number> => {
-  const data = { code: getAccessToken(username) };
+  const data = { code: getAccessToken(username), username };
 
   return data.code
     ? axios
@@ -172,8 +172,9 @@ export const markNotifications = (
   username: string,
   id: string | null = null
 ) => {
-  const data: { code: string | undefined; id?: string } = {
+  const data: { code: string | undefined; id?: string; username: string } = {
     code: getAccessToken(username),
+    username,
   };
   if (id) {
     data.id = id;

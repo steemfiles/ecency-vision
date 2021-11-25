@@ -14,16 +14,22 @@ export const hiveClient = new Client(["https://api.hive.blog"], {
   consoleOnFailover: true,
 });
 
-const maximumAge = 4000;
+const minimumPeriodBetweenFetches = 4000;
 const historyLimit = 999;
 const notificationLimit = 99;
 
-const users: { [id: string]: null | Array<ApiNotification> } = {};
-
+interface User {
+  history: Array<unknown>;
+  hiveNotifications: Array<unknown>;
+  apiNotifications: Array<ApiNotification>;
+}
+const users: { [id: string]: null | User } = {};
+const history_numbers: { [id: string]: number } = {};
+const notification_numbers: { [id: string]: number } = {};
 function fetch(activeUser: string): Promise<Array<ApiNotification> | null> {
   if (!activeUser) {
     return new Promise<Array<ApiNotification>>((resolve) => {
-      return resolve(users[activeUser] ?? []);
+      return resolve(null);
     });
   }
   try {
@@ -40,39 +46,33 @@ function fetch(activeUser: string): Promise<Array<ApiNotification> | null> {
     ])
       .then((results) => {
         const [rh, rn] = results;
-        const oldNotifications = cache ? users[activeUser] ?? [] : [];
+        const { history } = rh;
+        const last_history = history.length
+          ? history[history.length - 1][0]
+          : -1;
+        history_numbers[activeUser] = last_history;
+        //console.log(history_numbers);
+        const oldNotifications = users[activeUser];
         const newNotifications: ApiNotification[] =
           process(rh, rn, activeUser) ?? [];
-        if (!oldNotifications || oldNotifications.length === 0) {
-          return (users[activeUser] = newNotifications);
-        }
-        if (newNotifications.length === 0) return users[activeUser];
-        const newestOldNotification =
-          oldNotifications[oldNotifications.length - 1];
-        const oldestNewNotification = newNotifications[0];
-        for (
-          let startIndex = newNotifications.length - 1;
-          startIndex >= 0;
-          --startIndex
-        ) {
-          if ((newNotifications[startIndex].id = newestOldNotification.id)) {
-            return (users[activeUser] = [
-              ...newNotifications.slice(0, startIndex),
-              ...oldNotifications,
-            ]);
-          }
-        } // for
-        return (users[activeUser] = [...newNotifications, ...oldNotifications]);
+        users[activeUser] = {
+          history,
+          hiveNotifications: rn,
+          apiNotifications: oldNotifications
+            ? [...oldNotifications.apiNotifications, ...newNotifications]
+            : newNotifications,
+        };
+        return newNotifications;
       })
       .catch((e) => {
         console.log("Error:", JSON.stringify(e, null, 2));
-        return users[activeUser];
+        return users[activeUser].apiNotifications;
       });
   } catch (e) {
     console.log("Error:", e);
   }
   return new Promise<Array<ApiNotification>>((resolve) => {
-    return resolve(users[activeUser] ?? []);
+    return resolve(users[activeUser].apiNotifications ?? []);
   });
 }
 
@@ -141,16 +141,16 @@ const server = http
         }
         let promise: Promise<Array<ApiNotification> | null>;
         const oldNotifications = users[activeUser];
+        let lastNotification: ApiNotification | null = null;
+
         let x: any;
-        if (
-          oldNotifications &&
-          (x = oldNotifications.length) &&
-          (x = oldNotifications[x]) &&
-          x.ts <= maximumAge &&
-          cache
-        ) {
+        if ((x = oldNotifications) && (x = x.apiNotifications) && x.length) {
+          lastNotification = x[0];
+        }
+
+        if (false) {
           promise = new Promise<Array<ApiNotification>>((resolve) => {
-            return resolve(users[activeUser] ?? []);
+            return resolve(users[activeUser].apiNotifications ?? []);
           });
         } else {
           promise = fetch(activeUser);
@@ -161,32 +161,51 @@ const server = http
             handleError(404, lres);
             return;
           }
-          let notificaitons: Array<ApiNotification> =
+          let notifications: Array<ApiNotification> =
             notificaitons_p as Array<ApiNotification>;
+          if (lastNotification) {
+            console.log("lastNot...: " + lastNotification.id);
+            for (let i = 0; i < notifications.length; ++i) {
+              console.log(notifications[i].id);
+              if (notifications[i].id === lastNotification.id) {
+                console.log("lastNotification found in new notifications");
+                notifications = notifications.slice(0, i);
+                break;
+              }
+            }
+            users[activeUser].apiNotifications = notifications = [
+              ...notifications,
+              ...oldNotifications.apiNotifications,
+            ];
+          }
           if (url === "/notifications/unread") {
-            const count = notificaitons.filter(
-              (n: ApiNotification) => n.timestamp > since && n.read === 0
+            const count = notifications.filter(
+              (n: ApiNotification) =>
+                (!since || n.timestamp > since) && n.read === 0
             ).length;
             console.log({ count });
             lres.write(JSON.stringify({ count }) + "\n");
             lres.end();
           } else if (url === "/notifications") {
             console.log({ since, filter });
-            notificaitons = notificaitons.filter(
+            notifications = notifications.filter(
               (n) =>
                 (!since || n.timestamp > since) && (!filter || n.gk === filter)
             );
-            lres.write(JSON.stringify(notificaitons) + "\n");
+            lres.write(JSON.stringify(notifications) + "\n");
             lres.end();
           } else if (url === "/notifications/mark") {
             const { id } = data;
-            notificaitons = notificaitons.map((n) => {
-              if (id == undefined || n.id == id) {
-                console.log(`Marked ${n.id} as read`);
-                n.read = 1;
+            let userData: undefined | User = users[activeUser];
+            if (userData) {
+              let ns = userData.apiNotifications;
+              for (const n of ns) {
+                if (!id || id === n.id) {
+                  n.read = 1;
+                  console.log(`Marked ${n.id} as read`);
+                }
               }
-              return n;
-            });
+            } // if
             lres.end();
           } else {
             handleError(404, lres);
