@@ -21,40 +21,58 @@ const notificationLimit = 99;
 const users: { [id: string]: null | Array<ApiNotification> } = {};
 
 function fetch(activeUser: string): Promise<Array<ApiNotification> | null> {
-  return Promise.all([
-    hiveClient.call("account_history_api", "get_account_history", {
-      account: activeUser,
-      limit: historyLimit,
-      start: -1,
-    }),
-    hiveClient.call("bridge", "account_notifications", {
-      account: activeUser,
-      limit: notificationLimit,
-    }),
-  ]).then((results) => {
-    const [rh, rn] = results;
-    const oldNotifications = cache ? users[activeUser] ?? [] : [];
-    const newNotifications: ApiNotification[] =
-      process(rh, rn, activeUser) ?? [];
-    if (!oldNotifications || oldNotifications.length === 0) {
-      return (users[activeUser] = newNotifications);
-    }
-    if (newNotifications.length === 0) return users[activeUser];
-    const newestOldNotification = oldNotifications[oldNotifications.length - 1];
-    const oldestNewNotification = newNotifications[0];
-    for (
-      let startIndex = newNotifications.length - 1;
-      startIndex >= 0;
-      --startIndex
-    ) {
-      if ((newNotifications[startIndex].id = newestOldNotification.id)) {
-        return (users[activeUser] = [
-          ...newNotifications.slice(0, startIndex),
-          ...oldNotifications,
-        ]);
-      }
-    } // for
-    return (users[activeUser] = [...newNotifications, ...oldNotifications]);
+  if (!activeUser) {
+    return new Promise<Array<ApiNotification>>((resolve) => {
+      return resolve(users[activeUser] ?? []);
+    });
+  }
+  try {
+    return Promise.all([
+      hiveClient.call("account_history_api", "get_account_history", {
+        account: activeUser,
+        limit: historyLimit,
+        start: -1,
+      }),
+      hiveClient.call("bridge", "account_notifications", {
+        account: activeUser,
+        limit: notificationLimit,
+      }),
+    ])
+      .then((results) => {
+        const [rh, rn] = results;
+        const oldNotifications = cache ? users[activeUser] ?? [] : [];
+        const newNotifications: ApiNotification[] =
+          process(rh, rn, activeUser) ?? [];
+        if (!oldNotifications || oldNotifications.length === 0) {
+          return (users[activeUser] = newNotifications);
+        }
+        if (newNotifications.length === 0) return users[activeUser];
+        const newestOldNotification =
+          oldNotifications[oldNotifications.length - 1];
+        const oldestNewNotification = newNotifications[0];
+        for (
+          let startIndex = newNotifications.length - 1;
+          startIndex >= 0;
+          --startIndex
+        ) {
+          if ((newNotifications[startIndex].id = newestOldNotification.id)) {
+            return (users[activeUser] = [
+              ...newNotifications.slice(0, startIndex),
+              ...oldNotifications,
+            ]);
+          }
+        } // for
+        return (users[activeUser] = [...newNotifications, ...oldNotifications]);
+      })
+      .catch((e) => {
+        console.log("Error:", JSON.stringify(e, null, 2));
+        return users[activeUser];
+      });
+  } catch (e) {
+    console.log("Error:", e);
+  }
+  return new Promise<Array<ApiNotification>>((resolve) => {
+    return resolve(users[activeUser] ?? []);
   });
 }
 
@@ -94,7 +112,8 @@ const server = http
           return;
         }
         const data = JSON.parse(buffer.toString());
-        const { code } = data;
+        console.log({ data });
+        const { code, username } = data;
         // should validate this to prevent malicious scripts from mischief.
         lres.setHeader("Content-Type", "application/json;charset=utf-8");
         const _c = (k: string): any => {
@@ -114,7 +133,12 @@ const server = http
             return __pair[1];
           }
         };
-        const activeUser = _c("active_user") || null;
+        const activeUser = username || _c("active_user") || null;
+        if (activeUser === null) {
+          console.log("Error: activeUser not set in cookie");
+        } else {
+          console.log({ activeUser });
+        }
         let promise: Promise<Array<ApiNotification> | null>;
         const oldNotifications = users[activeUser];
         let x: any;
@@ -143,6 +167,7 @@ const server = http
             const count = notificaitons.filter(
               (n: ApiNotification) => n.timestamp > since && n.read === 0
             ).length;
+            console.log({ count });
             lres.write(JSON.stringify({ count }) + "\n");
             lres.end();
           } else if (url === "/notifications") {

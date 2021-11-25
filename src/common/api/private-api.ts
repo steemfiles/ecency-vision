@@ -135,6 +135,7 @@ export const getNotifications = (
   //
   const data: { code: string | undefined; filter?: string; since?: string } = {
     code: getAccessToken(username),
+    username,
   };
 
   if (filter) {
