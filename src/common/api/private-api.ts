@@ -133,7 +133,12 @@ export const getNotifications = (
   //  ops.recover_account, ops.comment
   //]);
   //
-  const data: { code: string | undefined; filter?: string; since?: string } = {
+  const data: {
+    code: string | undefined;
+    username: string;
+    filter?: string;
+    since?: string;
+  } = {
     code: getAccessToken(username),
     username,
   };
