@@ -70,7 +70,6 @@ interface ItemBodyProps {
 
 import appName from "../../../common/helper/app-name";
 
-
 export class ItemBody extends Component<ItemBodyProps> {
   shouldComponentUpdate(nextProps: Readonly<ItemBodyProps>): boolean {
     return this.props.entry.body !== nextProps.entry.body;
@@ -382,11 +381,13 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
               return (
                 <>
                   <ItemBody global={this.props.global} entry={entry} />
-                  {app && <div className="app" title={app}>
-                    <Tsx k="entry.via-app" args={{ app: appShort }}>
-                      <a href="/faq#source-label" />
-                    </Tsx>
-                  </div>}                  
+                  {app && (
+                    <div className="app" title={app}>
+                      <Tsx k="entry.via-app" args={{ app: appShort }}>
+                        <a href="/faq#source-label" />
+                      </Tsx>
+                    </div>
+                  )}
                   <div className="item-controls">
                     {EntryVoteBtn({
                       ...this.props,
@@ -402,7 +403,6 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
                       entry,
                     })}
 
-                    
                     <a
                       className={_c(`reply-btn ${edit ? "disabled" : ""}`)}
                       onClick={this.toggleReply}

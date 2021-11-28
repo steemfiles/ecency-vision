@@ -26,12 +26,6 @@ import HiveWallet from "../../helper/hive-wallet";
 
 import { vestsToHp } from "../../helper/vesting";
 
-import {
-  getAccount,
-  getConversionRequests,
-} from "../../api/hive";
-import {getCollateralizedConversionRequests} from "../../api/hive";
-
 import { claimRewardBalance, formatError } from "../../api/operations";
 
 import formattedNumber from "../../util/formatted-number";
@@ -43,9 +37,11 @@ import { _t } from "../../i18n";
 import { plusCircle } from "../../img/svg";
 import { TEST_NET } from "../../../client_config";
 import {
+  getAccount,
+  getConversionRequests,
+  getCollateralizedConversionRequests,
   HIVE_API_NAME,
   DOLLAR_API_NAME,
-  HIVE_LANGUAGE_KEY,
   HIVE_HUMAN_NAME_UPPERCASE,
 } from "../../api/hive";
 
@@ -110,14 +106,19 @@ export class WalletHive extends BaseComponent<Props, State> {
       this.stateSet({ converting });
     });
 
-    // I don't see this not being a function here...
-    getCollateralizedConversionRequests(account.name).then((rs) => {
-      let collaterializedConverting = 0;
-      for (const r of rs) {
-        collaterializedConverting += parseAsset(r.collateral_amount).amount;
-      }
-      this.setState({ collaterializedConverting });
-    });
+    try {
+      // I don't see this not being a function here...
+      if (getCollateralizedConversionRequests != undefined)
+        getCollateralizedConversionRequests(account.name).then((rs) => {
+          let collaterializedConverting = 0;
+          for (const r of rs) {
+            collaterializedConverting += parseAsset(r.collateral_amount).amount;
+          }
+          this.setState({ collaterializedConverting });
+        });
+    } catch (e) {
+      console.log("This fails as 'not a function' error.  Is node broken?");
+    }
   };
 
   toggleDelegatedList = () => {
@@ -251,7 +252,7 @@ export class WalletHive extends BaseComponent<Props, State> {
 
             <div className="balance-row hive">
               <div className="balance-info">
-                <div className="title">{_t("wallet." + HIVE_LANGUAGE_KEY)}</div>
+                <div className="title">{HIVE_HUMAN_NAME_UPPERCASE}</div>
                 <div className="description">
                   {_t("wallet.hive-description")}
                 </div>
@@ -692,7 +693,7 @@ export class WalletHive extends BaseComponent<Props, State> {
                   })()}
                   <span>
                     {formattedNumber(w.savingBalance, {
-                      suffix: HIVE_API_NAME,
+                      suffix: HIVE_HUMAN_NAME_UPPERCASE,
                     })}
                   </span>
                 </div>
@@ -725,7 +726,7 @@ export class WalletHive extends BaseComponent<Props, State> {
                   })()}
 
                   <span>
-                    {formattedNumber(w.savingBalanceHbd, { suffix: "$" })}
+                    {formattedNumber(w.savingBalanceHbd, { prefix: "$" })}
                   </span>
                 </div>
               </div>
@@ -736,7 +737,7 @@ export class WalletHive extends BaseComponent<Props, State> {
                 {_t("wallet.next-power-down", {
                   time: moment(w.nextVestingWithdrawalDate).fromNow(),
                   amount: formattedNumber(w.nextVestingSharesWithdrawalHive, {
-                    suffix: HIVE_API_NAME,
+                    suffix: HIVE_HUMAN_NAME_UPPERCASE,
                   }),
                 })}
               </div>

@@ -393,8 +393,14 @@ export interface CollateralizedConversionRequest {
 }
 export const getCollateralizedConversionRequests = (
   account: string
-): Promise<CollateralizedConversionRequest[]> =>
-  hiveClient.database.call("get_collateralized_conversion_requests", [account]);
+): Promise<CollateralizedConversionRequest[]> => {
+  return hiveClient.call(
+    "condenser_api",
+    "get_collateralized_conversion_requests",
+    [account]
+  );
+};
+
 export interface BlogEntry {
   blog: string;
   entry_id: number;

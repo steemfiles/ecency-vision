@@ -14,9 +14,17 @@ import {
   fullAccountInstance,
   allOver,
 } from "../../helper/test-helper";
+
 import { StaticRouter } from "react-router-dom";
 import { FullAccount } from "../../store/accounts/types";
-import { getConversionRequests } from "../../api/hive";
+import {
+  getAccount,
+  getConversionRequests,
+  getCollateralizedConversionRequests,
+  HIVE_API_NAME,
+  DOLLAR_API_NAME,
+  HIVE_HUMAN_NAME_UPPERCASE,
+} from "../../api/hive";
 
 jest.mock("moment", () => () => ({
   fromNow: () => "in 5 days",
