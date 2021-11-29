@@ -1,7 +1,7 @@
 COMPILE_FLAGS=-std=c++17 -I /usr/local/src/boost_1_76_0
 LINK_FLAGS=-std=c++17 -L /usr/local/src/boost_1_76_0/stage/lib  -lboost_thread -lboost_system -lpthread -lboost_chrono
 
-debug: private-api/build/private-api-server.js private-api/build/relayserver.js private-api/build/relayserver.js private-api/build/pull-history-data.js private-api/build/process.js runforever-dbg
+debug: private-api/build/private-api-server.js private-api/build/relayserver.js private-api/build/relayserver.js private-api/build/process.js runforever-dbg
 
 production: private-api/build/runforever private-api/build/private-api-server.js private-api/build/runforever-dyn private-api/build/relayserver.js
 
