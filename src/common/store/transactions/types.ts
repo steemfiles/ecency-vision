@@ -217,7 +217,6 @@ export interface HEUnstakeDone extends HECoarseBaseTransaction {
   operation: "tokens_unstakeDone";
   account: string;
   quantity: nAACRS;
-  symbol: string;
   timestamp: number;
   transactionId: string;
 }
@@ -253,7 +252,6 @@ export interface HEMarketCancel extends HECoarseBaseTransaction {
   orderType: orderTypeType;
   account: string;
   quantityReturned: string;
-  symbol: string;
 }
 export interface MarketCancel extends BaseTransaction {
   type: "market_cancel";
@@ -262,6 +260,7 @@ export interface MarketCancel extends BaseTransaction {
   orderType: orderTypeType;
   amount: aAAS;
 }
+
 export interface HETokensUndelegateDone extends HECoarseBaseTransaction {
   operation: "tokens_undelegateDone";
   num: number;
@@ -273,7 +272,6 @@ export interface HETokensDelegate extends HECoarseBaseTransaction {
   account: string;
   quantity: nAACRS;
   to: string;
-  symbol: string;
 }
 export interface TokensDelegate extends BaseTransaction {
   type: "tokens_delegate";
@@ -295,7 +293,6 @@ export interface HEMarketBuy extends HECoarseBaseTransaction {
   from: string;
   quantityHive: nAACRS;
   quantityTokens: nAACRS;
-  symbol: string;
 }
 export interface MarketBuy extends BaseTransaction {
   type: "market_buy";
@@ -309,7 +306,6 @@ export interface HETokensUndelegateStart extends HECoarseBaseTransaction {
   account: string;
   from: string;
   quantity: string;
-  symbol: string;
 }
 export interface TokensUndelegateStart extends BaseTransaction {
   type: "tokens_undelegateStart";
