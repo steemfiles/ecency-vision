@@ -286,6 +286,9 @@ export const makePreloadedState = async (
       JSON.stringify(e)
     );
   }
+  if (rawAcceptLanguage != headers["accept-language"]) {
+    console.log("Change of Accept-Language header during processing detected!");
+  }
   const globalState: Global = {
     ...initialState.global,
     search_requests_allowed,

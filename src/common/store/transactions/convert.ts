@@ -165,10 +165,12 @@ export function HEToHMarketSell(
       fractionDigits: 3,
       suffix: HIVE_HUMAN_NAME,
     }),
-    quote: FormattedNumber(het.quantityTokens, {
-      fractionDigits,
-      suffix: het.symbol,
-    }),
+    quote: quantityTokens
+      ? FormattedNumber(quantityTokens, {
+          fractionDigits,
+          suffix: het.symbol,
+        })
+      : "0",
   };
 }
 export function HEToHUnstakeStart(

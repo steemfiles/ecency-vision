@@ -1,4 +1,5 @@
 import numeral from "numeral";
+import { isntString, isntNumber, typeCheck } from "../euphoria";
 interface Options {
   maximumFractionDigits?: number;
   fractionDigits?: number;
@@ -23,6 +24,13 @@ export default (
   value: number | string,
   options: Options | undefined = undefined
 ) => {
+  typeCheck(
+    isntNumber(value) && isntString(value),
+    "number|string",
+    "value",
+    value
+  );
+
   let addNegativeSignFlag: boolean = false;
   let opts: Options = {
     maximumFractionDigits: 3,

@@ -179,7 +179,7 @@ export interface MarketSell extends BaseTransaction {
 export interface HEMarketSell extends HECoarseBaseTransaction {
   operation: "market_sell";
   quantityHive: nAACRS;
-  quantityTokens: nAACRS;
+  quantityTokens: null | nAACRS;
   account: string;
   to: string;
 }

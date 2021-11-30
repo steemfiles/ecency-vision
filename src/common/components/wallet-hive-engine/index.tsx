@@ -139,10 +139,12 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
       case "market-orders":
         return tx.type.startsWith("market_") || tx.type === "fill_order";
       case "stake-operations":
-        return ("transfer_to_saving,withdraw_vesting,tokens_unstakeDone,tokens_stake,withdraw_vesting," + 
-        "return_vesting_delegation,tokens_unstakeStart,tokens_CancelUnstake," + 
-        "tokens_unstake,tokens_undelegateDone,tokens_delegate," + 
-        "tokens_undelegateStart")
+        return (
+          "transfer_to_saving,withdraw_vesting,tokens_unstakeDone,tokens_stake,withdraw_vesting," +
+          "return_vesting_delegation,tokens_unstakeStart,tokens_CancelUnstake," +
+          "tokens_unstake,tokens_undelegateDone,tokens_delegate," +
+          "tokens_undelegateStart"
+        )
           .split(/,/)
           .includes(tx.type);
     }
@@ -166,26 +168,15 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     cts: Array<HECoarseTransaction>
   ) {
     const { transactions } = this.state;
-    try {
-      const txs: Array<Transaction> = cts.map((t) => HEToHTransaction(t))
-      .filter(x => x != null)
-      // @ts-ignore      
+    const txs: Array<Transaction> = cts
+      .map((t) => HEToHTransaction(t))
+      .filter((x) => x != null)
+      // @ts-ignore
       .filter(this.keepTransaction.bind(this, transactions.group));
-      const { list } = transactions;
-      this.stateSet({
-        transactions: { list: txs, loading: false, group: transactions.group },
-      });
-    } catch (e) {
-      error("Unknown transaction type error.");
-      console.log(e);
-      this.stateSet({
-        transactions: {
-          list: transactions.list,
-          loading: false,
-          group: transactions.group,
-        },
-      });
-    }
+    const { list } = transactions;
+    this.stateSet({
+      transactions: { list: txs, loading: false, group: transactions.group },
+    });
   }
   fetchHETransactions = (name: string, group?: OperationGroup | "") => {
     const { transactions } = this.state;
@@ -316,7 +307,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                   (time_interval_length / 1000) * counter +
                   "s"
               );
-              getScotDataAsync<{ [aPICoinName:string] : TokenStatus }>(
+              getScotDataAsync<{ [aPICoinName: string]: TokenStatus }>(
                 `@${account.name}`,
                 { hive: 1, token: aPICoinName }
               ).then((tokenStatuses) => {
