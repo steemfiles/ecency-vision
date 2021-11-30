@@ -268,12 +268,10 @@ export const makePreloadedState = async (
   let hiveEngineTokensProperties: TokenPropertiesMap =
     storedHiveEngineTokensProperties;
   try {
-    if (
+    if (!(
       storedHiveEngineTokensProperties &&
       storedHiveEngineTokensProperties[LIQUID_TOKEN_UPPERCASE]
-    ) {
-      console.log("Token information available.");
-    } else {
+    )) {
       console.log(
         "No token property information stored.  Loading tokens properties...",
         Object.keys(storedHiveEngineTokensProperties)
@@ -287,7 +285,7 @@ export const makePreloadedState = async (
     );
   }
   if (rawAcceptLanguage != headers["accept-language"]) {
-    console.log("Change of Accept-Language header during processing detected!");
+    console.log("Change of Accept-Language header during processing detected!", {saved: rawAcceptLanguage, after: headers['accept-language']});
   }
   const globalState: Global = {
     ...initialState.global,
