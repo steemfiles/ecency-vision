@@ -192,11 +192,12 @@ export const makePreloadedState = async (
   So it must be sorted here.
   
   */
+
+  const headers = (req && { ...req.headers }) || {};
+  const rawAcceptLanguage = (headers["accept-language"] || "").slice(0);
+  const userAgent = (headers["user-agent"] || "").slice(0);
   let acceptableLanguage: { [languageCode: string]: boolean } = {};
   let negotiatedLanguages: Array<string> = [];
-  const headers = (req && req.headers) || {};
-  const rawAcceptLanguage = headers["accept-language"] || "";
-  const userAgent = headers["user-agent"] || "";
   const acceptLanguage = rawAcceptLanguage
     .split(/;/)
     .map((languages_priority_pair_string) => {
