@@ -303,7 +303,7 @@ export function process(
         } catch (e) {
           // ignored ...
         }
-      }
+      } // if
     } else if (type === "mention_operation") {
       console.log(op);
     } // if
