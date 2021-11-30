@@ -134,6 +134,7 @@ exports[`(1) Full render with active user 1`] = `
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -274,6 +275,19 @@ exports[`(1) Full render with active user 1`] = `
               }
             }
           />
+          <div
+            className="app"
+            title="peakd/2020.05.5"
+          >
+            <a
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": "via <span class=\\"app-name\\">peakd</span>",
+                }
+              }
+              href="/faq#source-label"
+            />
+          </div>
           <div
             className="item-controls"
           >
@@ -417,6 +431,19 @@ exports[`(1) Full render with active user 1`] = `
                 }
               />
               <div
+                className="app"
+                title="peakd/2020.05.5"
+              >
+                <a
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": "via <span class=\\"app-name\\">peakd</span>",
+                    }
+                  }
+                  href="/faq#source-label"
+                />
+              </div>
+              <div
                 className="item-controls"
               >
                 <div>
@@ -558,6 +585,7 @@ exports[`(1) Full render with active user 1`] = `
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -700,6 +728,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -840,6 +869,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -981,6 +1011,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -1122,6 +1153,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -1263,6 +1295,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -1509,6 +1542,7 @@ exports[`(3) With selected item 1`] = `
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -1649,6 +1683,19 @@ exports[`(3) With selected item 1`] = `
               }
             }
           />
+          <div
+            className="app"
+            title="peakd/2020.05.5"
+          >
+            <a
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": "via <span class=\\"app-name\\">peakd</span>",
+                }
+              }
+              href="/faq#source-label"
+            />
+          </div>
           <div
             className="item-controls"
           >
@@ -1792,6 +1839,19 @@ exports[`(3) With selected item 1`] = `
                 }
               />
               <div
+                className="app"
+                title="peakd/2020.05.5"
+              >
+                <a
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": "via <span class=\\"app-name\\">peakd</span>",
+                    }
+                  }
+                  href="/faq#source-label"
+                />
+              </div>
+              <div
                 className="item-controls"
               >
                 <div>
@@ -1933,6 +1993,7 @@ exports[`(3) With selected item 1`] = `
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -2075,6 +2136,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -2215,6 +2277,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -2356,6 +2419,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -2497,6 +2561,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -2638,6 +2703,7 @@ Bug report <a href=\\"/esteem/@iliyan90/bug-report-to-esteemapp\\" class=\\"mark
               }
             }
           />
+          
           <div
             className="item-controls"
           >
@@ -2924,6 +2990,19 @@ exports[`(4) Show mute button, muted comment 1`] = `
               }
             }
           />
+          <div
+            className="app"
+            title="peakd/2020.05.5"
+          >
+            <a
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": "via <span class=\\"app-name\\">peakd</span>",
+                }
+              }
+              href="/faq#source-label"
+            />
+          </div>
           <div
             className="item-controls"
           >
