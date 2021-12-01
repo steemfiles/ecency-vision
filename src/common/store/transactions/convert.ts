@@ -28,6 +28,8 @@ import {
   HEMarketCancel,
   MarketCancel,
   validateOrderType,
+  HEMarketExpire,
+  MarketExpire,
 } from "./types";
 import FormattedNumber from "../../util/formatted-number";
 import { HIVE_HUMAN_NAME } from "../../api/hive";
@@ -239,6 +241,20 @@ function HEToHMarketCancel(t: HEMarketCancel): MarketCancel {
     amount: FormattedNumber(quantityReturned, { suffix: t.symbol }),
   };
 }
+export function HEToHMarketExpire(t: HEMarketExpire): MarketExpire {
+  const { symbol, orderID, orderType, quantityUnlocked } = t;
+  validateOrderType(orderType);
+  return {
+    type: "market_expireOrder",
+    amountUnlocked: FormattedNumber(quantityUnlocked, {
+      suffix: symbol,
+      maximumFractionDigits: 8,
+    }),
+    orderID,
+    orderType,
+    ...HEB2B(t),
+  };
+}
 export function HEToHTransaction(t: HECoarseTransaction): Transaction | null {
   switch (t.operation) {
     case "tokens_unstake":
@@ -298,6 +314,8 @@ export function HEToHTransaction(t: HECoarseTransaction): Transaction | null {
         base: FormattedNumber(t.quantityHive, { suffix: t.symbol }),
         quote: FormattedNumber(t.quantityHive, { suffix: t.symbol }),
       };
+    case "market_expire":
+      return HEToHMarketExpire(t);
   } // switch
   console.log("unhandled type:", t.operation, t);
   //throw Error("Unhandled type:" + t.operation);

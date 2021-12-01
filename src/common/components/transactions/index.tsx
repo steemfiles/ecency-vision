@@ -26,6 +26,7 @@ import {
   commentSvg,
   compareHorizontalSvg,
   exchangeSvg,
+  gridSvg,
   pickAxeSvg,
   powerDownSvg,
   powerUpSvg,
@@ -364,7 +365,6 @@ export class TransactionRow extends Component<RowProps> {
       numbers = <span className="number"> {tr.amount}</span>;
     }
     if (tr.type === "market_closeOrder") {
-      console.log(tr);
       flag = true;
       if (tr.orderType == "sell") {
         icon = arrowRightSvg;
@@ -377,7 +377,23 @@ export class TransactionRow extends Component<RowProps> {
             target={"blockexplorer"}
             href={"https://hiveblockexplorer.com/tx/" + tr.trx_id}
           >
-            orderID: {tr.orderType}
+            {tr.orderType}
+          </a>
+        </>
+      );
+    }
+    if (tr.type === "market_expireOrder") {
+      flag = true;
+      icon = closeSvg;
+      numbers = <>{tr.amountUnlocked}</>;
+      details = (
+        <>
+          <a
+            target={"blockexplorer"}
+            href={"https://hiveblockexplorer.com/tx/" + tr.trx_id}
+          >
+            orderID: {tr.orderID}
+            {tr.orderType}
           </a>
         </>
       );

@@ -655,6 +655,8 @@
     "type-tokens_undelegateDone": "Staked tokens delegation removed",
     "type-tokens_delegate": "Staked tokens delegated",
     "type-market_placeOrder": "Order placed",
+    "type-market_closeOrder": "Order closed",
+    "type-market_expireOrder": "Order expired",
     "type-market_cancel": "Order cancelled",
     "type-curation_reward": "Curation reward",
     "type-collateralized_convert": "Collateralized convert",

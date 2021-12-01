@@ -1,6 +1,6 @@
 import { SMTAsset } from "@hiveio/dhive";
 export type nAACRS = string; // number as a computer readable string:  No commas.  No units.
-export type nAAHRS = string; // number as a computer readable string:  Commas, but no units.
+export type nAAHRS = string; // number as a human readable string:  Commas, but no units.
 export type aAAS = string; // amount as a string: commas and units.
 export type orderTypeType = "buy" | "sell" | "marketSell" | "marketBuy";
 export function validateOrderType(s: string) {
@@ -38,6 +38,19 @@ export interface HECoarseBaseTransaction {
   operation: string;
   // POB for Proof of Brain
   symbol: string;
+}
+export interface HEMarketExpire extends HECoarseBaseTransaction {
+  account: string;
+  operation: "market_expire";
+  orderID: string;
+  orderType: "sell" | "buy";
+  quantityUnlocked: nAACRS;
+}
+export interface MarketExpire extends BaseTransaction {
+  type: "market_expireOrder";
+  amountUnlocked: aAAS;
+  orderID: string;
+  orderType: "sell" | "buy";
 }
 export interface HEMarketCloseOrder extends HECoarseBaseTransaction {
   operation: "market_closeOrder";
@@ -475,6 +488,7 @@ export interface EffectiveCommentVote extends BaseTransaction {
   weight: number;
 }
 export type Transaction =
+  | MarketExpire
   | MarketCloseOrder
   | TokensUnstake
   | CurationReward
@@ -525,6 +539,7 @@ export interface Transactions {
 }
 export type HECoarseTransaction =
   | HEMarketCloseOrder
+  | HEMarketExpire
   | HETokensUnstake
   | HETokensIssue
   | HEUnstakeStart
