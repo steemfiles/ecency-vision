@@ -69,7 +69,7 @@ interface ItemBodyProps {
 }
 
 import appName from "../../../common/helper/app-name";
-
+import { APP_DOMAIN, DISABLE_BLACKLIST } from "../../../client_config";
 export class ItemBody extends Component<ItemBodyProps> {
   shouldComponentUpdate(nextProps: Readonly<ItemBodyProps>): boolean {
     return this.props.entry.body !== nextProps.entry.body;
@@ -241,7 +241,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
       parent_permlink: parentPermlink,
     } = entry;
     const jsonMeta = makeJsonMetaDataReply(
-      entry.json_metadata.tags || ["proofofbrain"],
+      entry.json_metadata.tags || [APP_DOMAIN],
       version
     );
 
@@ -305,7 +305,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
           })
         : false;
 
-    const isHidden = !!entry.stats?.gray && !showIfHidden;
+    const isHidden = !DISABLE_BLACKLIST && !!entry.stats?.gray && !showIfHidden;
 
     const anchorId = `anchor-@${entry.author}/${entry.permlink}`;
 
