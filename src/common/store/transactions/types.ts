@@ -43,22 +43,22 @@ export interface HEMarketExpire extends HECoarseBaseTransaction {
   account: string;
   operation: "market_expire";
   orderID: string;
-  orderType: "sell" | "buy";
+  orderType: orderTypeType;
   quantityUnlocked: nAACRS;
 }
 export interface MarketExpire extends BaseTransaction {
   type: "market_expireOrder";
   amountUnlocked: aAAS;
   orderID: string;
-  orderType: "sell" | "buy";
+  orderType: orderTypeType;
 }
 export interface HEMarketCloseOrder extends HECoarseBaseTransaction {
   operation: "market_closeOrder";
-  orderType: "sell" | "buy";
+  orderType: orderTypeType;
 }
 export interface MarketCloseOrder extends BaseTransaction {
   type: "market_closeOrder";
-  orderType: "sell" | "buy";
+  orderType: orderTypeType;
 }
 export interface HETokensUnstake extends HECoarseBaseTransaction {
   account: string;
