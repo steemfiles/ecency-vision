@@ -82,7 +82,11 @@ import {
   HiveEngineTokenInfo,
   ScotPost,
 } from "../api/hive-engine";
-import { LIQUID_TOKEN_UPPERCASE, DISABLE_BLACKLIST } from "../../client_config";
+import {
+  LIQUID_TOKEN_UPPERCASE,
+  APP_DOMAIN,
+  DISABLE_BLACKLIST,
+} from "../../client_config";
 import { setHiveEngineTokensProperties } from "../store/global";
 
 setProxyBase(defaults.imageServer);
@@ -964,6 +968,7 @@ class EntryPage extends BaseComponent<Props, State> {
                       })}
 
                     {Discussion({
+                      appDomain: APP_DOMAIN,
                       enableBlackLists: !DISABLE_BLACKLIST,
                       ...this.props,
                       parent: entry,

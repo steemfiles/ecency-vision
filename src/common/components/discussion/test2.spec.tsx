@@ -29,6 +29,7 @@ const discussion: DiscussionType = {
 };
 
 const defProps = {
+  appDomain: "ecency.com",
   enableBlackLists: true,
   history: createBrowserHistory(),
   location: createLocation({}),

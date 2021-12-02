@@ -69,7 +69,6 @@ interface ItemBodyProps {
 }
 
 import appName from "../../../common/helper/app-name";
-import { APP_DOMAIN } from "../../../client_config";
 export class ItemBody extends Component<ItemBodyProps> {
   shouldComponentUpdate(nextProps: Readonly<ItemBodyProps>): boolean {
     return this.props.entry.body !== nextProps.entry.body;
@@ -92,6 +91,7 @@ export class ItemBody extends Component<ItemBodyProps> {
 }
 
 interface ItemProps {
+  appDomain: string;
   enableBlackLists: boolean;
   history: History;
   location: Location;
@@ -234,7 +234,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
 
   updateReply = (text: string) => {
     const { entry } = this.props;
-    const { activeUser, updateReply } = this.props;
+    const { activeUser, updateReply, appDomain } = this.props;
 
     const {
       permlink,
@@ -242,7 +242,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
       parent_permlink: parentPermlink,
     } = entry;
     const jsonMeta = makeJsonMetaDataReply(
-      entry.json_metadata.tags || [APP_DOMAIN],
+      entry.json_metadata.tags || [appDomain],
       version
     );
 
@@ -493,6 +493,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
 }
 
 interface ListProps {
+  appDomain: string;
   enableBlackLists: boolean;
   history: History;
   location: Location;
@@ -542,6 +543,7 @@ export class List extends Component<ListProps> {
 }
 
 interface Props {
+  appDomain: string;
   enableBlackLists: boolean;
   hiveEngineTokensProperties: TokenPropertiesMap;
   history: History;
@@ -715,6 +717,7 @@ export class Discussion extends Component<Props, State> {
 
 export default (p: Props) => {
   const props: Props = {
+    appDomain: p.appDomain,
     enableBlackLists: p.enableBlackLists,
     history: p.history,
     location: p.location,
