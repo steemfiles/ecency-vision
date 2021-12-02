@@ -69,7 +69,7 @@ interface ItemBodyProps {
 }
 
 import appName from "../../../common/helper/app-name";
-import { APP_DOMAIN, DISABLE_BLACKLIST } from "../../../client_config";
+import { APP_DOMAIN } from "../../../client_config";
 export class ItemBody extends Component<ItemBodyProps> {
   shouldComponentUpdate(nextProps: Readonly<ItemBodyProps>): boolean {
     return this.props.entry.body !== nextProps.entry.body;
@@ -92,6 +92,7 @@ export class ItemBody extends Component<ItemBodyProps> {
 }
 
 interface ItemProps {
+  enableBlackLists: boolean;
   history: History;
   location: Location;
   global: Global;
@@ -280,7 +281,8 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
   };
 
   render() {
-    const { entry, activeUser, community, location } = this.props;
+    const { entry, activeUser, community, location, enableBlackLists } =
+      this.props;
     const { reply, edit, inProgress, showIfHidden } = this.state;
 
     const created = moment(parseDate(entry.created));
@@ -305,7 +307,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
           })
         : false;
 
-    const isHidden = !DISABLE_BLACKLIST && !!entry.stats?.gray && !showIfHidden;
+    const isHidden = enableBlackLists && !!entry.stats?.gray && !showIfHidden;
 
     const anchorId = `anchor-@${entry.author}/${entry.permlink}`;
 
@@ -491,6 +493,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
 }
 
 interface ListProps {
+  enableBlackLists: boolean;
   history: History;
   location: Location;
   global: Global;
@@ -539,6 +542,7 @@ export class List extends Component<ListProps> {
 }
 
 interface Props {
+  enableBlackLists: boolean;
   hiveEngineTokensProperties: TokenPropertiesMap;
   history: History;
   location: Location;
@@ -711,6 +715,7 @@ export class Discussion extends Component<Props, State> {
 
 export default (p: Props) => {
   const props: Props = {
+    enableBlackLists: p.enableBlackLists,
     history: p.history,
     location: p.location,
     global: p.global,

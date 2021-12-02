@@ -36,6 +36,7 @@ const discussion: DiscussionType = {
 };
 
 const defProps = {
+  enableBlackLists: true,
   history: createBrowserHistory(),
   location: createLocation({}),
   global: globalInstance,
