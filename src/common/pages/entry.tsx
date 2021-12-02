@@ -86,6 +86,7 @@ import {
   LIQUID_TOKEN_UPPERCASE,
   APP_DOMAIN,
   DISABLE_BLACKLIST,
+  TAG_LIST,
 } from "../../client_config";
 import { setHiveEngineTokensProperties } from "../store/global";
 
@@ -272,7 +273,7 @@ class EntryPage extends BaseComponent<Props, State> {
     const { author: parentAuthor, permlink: parentPermlink } = entry;
     const author = activeUser.username;
     const permlink = createReplyPermlink(entry.author);
-    const tags = entry.json_metadata.tags || ["proofofbrain"];
+    const tags = entry.json_metadata.tags || TAG_LIST;
 
     const jsonMeta = makeJsonMetaDataReply(tags, version);
 
