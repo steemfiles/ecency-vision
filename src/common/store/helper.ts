@@ -31,7 +31,11 @@ import {
   HiveEngineTokenInfo,
 } from "../api/hive-engine";
 import { includeInfoConfigsAction } from "./hive-engine-tokens/index";
-import { LIQUID_TOKEN_UPPERCASE } from "../../client_config";
+import { TokenInfoConfigPair } from "./hive-engine-tokens/types";
+import {
+  LIQUID_TOKEN_UPPERCASE,
+  HIVE_ENGINE_TOKENS,
+} from "../../client_config";
 declare var window: AppWindow;
 export const activeUserMaker = (
   name: string,
@@ -107,7 +111,7 @@ export const updateTokensProperties = async (
   const info = r[0] as HiveEngineTokenInfo;
   const config = r[1] as HiveEngineTokenConfig;
   const prices = r[2] as { [shortCoinName: string]: number /* in Hive */ };
-  const hivePrice = prices["POB"];
+  const hivePrice = prices[LIQUID_TOKEN_UPPERCASE];
   store.dispatch(
     includeInfoConfigsAction({
       [LIQUID_TOKEN_UPPERCASE]: { info, config, hivePrice },
@@ -124,6 +128,20 @@ export const clientStoreTasks = (store: Store<AppState>) => {
   getDynamicProps().then((resp) => {
     store.dispatch(loadDynamicProps(resp));
   });
+
+  const { hiveEngineTokensProperties } = store.getState().global;
+  setInterval(() => {
+    getPrices(HIVE_ENGINE_TOKENS.map((e) => e.apiName)).then((r) => {
+      if (hiveEngineTokensProperties === undefined) return;
+      for (const apiCoinName in r) {
+        let ticp: undefined | TokenInfoConfigPair;
+
+        if ((ticp = hiveEngineTokensProperties[apiCoinName]) !== undefined) {
+          ticp.hivePrice = r[apiCoinName];
+        }
+      }
+    });
+  }, 40_000);
   Promise.all([
     getScotDataAsync<HiveEngineTokenInfo>("info", {
       token: LIQUID_TOKEN_UPPERCASE,
