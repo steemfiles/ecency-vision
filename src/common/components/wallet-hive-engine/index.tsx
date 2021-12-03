@@ -4,7 +4,6 @@ import React from "react";
 // https://github.com/hive-engine/steemsmartcontracts-wiki/blob/master/Tokens-Contract.md
 import { History } from "history";
 import moment from "moment";
-import { LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN } from "../../../client_config";
 import { Global } from "../../store/global/types";
 import { Account } from "../../store/accounts/types";
 import { DynamicProps } from "../../store/dynamic-props/types";
@@ -115,9 +114,9 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     transactions: { list: [], loading: false, group: "" },
   };
   componentDidMount() {
-    const { account } = this.props;
+    const { account, aPICoinName } = this.props;
     this.fetchConvertingAmount();
-    this.fetchHETransactions(account.name, "");
+    this.fetchHETransactions(aPICoinName, account.name, "");
   }
   keepTransaction(group: OperationGroup | "", tx: Transaction): boolean {
     switch (group) {
@@ -178,20 +177,24 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
       transactions: { list: txs, loading: false, group: transactions.group },
     });
   }
-  fetchHETransactions = (name: string, group?: OperationGroup | "") => {
+  fetchHETransactions = (
+    symbol: string,
+    name: string,
+    group?: OperationGroup | ""
+  ) => {
     const { transactions } = this.state;
     const { list } = transactions;
     this.stateSet({
       transactions: { list: [], loading: true, group: group || "" },
     });
     if (group === "rewards")
-      getFineTransactions(name, group === "rewards" ? 200 : 10, 0)
+      getFineTransactions(symbol, name, group === "rewards" ? 200 : 10, 0)
         .then(this.handleFineTransactions.bind(this))
         .catch((e) => {
           console.log(e);
         });
     else
-      getCoarseTransactions(name, 400, 0).then(
+      getCoarseTransactions(name, 400, symbol, 0).then(
         this.handleCoarseTransactions.bind(this, group ? group : "")
       );
   };
@@ -350,8 +353,8 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
   };
   openTransferDialog = (mode: TransferMode, asset: TransferAsset) => {
     const { aPICoinName, stakedCoinName } = this.props;
-    if (mode === "power-down" && asset === LIQUID_TOKEN_UPPERCASE) {
-      asset = VESTING_TOKEN;
+    if (mode === "power-down" && asset === aPICoinName) {
+      asset = stakedCoinName;
     }
     this.stateSet({ transfer: true, transferMode: mode, transferAsset: asset });
   };
@@ -751,7 +754,10 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
               )}
               {TransactionList({
                 dynamicProps,
-                fetchTransactions: this.fetchHETransactions.bind(this),
+                fetchTransactions: this.fetchHETransactions.bind(
+                  this,
+                  aPICoinName
+                ),
                 history: this.props.history,
                 transactions: this.state.transactions,
                 account: this.props.account,
