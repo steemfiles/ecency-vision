@@ -19,7 +19,7 @@ import isCommunity from "../helper/is-community";
 import TESTNET_SERVERS from "../constants/servers-testnet.json";
 import MAINNET_SERVERS from "../constants/servers-mainnet.json";
 import { getAccountHEFull } from "./hive-engine";
-import { LIQUID_TOKEN_UPPERCASE, TEST_NET } from "../../client_config";
+import { TEST_NET } from "../../client_config";
 const SERVERS = TEST_NET ? TESTNET_SERVERS : MAINNET_SERVERS;
 export const CHAIN_ID = TEST_NET
   ? "18dcf0a285365fc58b71f18b3d3fec954aa0c141c44e4e5cb4cf777b9eab274e"
