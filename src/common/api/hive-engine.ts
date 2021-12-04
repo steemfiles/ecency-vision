@@ -313,6 +313,7 @@ export async function getAccountHEFull(
   symbols: Array<string> = []
 ): Promise<FullHiveEngineAccount> {
   const userHive = true;
+  let follow_stats: AccountFollowStats | undefined = undefined;
   try {
     let hiveAccount: FullAccount,
       rawTokenBalances: Array<RawTokenBalance>,
@@ -389,7 +390,6 @@ export async function getAccountHEFull(
       }
     }
     const prices = await getPrices(coinPricesToQuery);
-    let follow_stats: AccountFollowStats | undefined;
     try {
       follow_stats = await getFollowCount(account);
     } catch (e) {}
@@ -406,7 +406,22 @@ export async function getAccountHEFull(
     };
   } catch (e) {
     console.log("getAccountHEFull threw an exception");
-    throw e;
+    const hiveAccount = await getAccount(account);
+    try {
+      follow_stats = await getFollowCount(account);
+    } catch (e) {
+    
+    }
+    return {
+      ...hiveAccount,
+      follow_stats: { account, follower_count: 0, following_count: 0 },
+      token_balances: [],
+      token_unstakes: [],
+      token_statuses: { data: {}, hiveData: {} },
+      transfer_history: null,
+      prices: { "HIVE.SWAP": 1 },
+      __loaded: true,
+    };
   }
 }
 export interface HiveEngineTokenInfo {
