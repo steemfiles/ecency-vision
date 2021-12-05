@@ -377,8 +377,8 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
       return null;
     }
     const { hiveEngineTokensProperties } = global;
-    const tokenProperties =
-      hiveEngineTokensProperties && hiveEngineTokensProperties[aPICoinName];
+    const tokenProperties = hiveEngineTokensProperties && hiveEngineTokensProperties[aPICoinName];
+    console.log({ tokenProperties });
     const precision = (() => {
       const p1 =
         tokenProperties &&
@@ -409,7 +409,18 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
       converting,
       aPICoinName
     );
-    const balances = w.engineBalanceTable[this.props.aPICoinName];
+    const balances = w.engineBalanceTable[this.props.aPICoinName] || {
+    "_id": 0,
+    "account": account.name,
+    "symbol": this.props.aPICoinName,
+    "balance": 0,
+    "stake": 0,
+    "pendingUnstake": 0,
+    "delegationsIn": 0,
+    "delegationsOut": 0,
+    "pendingUndelegations": 0
+    };
+
     const { token_unstakes } = account as FullHiveEngineAccount;
     if (token_unstakes) {
       let powerDownId;
@@ -458,17 +469,19 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                   </div>
                   <div className="balance-values">
                     <div className="amount amount-bold">
-                      <FormattedCurrency
+                      {tokenProperties ?
+                      (<FormattedCurrency
                         {...this.props}
                         value={w.estimatedValue}
                         fixAt={3}
-                      />
+                      />) :
+                      _t("wallet.loading")}
+                      
                     </div>
                   </div>
                 </div>
               )}
-              {w.engineBalanceTable &&
-                w.engineBalanceTable[this.props.aPICoinName] && (
+              
                   <div className="balance-row">
                     <div className="balance-info">
                       <div className="title">{this.props.coinName}</div>
@@ -551,20 +564,19 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                           return null;
                         })()}
                         <span>
-                          {formattedNumber(
-                            w.engineBalanceTable[this.props.aPICoinName]
-                              .balance,
+                          {tokenProperties ? formattedNumber(
+                            balances.balance,
                             {
                               fractionDigits: precision,
                               suffix: this.props.aPICoinName,
                             }
-                          )}
+                          ) : _t('wallet.loading')}
                         </span>
                       </div>
                     </div>
                   </div>
-                )}
-              {w.engineBalanceTable && balances && (
+                
+              {(
                 <div className="balance-row hive-power alternative">
                   <div className="balance-info">
                     <div className="title">{this.props.stakedCoinName}</div>
@@ -627,10 +639,11 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                         }
                         return null;
                       })()}
-                      {formattedNumber(balances.stake, {
-                        suffix: this.props.aPICoinName,
-                        fractionDigits: precision,
-                      })}
+                      {tokenProperties ?
+                        formattedNumber(balances.stake, {
+                            suffix: this.props.aPICoinName,
+                            fractionDigits: precision,
+                        }): _t('wallet.loading')}
                     </div>
                     {balances.delegationsOut > 0 && (
                       <div className="amount amount-passive delegated-shares">

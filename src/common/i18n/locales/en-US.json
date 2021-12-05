@@ -456,6 +456,7 @@
     "updated": "Preference updated!"
   },
   "wallet": {
+  	"loading": "Loading...",
     "unclaimed-rewards": "Unclaimed rewards",
     "claim-reward-balance": "Claim reward balance",
     "claim-reward-balance-ok": "Reward balance claimed",
