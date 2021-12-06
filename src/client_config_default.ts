@@ -54,6 +54,7 @@ export const HIVE_ENGINE_TOKENS = [
     apiName: "Weed",
     liquidHumanName: "Weed Cash",
     stakedHumanName: "Weed Power",
+    precision: 3,
   },
 ];
 

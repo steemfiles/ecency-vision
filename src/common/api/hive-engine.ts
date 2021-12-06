@@ -261,22 +261,17 @@ export async function getScotDataAsync<T>(
   );
   return x;
 }
-export async function getScotAccountDataAsync(
-  account: string,
-  chainFlags: { hive: boolean; steem: boolean } = { hive: true, steem: false }
-): Promise<{
+export async function getScotAccountDataAsync(account: string): Promise<{
   data: null | { [id: string]: TokenStatus };
   hiveData: null | { [id: string]: TokenStatus };
 }> {
-  const data = chainFlags.steem
-    ? await getScotDataAsync<{ [id: string]: TokenStatus }>(`@${account}`, {})
-    : null;
-  const hiveData = chainFlags.hive
-    ? null
-    : await getScotDataAsync<{ [id: string]: TokenStatus }>(`@${account}`, {
-        hive: 1,
-      });
-  return { data, hiveData };
+  let hiveData = await getScotDataAsync<{ [id: string]: TokenStatus }>(
+    `@${account}`,
+    {
+      hive: 1,
+    }
+  );
+  return { data: null, hiveData };
 }
 function mergeContent(
   content: Entry,
@@ -354,7 +349,7 @@ export async function getAccountHEFull(
         $or: [{ from: account }, { to: account }],
       }),
     ]);
-
+    console.log({ tokenStatuses });
     let modifiedTokenBalances: Array<TokenBalance> = [];
     // There is no typesafe way to modify the type of something
     // in place.  You have to do a typecast eventually or participate in
