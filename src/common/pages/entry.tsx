@@ -82,7 +82,12 @@ import {
   HiveEngineTokenInfo,
   ScotPost,
 } from "../api/hive-engine";
-import { LIQUID_TOKEN_UPPERCASE } from "../../client_config";
+import {
+  LIQUID_TOKEN_UPPERCASE,
+  APP_DOMAIN,
+  DISABLE_BLACKLIST,
+  TAG_LIST,
+} from "../../client_config";
 import { setHiveEngineTokensProperties } from "../store/global";
 
 setProxyBase(defaults.imageServer);
@@ -268,7 +273,7 @@ class EntryPage extends BaseComponent<Props, State> {
     const { author: parentAuthor, permlink: parentPermlink } = entry;
     const author = activeUser.username;
     const permlink = createReplyPermlink(entry.author);
-    const tags = entry.json_metadata.tags || ["proofofbrain"];
+    const tags = entry.json_metadata.tags || TAG_LIST;
 
     const jsonMeta = makeJsonMetaDataReply(tags, version);
 
@@ -381,11 +386,22 @@ class EntryPage extends BaseComponent<Props, State> {
     const isComment = !!entry.parent_author;
 
     const { activeUser } = this.props;
-    const ownEntry : boolean = (activeUser && activeUser.username === entry.author) || false;
-    const tokenScotPost : ScotPost | null = (entry?.he && entry?.he[LIQUID_TOKEN_UPPERCASE]) || null;
-    const isHidden : boolean = (tokenScotPost && tokenScotPost.pending_token === 0 && tokenScotPost.total_payout_value === 0 && tokenScotPost.active_votes.length > 0) || false;
+    const ownEntry: boolean =
+      (activeUser && activeUser.username === entry.author) || false;
+    const tokenScotPost: ScotPost | null =
+      (entry?.he && entry?.he[LIQUID_TOKEN_UPPERCASE]) || null;
+    const isHidden: boolean =
+      (tokenScotPost &&
+        tokenScotPost.pending_token === 0 &&
+        tokenScotPost.total_payout_value === 0 &&
+        tokenScotPost.active_votes.length > 0) ||
+      false;
     // There is no list of muted user in neither the info or the config of the token...
-    const isMuted : boolean = (entry?.he && entry?.he[LIQUID_TOKEN_UPPERCASE] && entry?.he[LIQUID_TOKEN_UPPERCASE].muted) || false;
+    const isMuted: boolean =
+      (entry?.he &&
+        entry?.he[LIQUID_TOKEN_UPPERCASE] &&
+        entry?.he[LIQUID_TOKEN_UPPERCASE].muted) ||
+      false;
     const isLowReputation = false;
 
     //  Meta config
@@ -953,6 +969,8 @@ class EntryPage extends BaseComponent<Props, State> {
                       })}
 
                     {Discussion({
+                      appDomain: APP_DOMAIN,
+                      enableBlackLists: !DISABLE_BLACKLIST,
                       ...this.props,
                       parent: entry,
                       community,

@@ -7,7 +7,6 @@ import {
     augmentContentWithCrossPost,
 } from './util/CrossPosts';
 */
-import { LIQUID_TOKEN_UPPERCASE } from "../../client_config";
 import axios from "axios";
 // @ts-ignore
 import SSC from "sscjs";
@@ -76,61 +75,51 @@ const defaultPrices = {
 export async function getPrices(
   token_list: undefined | Array<string>
 ): Promise<{ [shortCoinName: string]: number /* in Hive */ }> {
+  let failedFetches: Array<string> = [];
+  let obj: any = {
+    "SWAP.HIVE": 1,
+  };
   try {
-    let obj: any = {
-      "SWAP.HIVE": 1,
-    };
-    try {
-      // others
-      const others = await hiveSsc.find("market", "tradesHistory", {
-        type: "buy",
-      });
-      for (const other of others) {
-        obj[other.symbol] = parseFloat(other.price);
-      }
-    } catch (e) {
-      console.log(e);
-      // do nothing...
+    const others = await hiveSsc.find("market", "tradesHistory", {
+      type: "buy",
+    });
+    for (const other of others) {
+      obj[other.symbol] = parseFloat(other.price);
     }
-    try {
-      if (!obj["POB"]) {
-        const HIVEpPOB = parseFloat(
-          (
-            await hiveSsc.find("market", "tradesHistory", {
-              symbol: "POB",
-              type: "buy",
-            })
-          )[0].price
-        );
-      }
-      if (!obj["LEO"]) {
-        const HIVEpLEO = parseFloat(
-          (
-            await hiveSsc.find("market", "tradesHistory", {
-              symbol: "LEO",
-              type: "buy",
-            })
-          )[0].price
-        );
-      }
-      if (!obj["SWAP.BTC"]) {
-        obj["SWAP.BTC"] = parseFloat(
-          (
-            await hiveSsc.find("market", "tradesHistory", {
-              symbol: "SWAP.BTC",
-              type: "buy",
-            })
-          )[0].price
-        );
-      }
-    } catch (e) {
-      // do nothing....
+    if (token_list) {
+      for (const i in token_list) {
+        const symbol = token_list[i];
+        if (!obj[symbol]) {
+          try {
+            const recentTrades: Array<{ price: string }> = await hiveSsc.find(
+              "market",
+              "tradesHistory",
+              {
+                symbol,
+                type: "buy",
+              }
+            );
+            if (recentTrades && recentTrades.length) {
+              const recentTrade = recentTrades[0];
+              const rate = parseFloat(recentTrade.price);
+              obj[symbol] = rate;
+            } else {
+              throw new Error("Cannot fetch price for " + symbol);
+            }
+          } catch (e) {
+            failedFetches.push(symbol);
+          }
+        } // if
+      } // for
+    } // if
+    if (failedFetches.length) {
+      console.log("Unable to fetch prices for these tokens:", failedFetches);
     }
     return obj;
   } catch (e) {
     console.log("getPrices are failing:", e.message);
   }
-  return defaultPrices;
+  return { ...defaultPrices, ...obj };
 }
 interface RawTokenBalance {
   _id: number;
@@ -185,7 +174,7 @@ export interface FullHiveEngineAccount extends FullAccount {
   token_balances: Array<TokenBalance>;
   token_unstakes: Array<UnStake>;
   token_statuses: {
-    data: { [id: string]: TokenStatus };
+    data: { [id: string]: TokenStatus } | null;
     hiveData: { [id: string]: TokenStatus } | null;
   };
   transfer_history: undefined | null | Array<HEFineTransaction>;
@@ -230,6 +219,7 @@ async function callApi(url: string, params: any) {
 export async function getCoarseTransactions(
   account: string,
   limit: number,
+  symbol: string,
   offset: number = 0
 ) {
   const transfers: Array<HECoarseTransaction> = await callApi(
@@ -239,13 +229,14 @@ export async function getCoarseTransactions(
       limit,
       offset,
       type: "user",
-      symbol: LIQUID_TOKEN_UPPERCASE,
+      symbol,
     }
   );
   return transfers;
 }
 // Include virtual transactions like curation and author reward details.
 export async function getFineTransactions(
+  symbol: string,
   account: string,
   limit: number,
   offset: number
@@ -254,7 +245,7 @@ export async function getFineTransactions(
     Array<HEFineTransaction>
   >("get_account_history", {
     account,
-    token: LIQUID_TOKEN_UPPERCASE,
+    token: symbol,
     limit,
     offset,
   });
@@ -270,20 +261,21 @@ export async function getScotDataAsync<T>(
   );
   return x;
 }
-export async function getScotAccountDataAsync(account: string): Promise<{
-  data: { [id: string]: TokenStatus };
+export async function getScotAccountDataAsync(
+  account: string,
+  chainFlags: { hive: boolean; steem: boolean } = { hive: true, steem: false }
+): Promise<{
+  data: null | { [id: string]: TokenStatus };
   hiveData: null | { [id: string]: TokenStatus };
 }> {
-  const data = await getScotDataAsync<{ [id: string]: TokenStatus }>(
-    `@${account}`,
-    {}
-  );
-  const hiveData = await getScotDataAsync<{ [id: string]: TokenStatus }>(
-    `@${account}`,
-    {
-      hive: 1,
-    }
-  );
+  const data = chainFlags.steem
+    ? await getScotDataAsync<{ [id: string]: TokenStatus }>(`@${account}`, {})
+    : null;
+  const hiveData = chainFlags.hive
+    ? null
+    : await getScotDataAsync<{ [id: string]: TokenStatus }>(`@${account}`, {
+        hive: 1,
+      });
   return { data, hiveData };
 }
 function mergeContent(
@@ -315,41 +307,30 @@ export const enginifyPost = (post: Entry, observer: string): Promise<Entry> => {
       return post;
     });
 };
-export const fetchedHiveEngineTokensProperties = async (
-  r: [
-    HiveEngineTokenInfo,
-    HiveEngineTokenConfig,
-    { [shortCoinName: string]: number /* in Hive */ }
-  ]
-) => {
-  const info = r[0] as HiveEngineTokenInfo;
-  const config = r[1] as HiveEngineTokenConfig;
-  const prices = r[2] as { [shortCoinName: string]: number /* in Hive */ };
-  const hivePrice = prices["POB"];
-  return { [LIQUID_TOKEN_UPPERCASE]: { info, config, hivePrice } };
-};
 export async function getAccountHEFull(
   account: string,
-  useHive: boolean
+  notUsed: boolean,
+  symbols: Array<string> = []
 ): Promise<FullHiveEngineAccount> {
   let follow_stats: AccountFollowStats | undefined = {
     account,
     follower_count: 0,
     following_count: 0,
   };
+  const userHive = true;
   try {
     let hiveAccount: FullAccount,
-      tokenBalances: Array<object>,
+      rawTokenBalances: Array<RawTokenBalance>,
       tokenUnstakes: Array<UnStake>,
       tokenStatuses: {
-        data: { [id: string]: TokenStatus };
+        data: { [id: string]: TokenStatus } | null;
         hiveData: { [id: string]: TokenStatus } | null;
       },
       transferHistory: any,
       tokenDelegations: any;
     [
       hiveAccount,
-      tokenBalances,
+      rawTokenBalances,
       tokenUnstakes,
       tokenStatuses,
       transferHistory,
@@ -362,43 +343,49 @@ export async function getAccountHEFull(
       }),
       hiveSsc.find("tokens", "pendingUnstakes", {
         account,
-        symbol: LIQUID_TOKEN_UPPERCASE,
       }),
       getScotAccountDataAsync(account),
-      getFineTransactions(account, 100, 0),
+      getScotDataAsync<Array<HEFineTransaction>>("get_account_history", {
+        account,
+        limit: 100,
+        offset: 0,
+      }),
       hiveSsc.find("tokens", "delegations", {
         $or: [{ from: account }, { to: account }],
-        symbol: LIQUID_TOKEN_UPPERCASE,
       }),
     ]);
+
     let modifiedTokenBalances: Array<TokenBalance> = [];
     // There is no typesafe way to modify the type of something
     // in place.  You have to do a typecast eventually or participate in
     // copying.
-    for (const tokenBalance of tokenBalances) {
-      const b = tokenBalance;
+    let rawTokenBalance: RawTokenBalance | undefined = undefined;
+    while ((rawTokenBalance = rawTokenBalances.pop())) {
       if (
-        typeof b["_id"] !== "number" ||
-        typeof b["symbol"] !== "string" ||
-        typeof b["balance"] !== "string" ||
-        typeof b["stake"] !== "string"
+        typeof rawTokenBalance["_id"] !== "number" ||
+        typeof rawTokenBalance["symbol"] !== "string" ||
+        typeof rawTokenBalance["balance"] !== "string" ||
+        typeof rawTokenBalance["stake"] !== "string"
       )
         continue;
-      const b2: RawTokenBalance = b as RawTokenBalance;
+
       // pass by reference semantics modifies the array.
       // This is on purpose.
-      const b1: TokenBalance = Object.assign(b2, {
-        delegationsIn: parseFloat(b2.delegationsIn),
-        balance: parseFloat(b2.balance),
-        stake: parseFloat(b2.stake),
-        delegationsOut: parseFloat(b2.delegationsOut),
-        pendingUndelegations: parseFloat(b2.pendingUndelegations),
-        pendingUnstake: parseFloat(b2.pendingUndelegations),
+      const tokenBalance: TokenBalance = Object.assign(rawTokenBalance, {
+        delegationsIn: parseFloat(rawTokenBalance.delegationsIn),
+        balance: parseFloat(rawTokenBalance.balance),
+        stake: parseFloat(rawTokenBalance.stake),
+        delegationsOut: parseFloat(rawTokenBalance.delegationsOut),
+        pendingUndelegations: parseFloat(rawTokenBalance.pendingUndelegations),
+        pendingUnstake: parseFloat(rawTokenBalance.pendingUndelegations),
       });
-      modifiedTokenBalances.push(b1);
+      modifiedTokenBalances.push(tokenBalance);
     }
     // Now tokenBalances is an Array<TokenBalance>.
-    const prices = await getPrices(Object.keys(tokenBalances));
+    const prices = await getPrices(
+      modifiedTokenBalances.map((tb) => tb.symbol)
+    );
+    let follow_stats: AccountFollowStats | undefined;
     try {
       follow_stats = await getFollowCount(account);
     } catch (e) {}

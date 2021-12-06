@@ -178,6 +178,7 @@ if (!loadingHiveTokenInformation) {
     loadingHiveTokenInformation = false;
   });
 }
+
 export const makePreloadedState = async (
   req: express.Request
 ): Promise<AppState> => {
@@ -192,66 +193,15 @@ export const makePreloadedState = async (
   So it must be sorted here.
   
   */
-  let acceptableLanguage: { [languageCode: string]: boolean } = {};
-  let negotiatedLanguages: Array<string> = [];
-  const headers = (req && req.headers) || {};
-  const rawAcceptLanguage = headers["accept-language"] || "";
-  const userAgent = headers["user-agent"] || "";
-  const acceptLanguage = rawAcceptLanguage
-    .split(/;/)
-    .map((languages_priority_pair_string) => {
-      const languages_priority_vector =
-        languages_priority_pair_string.split(/, */);
-      let priority: number = 1;
-      let lang_struct_vector: Array<LanguageSpec> = [];
-      for (const language of languages_priority_vector) {
-        const new_priority = language.split(/=/);
-        if (new_priority.length > 1 && new_priority[0] === "q") {
-          priority = parseFloat(new_priority[1]);
-        }
-      }
-      for (const languageCode of languages_priority_vector) {
-        const new_priority = languageCode.split(/=/);
-        if (new_priority.length === 1 || new_priority[0] !== "q") {
-          acceptableLanguage[languageCode] = true;
-          lang_struct_vector.push({ priority, languageCode });
-        }
-      }
-      return lang_struct_vector;
-    })
-    .flat()
-    .filter(function (lang_struct: LanguageSpec) {
-      for (const availableLanguage of langOptions) {
-        if (
-          lang_struct.languageCode.split(/-/)[0] ==
-          availableLanguage.code.split(/-/)[0]
-        ) {
-          if (!negotiatedLanguages.includes(availableLanguage.code)) {
-            negotiatedLanguages.push(availableLanguage.code);
-          }
-          return (acceptableLanguage[availableLanguage.code.split(/-/)[0]] =
-            acceptableLanguage[availableLanguage.code] =
-              true);
-        }
-      }
-      return false;
-    })
-    .sort(function (a: LanguageSpec, b: LanguageSpec) {
-      return b.priority - a.priority;
-    });
 
-  if (negotiatedLanguages.length === 0) {
-    negotiatedLanguages.push("en-US");
-  }
-  // only log human requests.
-  if (rawAcceptLanguage !== "" && userAgent !== "") {
-    console.log({
-      rawAcceptLanguage,
-      negotiatedLanguages,
-      userAgent,
-      search_requests_allowed,
-    });
-  }
+  const headers = (req && { ...req.headers }) || {};
+  const userAgent = (headers["user-agent"] || "").slice(0);
+  const acceptableLanguage: { [languageCode: string]: boolean } = {
+    en: true,
+    "en-US": true,
+  };
+  const negotiatedLanguages: Array<string> = ["en-US"];
+  const acceptLanguage = [{ languageCode: "en-US", priority: 1 }];
   const _c = (k: string): any => req.cookies[k];
   const activeUser = _c("active_user") || null;
   const theme =
@@ -268,11 +218,11 @@ export const makePreloadedState = async (
     storedHiveEngineTokensProperties;
   try {
     if (
-      storedHiveEngineTokensProperties &&
-      storedHiveEngineTokensProperties[LIQUID_TOKEN_UPPERCASE]
+      !(
+        storedHiveEngineTokensProperties &&
+        storedHiveEngineTokensProperties[LIQUID_TOKEN_UPPERCASE]
+      )
     ) {
-      console.log("Token information available.");
-    } else {
       console.log(
         "No token property information stored.  Loading tokens properties...",
         Object.keys(storedHiveEngineTokensProperties)

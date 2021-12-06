@@ -12,10 +12,8 @@ public/static
 .env.development.local
 .env.test.local
 .env.production.local
-
 src/config.ts
 .vscode
-
 dev.sh
 *~
 *.marks
@@ -24,3 +22,8 @@ src/common/constants/site.json
 *#*#
 *.o
 *.pid
+.builds/**/*.*
+.servers-build/**/*.*
+runforever-dbg
+To_Do.txt
+*.js

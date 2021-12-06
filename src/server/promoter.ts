@@ -315,8 +315,12 @@ interface Block {
           continue;
         }
 
-        if (quantity + 0 !== quantity) {
-          console.log("quantity is supposed to be a number not a string");
+        if (quantity + 0 === quantity) {
+          console.log(
+            `quantity (${JSON.stringify(
+              quantity
+            )}) is supposed to be a string not a number`
+          );
           continue;
         }
 
@@ -326,13 +330,12 @@ interface Block {
           continue;
         }
 
-        const quantity_string = "" + quantity;
-        const dotLocation = quantity_string.indexOf(".");
+        const dotLocation = quantity.indexOf(".");
         if (
           dotLocation != -1 &&
-          dotLocation + 1 + precision < quantity_string.length
+          dotLocation + 1 + precision < quantity.length
         ) {
-          console.log("Invalid amount of POB: " + quantity_string);
+          console.log("Invalid amount of POB: " + quantity);
           continue;
         }
 

@@ -41,6 +41,7 @@ import LoginRequired from "../login-required";
 import parseDate from "../../helper/parse-date";
 
 import { _t } from "../../i18n";
+import { Tsx } from "../../i18n/helper";
 
 import { comment, formatError } from "../../api/operations";
 
@@ -67,6 +68,7 @@ interface ItemBodyProps {
   global: Global;
 }
 
+import appName from "../../../common/helper/app-name";
 export class ItemBody extends Component<ItemBodyProps> {
   shouldComponentUpdate(nextProps: Readonly<ItemBodyProps>): boolean {
     return this.props.entry.body !== nextProps.entry.body;
@@ -89,6 +91,8 @@ export class ItemBody extends Component<ItemBodyProps> {
 }
 
 interface ItemProps {
+  appDomain: string;
+  enableBlackLists: boolean;
   history: History;
   location: Location;
   global: Global;
@@ -230,7 +234,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
 
   updateReply = (text: string) => {
     const { entry } = this.props;
-    const { activeUser, updateReply } = this.props;
+    const { activeUser, updateReply, appDomain } = this.props;
 
     const {
       permlink,
@@ -238,7 +242,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
       parent_permlink: parentPermlink,
     } = entry;
     const jsonMeta = makeJsonMetaDataReply(
-      entry.json_metadata.tags || ["proofofbrain"],
+      entry.json_metadata.tags || [appDomain],
       version
     );
 
@@ -277,7 +281,8 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
   };
 
   render() {
-    const { entry, activeUser, community, location } = this.props;
+    const { entry, activeUser, community, location, enableBlackLists } =
+      this.props;
     const { reply, edit, inProgress, showIfHidden } = this.state;
 
     const created = moment(parseDate(entry.created));
@@ -285,6 +290,8 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
     const readMore = entry.children > 0 && entry.depth > 5;
     const showSubList = !readMore && entry.children > 0;
     const canEdit = activeUser && activeUser.username === entry.author;
+    const app = appName(entry.json_metadata.app);
+    const appShort = app.split("/")[0].split(" ")[0];
 
     const canMute =
       activeUser && community
@@ -300,7 +307,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
           })
         : false;
 
-    const isHidden = !!entry.stats?.gray && !showIfHidden;
+    const isHidden = enableBlackLists && !!entry.stats?.gray && !showIfHidden;
 
     const anchorId = `anchor-@${entry.author}/${entry.permlink}`;
 
@@ -376,6 +383,13 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
               return (
                 <>
                   <ItemBody global={this.props.global} entry={entry} />
+                  {app && (
+                    <div className="app" title={app}>
+                      <Tsx k="entry.via-app" args={{ app: appShort }}>
+                        <a href="/faq#source-label" />
+                      </Tsx>
+                    </div>
+                  )}
                   <div className="item-controls">
                     {EntryVoteBtn({
                       ...this.props,
@@ -390,6 +404,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
                       ...this.props,
                       entry,
                     })}
+
                     <a
                       className={_c(`reply-btn ${edit ? "disabled" : ""}`)}
                       onClick={this.toggleReply}
@@ -478,6 +493,8 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
 }
 
 interface ListProps {
+  appDomain: string;
+  enableBlackLists: boolean;
   history: History;
   location: Location;
   global: Global;
@@ -526,6 +543,8 @@ export class List extends Component<ListProps> {
 }
 
 interface Props {
+  appDomain: string;
+  enableBlackLists: boolean;
   hiveEngineTokensProperties: TokenPropertiesMap;
   history: History;
   location: Location;
@@ -698,6 +717,8 @@ export class Discussion extends Component<Props, State> {
 
 export default (p: Props) => {
   const props: Props = {
+    appDomain: p.appDomain,
+    enableBlackLists: p.enableBlackLists,
     history: p.history,
     location: p.location,
     global: p.global,

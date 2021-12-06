@@ -1,0 +1,5 @@
+./node_modules/*
+./src/desktop/node_modules/*
+./build/*
+./src/desktop/*
+*.js

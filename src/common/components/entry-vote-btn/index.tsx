@@ -387,9 +387,11 @@ export class VoteDialog extends Component<VoteDialogProps, VoteDialogState> {
       const usersFullUpVoteRShares =
         (this.props.tokenInfo.pending_rshares /
           this.props.tokenInfo.staked_token) *
-        (liquid_balance===undefined ? 0 : liquid_balance.stake +
-          liquid_balance.delegationsIn -
-          liquid_balance.delegationsOut); // .staked_tokens;
+        (liquid_balance === undefined
+          ? 0
+          : liquid_balance.stake +
+            liquid_balance.delegationsIn -
+            liquid_balance.delegationsOut); // .staked_tokens;
       const applyRewardsCurve = this.applyRewardsCurve.bind(this);
       const active_votes: Array<ScotVoteShare> = this.state.tokenEntryMap[
         LIQUID_TOKEN_UPPERCASE
@@ -801,7 +803,7 @@ export class EntryVoteBtn extends BaseComponent<Props, State> {
         getScotDataAsync<HiveEngineTokenConfig>("config", {
           token: LIQUID_TOKEN_UPPERCASE,
         }),
-        getPrices(undefined),
+        getPrices([LIQUID_TOKEN_UPPERCASE, "LEO", "SWAP.BTC"]),
       ]).then(function (
         values: [
           HiveEngineTokenInfo,

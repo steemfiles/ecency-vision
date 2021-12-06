@@ -1,9 +1,11 @@
 import numeral from "numeral";
+import { isntString, isntNumber, typeCheck } from "../euphoria";
 interface Options {
   maximumFractionDigits?: number;
   fractionDigits?: number;
   prefix?: string;
   suffix?: string;
+  debug?: boolean;
 }
 function count0s(s: string) {
   let counter = 0;
@@ -22,18 +24,32 @@ export default (
   value: number | string,
   options: Options | undefined = undefined
 ) => {
-  const debugLog = false;
+  typeCheck(
+    isntNumber(value) && isntString(value),
+    "number|string",
+    "value",
+    value
+  );
+
   let addNegativeSignFlag: boolean = false;
   let opts: Options = {
     maximumFractionDigits: 3,
     fractionDigits: 3,
     prefix: "",
     suffix: "",
+    debug: false,
   };
   if (options) {
     opts = { ...opts, ...options };
   }
-  if (debugLog) console.log({ value, fractionDigits: opts.fractionDigits });
+  const debugLog = opts.debug;
+  if (debugLog)
+    console.log({
+      value,
+      fractionDigits: opts.fractionDigits,
+      prefix: opts.prefix,
+      suffix: opts.suffix,
+    });
   const { prefix, suffix } = opts;
   const mandatoryFractionDigits = opts.fractionDigits || 0;
   const maximumFractionDigits: number =
@@ -48,10 +64,7 @@ export default (
       return "NaN";
     }
     const digitsTry = max(maximumFractionDigits, mandatoryFractionDigits);
-    const unity = Math.pow(
-      10,
-      digitsTry
-    );
+    const unity = Math.pow(10, digitsTry);
     if (value < 0) {
       addNegativeSignFlag = true;
     }

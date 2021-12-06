@@ -28,7 +28,6 @@ import ToolTip from "../tooltip";
 import Search from "../search";
 import Login from "../login";
 import UserNav from "../user-nav";
-
 import { _t } from "../../i18n";
 
 import _c from "../../util/fix-class-names";
@@ -42,6 +41,7 @@ import {
 
 const logo = require("../../img/bluebrain-logo-circle.webp");
 const hiveLogo = require("../../img/hiveLogo.png");
+const discordLogo = require("../../img/discord-logo-transparent-better.png");
 
 import { hiveSvg } from "../../img/svg";
 import site from "../../constants/site.json";
@@ -240,6 +240,9 @@ export class NavBar extends Component<Props, State> {
                   />
                 </div>
               )}
+              <a href="https://discord.gg/8vBmmtS9ZU" target="discord">
+                <img src={discordLogo} className="logo" alt="discord" />
+              </a>
             </div>
             <div className="flex-spacer" />
             {(step !== 1 || transparentVerify) && (
@@ -308,7 +311,7 @@ export class NavBar extends Component<Props, State> {
             )}
           </div>
           {ui.login && <Login {...this.props} />}
-          {global.usePrivate && <NotificationHandler {...this.props} />}
+          <NotificationHandler {...this.props} />
         </div>
       </>
     );

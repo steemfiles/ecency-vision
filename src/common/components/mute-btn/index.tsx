@@ -125,7 +125,6 @@ export class MuteBtn extends BaseComponent<Props, State> {
 
   mute = (mute: boolean, notes: string) => {
     const { entry, community, activeUser, onSuccess } = this.props;
-
     this.stateSet({ inProgress: true });
     mutePost(
       activeUser.username,

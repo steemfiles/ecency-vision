@@ -1,6 +1,6 @@
 import { SMTAsset } from "@hiveio/dhive";
 export type nAACRS = string; // number as a computer readable string:  No commas.  No units.
-export type nAAHRS = string; // number as a computer readable string:  Commas, but no units.
+export type nAAHRS = string; // number as a human readable string:  Commas, but no units.
 export type aAAS = string; // amount as a string: commas and units.
 export type orderTypeType = "buy" | "sell" | "marketSell" | "marketBuy";
 export function validateOrderType(s: string) {
@@ -39,13 +39,26 @@ export interface HECoarseBaseTransaction {
   // POB for Proof of Brain
   symbol: string;
 }
+export interface HEMarketExpire extends HECoarseBaseTransaction {
+  account: string;
+  operation: "market_expire";
+  orderID: string;
+  orderType: orderTypeType;
+  quantityUnlocked: nAACRS;
+}
+export interface MarketExpire extends BaseTransaction {
+  type: "market_expireOrder";
+  amountUnlocked: aAAS;
+  orderID: string;
+  orderType: orderTypeType;
+}
 export interface HEMarketCloseOrder extends HECoarseBaseTransaction {
   operation: "market_closeOrder";
-  orderType: "sell" | "buy";
+  orderType: orderTypeType;
 }
 export interface MarketCloseOrder extends BaseTransaction {
   type: "market_closeOrder";
-  orderType: "sell" | "buy";
+  orderType: orderTypeType;
 }
 export interface HETokensUnstake extends HECoarseBaseTransaction {
   account: string;
@@ -179,7 +192,7 @@ export interface MarketSell extends BaseTransaction {
 export interface HEMarketSell extends HECoarseBaseTransaction {
   operation: "market_sell";
   quantityHive: nAACRS;
-  quantityTokens: nAACRS;
+  quantityTokens: null | nAACRS;
   account: string;
   to: string;
 }
@@ -217,7 +230,6 @@ export interface HEUnstakeDone extends HECoarseBaseTransaction {
   operation: "tokens_unstakeDone";
   account: string;
   quantity: nAACRS;
-  symbol: string;
   timestamp: number;
   transactionId: string;
 }
@@ -253,7 +265,6 @@ export interface HEMarketCancel extends HECoarseBaseTransaction {
   orderType: orderTypeType;
   account: string;
   quantityReturned: string;
-  symbol: string;
 }
 export interface MarketCancel extends BaseTransaction {
   type: "market_cancel";
@@ -262,6 +273,7 @@ export interface MarketCancel extends BaseTransaction {
   orderType: orderTypeType;
   amount: aAAS;
 }
+
 export interface HETokensUndelegateDone extends HECoarseBaseTransaction {
   operation: "tokens_undelegateDone";
   num: number;
@@ -273,7 +285,6 @@ export interface HETokensDelegate extends HECoarseBaseTransaction {
   account: string;
   quantity: nAACRS;
   to: string;
-  symbol: string;
 }
 export interface TokensDelegate extends BaseTransaction {
   type: "tokens_delegate";
@@ -295,7 +306,6 @@ export interface HEMarketBuy extends HECoarseBaseTransaction {
   from: string;
   quantityHive: nAACRS;
   quantityTokens: nAACRS;
-  symbol: string;
 }
 export interface MarketBuy extends BaseTransaction {
   type: "market_buy";
@@ -309,7 +319,6 @@ export interface HETokensUndelegateStart extends HECoarseBaseTransaction {
   account: string;
   from: string;
   quantity: string;
-  symbol: string;
 }
 export interface TokensUndelegateStart extends BaseTransaction {
   type: "tokens_undelegateStart";
@@ -479,6 +488,7 @@ export interface EffectiveCommentVote extends BaseTransaction {
   weight: number;
 }
 export type Transaction =
+  | MarketExpire
   | MarketCloseOrder
   | TokensUnstake
   | CurationReward
@@ -521,6 +531,7 @@ export type OperationGroup =
   | "interests"
   | "stake-operations"
   | "rewards";
+//  | "socials";
 export interface Transactions {
   list: Transaction[];
   loading: boolean;
@@ -528,6 +539,7 @@ export interface Transactions {
 }
 export type HECoarseTransaction =
   | HEMarketCloseOrder
+  | HEMarketExpire
   | HETokensUnstake
   | HETokensIssue
   | HEUnstakeStart

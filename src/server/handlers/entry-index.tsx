@@ -16,7 +16,6 @@ import {
   HiveEngineTokenInfo,
   HiveEngineTokenConfig,
   getPrices,
-  fetchedHiveEngineTokensProperties,
 } from "../../common/api/hive-engine";
 export default async (req: express.Request, res: express.Response) => {
   const params = filterTagExtract(req.originalUrl.split("?")[0])!;

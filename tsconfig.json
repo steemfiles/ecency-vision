@@ -28,6 +28,7 @@
     "build",
     "src/server/getsearchdata.*",
     "src/server/relayserver.*",
+    "private-api",
     "scripts",
     "acceptance-tests",
     "webpack",

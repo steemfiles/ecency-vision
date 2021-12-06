@@ -49,7 +49,13 @@ export const WHITEPAPER_URL = "https://hive.io/hive-whitepaper.pdf";
 export const VEST_TICKER = "VESTS";
 
 //           Hive-Engine Layer token (for API use)
-export const HIVE_ENGINE_TOKEN = "";
+export const HIVE_ENGINE_TOKENS = [
+  {
+    apiName: "Weed",
+    liquidHumanName: "Weed Cash",
+    stakedHumanName: "Weed Power",
+  },
+];
 
 // application settings
 export const DEFAULT_LANGUAGE = "en"; // used on application internationalization bootstrap

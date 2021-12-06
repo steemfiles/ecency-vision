@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { utils } from "@hiveio/dhive";
 import { PointTransaction } from "../store/points/types";
 import {
   ApiNotification,
@@ -12,9 +12,11 @@ import { getAccessToken } from "../helper/user-token";
 import { apiBase } from "./helper";
 
 import { AppWindow } from "../../client/window";
-import { DOLLAR_API_NAME } from "./hive";
+import { DOLLAR_API_NAME, hiveClient, getAccountHistory } from "./hive";
 import { enginifyPost, getScotDataAsync } from "./hive-engine";
 declare var window: AppWindow;
+
+const ops = { utils };
 
 export interface ReceivedVestingShare {
   delegatee: string;
@@ -127,8 +129,19 @@ export const getNotifications = (
   filter: NotificationFilter | null,
   since: string | null = null
 ): Promise<ApiNotification[]> => {
-  const data: { code: string | undefined; filter?: string; since?: string } = {
+  //const social_op_filter = utils.makeBitMaskFilter([
+  //  ops.vote , ops.custom_json, ops.request_account_recovery,
+  //  ops.recover_account, ops.comment
+  //]);
+  //
+  const data: {
+    code: string | undefined;
+    username: string;
+    filter?: string;
+    since?: string;
+  } = {
     code: getAccessToken(username),
+    username,
   };
 
   if (filter) {
@@ -147,7 +160,7 @@ export const getNotifications = (
 export const getUnreadNotificationCount = (
   username: string
 ): Promise<number> => {
-  const data = { code: getAccessToken(username) };
+  const data = { code: getAccessToken(username), username };
 
   return data.code
     ? axios
@@ -160,8 +173,9 @@ export const markNotifications = (
   username: string,
   id: string | null = null
 ) => {
-  const data: { code: string | undefined; id?: string } = {
+  const data: { code: string | undefined; id?: string; username: string } = {
     code: getAccessToken(username),
+    username,
   };
   if (id) {
     data.id = id;

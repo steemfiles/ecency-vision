@@ -26,6 +26,7 @@ import {
   commentSvg,
   compareHorizontalSvg,
   exchangeSvg,
+  gridSvg,
   pickAxeSvg,
   powerDownSvg,
   powerUpSvg,
@@ -364,20 +365,42 @@ export class TransactionRow extends Component<RowProps> {
       numbers = <span className="number"> {tr.amount}</span>;
     }
     if (tr.type === "market_closeOrder") {
-      console.log(tr);
       flag = true;
       if (tr.orderType == "sell") {
         icon = arrowRightSvg;
       } else {
         icon = arrowLeftSvg;
       }
-      details = <><a target={"blockexplorer"} href={"https://hiveblockexplorer.com/tx/" + tr.trx_id}>
-           orderID: {tr.orderType}
-      </a></>;
+      details = (
+        <>
+          <a
+            target={"blockexplorer"}
+            href={"https://hiveblockexplorer.com/tx/" + tr.trx_id}
+          >
+            {tr.orderType}
+          </a>
+        </>
+      );
+    }
+    if (tr.type === "market_expireOrder") {
+      flag = true;
+      icon = closeSvg;
+      numbers = <>{tr.amountUnlocked}</>;
+      details = (
+        <>
+          <a
+            target={"blockexplorer"}
+            href={"https://hiveblockexplorer.com/tx/" + tr.trx_id}
+          >
+            orderID: {tr.orderID}
+            {tr.orderType}
+          </a>
+        </>
+      );
     }
     if (
-      ((tr.type === "market_sell") && (icon = arrowRightSvg)) ||
-      ((tr.type === "market_buy") && (icon = arrowLeftSvg))
+      (tr.type === "market_sell" && (icon = arrowRightSvg)) ||
+      (tr.type === "market_buy" && (icon = arrowLeftSvg))
     ) {
       flag = true;
       numbers = (
@@ -577,6 +600,7 @@ export class TransactionList extends Component<Props> {
               "interests",
               "stake-operations",
               "rewards",
+              //"socials",
             ].map((x) => (
               <option key={x} value={x}>
                 {_t(`transactions.group-${x}`)}
