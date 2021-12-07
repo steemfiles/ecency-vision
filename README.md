@@ -6,19 +6,6 @@ Immutable, decentralized, uncensored, rewarding communities powered by Hive.
 
 Fast, simple and clean source code with Reactjs + Typescript.
 
-## Website
-
-- [Production version][ecency_vision] - master branch
-- [Alpha version][ecency_alpha] - development branch
-
-## Ecency has a similar Desktop app (but is not Hive Engine aware!)
-
-Please check latest version on [Release page][ecency_release] or [Ecency link][ecency_desktop].
-
-- Mac users: `Ecency-3.x.x.dmg`
-- Windows users: `Ecency.Setup.3.x.x.exe`
-- Linux users: `ecency-surfer_3.x.x_amd_64.deb`, `Ecency-3.x.x.AppImage`, `ecency-surfer-3.x.x.x86_64.rpm`, `ecency-surfer-3.x.x.tar.gz`
-
 ## Developers
 
 Feel free to test it out and submit improvements and pull requests.  
@@ -30,16 +17,26 @@ Please run pre-commit-hook.sh before committing
 
 - node ^12.0.0
 - yarn
+- g++ 9.3 (other versions probably work)
+- boost 1.76 (other versions probably work)
+- mariadb or mysql
 
 ##### Clone
 
-`$ git clone https://github.com/ecency/ecency-vision`
-
+`$ git clone https://github.com/steemfiles/ecency-vision`
 `$ cd ecency-vision`
+`$ git checkout POB-vision`
 
 ##### Install dependencies
 
 `$ yarn`
+
+##### Set Up Your Proxying Web Front End
+
+In order for this to work at all, you'll need a server that can do proxy ports.  `./proxy.apache-conf` in the base
+directory should give you some ideas.  There is another server that can do it, but I can't remember how to spell 
+the thing. :)  
+
 
 ##### Edit backend config file or define environment variables
 
@@ -132,11 +129,25 @@ chromium --disable-web-security --disable-gpu --user-data-dir=$HOME/userTmp http
 
 ##### Start website in dev
 
+In testing your need a reverse-proxy server to receive on port 80 and then proxy for ports 2997-3000 as described
+in the configuration file.
+
+`$ make`
+`$ node private-api/build/private-api-server.js &`
+`$ node private-api/build/relayserver.js & node private-api/build/promoter.js &`
 `$ yarn start`
 
-For website development Change `HIVE_SIGNER_APP` in `src/client_config.ts` to an account that you control. This account must have it's APP_SECRET with Hive Signer. This environment variable `HIVESIGNER_CLIENT_SECRET` must be set to this secret. Additionally, @hivesigner must be given posting authority for said account. If that HIVE_SIGNER_APP happens to be 'ecency.app', then you'll need the APP_SECRET that corresponds to that app.
+For website development Change `HIVE_SIGNER_APP` in `src/client_config.ts` to an account that you control. This account
+must have it's APP_SECRET with Hive Signer. This environment variable `HIVESIGNER_CLIENT_SECRET` must be set to this
+secret. Additionally, @hivesigner must be given posting authority for said account. If that HIVE_SIGNER_APP happens to
+be 'ecency.app', then you'll need the APP_SECRET that corresponds to that app.
+
+You'll be able to view it at port 80.
+
 
 ##### Start desktop in dev
+
+This is not being maintained.
 
 `$ cd src/desktop`
 `$ yarn`
@@ -147,44 +158,18 @@ and Ecency points.
 
 ##### Pushing new code / Pull requests
 
-- Make sure to branch off your changes from `development` branch.
+- Make sure to branch off your changes from `POB-vision` branch.
 - Make sure to run `yarn test` and add tests to your changes.
 - Code on!
-
-## Docker
-
-You can use official `ecency/vision:latest` image to run Vision locally, deploy it to staging or even production environment. The simplest way is to run it with following command:
-
-```bash
-docker run -it --rm -p 3000:3000 ecency/vision:latest
-```
-
-Configure the instance using following environment variables:
-
-- `USE_PRIVATE`
-
-```bash
-docker run -it --rm -p 3000:3000 -e USE_PRIVATE=1 ecency/vision:latest
-```
-
-### Swarm
-
-You can easily deploy a set of vision instances to your production environment, using example `docker-compose.yml` file. Docker Swarm will automatically keep it alive and load balance incoming traffic between the containers:
-
-```bash
-docker stack deploy -c docker-compose.yml -c docker-compose.production.yml vision
-```
 
 ## Issues
 
 To report a non-critical issue, please file an issue on this GitHub project.
 
-If you find a security issue please report details to: security@ecency.com
+If you find a security issue please report details to: leprechaun 6010 on Discord
 
 We will evaluate the risk and make a patch available before filing the issue.
 
 [//]: # "LINKS"
-[ecency_vision]: https://ecency.com
-[ecency_desktop]: https://desktop.ecency.com
-[ecency_alpha]: https://alpha.ecency.com
-[ecency_release]: https://github.com/ecency/ecency-vision/releases
+Main site using software: https://proofofbrain.blog
+GitHub Repo: https://github.com/steemfiles/ecency-vision
