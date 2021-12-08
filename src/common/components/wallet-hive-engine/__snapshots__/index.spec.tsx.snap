@@ -11,6 +11,62 @@ exports[`(1) Default Render 1`] = `
       className="wallet-info"
     >
       <div
+        className="balance-row"
+      >
+        <div
+          className="balance-info"
+        >
+          <div
+            className="title"
+          >
+            Proof of Brain
+          </div>
+          <div
+            className="description"
+          >
+            Proof of Brain are tradeable tokens that may be transferred at anytime.  POB can be staked in a process called powering up.
+          </div>
+        </div>
+        <div
+          className="balance-values"
+        >
+          <div
+            className="amount"
+          >
+            <span>
+              Loading...
+            </span>
+          </div>
+        </div>
+      </div>
+      <div
+        className="balance-row hive-power alternative"
+      >
+        <div
+          className="balance-info"
+        >
+          <div
+            className="title"
+          >
+            Brain Power
+          </div>
+          <div
+            className="description"
+          >
+            Staked Proof of Brain earn more Proof of Brain for voting on posts. The more Staked Proof of Brain one holds, the more one can influence other’s rewards and earn rewards for accurate voting.
+          </div>
+        </div>
+        <div
+          className="balance-values"
+        >
+          <div
+            className="amount"
+          >
+            Loading...
+          </div>
+        </div>
+      </div>
+      <div
         className="transaction-list"
       >
         <div
@@ -144,6 +200,62 @@ exports[`(2) Render with converting HBD 1`] = `
       className="wallet-info"
     >
       <div
+        className="balance-row"
+      >
+        <div
+          className="balance-info"
+        >
+          <div
+            className="title"
+          >
+            Proof of Brain
+          </div>
+          <div
+            className="description"
+          >
+            Proof of Brain are tradeable tokens that may be transferred at anytime.  POB can be staked in a process called powering up.
+          </div>
+        </div>
+        <div
+          className="balance-values"
+        >
+          <div
+            className="amount"
+          >
+            <span>
+              Loading...
+            </span>
+          </div>
+        </div>
+      </div>
+      <div
+        className="balance-row hive-power alternative"
+      >
+        <div
+          className="balance-info"
+        >
+          <div
+            className="title"
+          >
+            Brain Power
+          </div>
+          <div
+            className="description"
+          >
+            Staked Proof of Brain earn more Proof of Brain for voting on posts. The more Staked Proof of Brain one holds, the more one can influence other’s rewards and earn rewards for accurate voting.
+          </div>
+        </div>
+        <div
+          className="balance-values"
+        >
+          <div
+            className="amount"
+          >
+            Loading...
+          </div>
+        </div>
+      </div>
+      <div
         className="transaction-list"
       >
         <div
@@ -276,6 +388,62 @@ exports[`(3) usePrivate = false 1`] = `
     <div
       className="wallet-info"
     >
+      <div
+        className="balance-row"
+      >
+        <div
+          className="balance-info"
+        >
+          <div
+            className="title"
+          >
+            Proof of Brain
+          </div>
+          <div
+            className="description"
+          >
+            Proof of Brain are tradeable tokens that may be transferred at anytime.  POB can be staked in a process called powering up.
+          </div>
+        </div>
+        <div
+          className="balance-values"
+        >
+          <div
+            className="amount"
+          >
+            <span>
+              Loading...
+            </span>
+          </div>
+        </div>
+      </div>
+      <div
+        className="balance-row hive-power alternative"
+      >
+        <div
+          className="balance-info"
+        >
+          <div
+            className="title"
+          >
+            Brain Power
+          </div>
+          <div
+            className="description"
+          >
+            Staked Proof of Brain earn more Proof of Brain for voting on posts. The more Staked Proof of Brain one holds, the more one can influence other’s rewards and earn rewards for accurate voting.
+          </div>
+        </div>
+        <div
+          className="balance-values"
+        >
+          <div
+            className="amount"
+          >
+            Loading...
+          </div>
+        </div>
+      </div>
       <div
         className="transaction-list"
       >
