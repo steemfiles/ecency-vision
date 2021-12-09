@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Fragment, Component } from "react";
 
 import { Link } from "react-router-dom";
 
@@ -9,7 +9,7 @@ const logo = require("../../img/logo-small-transparent.png");
 import _c from "../../util/fix-class-names";
 
 import { hiveSvg } from "../../img/svg";
-import { LIQUID_TOKEN, LIQUID_TOKEN_UPPERCASE } from "../../../client_config";
+import { HIVE_ENGINE_TOKENS } from "../../../client_config";
 
 interface Props {
   global: Global;
@@ -23,18 +23,23 @@ export default class WalletMenu extends Component<Props> {
 
     return (
       <div className="wallet-menu">
-        <Link
-          className={_c(
-            `menu-item hive ${active === "hiveEngine" ? "active" : ""}`
-          )}
-          to={`/@${username}/wallet`}
-        >
-          <span className="title">{LIQUID_TOKEN}</span>
-          <span className="sub-title">Wallet</span>
-          <span className="platform-logo">
-            <img alt={LIQUID_TOKEN_UPPERCASE} src={logo} />
-          </span>
-        </Link>
+        <Fragment>
+          {HIVE_ENGINE_TOKENS.map((t) => (
+            <Link
+              key={t.apiName}
+              className={_c(
+                `menu-item hive ${active === "hiveEngine" ? "active" : ""}`
+              )}
+              to={`/@${username}/wallet?aPICoinName=${t.apiName}&precision=${t.precision}&coinName=${t.liquidHumanName}&stakedCoinName=${t.stakedHumanName}`}
+            >
+              <span className="title">{t.liquidHumanName}</span>
+              <span className="sub-title">Wallet</span>
+              <span className="platform-logo">
+                <img alt={t.apiName} src={logo} />
+              </span>
+            </Link>
+          ))}
+        </Fragment>
         <Link
           className={_c(`menu-item hive ${active === "hive" ? "active" : ""}`)}
           to={`/@${username}/hive`}

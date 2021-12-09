@@ -89,7 +89,9 @@ export async function getPrices(
     if (token_list) {
       for (const i in token_list) {
         const symbol = token_list[i];
-        if (!obj[symbol]) {
+        if (symbol === "SWAP.HIVE") {
+          obj["SWAP.HIVE"] = 1;
+        } else if (!obj[symbol]) {
           try {
             const recentTrades: Array<{ price: string }> = await hiveSsc.find(
               "market",
@@ -349,7 +351,6 @@ export async function getAccountHEFull(
         $or: [{ from: account }, { to: account }],
       }),
     ]);
-    console.log({ tokenStatuses });
     let modifiedTokenBalances: Array<TokenBalance> = [];
     // There is no typesafe way to modify the type of something
     // in place.  You have to do a typecast eventually or participate in

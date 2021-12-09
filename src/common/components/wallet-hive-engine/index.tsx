@@ -385,6 +385,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
       converting,
       transactions,
     } = this.state;
+
     if (!account.__loaded) {
       return null;
     }
@@ -480,7 +481,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                   </div>
                   <div className="balance-values">
                     <div className="amount amount-bold">
-                      {tokenProperties ? (
+                      {is_FullHiveEngineAccount(account) ? (
                         <FormattedCurrency
                           {...this.props}
                           value={w.estimatedValue}
@@ -540,7 +541,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                               label: "Trade at LeoDex",
                               onClick: () => {
                                 window.open(
-                                  "https://leodex.io/market/POB",
+                                  `https://leodex.io/market/${this.props.aPICoinName}`,
                                   "leodex"
                                 );
                               },
@@ -549,7 +550,8 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                               label: "Trade at TribalDex",
                               onClick: () => {
                                 window.open(
-                                  "https://tribaldex.com/trade/POB",
+                                  "https://tribaldex.com/trade/" +
+                                    this.props.aPICoinName,
                                   "tribaldex"
                                 );
                               },
@@ -574,7 +576,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                       return null;
                     })()}
                     <span>
-                      {tokenProperties
+                      {is_FullHiveEngineAccount(account)
                         ? formattedNumber(balances.balance, {
                             fractionDigits: precision,
                             suffix: this.props.aPICoinName,
@@ -648,7 +650,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                         }
                         return null;
                       })()}
-                      {tokenProperties
+                      {is_FullHiveEngineAccount(account)
                         ? formattedNumber(balances.stake, {
                             suffix: this.props.aPICoinName,
                             fractionDigits: precision,
@@ -831,7 +833,20 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     } // if
   }
 }
-export default (p: Props) => {
+export default (q: Props) => {
+  const params_string = (() => {
+    try {
+      return window.location.search.slice(1);
+    } catch (e) {
+      return "";
+    }
+  })();
+  const params_list = params_string.split("&");
+  const settings = params_list.map((x) => x.split("="));
+  let p = q;
+  for (const setting of settings) {
+    p[setting[0]] = decodeURIComponent(setting[1]);
+  }
   const props = {
     history: p.history,
     global: p.global,

@@ -25,6 +25,7 @@ import WalletEcency from "../components/wallet-ecency";
 import WalletHiveEngine from "../components/wallet-hive-engine";
 import ScrollToTop from "../components/scroll-to-top";
 import { getAccountHEFull } from "../api/hive-engine";
+import { HIVE_ENGINE_TOKENS } from "../../client_config";
 import {
   LIQUID_TOKEN,
   LIQUID_TOKEN_UPPERCASE,
@@ -291,11 +292,34 @@ class ProfilePage extends BaseComponent<Props, State> {
                 account,
               })}
             {(() => {
+              const params_string = (() => {
+                try {
+                  return window.location.search.slice(1);
+                } catch (e) {
+                  return "";
+                }
+              })();
+              const params_list = params_string.split("&");
+              const settings = params_list.map((x) => x.split("="));
+              let aPICoinName: string = LIQUID_TOKEN_UPPERCASE;
+              for (const setting of settings) {
+                if (setting[0] === "aPICoinName") {
+                  aPICoinName = setting[1];
+                }
+              }
+              const coinInfo =
+                HIVE_ENGINE_TOKENS.find((ki) => ki.apiName == aPICoinName) ||
+                HIVE_ENGINE_TOKENS[0];
+              if (!coinInfo) {
+                return null;
+              }
+              const coinName = coinInfo.liquidHumanName;
+              const stakedCoinName = coinInfo.stakedHumanName;
               if (section === "wallet") {
                 return WalletHiveEngine({
-                  coinName: LIQUID_TOKEN,
-                  aPICoinName: LIQUID_TOKEN_UPPERCASE,
-                  stakedCoinName: VESTING_TOKEN,
+                  coinName,
+                  aPICoinName,
+                  stakedCoinName,
                   ...this.props,
                   account,
                 });
