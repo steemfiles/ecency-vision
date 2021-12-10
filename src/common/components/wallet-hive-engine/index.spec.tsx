@@ -78,6 +78,7 @@ const defProps = {
   aPICoinName: "POB",
   coinName: "Proof of Brain",
   stakedCoinName: "Brain Power",
+  hiveEngineTokens: [],
 };
 
 it("(1) Default Render", () => {

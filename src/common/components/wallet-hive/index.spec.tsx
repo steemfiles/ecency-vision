@@ -86,6 +86,7 @@ const defProps = {
   fetchTransactions: () => {},
   shortCoinName: "POB",
   coinName: "Proof of Brain",
+  hiveEngineTokens: [],
 };
 
 it("(1) Default Render", () => {

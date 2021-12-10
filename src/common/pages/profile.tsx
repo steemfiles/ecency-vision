@@ -25,11 +25,9 @@ import WalletEcency from "../components/wallet-ecency";
 import WalletHiveEngine from "../components/wallet-hive-engine";
 import ScrollToTop from "../components/scroll-to-top";
 import { getAccountHEFull } from "../api/hive-engine";
-import { HIVE_ENGINE_TOKENS } from "../../client_config";
 import {
-  LIQUID_TOKEN,
+  HIVE_ENGINE_TOKENS,
   LIQUID_TOKEN_UPPERCASE,
-  VESTING_TOKEN,
 } from "../../client_config";
 import defaults from "../constants/site.json";
 import _c from "../util/fix-class-names";
@@ -321,18 +319,21 @@ class ProfilePage extends BaseComponent<Props, State> {
                   aPICoinName,
                   stakedCoinName,
                   ...this.props,
+                  hiveEngineTokens: HIVE_ENGINE_TOKENS,
                   account,
                 });
               }
               if (section === "hive") {
                 return WalletHive({
                   ...this.props,
+                  hiveEngineTokens: HIVE_ENGINE_TOKENS,
                   account,
                 });
               }
               if (section === "points") {
                 return WalletEcency({
                   ...this.props,
+                  hiveEngineTokens: HIVE_ENGINE_TOKENS,
                   account,
                 });
               }

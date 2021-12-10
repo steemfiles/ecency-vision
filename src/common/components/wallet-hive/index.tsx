@@ -57,6 +57,12 @@ interface Props {
   updateActiveUser: (data?: Account) => void;
   setSigningKey: (key: string) => void;
   fetchTransactions: (username: string, group?: OperationGroup | "") => void;
+  hiveEngineTokens: Array<{
+    apiName: string;
+    liquidHumanName: string;
+    stakedHumanName: string;
+    precision: number;
+  }>;
 }
 
 interface State {
@@ -182,7 +188,8 @@ export class WalletHive extends BaseComponent<Props, State> {
   };
 
   render() {
-    const { global, dynamicProps, account, activeUser } = this.props;
+    const { global, dynamicProps, account, activeUser, hiveEngineTokens } =
+      this.props;
     const {
       claiming,
       claimed,
@@ -745,7 +752,12 @@ export class WalletHive extends BaseComponent<Props, State> {
 
             {TransactionList({ ...this.props })}
           </div>
-          <WalletMenu global={global} username={account.name} active="hive" />
+          <WalletMenu
+            global={global}
+            username={account.name}
+            active="hive"
+            hiveEngineTokens={hiveEngineTokens}
+          />
         </div>
 
         {transfer && (
@@ -799,6 +811,7 @@ export default (p: Props) => {
     updateActiveUser: p.updateActiveUser,
     setSigningKey: p.setSigningKey,
     fetchTransactions: p.fetchTransactions,
+    hiveEngineTokens: p.hiveEngineTokens,
   };
 
   return <WalletHive {...props} />;

@@ -68,6 +68,7 @@ interface Props {
   coinName: string;
   aPICoinName: string;
   stakedCoinName: string;
+  hiveEngineTokens: Array<any>;
 }
 interface State {
   delegatedList: boolean;
@@ -374,8 +375,16 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     this.stateSet({ transfer: false, transferMode: null, transferAsset: null });
   };
   render() {
-    const { global, dynamicProps, account, activeUser, aPICoinName } =
-      this.props;
+    const {
+      global,
+      dynamicProps,
+      account,
+      activeUser,
+      aPICoinName,
+      stakedCoinName,
+      hiveEngineTokens,
+    } = this.props;
+    console.log({ hiveEngineTokens });
     const {
       claiming,
       claimed,
@@ -495,99 +504,101 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                 </div>
               )}
 
-              <div className="balance-row">
-                <div className="balance-info">
-                  <div className="title">{this.props.coinName}</div>
-                  <div className="description">
-                    {_t("wallet." + this.props.aPICoinName + "-description")}
-                  </div>
-                </div>
-                <div className="balance-values">
-                  <div className="amount">
-                    {(() => {
-                      if (isMyPage) {
-                        const dropDownConfig = {
-                          history: this.props.history,
-                          label: "",
-                          items: [
-                            {
-                              label: "Wallet Operations",
-                              onClick: () => {
-                                window.open(
-                                  `https://www.proofofbrain.io/@${account.name}/transfers`,
-                                  "origPOB"
-                                );
-                              },
-                            },
-                            {
-                              label: _t("wallet.transfer"),
-                              onClick: () => {
-                                this.openTransferDialog(
-                                  "transfer",
-                                  this.props.aPICoinName
-                                );
-                              },
-                            },
-                            {
-                              label: _t("wallet.power-up"),
-                              onClick: () => {
-                                this.openTransferDialog(
-                                  "power-up",
-                                  this.props.aPICoinName
-                                );
-                              },
-                            },
-                            {
-                              label: "Trade at LeoDex",
-                              onClick: () => {
-                                window.open(
-                                  `https://leodex.io/market/${this.props.aPICoinName}`,
-                                  "leodex"
-                                );
-                              },
-                            },
-                            {
-                              label: "Trade at TribalDex",
-                              onClick: () => {
-                                window.open(
-                                  "https://tribaldex.com/trade/" +
-                                    this.props.aPICoinName,
-                                  "tribaldex"
-                                );
-                              },
-                            },
-                            {
-                              label: `Trade at HiveEngine`,
-                              onClick: () => {
-                                window.open(
-                                  `https://hive-engine.com/?p=market&t=${this.props.aPICoinName}`,
-                                  "hiveEngineDex"
-                                );
-                              },
-                            },
-                          ],
-                        };
-                        return (
-                          <div className="amount-actions">
-                            <DropDown {...dropDownConfig} float="right" />
-                          </div>
-                        );
-                      }
-                      return null;
-                    })()}
-                    <span>
-                      {is_FullHiveEngineAccount(account)
-                        ? formattedNumber(balances.balance, {
-                            fractionDigits: precision,
-                            suffix: this.props.aPICoinName,
-                          })
-                        : _t("wallet.loading")}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
               {
+                <div className="balance-row">
+                  <div className="balance-info">
+                    <div className="title">{this.props.coinName}</div>
+                    <div className="description">
+                      {_t("wallet." + this.props.aPICoinName + "-description")}
+                    </div>
+                  </div>
+                  <div className="balance-values">
+                    <div className="amount">
+                      {(() => {
+                        if (isMyPage) {
+                          const dropDownConfig = {
+                            history: this.props.history,
+                            label: "",
+                            items: [
+                              {
+                                label: "Wallet Operations",
+                                onClick: () => {
+                                  window.open(
+                                    `https://www.proofofbrain.io/@${account.name}/transfers`,
+                                    "origPOB"
+                                  );
+                                },
+                              },
+                              {
+                                label: _t("wallet.transfer"),
+                                onClick: () => {
+                                  this.openTransferDialog(
+                                    "transfer",
+                                    this.props.aPICoinName
+                                  );
+                                },
+                              },
+                              {
+                                label: _t("wallet.power-up"),
+                                onClick: () => {
+                                  this.openTransferDialog(
+                                    "power-up",
+                                    this.props.aPICoinName
+                                  );
+                                },
+                              },
+                              {
+                                label: "Trade at LeoDex",
+                                onClick: () => {
+                                  window.open(
+                                    `https://leodex.io/market/${this.props.aPICoinName}`,
+                                    "leodex"
+                                  );
+                                },
+                              },
+                              {
+                                label: "Trade at TribalDex",
+                                onClick: () => {
+                                  window.open(
+                                    "https://tribaldex.com/trade/" +
+                                      this.props.aPICoinName,
+                                    "tribaldex"
+                                  );
+                                },
+                              },
+                              {
+                                label: `Trade at HiveEngine`,
+                                onClick: () => {
+                                  window.open(
+                                    `https://hive-engine.com/?p=market&t=${this.props.aPICoinName}`,
+                                    "hiveEngineDex"
+                                  );
+                                },
+                              },
+                            ],
+                          };
+                          return (
+                            <div className="amount-actions">
+                              <DropDown {...dropDownConfig} float="right" />
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
+                      <span>
+                        {is_FullHiveEngineAccount(account)
+                          ? formattedNumber(balances.balance, {
+                              fractionDigits: precision,
+                              suffix: this.props.aPICoinName,
+                            })
+                          : _t("wallet.loading")}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              {stakedCoinName !== "" && (
                 <div className="balance-row hive-power alternative">
                   <div className="balance-info">
                     <div className="title">{this.props.stakedCoinName}</div>
@@ -678,15 +689,35 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                         </Tooltip>
                       </div>
                     )}
-                    {(() => {
-                      if (balances.delegationsIn <= 0) {
-                        return null;
-                      }
-                      const strReceived = formattedNumber(
-                        balances.delegationsIn,
-                        { prefix: "+", suffix: this.props.aPICoinName }
-                      );
-                      if (global.usePrivate) {
+                    {stakedCoinName !== "" &&
+                      (() => {
+                        if (balances.delegationsIn <= 0) {
+                          return null;
+                        }
+                        const strReceived = formattedNumber(
+                          balances.delegationsIn,
+                          { prefix: "+", suffix: this.props.aPICoinName }
+                        );
+                        if (global.usePrivate) {
+                          return (
+                            <div className="amount amount-passive received-shares">
+                              <Tooltip
+                                content={_t(
+                                  "wallet." +
+                                    this.props.aPICoinName +
+                                    "-power-received"
+                                )}
+                              >
+                                <span
+                                  className="amount-btn"
+                                  onClick={this.toggleReceivedList}
+                                >
+                                  {strReceived}
+                                </span>
+                              </Tooltip>
+                            </div>
+                          );
+                        }
                         return (
                           <div className="amount amount-passive received-shares">
                             <Tooltip
@@ -696,30 +727,11 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                   "-power-received"
                               )}
                             >
-                              <span
-                                className="amount-btn"
-                                onClick={this.toggleReceivedList}
-                              >
-                                {strReceived}
-                              </span>
+                              <span className="amount">{strReceived}</span>
                             </Tooltip>
                           </div>
                         );
-                      }
-                      return (
-                        <div className="amount amount-passive received-shares">
-                          <Tooltip
-                            content={_t(
-                              "wallet." +
-                                this.props.aPICoinName +
-                                "-power-received"
-                            )}
-                          >
-                            <span className="amount">{strReceived}</span>
-                          </Tooltip>
-                        </div>
-                      );
-                    })()}
+                      })()}
                     {(() => {
                       return (
                         token_unstake && (
@@ -776,7 +788,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                     )}
                   </div>
                 </div>
-              }
+              )}
               {TransactionList({
                 dynamicProps,
                 fetchTransactions: this.fetchHETransactions.bind(
@@ -792,6 +804,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
               global={global}
               username={account.name}
               active="hiveEngine"
+              hiveEngineTokens={hiveEngineTokens}
             />
           </div>
           {transfer && (
@@ -845,7 +858,16 @@ export default (q: Props) => {
   const settings = params_list.map((x) => x.split("="));
   let p = q;
   for (const setting of settings) {
-    p[setting[0]] = decodeURIComponent(setting[1]);
+    for (const key of [
+      "apiName",
+      "liquidHiveName",
+      "stakedHumanName",
+      "precision",
+    ]) {
+      if (key === setting[0]) {
+        p[key] = decodeURIComponent(setting[1]);
+      }
+    }
   }
   const props = {
     history: p.history,
@@ -862,6 +884,7 @@ export default (q: Props) => {
     aPICoinName: p.aPICoinName,
     coinName: p.coinName,
     stakedCoinName: p.stakedCoinName,
+    hiveEngineTokens: p.hiveEngineTokens,
   };
   return <WalletHiveEngine {...props} />;
 };

@@ -42,6 +42,7 @@ const defProps = {
   addAccount: () => {},
   updateActiveUser: () => {},
   setSigningKey: () => {},
+  hiveEngineTokens: [],
 };
 
 it("(1) Default Render", () => {

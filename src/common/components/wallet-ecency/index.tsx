@@ -187,6 +187,12 @@ interface Props {
   addAccount: (data: Account) => void;
   updateActiveUser: (data?: Account) => void;
   setSigningKey: (key: string) => void;
+  hiveEngineTokens: Array<{
+    apiName: string;
+    liquidHumanName: string;
+    stakedHumanName: string;
+    precision: number;
+  }>;
 }
 
 interface State {
@@ -266,7 +272,8 @@ export class WalletEcency extends BaseComponent<Props, State> {
 
   render() {
     const { claiming, transfer, purchase, promote, boost } = this.state;
-    const { global, activeUser, account, points } = this.props;
+    const { global, activeUser, account, points, hiveEngineTokens } =
+      this.props;
 
     if (process.env.LIQUID_TOKEN_UPPERCASE !== "POINTS") {
       return <div>We don't do points here. Try {LIQUID_TOKEN}!</div>;
@@ -485,6 +492,7 @@ export class WalletEcency extends BaseComponent<Props, State> {
               global={global}
               username={account.name}
               active="ecency"
+              hiveEngineTokens={hiveEngineTokens}
             />
           </div>
 
@@ -539,6 +547,7 @@ export default (p: Props) => {
     addAccount: p.addAccount,
     updateActiveUser: p.updateActiveUser,
     setSigningKey: p.setSigningKey,
+    hiveEngineTokens: p.hiveEngineTokens,
   };
 
   return <WalletEcency {...props} />;
