@@ -301,7 +301,7 @@ class ProfilePage extends BaseComponent<Props, State> {
               const settings = params_list.map((x) => x.split("="));
               let aPICoinName: string = LIQUID_TOKEN_UPPERCASE;
               for (const setting of settings) {
-                if (setting[0] === "aPICoinName") {
+                if (setting[0] === "aPICoinName" || setting[0] === "token") {
                   aPICoinName = setting[1];
                 }
               }
@@ -314,14 +314,18 @@ class ProfilePage extends BaseComponent<Props, State> {
               const coinName = coinInfo.liquidHumanName;
               const stakedCoinName = coinInfo.stakedHumanName;
               if (section === "wallet") {
-                return WalletHiveEngine({
-                  coinName,
-                  aPICoinName,
-                  stakedCoinName,
-                  ...this.props,
-                  hiveEngineTokens: HIVE_ENGINE_TOKENS,
-                  account,
-                });
+                return (
+                  <div key={coinName}>
+                    {WalletHiveEngine({
+                      coinName,
+                      aPICoinName,
+                      stakedCoinName,
+                      ...this.props,
+                      hiveEngineTokens: HIVE_ENGINE_TOKENS,
+                      account,
+                    })}
+                  </div>
+                );
               }
               if (section === "hive") {
                 return WalletHive({

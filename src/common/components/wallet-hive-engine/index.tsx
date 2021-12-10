@@ -450,7 +450,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         token_unstakes.find((u) => u.symbol === this.props.aPICoinName);
       if (token_unstake) powerDownId = token_unstake.txID;
       return (
-        <div className="wallet-hive">
+        <div className="wallet-hive" key={aPICoinName}>
           <div className="wallet-main">
             <div className="wallet-info">
               {pending_token > 0 && !claimed && (
@@ -803,7 +803,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
             <WalletMenu
               global={global}
               username={account.name}
-              active="hiveEngine"
+              active={aPICoinName}
               hiveEngineTokens={hiveEngineTokens}
             />
           </div>
