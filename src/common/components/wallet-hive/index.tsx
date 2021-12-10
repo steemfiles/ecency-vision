@@ -318,33 +318,6 @@ export class WalletHive extends BaseComponent<Props, State> {
                             },
                           },
                           {
-                            label: `Trade at HiveEngine`,
-                            onClick: () => {
-                              window.open(
-                                `https://hive-engine.com/?p=balances&a=${account.name}`,
-                                "hiveEngineDex"
-                              );
-                            },
-                          },
-                          {
-                            label: "Trade at LeoDex",
-                            onClick: () => {
-                              window.open(
-                                "https://leodex.io/market/POB",
-                                "leodex"
-                              );
-                            },
-                          },
-                          {
-                            label: "Trade at TribalDex",
-                            onClick: () => {
-                              window.open(
-                                "https://tribaldex.com/trade/POB",
-                                "tribaldex"
-                              );
-                            },
-                          },
-                          {
                             label: _t("wallet.trade-on-Blocktrades"),
                             onClick: () => {
                               window.open(
@@ -592,24 +565,6 @@ export class WalletHive extends BaseComponent<Props, State> {
                               window.open(
                                 `https://wallet.hive.blog/market`,
                                 "HiveDEx"
-                              );
-                            },
-                          },
-                          {
-                            label: `Trade at HiveEngine`,
-                            onClick: () => {
-                              window.open(
-                                `https://hive-engine.com/?p=balances&a=${account.name}`,
-                                "hiveEngineDex"
-                              );
-                            },
-                          },
-                          {
-                            label: "Trade at TribalDex",
-                            onClick: () => {
-                              window.open(
-                                "https://tribaldex.com/trade/POB",
-                                "tribaldex"
                               );
                             },
                           },
