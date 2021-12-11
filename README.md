@@ -33,10 +33,9 @@ Please run pre-commit-hook.sh before committing
 
 ##### Set Up Your Proxying Web Front End
 
-In order for this to work at all, you'll need a server that can do proxy ports.  `./proxy.apache-conf` in the base
-directory should give you some ideas.  There is another server that can do it, but I can't remember how to spell 
-the thing. :)  
-
+In order for this to work at all, you'll need a server that can do proxy ports. `./proxy.apache-conf` in the base
+directory should give you some ideas. There is another server that can do it, but I can't remember how to spell
+the thing. :)
 
 ##### Edit backend config file or define environment variables
 
@@ -99,9 +98,12 @@ You need to sign up at HiveSearcher and get a secret there. The Hive Searcher UR
 
 ###### HIVE_SIGNER_CLIENT_SECRET
 
-You need to sign up with a Hive account at [Hive Signer](https://hivesigner.com/developers).
-You'll get an APP_SECRET there for that account and you'll
-need to add the account name to the common config file.
+You need to sign up with a Hive account at [Hive Signer](https://hivesigner.com/profile). You'll get an APP_SECRET there
+for that account and you'll need to add the account name to the common config file. There is
+https://www.grc.com/passwords.htm for example. Take the alpanumeric string to avoid quotation marks ruining things in
+the environment. Copy that, save it as `HIVE_SIGNER_CLIENT_SECRET` to the `.profile` file of the user. Then go
+to https://hivesigner.com/profile and enter the secret in there. You need to give the @hivesigner account ability to
+post as your new account [here](https://hivesigner.com/authorize/hivesigner).
 
 ##### Create Common Config File
 
@@ -144,7 +146,6 @@ be 'ecency.app', then you'll need the APP_SECRET that corresponds to that app.
 
 You'll be able to view it at port 80.
 
-
 ##### Start desktop in dev
 
 This is not being maintained.
@@ -171,5 +172,6 @@ If you find a security issue please report details to: leprechaun 6010 on Discor
 We will evaluate the risk and make a patch available before filing the issue.
 
 [//]: # "LINKS"
+
 Main site using software: https://proofofbrain.blog
 GitHub Repo: https://github.com/steemfiles/ecency-vision
