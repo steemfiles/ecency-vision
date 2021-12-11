@@ -32,6 +32,7 @@ const defProps = {
     },
     hiveEngineBalances: [],
   },
+  hiveEngineTokens: [],
   transactions: transactionsInitialState,
   signingKey: "",
   addAccount: () => {},

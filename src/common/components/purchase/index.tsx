@@ -28,6 +28,7 @@ interface Props {
   addAccount: (data: Account) => void;
   updateActiveUser: (data?: Account) => void;
   setSigningKey: (key: string) => void;
+  hiveEngineTokens: Array<any>;
   onHide: () => void;
 }
 

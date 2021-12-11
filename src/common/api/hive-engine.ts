@@ -115,7 +115,6 @@ export async function getPrices(
       } // for
     } // if
     if (failedFetches.length) {
-      console.log("Unable to fetch prices for these tokens:", failedFetches);
     }
     return obj;
   } catch (e) {

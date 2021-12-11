@@ -45,6 +45,8 @@ import {
   HIVE_HUMAN_NAME_UPPERCASE,
 } from "../../api/hive";
 
+import { HiveEngineStaticInfo } from "../../store/hive-engine-tokens/types";
+
 interface Props {
   history: History;
   global: Global;
@@ -57,12 +59,7 @@ interface Props {
   updateActiveUser: (data?: Account) => void;
   setSigningKey: (key: string) => void;
   fetchTransactions: (username: string, group?: OperationGroup | "") => void;
-  hiveEngineTokens: Array<{
-    apiName: string;
-    liquidHumanName: string;
-    stakedHumanName: string;
-    precision: number;
-  }>;
+  hiveEngineTokens: Array<HiveEngineStaticInfo>;
 }
 
 interface State {

@@ -36,6 +36,7 @@ const defProps = {
   deleteUser: () => {},
   toggleUIProp: () => {},
   setSigningKey: () => {},
+  hiveEngineTokens: [],
 };
 
 it("(1) Default render", async () => {

@@ -53,6 +53,8 @@ import { plusCircle } from "../../img/svg";
 import { resolveAny } from "dns";
 import { getScotDataAsync, TokenBalance, UnStake } from "../../api/hive-engine";
 import HiveWallet from "../../helper/hive-wallet";
+import { HiveEngineStaticInfo } from "../../store/hive-engine-tokens/types";
+
 interface Props {
   history: History;
   global: Global;
@@ -68,7 +70,7 @@ interface Props {
   coinName: string;
   aPICoinName: string;
   stakedCoinName: string;
-  hiveEngineTokens: Array<any>;
+  hiveEngineTokens: Array<HiveEngineStaticInfo>;
 }
 interface State {
   delegatedList: boolean;

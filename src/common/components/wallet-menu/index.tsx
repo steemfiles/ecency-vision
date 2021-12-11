@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 
 import { Global } from "../../store/global/types";
 
+import { HiveEngineStaticInfo } from "../../store/hive-engine-tokens/types";
+
 import _c from "../../util/fix-class-names";
 
 import { hiveSvg } from "../../img/svg";
@@ -12,12 +14,7 @@ interface Props {
   global: Global;
   username: string;
   active: string;
-  hiveEngineTokens: Array<{
-    apiName: string;
-    liquidHumanName: string;
-    stakedHumanName: string;
-    precision: number;
-  }>;
+  hiveEngineTokens: Array<HiveEngineStaticInfo>;
 }
 
 export default class WalletMenu extends Component<Props> {
@@ -30,7 +27,6 @@ export default class WalletMenu extends Component<Props> {
           {hiveEngineTokens &&
             hiveEngineTokens.map((t) => {
               const logo = require("../../img/coins/" + t.apiName + ".png");
-              console.log([t.apiName, active]);
               return (
                 <Link
                   key={t.apiName}

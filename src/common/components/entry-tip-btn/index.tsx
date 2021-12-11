@@ -19,6 +19,7 @@ import { _t } from "../../i18n";
 
 import { giftOutlineSvg } from "../../img/svg";
 import { HIVE_API_NAME } from "../../api/hive";
+import { HiveEngineStaticInfo } from "../../store/hive-engine-tokens/types";
 
 interface Props {
   global: Global;
@@ -34,6 +35,7 @@ interface Props {
   deleteUser: (username: string) => void;
   toggleUIProp: (what: ToggleType) => void;
   setSigningKey: (key: string) => void;
+  hiveEngineTokens: Array<HiveEngineStaticInfo>;
 }
 
 interface DialogProps extends Props {
@@ -42,7 +44,7 @@ interface DialogProps extends Props {
 
 export class TippingDialog extends Component<DialogProps> {
   render() {
-    const { global, entry, activeUser } = this.props;
+    const { global, entry, activeUser, hiveEngineTokens } = this.props;
 
     if (!activeUser) {
       return null;
@@ -61,6 +63,7 @@ export class TippingDialog extends Component<DialogProps> {
         {...this.props}
         activeUser={activeUser}
         transactions={transactions}
+        hiveEngineTokens={hiveEngineTokens}
         asset={global.usePrivate ? "POINT" : HIVE_API_NAME}
         mode="transfer"
         amount={global.usePrivate ? "100.000" : "1.000"}
@@ -138,6 +141,7 @@ export default (p: Props) => {
     deleteUser: p.deleteUser,
     toggleUIProp: p.toggleUIProp,
     setSigningKey: p.setSigningKey,
+    hiveEngineTokens: p.hiveEngineTokens,
   };
 
   return <EntryTipBtn {...props} />;

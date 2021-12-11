@@ -80,7 +80,6 @@ import {
   cancelWithdrawVestingKc,
   formatError,
 } from "../../api/operations";
-import { LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN } from "../../../client_config";
 import { _t } from "../../i18n";
 import { Tsx } from "../../i18n/helper";
 import { arrowRightSvg } from "../../img/svg";
@@ -93,6 +92,7 @@ import {
   FullHiveEngineAccount,
 } from "../../api/hive-engine";
 import HiveEngineWallet from "../../helper/hive-engine-wallet";
+import { LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN } from "../../../client_config";
 export type TransferMode =
   | "borrow"
   | "transfer"
@@ -148,6 +148,8 @@ class FormText extends Component<{
     );
   }
 }
+import { HiveEngineStaticInfo } from "../../store/hive-engine-tokens/types";
+
 interface Props {
   global: Global;
   dynamicProps: DynamicProps;
@@ -163,6 +165,7 @@ interface Props {
   updateActiveUser: (data?: Account) => void;
   setSigningKey: (key: string) => void;
   onHide: () => void;
+  hiveEngineTokens: Array<HiveEngineStaticInfo>;
   LIQUID_TOKEN_balances?: TokenBalance;
   LIQUID_TOKEN_precision?: number;
 }
@@ -813,7 +816,14 @@ export class Transfer extends BaseComponent<Props, State> {
     this.stateSet(pureState(this.props));
   };
   render() {
-    const { global, mode, activeUser, transactions, dynamicProps } = this.props;
+    const {
+      global,
+      mode,
+      activeUser,
+      transactions,
+      dynamicProps,
+      hiveEngineTokens,
+    } = this.props;
     const {
       step,
       asset,
@@ -860,11 +870,11 @@ export class Transfer extends BaseComponent<Props, State> {
     let assets: TransferAsset[] = [];
     switch (mode) {
       case "transfer":
-        if (global.usePrivate) {
-          assets = [HIVE_API_NAME, DOLLAR_API_NAME, LIQUID_TOKEN_UPPERCASE];
-        } else {
-          assets = [HIVE_API_NAME, DOLLAR_API_NAME, LIQUID_TOKEN_UPPERCASE];
-        }
+        assets = [
+          HIVE_API_NAME,
+          DOLLAR_API_NAME,
+          ...hiveEngineTokens.map((t) => t.apiName),
+        ];
         break;
       case "transfer-saving":
       case "withdraw-saving":
@@ -877,7 +887,12 @@ export class Transfer extends BaseComponent<Props, State> {
         assets = [DOLLAR_API_NAME];
         break;
       case "power-up":
-        assets = [HIVE_API_NAME, LIQUID_TOKEN_UPPERCASE];
+        assets = [
+          HIVE_API_NAME,
+          ...hiveEngineTokens
+            .filter((t) => t.stakedHumanName !== "")
+            .map((t) => t.apiName),
+        ];
         break;
       case "power-down":
       case "delegate":
@@ -1074,13 +1089,25 @@ export class Transfer extends BaseComponent<Props, State> {
                       autoFocus={mode !== "transfer"}
                     />
                   </InputGroup>
-                  {assets.length > 1 && (
-                    <AssetSwitch
-                      options={assets}
-                      selected={asset}
-                      onChange={this.assetChanged}
-                    />
-                  )}
+                  {assets.length > 1 &&
+                    (assets.length < 4 ? (
+                      <AssetSwitch
+                        options={assets}
+                        selected={asset}
+                        onChange={this.assetChanged}
+                      />
+                    ) : (
+                      <select
+                        onChange={(e) => this.assetChanged(e.target.value)}
+                        defaultValue={asset}
+                      >
+                        {assets.map((this_asset) => (
+                          <option key={this_asset} value={this_asset}>
+                            {this_asset}
+                          </option>
+                        ))}
+                      </select>
+                    ))}
                 </Col>
               </Form.Group>
               {amountError && <FormText msg={amountError} type="danger" />}

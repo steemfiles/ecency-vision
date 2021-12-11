@@ -87,6 +87,7 @@ import {
   APP_DOMAIN,
   DISABLE_BLACKLIST,
   TAG_LIST,
+  HIVE_ENGINE_TOKENS,
 } from "../../client_config";
 import { setHiveEngineTokensProperties } from "../store/global";
 
@@ -913,6 +914,7 @@ class EntryPage extends BaseComponent<Props, State> {
                           entry,
                         })}
                         {EntryTipBtn({
+                          hiveEngineTokens: HIVE_ENGINE_TOKENS,
                           ...this.props,
                           entry,
                         })}

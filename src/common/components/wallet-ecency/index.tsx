@@ -173,6 +173,7 @@ export class TransactionRow extends Component<TransactionRowProps> {
     );
   }
 }
+import { HiveEngineStaticInfo } from "../../store/hive-engine-tokens/types";
 
 interface Props {
   global: Global;
@@ -187,12 +188,7 @@ interface Props {
   addAccount: (data: Account) => void;
   updateActiveUser: (data?: Account) => void;
   setSigningKey: (key: string) => void;
-  hiveEngineTokens: Array<{
-    apiName: string;
-    liquidHumanName: string;
-    stakedHumanName: string;
-    precision: number;
-  }>;
+  hiveEngineTokens: Array<HiveEngineStaticInfo>;
 }
 
 interface State {

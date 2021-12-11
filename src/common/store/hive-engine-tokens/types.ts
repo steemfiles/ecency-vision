@@ -27,4 +27,11 @@ export interface HEIncludeAction {
   data: TokenPropertiesMap;
 }
 
+export interface HiveEngineStaticInfo {
+  apiName: string;
+  liquidHumanName: string;
+  stakedHumanName: string;
+  precision: number;
+}
+
 export type HEActions = HEIncludeAction | HEFetchAction;
