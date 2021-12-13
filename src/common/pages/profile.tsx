@@ -145,7 +145,6 @@ class ProfilePage extends BaseComponent<Props, State> {
         .then((data) => {
           if (data.name === username) {
             addAccount(data);
-            console.log(data);
           }
         })
         .finally(() => {

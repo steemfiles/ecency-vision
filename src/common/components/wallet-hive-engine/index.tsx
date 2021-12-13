@@ -51,7 +51,7 @@ import parseAsset from "../../helper/parse-asset";
 import { _t } from "../../i18n";
 import { plusCircle } from "../../img/svg";
 import { resolveAny } from "dns";
-import { getScotDataAsync, TokenBalance, UnStake } from "../../api/hive-engine";
+import { getScotDataAsync, TokenBalance, isNonZeroBalance, UnStake } from "../../api/hive-engine";
 import HiveWallet from "../../helper/hive-wallet";
 import { HiveEngineStaticInfo } from "../../store/hive-engine-tokens/types";
 
@@ -806,7 +806,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
               global={global}
               username={account.name}
               active={aPICoinName}
-              hiveEngineTokens={hiveEngineTokens}
+              hiveEngineTokens={hiveEngineTokens.filter( z => isNonZeroBalance(w.engineBalanceTable[ z.apiName ]) )}
             />
           </div>
           {transfer && (

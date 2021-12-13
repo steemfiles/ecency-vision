@@ -75,7 +75,7 @@ You should set this to '0' unless you're part of the ecency team.
 
 ###### PRIVATE_API_ADDR
 
-Should be a full address with protocol and port
+Should be a full address with protocol and port. For testing this should simply be http://localhost:3000/
 
 ###### PRIVATE_API_AUTH
 
@@ -131,18 +131,19 @@ chromium --disable-web-security --disable-gpu --user-data-dir=$HOME/userTmp http
 
 ##### Start website in dev
 
-In testing your need a reverse-proxy server to receive on port 80 and then proxy for ports 2997-3000 as described
-in the configuration file.
+In testing you will need a reverse-proxy server to receive on port 80 and then proxy for ports 2997-3000 as described
+in the configuration file.  You need to make a symlink from `proxy.apache-conf` into `/etc/apache2/sites-enabled`.
 
-`$ make`
+`$ make;`
 `$ node private-api/build/private-api-server.js &`
-`$ node private-api/build/relayserver.js & node private-api/build/promoter.js &`
+`$ node private-api/build/relayserver.js &`
+`$ node private-api/build/promoter.js &`
 `$ yarn start`
 
 For website development Change `HIVE_SIGNER_APP` in `src/client_config.ts` to an account that you control. This account
 must have it's APP_SECRET with Hive Signer. This environment variable `HIVESIGNER_CLIENT_SECRET` must be set to this
-secret. Additionally, @hivesigner must be given posting authority for said account. If that HIVE_SIGNER_APP happens to
-be 'ecency.app', then you'll need the APP_SECRET that corresponds to that app.
+secret. Additionally, @hivesigner must be given posting authority for said account. If that `HIVE_SIGNER_APP` happens to
+be 'ecency.app', then you'll need the `APP_SECRET` that corresponds to that app.
 
 You'll be able to view it at port 80.
 

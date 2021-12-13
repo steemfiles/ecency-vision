@@ -46,7 +46,10 @@ import {
 } from "../../api/hive";
 
 import { HiveEngineStaticInfo } from "../../store/hive-engine-tokens/types";
-
+import {
+  isNonZeroBalance,
+  is_FullHiveEngineAccount,
+} from "../../api/hive-engine";
 interface Props {
   history: History;
   global: Global;
@@ -204,6 +207,26 @@ export class WalletHive extends BaseComponent<Props, State> {
     const { hivePerMVests } = dynamicProps;
     const isMyPage = activeUser && activeUser.username === account.name;
     const w = new HiveWallet(account, dynamicProps, converting);
+
+    const hiveEngineTokensNZ = (() => {
+      try {
+        let out = [];
+        if (is_FullHiveEngineAccount(account)) {
+          const { token_balances } = account;
+          for (const h of hiveEngineTokens) {
+            const tb = token_balances.find((ttb) => ttb.symbol == h.apiName);
+            if (tb && isNonZeroBalance(tb)) {
+              out.push(h);
+            }
+          }
+          return out;
+        } else {
+          return [];
+        }
+      } catch (e) {
+        return [];
+      }
+    })();
 
     return (
       <div className="wallet-hive">
@@ -708,7 +731,7 @@ export class WalletHive extends BaseComponent<Props, State> {
             global={global}
             username={account.name}
             active="hive"
-            hiveEngineTokens={hiveEngineTokens}
+            hiveEngineTokens={hiveEngineTokensNZ}
           />
         </div>
 

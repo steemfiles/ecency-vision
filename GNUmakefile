@@ -39,9 +39,9 @@ private-api/build/promoter.js: src/server/promoter.ts
 	touch private-api/build/promote.js
 
 private-api/build/private-api-server.js: private-api/src/private-api-server.ts private-api/src/notifications.ts
-	tsc --OutDir private-api/build  --resolveJsonModule --esModuleInterop private-api/src/promote.ts
-	./node_modules/.bin/prettier --ignore-unknown --write private-api/src/private-api-server.ts
-	touch private-api/build/server/private-api-server.js
+	tsc --OutDir private-api/build  --resolveJsonModule --esModuleInterop private-api/src/private-api-server.ts 
+	./node_modules/.bin/prettier --ignore-unknown --write private-api/src/private-api-server.ts 
+	touch private-api/build/private-api-server.js
 
 
 private-api/build/process.js: private-api/src/process.ts private-api/src/notifications.ts

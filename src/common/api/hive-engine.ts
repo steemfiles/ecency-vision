@@ -144,6 +144,15 @@ export interface TokenBalance {
   delegationsOut: number;
   pendingUndelegations: number;
 }
+export const isNonZeroBalance = (t: TokenBalance) => {
+  console.log({ t });
+  if (t) {
+    const { balance, stake, delegationsIn } = t;
+    return balance !== 0 || stake !== 0 || delegationsIn !== 0;
+  }
+  return false;
+};
+
 export interface CoinDescription {
   downvote_weight_multiplier: number;
   downvoting_power: number;
@@ -199,7 +208,7 @@ export function is_not_FullHiveEngineAccount(
 }
 export function is_FullHiveEngineAccount(
   account: FullHiveEngineAccount | FullAccount | BaseAccount
-) {
+): account is FullHiveEngineAccount {
   return !is_not_FullHiveEngineAccount(account);
 }
 async function callApi(url: string, params: any) {
