@@ -43,8 +43,8 @@ import parseDate from "../../helper/parse-date";
 import { _t } from "../../i18n";
 import { Tsx } from "../../i18n/helper";
 
-import { comment, formatError } from "../../api/operations";
-
+import { comment, formatError, CommentOptions } from "../../api/operations";
+import { makeCommentOptions } from "../../helper/posting";
 import * as ls from "../../util/local-storage";
 
 import {
@@ -164,7 +164,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
     ls.set(`reply_draft_${entry.author}_${entry.permlink}`, text);
   };
 
-  submitReply = (text: string) => {
+  submitReply = (text: string, receiveRewards: boolean) => {
     const { entry } = this.props;
     const { activeUser, addReply, updateReply } = this.props;
 
@@ -181,6 +181,10 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
       version
     );
 
+    const options: CommentOptions | null = receiveRewards
+      ? null
+      : makeCommentOptions(author, permlink, "dp", []);
+
     this.stateSet({ inProgress: true });
 
     comment(
@@ -191,7 +195,7 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
       "",
       text,
       jsonMeta,
-      null,
+      options,
       true
     )
       .then(() => {
@@ -206,7 +210,8 @@ export class Item extends BaseComponent<ItemProps, ItemState> {
         });
 
         // add new reply to store
-        addReply(nReply);
+        if (receiveRewards) addReply(nReply);
+        else addReply({ ...nReply, max_accepted_payout: "0.000 HBD" });
 
         // remove reply draft
         ls.remove(`reply_draft_${entry.author}_${entry.permlink}`);

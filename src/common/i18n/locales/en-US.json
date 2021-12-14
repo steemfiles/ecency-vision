@@ -282,6 +282,7 @@
     "title": "Read next"
   },
   "comment": {
+    "receiverewards": "Receive Rewards?",
     "body-placeholder": "Write your reply here",
     "preview": "Preview"
   },

@@ -256,6 +256,20 @@ exports[`(1) Default render 1`] = `
   <div
     className="comment-buttons"
   >
+    <div
+      className="row row-cols-sm-5"
+    >
+      <input
+        className="form-control form-control-sm"
+        onChange={[Function]}
+        type="checkbox"
+      />
+      <label
+        className="form-label col-form-label col-sm-1"
+      >
+        Receive Rewards?
+      </label>
+    </div>
     <button
       className="btn-submit btn btn-primary btn-sm"
       disabled={false}
@@ -526,6 +540,21 @@ exports[`(2) Cancellable, in progress 1`] = `
   <div
     className="comment-buttons"
   >
+    <div
+      className="row row-cols-sm-5"
+    >
+      <input
+        className="form-control form-control-sm"
+        disabled={true}
+        onChange={[Function]}
+        type="checkbox"
+      />
+      <label
+        className="form-label col-form-label col-sm-1"
+      >
+        Receive Rewards?
+      </label>
+    </div>
     <button
       className="btn-cancel btn btn-outline-primary btn-sm"
       disabled={true}

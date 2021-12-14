@@ -1,6 +1,6 @@
 import React, { Component, KeyboardEventHandler } from "react";
 
-import { Form, FormControl, Button, Spinner } from "react-bootstrap";
+import { Form, FormControl, Button, Spinner, Row, Col } from "react-bootstrap";
 
 import { User } from "../../store/users/types";
 import { ActiveUser } from "../../store/active-user/types";
@@ -64,7 +64,7 @@ interface Props {
   updateActiveUser: (data?: Account) => void;
   deleteUser: (username: string) => void;
   toggleUIProp: (what: ToggleType) => void;
-  onSubmit: (text: string) => void;
+  onSubmit: (text: string, receiveRewards: boolean) => void;
   onChange?: (text: string) => void;
   onCancel?: () => void;
 }
@@ -73,6 +73,7 @@ interface State {
   text: string;
   preview: string;
   rows: number;
+  receiveRewards: boolean;
 }
 
 export class Comment extends Component<Props, State> {
@@ -80,6 +81,7 @@ export class Comment extends Component<Props, State> {
     text: "",
     preview: "",
     rows: 1,
+    receiveRewards: true,
   };
 
   _updateTimer: any = null;
@@ -95,6 +97,13 @@ export class Comment extends Component<Props, State> {
       this.setState({ text: defText, preview: defText });
     }
   }
+
+  receiveRewardsCheckboxChanged = (
+    e: React.ChangeEvent<typeof FormControl & HTMLInputElement>
+  ): void => {
+    // @ts-ignore
+    const { checked: boolean } = e.target;
+  };
 
   textChanged = (
     e: React.ChangeEvent<typeof FormControl & HTMLInputElement>
@@ -121,9 +130,9 @@ export class Comment extends Component<Props, State> {
   };
 
   submit = () => {
-    const { text } = this.state;
+    const { text, receiveRewards } = this.state;
     const { onSubmit } = this.props;
-    onSubmit(text);
+    onSubmit(text, receiveRewards);
   };
 
   cancel = () => {
@@ -157,6 +166,18 @@ export class Comment extends Component<Props, State> {
             />
           </div>
           <div className="comment-buttons">
+            <Row sm="5">
+              <Form.Control
+                type="checkbox"
+                size="sm"
+                disabled={inProgress}
+                onChange={this.receiveRewardsCheckboxChanged}
+                checked={true}
+              />
+              <Form.Label column={true} sm="1">
+                {_t("comment.receiverewards")}
+              </Form.Label>
+            </Row>
             {cancellable && (
               <Button
                 className="btn-cancel"
