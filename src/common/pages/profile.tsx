@@ -267,11 +267,12 @@ class ProfilePage extends BaseComponent<Props, State> {
       let aPICoinName: string = LIQUID_TOKEN_UPPERCASE;
       for (const setting of settings) {
         if (setting[0] === "aPICoinName" || setting[0] === "token") {
-          aPICoinName = setting[1];
+          aPICoinName = setting[1].toUpperCase();
+          console.log({ aPICoinName });
         }
       }
       const coinInfo =
-        HIVE_ENGINE_TOKENS.find((ki) => ki.apiName == aPICoinName) ||
+        HIVE_ENGINE_TOKENS.find((ki) => ki.apiName == aPICoinName) ??
         HIVE_ENGINE_TOKENS[0];
       return coinInfo;
     })();
@@ -325,7 +326,7 @@ class ProfilePage extends BaseComponent<Props, State> {
                   <div key={coinAPIName}>
                     {WalletHiveEngine({
                       coinName,
-                      aPICoinName,
+                      aPICoinName: coinAPIName,
                       stakedCoinName,
                       ...this.props,
                       hiveEngineTokens: HIVE_ENGINE_TOKENS,
