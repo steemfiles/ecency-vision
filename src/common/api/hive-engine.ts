@@ -145,7 +145,6 @@ export interface TokenBalance {
   pendingUndelegations: number;
 }
 export const isNonZeroBalance = (t: TokenBalance) => {
-  console.log({ t });
   if (t) {
     const { balance, stake, delegationsIn } = t;
     return balance !== 0 || stake !== 0 || delegationsIn !== 0;

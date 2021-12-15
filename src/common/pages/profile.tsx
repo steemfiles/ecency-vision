@@ -254,6 +254,32 @@ class ProfilePage extends BaseComponent<Props, State> {
     const groupKey = makeGroupKey(filter, tag);
     const data = entries[groupKey];
 
+    const coinInfo = (() => {
+      const params_string = (() => {
+        try {
+          return window.location.search.slice(1);
+        } catch (e) {
+          return "";
+        }
+      })();
+      const params_list = params_string.split("&");
+      const settings = params_list.map((x) => x.split("="));
+      let aPICoinName: string = LIQUID_TOKEN_UPPERCASE;
+      for (const setting of settings) {
+        if (setting[0] === "aPICoinName" || setting[0] === "token") {
+          aPICoinName = setting[1];
+        }
+      }
+      const coinInfo =
+        HIVE_ENGINE_TOKENS.find((ki) => ki.apiName == aPICoinName) ||
+        HIVE_ENGINE_TOKENS[0];
+      return coinInfo;
+    })();
+    const coinAPIName = coinInfo.apiName;
+    const coinName = coinInfo.liquidHumanName;
+    const stakedCoinName = coinInfo.stakedHumanName;
+    const aPICoinName = coinAPIName;
+
     return (
       <>
         <Meta {...metaProps} />
@@ -289,32 +315,14 @@ class ProfilePage extends BaseComponent<Props, State> {
                 account,
               })}
             {(() => {
-              const params_string = (() => {
-                try {
-                  return window.location.search.slice(1);
-                } catch (e) {
-                  return "";
-                }
-              })();
-              const params_list = params_string.split("&");
-              const settings = params_list.map((x) => x.split("="));
-              let aPICoinName: string = LIQUID_TOKEN_UPPERCASE;
-              for (const setting of settings) {
-                if (setting[0] === "aPICoinName" || setting[0] === "token") {
-                  aPICoinName = setting[1];
-                }
-              }
-              const coinInfo =
-                HIVE_ENGINE_TOKENS.find((ki) => ki.apiName == aPICoinName) ||
-                HIVE_ENGINE_TOKENS[0];
               if (!coinInfo) {
                 return null;
               }
               const coinName = coinInfo.liquidHumanName;
               const stakedCoinName = coinInfo.stakedHumanName;
-              if (section === "wallet") {
+              if (section === "wallet" && coinAPIName != "HIVE") {
                 return (
-                  <div key={coinName}>
+                  <div key={coinAPIName}>
                     {WalletHiveEngine({
                       coinName,
                       aPICoinName,
