@@ -94,7 +94,7 @@ server
       "^/@:username$", // /@esteemapp
       `^/@:username/:section(${profileFilters.join(
         "|"
-      )}|communities|wallet|points|settings)$`, // /@esteemapp/comments
+      )}|communities|wallet-[a-z.]+|points|settings)$`, // /@esteemapp/comments
     ],
     profileHandler
   )

@@ -255,26 +255,23 @@ class ProfilePage extends BaseComponent<Props, State> {
     const data = entries[groupKey];
 
     const coinInfo = (() => {
-      const params_string = (() => {
-        try {
-          return window.location.search.slice(1);
-        } catch (e) {
-          return "";
+      const defaultRet = HIVE_ENGINE_TOKENS[0];
+      try {
+        const params_string = window.location.search.slice(1);
+        const params_list = params_string.split("&");
+        const settings = params_list.map((x) => x.split("="));
+        let aPICoinName: string = LIQUID_TOKEN_UPPERCASE;
+        for (const setting of settings) {
+          if (setting[0] === "aPICoinName" || setting[0] === "token") {
+            aPICoinName = setting[1].toUpperCase();
+          }
         }
-      })();
-      const params_list = params_string.split("&");
-      const settings = params_list.map((x) => x.split("="));
-      let aPICoinName: string = LIQUID_TOKEN_UPPERCASE;
-      for (const setting of settings) {
-        if (setting[0] === "aPICoinName" || setting[0] === "token") {
-          aPICoinName = setting[1].toUpperCase();
-          console.log({ aPICoinName });
-        }
-      }
-      const coinInfo =
-        HIVE_ENGINE_TOKENS.find((ki) => ki.apiName == aPICoinName) ??
-        HIVE_ENGINE_TOKENS[0];
-      return coinInfo;
+        const coinInfo =
+          HIVE_ENGINE_TOKENS.find((ki) => ki.apiName == aPICoinName) ??
+          HIVE_ENGINE_TOKENS[0];
+        return coinInfo;
+      } catch (e) {}
+      return defaultRet;
     })();
     const coinAPIName = coinInfo.apiName;
     const coinName = coinInfo.liquidHumanName;
@@ -321,14 +318,15 @@ class ProfilePage extends BaseComponent<Props, State> {
               }
               const coinName = coinInfo.liquidHumanName;
               const stakedCoinName = coinInfo.stakedHumanName;
+
               if (section === "wallet" && coinAPIName != "HIVE") {
                 return (
                   <div key={coinAPIName}>
                     {WalletHiveEngine({
+                      ...this.props,
                       coinName,
                       aPICoinName: coinAPIName,
                       stakedCoinName,
-                      ...this.props,
                       hiveEngineTokens: HIVE_ENGINE_TOKENS,
                       account,
                     })}

@@ -33,7 +33,7 @@ export default class WalletMenu extends Component<Props> {
                   className={_c(
                     `menu-item hive ${t.apiName === active ? "active" : ""}`
                   )}
-                  to={`/@${username}/wallet?token=${t.apiName}`}
+                  to={`/@${username}/wallet?token=${t.apiName.toLowerCase()}`}
                 >
                   <span className="title">{t.liquidHumanName}</span>
                   <span className="sub-title">Wallet</span>

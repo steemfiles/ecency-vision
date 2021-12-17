@@ -51,7 +51,12 @@ import parseAsset from "../../helper/parse-asset";
 import { _t } from "../../i18n";
 import { plusCircle } from "../../img/svg";
 import { resolveAny } from "dns";
-import { getScotDataAsync, TokenBalance, isNonZeroBalance, UnStake } from "../../api/hive-engine";
+import {
+  getScotDataAsync,
+  TokenBalance,
+  isNonZeroBalance,
+  UnStake,
+} from "../../api/hive-engine";
 import HiveWallet from "../../helper/hive-wallet";
 import { HiveEngineStaticInfo } from "../../store/hive-engine-tokens/types";
 
@@ -806,7 +811,9 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
               global={global}
               username={account.name}
               active={aPICoinName}
-              hiveEngineTokens={hiveEngineTokens.filter( z => isNonZeroBalance(w.engineBalanceTable[ z.apiName ]) )}
+              hiveEngineTokens={hiveEngineTokens.filter((z) =>
+                isNonZeroBalance(w.engineBalanceTable[z.apiName])
+              )}
             />
           </div>
           {transfer && (
@@ -848,29 +855,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     } // if
   }
 }
-export default (q: Props) => {
-  const params_string = (() => {
-    try {
-      return window.location.search.slice(1);
-    } catch (e) {
-      return "";
-    }
-  })();
-  const params_list = params_string.split("&");
-  const settings = params_list.map((x) => x.split("="));
-  let p = q;
-  for (const setting of settings) {
-    for (const key of [
-      "apiName",
-      "liquidHiveName",
-      "stakedHumanName",
-      "precision",
-    ]) {
-      if (key === setting[0]) {
-        p[key] = decodeURIComponent(setting[1]);
-      }
-    }
-  }
+export default (p: Props) => {
   const props = {
     history: p.history,
     global: p.global,
