@@ -31,7 +31,7 @@ import {
   HiveEngineTokenInfo,
 } from "../api/hive-engine";
 import { includeInfoConfigsAction } from "./hive-engine-tokens/index";
-import { TokenInfoConfigPair } from "./hive-engine-tokens/types";
+import { TokenInfoConfigPriceTriple } from "./hive-engine-tokens/types";
 import {
   LIQUID_TOKEN_UPPERCASE,
   HIVE_ENGINE_TOKENS,
@@ -134,7 +134,7 @@ export const clientStoreTasks = (store: Store<AppState>) => {
     getPrices(HIVE_ENGINE_TOKENS.map((e) => e.apiName)).then((r) => {
       if (hiveEngineTokensProperties === undefined) return;
       for (const apiCoinName in r) {
-        let ticp: undefined | TokenInfoConfigPair;
+        let ticp: undefined | TokenInfoConfigPriceTriple;
 
         if ((ticp = hiveEngineTokensProperties[apiCoinName]) !== undefined) {
           ticp.hivePrice = r[apiCoinName];

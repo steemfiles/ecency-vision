@@ -247,12 +247,6 @@ exports[`(2) Should switch to transfer 1`] = `
             >
               HBD
             </a>
-            <a
-              className="asset "
-              onClick={[Function]}
-            >
-              POB
-            </a>
           </div>
         </div>
       </div>

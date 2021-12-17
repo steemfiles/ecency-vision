@@ -172,12 +172,6 @@ exports[`(2) Dialog 1`] = `
             >
               HBD
             </a>
-            <a
-              className="asset "
-              onClick={[Function]}
-            >
-              POB
-            </a>
           </div>
         </div>
       </div>

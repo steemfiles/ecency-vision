@@ -81,7 +81,7 @@ export class Comment extends Component<Props, State> {
     text: "",
     preview: "",
     rows: 1,
-    receiveRewards: false,
+    receiveRewards: true,
   };
 
   _updateTimer: any = null;
@@ -101,8 +101,8 @@ export class Comment extends Component<Props, State> {
   receiveRewardsCheckboxChanged = (
     e: React.ChangeEvent<typeof FormControl & HTMLInputElement>
   ): void => {
-    // @ts-ignore
-    const { checked: boolean } = e.target;
+    const checked = e.target.checked;
+    this.setState({ receiveRewards: checked });
   };
 
   textChanged = (
@@ -142,7 +142,7 @@ export class Comment extends Component<Props, State> {
 
   render() {
     const { inProgress, cancellable, autoFocus, submitText } = this.props;
-    const { text, preview, rows } = this.state;
+    const { text, preview, rows, receiveRewards } = this.state;
 
     return (
       <>
@@ -167,15 +167,14 @@ export class Comment extends Component<Props, State> {
           </div>
           <div className="comment-buttons">
             <Row sm="5">
-              <Form.Control
+              <Form.Check
                 type="checkbox"
-                size="sm"
+                size={2}
                 disabled={inProgress}
                 onChange={this.receiveRewardsCheckboxChanged}
+                defaultChecked={receiveRewards}
+                label={_t("comment.receiverewards")}
               />
-              <Form.Label column={true} sm="1">
-                {_t("comment.receiverewards")}
-              </Form.Label>
             </Row>
             {cancellable && (
               <Button

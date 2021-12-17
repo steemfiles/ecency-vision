@@ -22,7 +22,7 @@ import { _t } from "../../i18n";
 import { peopleSvg } from "../../img/svg";
 import {
   TokenPropertiesMap,
-  TokenInfoConfigPair,
+  TokenInfoConfigPriceTriple,
 } from "../../store/hive-engine-tokens/types";
 export const prepareVotes = (
   entry: Entry,
@@ -37,7 +37,7 @@ export const prepareVotes = (
   const { he } = entry;
   if (he && hiveEngineTokensProperties) {
     for (const token in he) {
-      let tokenInfo: TokenInfoConfigPair;
+      let tokenInfo: TokenInfoConfigPriceTriple;
       if (!(tokenInfo = hiveEngineTokensProperties[token])) continue;
       const postTokenRewardInfo = he[token];
       let hivePrice: number = tokenInfo.hivePrice || 0;

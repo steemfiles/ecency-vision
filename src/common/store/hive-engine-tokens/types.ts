@@ -3,14 +3,14 @@ import {
   HiveEngineTokenInfo,
 } from "../../api/hive-engine";
 
-export interface TokenInfoConfigPair {
+export interface TokenInfoConfigPriceTriple {
   config?: HiveEngineTokenConfig;
   info?: HiveEngineTokenInfo;
   hivePrice?: number;
 }
 
 export interface TokenPropertiesMap {
-  [coinName: string]: TokenInfoConfigPair;
+  [coinName: string]: TokenInfoConfigPriceTriple;
 }
 
 export enum HEActionTypes {

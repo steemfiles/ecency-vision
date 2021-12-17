@@ -34,7 +34,7 @@ exports[`(1) Default Render 1`] = `
             className="amount"
           >
             <span>
-              Loading...
+              0 POB
             </span>
           </div>
         </div>
@@ -62,7 +62,7 @@ exports[`(1) Default Render 1`] = `
           <div
             className="amount"
           >
-            Loading...
+            0 POB
           </div>
         </div>
       </div>
@@ -130,30 +130,6 @@ exports[`(1) Default Render 1`] = `
     <div
       className="wallet-menu"
     >
-      <a
-        className="menu-item hive active"
-        href="/@user1/wallet"
-        onClick={[Function]}
-      >
-        <span
-          className="title"
-        >
-          Proof of Brain
-        </span>
-        <span
-          className="sub-title"
-        >
-          Wallet
-        </span>
-        <span
-          className="platform-logo"
-        >
-          <img
-            alt="POB"
-            src="logo-small-transparent.png"
-          />
-        </span>
-      </a>
       <a
         className="menu-item hive"
         href="/@user1/hive"
@@ -223,7 +199,7 @@ exports[`(2) Render with converting HBD 1`] = `
             className="amount"
           >
             <span>
-              Loading...
+              0 POB
             </span>
           </div>
         </div>
@@ -251,7 +227,7 @@ exports[`(2) Render with converting HBD 1`] = `
           <div
             className="amount"
           >
-            Loading...
+            0 POB
           </div>
         </div>
       </div>
@@ -319,30 +295,6 @@ exports[`(2) Render with converting HBD 1`] = `
     <div
       className="wallet-menu"
     >
-      <a
-        className="menu-item hive active"
-        href="/@user1/wallet"
-        onClick={[Function]}
-      >
-        <span
-          className="title"
-        >
-          Proof of Brain
-        </span>
-        <span
-          className="sub-title"
-        >
-          Wallet
-        </span>
-        <span
-          className="platform-logo"
-        >
-          <img
-            alt="POB"
-            src="logo-small-transparent.png"
-          />
-        </span>
-      </a>
       <a
         className="menu-item hive"
         href="/@user1/hive"
@@ -412,7 +364,7 @@ exports[`(3) usePrivate = false 1`] = `
             className="amount"
           >
             <span>
-              Loading...
+              0 POB
             </span>
           </div>
         </div>
@@ -440,7 +392,7 @@ exports[`(3) usePrivate = false 1`] = `
           <div
             className="amount"
           >
-            Loading...
+            0 POB
           </div>
         </div>
       </div>
@@ -508,30 +460,6 @@ exports[`(3) usePrivate = false 1`] = `
     <div
       className="wallet-menu"
     >
-      <a
-        className="menu-item hive active"
-        href="/@user1/wallet"
-        onClick={[Function]}
-      >
-        <span
-          className="title"
-        >
-          Proof of Brain
-        </span>
-        <span
-          className="sub-title"
-        >
-          Wallet
-        </span>
-        <span
-          className="platform-logo"
-        >
-          <img
-            alt="POB"
-            src="logo-small-transparent.png"
-          />
-        </span>
-      </a>
       <a
         className="menu-item hive"
         href="/@user1/hive"

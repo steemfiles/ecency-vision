@@ -9,7 +9,7 @@ import parseAsset from "../../helper/parse-asset";
 import parseDate from "../../helper/parse-date";
 import formattedNumber from "../../util/formatted-number";
 import { _t } from "../../i18n";
-import { TokenInfoConfigPair } from "../../store/hive-engine-tokens/types";
+import { TokenInfoConfigPriceTriple } from "../../store/hive-engine-tokens/types";
 import _c from "../../util/fix-class-names";
 import { HIVE_API_NAME, DOLLAR_API_NAME } from "../../api/hive";
 interface Props {
@@ -35,7 +35,7 @@ export class EntryPayoutDetail extends Component<Props> {
     const tokenAmounts: { [id: string]: number } = {};
     if (he && hiveEngineTokensProperties) {
       for (const token in he) {
-        let tokenInfo: TokenInfoConfigPair;
+        let tokenInfo: TokenInfoConfigPriceTriple;
         if (!(tokenInfo = hiveEngineTokensProperties[token])) continue;
         const postTokenRewardInfo = he[token];
         let hivePrice: number = tokenInfo.hivePrice || 0;
@@ -92,7 +92,7 @@ export class EntryPayoutDetail extends Component<Props> {
       try {
         for (const token in this.props.entry.he) {
           const postTokenRewardInfo = this.props.entry.he[token];
-          let tokenProperties: TokenInfoConfigPair;
+          let tokenProperties: TokenInfoConfigPriceTriple;
           let hivePrice: number;
           const complete_payout_value =
             postTokenRewardInfo.pending_token ||
@@ -236,7 +236,7 @@ export class EntryPayout extends Component<Props> {
         for (const token in he)
           if (hiveEngineTokensProperties[token] && he[token]) {
             //console.log({token});
-            const tokenProperties: TokenInfoConfigPair =
+            const tokenProperties: TokenInfoConfigPriceTriple =
               hiveEngineTokensProperties[token];
             const postTokenRewardInfo = he[token];
             const tokenInfo = tokenProperties.info;

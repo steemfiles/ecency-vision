@@ -269,30 +269,6 @@ exports[`(1) Default Render 1`] = `
       className="wallet-menu"
     >
       <a
-        className="menu-item hive"
-        href="/@user1/wallet"
-        onClick={[Function]}
-      >
-        <span
-          className="title"
-        >
-          Proof of Brain
-        </span>
-        <span
-          className="sub-title"
-        >
-          Wallet
-        </span>
-        <span
-          className="platform-logo"
-        >
-          <img
-            alt="POB"
-            src="logo-small-transparent.png"
-          />
-        </span>
-      </a>
-      <a
         className="menu-item hive active"
         href="/@user1/hive"
         onClick={[Function]}
@@ -607,30 +583,6 @@ exports[`(2) Render with converting HBD 1`] = `
       className="wallet-menu"
     >
       <a
-        className="menu-item hive"
-        href="/@user1/wallet"
-        onClick={[Function]}
-      >
-        <span
-          className="title"
-        >
-          Proof of Brain
-        </span>
-        <span
-          className="sub-title"
-        >
-          Wallet
-        </span>
-        <span
-          className="platform-logo"
-        >
-          <img
-            alt="POB"
-            src="logo-small-transparent.png"
-          />
-        </span>
-      </a>
-      <a
         className="menu-item hive active"
         href="/@user1/hive"
         onClick={[Function]}
@@ -932,30 +884,6 @@ exports[`(3) usePrivate = false 1`] = `
     <div
       className="wallet-menu"
     >
-      <a
-        className="menu-item hive"
-        href="/@user1/wallet"
-        onClick={[Function]}
-      >
-        <span
-          className="title"
-        >
-          Proof of Brain
-        </span>
-        <span
-          className="sub-title"
-        >
-          Wallet
-        </span>
-        <span
-          className="platform-logo"
-        >
-          <img
-            alt="POB"
-            src="logo-small-transparent.png"
-          />
-        </span>
-      </a>
       <a
         className="menu-item hive active"
         href="/@user1/hive"

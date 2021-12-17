@@ -256,6 +256,28 @@ exports[`(1) Default render 1`] = `
   <div
     className="comment-buttons"
   >
+    <div
+      className="row row-cols-sm-5"
+    >
+      <div
+        className="form-check"
+      >
+        <input
+          className="form-check-input"
+          defaultChecked={true}
+          disabled={false}
+          onChange={[Function]}
+          size={2}
+          type="checkbox"
+        />
+        <label
+          className="form-check-label"
+          title=""
+        >
+          Receive Rewards?
+        </label>
+      </div>
+    </div>
     <button
       className="btn-submit btn btn-primary btn-sm"
       disabled={false}
@@ -526,6 +548,28 @@ exports[`(2) Cancellable, in progress 1`] = `
   <div
     className="comment-buttons"
   >
+    <div
+      className="row row-cols-sm-5"
+    >
+      <div
+        className="form-check"
+      >
+        <input
+          className="form-check-input"
+          defaultChecked={true}
+          disabled={true}
+          onChange={[Function]}
+          size={2}
+          type="checkbox"
+        />
+        <label
+          className="form-check-label"
+          title=""
+        >
+          Receive Rewards?
+        </label>
+      </div>
+    </div>
     <button
       className="btn-cancel btn btn-outline-primary btn-sm"
       disabled={true}

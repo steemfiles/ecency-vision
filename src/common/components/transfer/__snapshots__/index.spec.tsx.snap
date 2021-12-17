@@ -151,12 +151,6 @@ exports[`(1) Transfer HIVE (1) Step 1 1`] = `
             >
               HBD
             </a>
-            <a
-              className="asset "
-              onClick={[Function]}
-            >
-              POB
-            </a>
           </div>
         </div>
       </div>
@@ -697,12 +691,6 @@ exports[`(2) Transfer HBD (1) Step 1 1`] = `
             >
               HBD
             </a>
-            <a
-              className="asset "
-              onClick={[Function]}
-            >
-              POB
-            </a>
           </div>
         </div>
       </div>
@@ -1125,12 +1113,6 @@ exports[`(3) Transfer POINT (1) Step 1 1`] = `
               onClick={[Function]}
             >
               HBD
-            </a>
-            <a
-              className="asset "
-              onClick={[Function]}
-            >
-              POB
             </a>
           </div>
         </div>
@@ -2680,22 +2662,6 @@ exports[`(7) Power up (1) Step 1 1`] = `
               type="text"
               value=""
             />
-          </div>
-          <div
-            className="asset-switch"
-          >
-            <a
-              className="asset selected"
-              onClick={[Function]}
-            >
-              HIVE
-            </a>
-            <a
-              className="asset "
-              onClick={[Function]}
-            >
-              POB
-            </a>
           </div>
         </div>
       </div>
