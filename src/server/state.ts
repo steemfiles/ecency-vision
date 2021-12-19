@@ -22,14 +22,22 @@ import {
   HiveEngineTokenConfig,
   HiveEngineTokenInfo,
 } from "../common/api/hive-engine";
-import { LIQUID_TOKEN_UPPERCASE } from "../client_config";
+import { LIQUID_TOKEN_UPPERCASE, HIVE_ENGINE_TOKENS } from "../client_config";
 import { TokenPropertiesMap } from "../common/store/hive-engine-tokens/types";
 import { langOptions } from "../common/i18n";
 const thirty_seconds = 30000;
 const one_minute = 60000;
 const five_minutes = 5 * one_minute;
 const ten_minutes = 10 * one_minute;
-let storedHiveEngineTokensProperties: TokenPropertiesMap = {};
+let storedHiveEngineTokensProperties: TokenPropertiesMap = {
+  "SWAP.HIVE": {
+    hivePrice: 1,
+  },
+
+  VYB: {
+    hivePrice: 0,
+  },
+};
 let storedInfos: { [id: string]: HiveEngineTokenInfo } = {};
 let storedConfigs: Array<HiveEngineTokenConfig> = [];
 let storedPrices: { [id: string]: number } = {};
@@ -78,42 +86,44 @@ const fetch_hive_engine_token_information =
     let ret = storedHiveEngineTokensProperties;
     clearInterval(fetch_interval_handle);
     try {
-      if (ret && ret[LIQUID_TOKEN_UPPERCASE])
-        console.log("Loading tokens properties...");
-      else if (ret)
-        console.log(
-          `No ${LIQUID_TOKEN_UPPERCASE} token information stored.  Loading token properties...`
+      const token_names = HIVE_ENGINE_TOKENS.map((info) => info.apiName);
+      const prices: { [id: string]: number } = await getPrices(token_names);
+      const tokensInfos: { [coinname: string]: HiveEngineTokenInfo } =
+        await getScotDataAsync<{ [coinname: string]: HiveEngineTokenInfo }>(
+          "info",
+          {}
         );
-      else
-        console.log(
-          `No token information stored.  Loading token properties...`
-        );
-      const prices: { [id: string]: number } = await getPrices([
-        LIQUID_TOKEN_UPPERCASE,
-      ]);
-      const POBTokenInfos = await getScotDataAsync<HiveEngineTokenInfo>(
-        "info",
-        {
-          token: LIQUID_TOKEN_UPPERCASE,
+
+      const tokensConfigs: Array<HiveEngineTokenConfig> =
+        await getScotDataAsync<Array<HiveEngineTokenConfig>>("config", {});
+
+      for (const token of token_names) {
+        if (token === "SWAP.HIVE" || token === "VYB") continue;
+        try {
+          const tokenInfos = await getScotDataAsync<HiveEngineTokenInfo>(
+            "info",
+            {
+              token,
+            }
+          );
+
+          const tokenConfigs = await getScotDataAsync<HiveEngineTokenConfig>(
+            "config",
+            { token }
+          );
+
+          tokensInfos[token] = tokenInfos;
+          tokensConfigs.push(tokenConfigs);
+        } catch (e) {
+          console.log("Unable to get parameters for token:", token);
         }
-      );
-      const POBTokenConfigs = await getScotDataAsync<HiveEngineTokenConfig>(
-        "config",
-        { token: LIQUID_TOKEN_UPPERCASE }
-      );
-      const tokensInfos = await getScotDataAsync<{
-        [coinname: string]: HiveEngineTokenInfo;
-      }>("info", {});
-      const tokensConfigs = await getScotDataAsync<
-        Array<HiveEngineTokenConfig>
-      >("config", {});
-      tokensInfos["POB"] = POBTokenInfos;
-      tokensConfigs.push(POBTokenConfigs);
+      } // for
+
       if (tokensInfos && tokensConfigs && prices) {
         for (const config of tokensConfigs) {
           const token = config.token;
           if (!tokensInfos[token] || !prices[token]) {
-            //console.log("Cannot get info or price for ", token);
+            console.log("Cannot get info or price for ", token);
             continue;
           }
           ret[token] = {
@@ -216,25 +226,6 @@ export const makePreloadedState = async (
 
   let hiveEngineTokensProperties: TokenPropertiesMap =
     storedHiveEngineTokensProperties;
-  try {
-    if (
-      !(
-        storedHiveEngineTokensProperties &&
-        storedHiveEngineTokensProperties[LIQUID_TOKEN_UPPERCASE]
-      )
-    ) {
-      console.log(
-        "No token property information stored.  Loading tokens properties...",
-        Object.keys(storedHiveEngineTokensProperties)
-      );
-    }
-  } catch (e) {
-    hiveEngineTokensProperties = {};
-    console.log(
-      "Trying to get data resulted in this exception:",
-      JSON.stringify(e)
-    );
-  }
   const globalState: Global = {
     ...initialState.global,
     search_requests_allowed,

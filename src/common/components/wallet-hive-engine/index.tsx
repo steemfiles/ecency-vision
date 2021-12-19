@@ -214,9 +214,9 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
           console.log(e);
         });
     else
-      getCoarseTransactions(name, 400, symbol, 0).then(
-        this.handleCoarseTransactions.bind(this, group ? group : "")
-      );
+      getCoarseTransactions(name, 400, symbol, 0)
+        .then(this.handleCoarseTransactions.bind(this, group ? group : ""))
+        .catch(console.log);
   };
   fetchConvertingAmount = () => {
     const { account } = this.props;
@@ -333,26 +333,28 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
               getScotDataAsync<{ [aPICoinName: string]: TokenStatus }>(
                 `@${account.name}`,
                 { hive: 1, token: aPICoinName }
-              ).then((tokenStatuses) => {
-                if (tokenStatuses[aPICoinName]) {
-                  const tokenStatus = tokenStatuses[aPICoinName];
-                  if (tokenStatus.pending_token === 0) {
-                    clearInterval(check_handle);
-                    success(_t("wallet.claim-reward-balance-ok"));
-                    successful();
-                    updateActiveUser(account);
+              )
+                .then((tokenStatuses) => {
+                  if (tokenStatuses[aPICoinName]) {
+                    const tokenStatus = tokenStatuses[aPICoinName];
+                    if (tokenStatus.pending_token === 0) {
+                      clearInterval(check_handle);
+                      success(_t("wallet.claim-reward-balance-ok"));
+                      successful();
+                      updateActiveUser(account);
+                    } else {
+                      console.log(
+                        "The loading of the account worked fine but the pending balance has not yet been updtaed."
+                      );
+                    } // end if
                   } else {
                     console.log(
-                      "The loading of the account worked fine but the pending balance has not yet been updtaed."
+                      "The account data returned an unexpected data structure:",
+                      { account }
                     );
                   } // end if
-                } else {
-                  console.log(
-                    "The account data returned an unexpected data structure:",
-                    { account }
-                  );
-                } // end if
-              }); // getAccountHEFull.then
+                })
+                .catch((e) => {}); // getAccountHEFull.then
             } catch (e) {
               console.log("Exception was thrown in the handler");
             }
@@ -413,7 +415,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         tokenProperties &&
         tokenProperties.info &&
         tokenProperties.info.precision;
-      if (p1 === null || p1 == undefined) return 0;
+      if (p1 === null || p1 == undefined) return 8;
       else return p1;
     })();
     const { hivePerMVests } = dynamicProps;
@@ -438,6 +440,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
       converting,
       aPICoinName
     );
+    console.log({ w });
     const balances = w.engineBalanceTable[this.props.aPICoinName] || {
       _id: 0,
       account: account.name,
@@ -450,6 +453,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
       pendingUndelegations: 0,
     };
     const { token_unstakes } = account as FullHiveEngineAccount;
+    console.log({ balances, transferAsset, transferMode, precision });
     if (token_unstakes) {
       let powerDownId;
       const token_unstake: undefined | UnStake =
@@ -528,32 +532,28 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                             label: "",
                             items: [
                               {
-                                label: "Wallet Operations",
-                                onClick: () => {
-                                  window.open(
-                                    `https://www.proofofbrain.io/@${account.name}/transfers`,
-                                    "origPOB"
-                                  );
-                                },
-                              },
-                              {
                                 label: _t("wallet.transfer"),
                                 onClick: () => {
+                                  console.log(this.props.aPICoinName);
                                   this.openTransferDialog(
                                     "transfer",
                                     this.props.aPICoinName
                                   );
                                 },
                               },
-                              {
-                                label: _t("wallet.power-up"),
-                                onClick: () => {
-                                  this.openTransferDialog(
-                                    "power-up",
-                                    this.props.aPICoinName
-                                  );
-                                },
-                              },
+                              ...(stakedCoinName === ""
+                                ? []
+                                : [
+                                    {
+                                      label: _t("wallet.power-up"),
+                                      onClick: () => {
+                                        this.openTransferDialog(
+                                          "power-up",
+                                          this.props.aPICoinName
+                                        );
+                                      },
+                                    },
+                                  ]),
                               {
                                 label: "Trade at LeoDex",
                                 onClick: () => {

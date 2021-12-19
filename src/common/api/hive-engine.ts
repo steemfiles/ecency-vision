@@ -210,19 +210,14 @@ export function is_FullHiveEngineAccount(
 ): account is FullHiveEngineAccount {
   return !is_not_FullHiveEngineAccount(account);
 }
-async function callApi(url: string, params: any) {
+async function callApi<T>(url: string, params: any): T {
   return await axios({
     url,
     method: "GET",
     params,
-  })
-    .then((response) => {
-      return response.data;
-    })
-    .catch((err) => {
-      console.error(`Could not fetch data, url: ${url}`, JSON.stringify(err));
-      return [];
-    });
+  }).then((response) => {
+    return response.data;
+  });
 }
 // Exclude author and curation reward details
 export async function getCoarseTransactions(
@@ -231,16 +226,15 @@ export async function getCoarseTransactions(
   symbol: string,
   offset: number = 0
 ) {
-  const transfers: Array<HECoarseTransaction> = await callApi(
-    "https://accounts.hive-engine.com/accountHistory",
-    {
-      account,
-      limit,
-      offset,
-      type: "user",
-      symbol,
-    }
-  );
+  const transfers: Array<HECoarseTransaction> = await callApi<
+    Array<HECoarseTransaction>
+  >("https://accounts.hive-engine.com/accountHistory", {
+    account,
+    limit,
+    offset,
+    type: "user",
+    symbol,
+  });
   return transfers;
 }
 // Include virtual transactions like curation and author reward details.

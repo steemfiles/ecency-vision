@@ -92,7 +92,11 @@ import {
   FullHiveEngineAccount,
 } from "../../api/hive-engine";
 import HiveEngineWallet from "../../helper/hive-engine-wallet";
-import { LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN } from "../../../client_config";
+import {
+  HIVE_ENGINE_TOKENS,
+  LIQUID_TOKEN_UPPERCASE,
+  VESTING_TOKEN,
+} from "../../../client_config";
 export type TransferMode =
   | "borrow"
   | "transfer"
@@ -184,20 +188,12 @@ interface State {
   estimatedRequiredHiveCollateral: number;
 }
 const pureState = (props: Props): State => {
-  const { global, activeUser } = props;
+  const { global, activeUser, asset, LIQUID_TOKEN_precision } = props;
   let _to: string = "";
   let _toData: Account | null = null;
   const { hiveEngineTokensProperties } = global;
-  let x;
-  const liquid_token_precision: number =
-    (LIQUID_TOKEN_UPPERCASE &&
-      (x = hiveEngineTokensProperties) &&
-      (x = x[LIQUID_TOKEN_UPPERCASE]) &&
-      (x = x.info) &&
-      (x = x.precision)) ||
-    6;
-  const precision =
-    props.asset === LIQUID_TOKEN_UPPERCASE ? liquid_token_precision : 3;
+  console.log({ props });
+
   if (
     [
       "transfer-saving",
@@ -211,10 +207,13 @@ const pureState = (props: Props): State => {
     _to = props.activeUser.username;
     _toData = props.activeUser.data;
   }
+
+  console.log({ LIQUID_TOKEN_precision });
+
   return {
     step: 1,
     asset: props.asset,
-    precision,
+    precision: LIQUID_TOKEN_precision ?? 8,
     to: props.to || _to,
     toData: props.to ? { name: props.to } : _toData,
     toError: "",
@@ -226,15 +225,6 @@ const pureState = (props: Props): State => {
     inProgress: false,
   };
 };
-function getPrecision(asset: string) {
-  if (asset == HIVE_API_NAME || asset === DOLLAR_API_NAME || asset == "HP") {
-    return 3;
-  } else if (asset == "POB" || asset === "Brain Power") {
-    return 8;
-  } else if (asset == "VESTS") {
-    return 6;
-  } else return NaN;
-}
 export class Transfer extends BaseComponent<Props, State> {
   state: State = pureState(this.props);
   _timer: any = null;
@@ -248,6 +238,26 @@ export class Transfer extends BaseComponent<Props, State> {
       this.checkAmount();
     }
   }
+  getPrecision = (asset: string) => {
+    const { global } = this.props;
+    const hiveEngineTokensProperties = global.hiveEngineTokensProperties;
+    if (asset == HIVE_API_NAME || asset === DOLLAR_API_NAME || asset == "HP") {
+      return 3;
+    } else if (asset == "VESTS") {
+      return 6;
+    }
+
+    if (hiveEngineTokensProperties) {
+      const hiveETP = hiveEngineTokensProperties[asset];
+      if (hiveETP) {
+        if (hiveETP.info) {
+          return hiveETP.info.precision ?? 8;
+        }
+      }
+    }
+    return 8;
+  };
+
   // for sending to APIs and such
   formatNumber = (num: number | string, precision: number): string => {
     if (typeof num === "string") return this.parseFloat(num).toFixed(precision);
@@ -324,15 +334,18 @@ export class Transfer extends BaseComponent<Props, State> {
     const { asset } = this.state;
     const { global } = this.props;
     const { hiveEngineTokensProperties } = global;
-    let x: any;
-    if ([LIQUID_TOKEN_UPPERCASE, VESTING_TOKEN].includes(asset))
-      return this.props.LIQUID_TOKEN_precision || 3;
-    return 3;
+    try {
+      let x = hiveEngineTokensProperties,
+        y,
+        z;
+      if (x && (y = x[asset]) && (z = y.info)) return z.precision ?? 0;
+    } catch (e) {}
+    return 0;
   }
   checkAmount = () => {
     const { mode, activeUser, dynamicProps } = this.props;
     const { asset } = this.state;
-    const precision = getPrecision(asset);
+    const precision = this.getPrecision(asset);
     const raw_amount = this.state.amount;
     const raw_length = raw_amount.length;
     const amount = raw_amount.replace(/,/g, "");
@@ -379,12 +392,7 @@ export class Transfer extends BaseComponent<Props, State> {
     const stateSet = this.stateSet.bind(this);
     if (this.props.mode === "borrow") {
       estimateHiveCollateral(parseFloat(amount)).then((amount) => {
-        const w = new HiveEngineWallet(
-          activeUser.data,
-          dynamicProps,
-          0,
-          LIQUID_TOKEN_UPPERCASE
-        );
+        const w = new HiveEngineWallet(activeUser.data, dynamicProps, 0, asset);
         if (amount > w.balance) {
           stateSet({
             estimatedRequiredHiveCollateral: amount,
@@ -416,7 +424,7 @@ export class Transfer extends BaseComponent<Props, State> {
     const balances =
       ((x = activeUser.data) &&
         (x = (x as FullHiveEngineAccount).token_balances) &&
-        x.find((x) => x.symbol === LIQUID_TOKEN_UPPERCASE)) ||
+        x.find((x) => x.symbol === asset)) ||
       null;
     if (asset === "POINT") {
       return parseAsset(activeUser.points.points).amount;
@@ -441,7 +449,7 @@ export class Transfer extends BaseComponent<Props, State> {
       const vestingShares = w.vestingSharesAvailable;
       return vestsToHp(vestingShares, hivePerMVests);
     }
-    if (asset === LIQUID_TOKEN_UPPERCASE) {
+    if (asset !== VESTING_TOKEN) {
       if (!!balances) {
         return balances.balance;
       }
@@ -574,7 +582,7 @@ export class Transfer extends BaseComponent<Props, State> {
         const vests: string =
           asset === NATIVE_PD_ASSET
             ? this.hpToVests(Number(amount))
-            : this.formatNumber(amount, getPrecision(stake_asset));
+            : this.formatNumber(amount, this.getPrecision(stake_asset));
         if (
           stake_asset === LIQUID_TOKEN_UPPERCASE &&
           parseFloat(vests) === 0 &&
@@ -677,7 +685,7 @@ export class Transfer extends BaseComponent<Props, State> {
         const vests: string =
           asset === NATIVE_PD_ASSET
             ? this.hpToVests(Number(amount))
-            : this.formatNumber(amount, getPrecision(stake_asset));
+            : this.formatNumber(amount, this.getPrecision(stake_asset));
         if (
           stake_asset === LIQUID_TOKEN_UPPERCASE &&
           parseFloat(vests) === 0 &&
@@ -766,7 +774,7 @@ export class Transfer extends BaseComponent<Props, State> {
         const vests: string =
           asset === NATIVE_PD_ASSET
             ? this.hpToVests(Number(amount))
-            : this.formatNumber(amount, getPrecision(stake_asset));
+            : this.formatNumber(amount, this.getPrecision(stake_asset));
         if (
           stake_asset === LIQUID_TOKEN_UPPERCASE &&
           parseFloat(vests) === 0 &&
@@ -896,7 +904,12 @@ export class Transfer extends BaseComponent<Props, State> {
         break;
       case "power-down":
       case "delegate":
-        assets = ["HP", VESTING_TOKEN];
+        assets = [
+          "HP",
+          ...hiveEngineTokens
+            .map((t) => t.stakedHumanName)
+            .filter((name) => name !== ""),
+        ];
         break;
     }
     const showTo = [
@@ -974,7 +987,7 @@ export class Transfer extends BaseComponent<Props, State> {
           (pob_unstake = unstakes.find((x) => x.symbol === "POB")) &&
           (liquid_asset = "POB"))
       ) {
-        const fractionDigits = getPrecision(liquid_asset);
+        const fractionDigits = this.getPrecision(liquid_asset);
         return (
           <div className="transfer-dialog-content">
             <div className="transaction-form">
@@ -1090,7 +1103,7 @@ export class Transfer extends BaseComponent<Props, State> {
                     />
                   </InputGroup>
                   {assets.length > 1 &&
-                    (assets.length < 4 ? (
+                    (assets.length < 4 && assets.join(".").length < 13 ? (
                       <AssetSwitch
                         options={assets}
                         selected={asset}

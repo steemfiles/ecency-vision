@@ -357,7 +357,7 @@ export const transferHot = (
     },
   ];
   const params: Parameters = {
-    callback: document.location.href,
+    callback: document.location.toString(),
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -539,7 +539,7 @@ export const transferToSavingsHot = (
     },
   ];
   const params: Parameters = {
-    callback: document.location.href,
+    callback: document.location.toString(),
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -588,7 +588,7 @@ export const collateralizedConvertHot = (
     },
   ];
   const params: Parameters = {
-    callback: document.location.href,
+    callback: document.location.toString(),
   };
   hs.sendOperation(op, params, () => {});
 };
@@ -628,7 +628,7 @@ export const convertHot = (owner: string, amount: string) => {
     },
   ];
   const params: Parameters = {
-    callback: document.location.href,
+    callback: document.location.toString(),
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -679,7 +679,7 @@ export const transferFromSavingsHot = (
     },
   ];
   const params: Parameters = {
-    callback: document.location.href,
+    callback: document.location.toString(),
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -757,7 +757,7 @@ export const transferToVestingHot = (
 ) => {
   console.log(from, to, amount);
   const params: Parameters = {
-    callback: document.location.href,
+    callback: document.location.toString(),
   };
   const op: Operation = createTransferToVestingOp(from, to, amount);
   return hs.sendOperation(op, params, () => {});
@@ -844,7 +844,7 @@ export const delegateVestingSharesHot = (
   const currency = parts[parts.length - 1];
   const quantity = parts[0].replace(/,/g, "");
   const params: Parameters = {
-    callback: document.location.href,
+    callback: document.location.toString(),
   };
   return hs.sendOperation(op, params, console.log);
 };
@@ -944,7 +944,7 @@ export const undelegateVestingSharesHot = (
     currency
   );
   const params: Parameters = {
-    callback: document.location.href,
+    callback: document.location.toString(),
   };
   return hs.sendOperation(op, params, () => {});
 };
@@ -1034,7 +1034,7 @@ export const withdrawVestingHot = (
 ) => {
   const op: Operation = createWithdrawVestingOp(account, vestingShares, symbol);
   const params: Parameters = {
-    callback: document.location.href,
+    callback: document.location.toString(),
   };
   return hs.sendOperation(op, params, fn);
 };
@@ -1077,7 +1077,7 @@ export const cancelWithdrawVesting = (
 export const cancelWithdrawVestingHot = (account: string, txID: string) => {
   const op: Operation = createCancelPowerDownOp(account, txID);
   const params: Parameters = {
-    callback: document.location.href,
+    callback: document.location.toString(),
   };
   hs.sendOperation(op, params, () => {});
 };
@@ -1119,7 +1119,7 @@ export const setWithdrawVestingRouteHot = (
     },
   ];
   const params: Parameters = {
-    callback: document.location.href,
+    callback: document.location.toString(),
   };
   return hs.sendOperation(op, params, () => {});
 };
