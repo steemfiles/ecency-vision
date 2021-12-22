@@ -5,6 +5,14 @@ debug: private-api/build/private-api-server.js private-api/build/relayserver.js 
 
 production: private-api/build/runforever private-api/build/private-api-server.js private-api/build/runforever-dyn private-api/build/relayserver.js  private-api/build/promoter.js
 
+most:  private-api/build/runforever private-api/build/private-api-server.js private-api/build/runforever-dyn private-api/build/relayserver.js
+
+syntax:
+	g++ -fsyntax-only src/runforever.cpp $(COMPILE_FLAGS)
+
+clean:
+	rm *.o runforever-dbg 
+	
 runforever.o: src/runforever.cpp
 	g++ src/runforever.cpp -c $(COMPILE_FLAGS)
 
@@ -19,9 +27,6 @@ private-api/build/runforever: runforever.o
 
 private-api/build/runforever-dyn: runforever.o 
 	g++ runforever.o -o private-api/build/runforever-dyn $(LINK_FLAGS)
-
-syntax:
-	g++ -fsyntax-only src/runforever.cpp $(COMPILE_FLAGS)
 
 runforever-dbg: runforever-dbg.o
 	g++ -ggdb runforever-dbg.o -o runforever-dbg  $(LINK_FLAGS) -static
@@ -52,7 +57,4 @@ private-api/build/pull-history-data.js: private-api/src/pull-history-data.ts pri
 	rm -f private-api/build/pull-history-data.js
 	tsc --OutDir private-api/build --lib es2021 --resolveJsonModule --esModuleInterop private-api/src/pull-history-data.ts
 	
-clean:
-	rm *.o runforever-dbg 
-	
-.PHONY: syntax production clean default
+.PHONY: syntax production clean most debug
