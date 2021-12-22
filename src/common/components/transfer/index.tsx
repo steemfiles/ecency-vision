@@ -596,7 +596,7 @@ export class Transfer extends BaseComponent<Props, State> {
       }
       case "delegate": {
         const vests =
-          asset === HIVE_API_NAME
+          asset === HIVE_API_NAME || asset === NATIVE_PD_ASSET
             ? this.hpToVests(Number(amount))
             : `${amount} ${
                 asset === VESTING_TOKEN ? LIQUID_TOKEN_UPPERCASE : asset
@@ -699,7 +699,7 @@ export class Transfer extends BaseComponent<Props, State> {
       }
       case "delegate": {
         const vests =
-          asset === HIVE_API_NAME
+          asset === HIVE_API_NAME || asset === NATIVE_PD_ASSET
             ? this.hpToVests(Number(amount))
             : `${amount} ${
                 asset === VESTING_TOKEN ? LIQUID_TOKEN_UPPERCASE : asset
@@ -788,7 +788,7 @@ export class Transfer extends BaseComponent<Props, State> {
       }
       case "delegate": {
         const vests =
-          asset === HIVE_API_NAME
+          asset === HIVE_API_NAME || asset === NATIVE_PD_ASSET
             ? this.hpToVests(Number(amount))
             : `${amount} ${
                 asset === VESTING_TOKEN ? LIQUID_TOKEN_UPPERCASE : asset

@@ -786,6 +786,11 @@ export const createDelegateVestingSharesOp = (
   const parts = vestingShares.split(/ /);
   const currency = parts[parts.length - 1];
   const quantity = parts[0].replace(/,/g, "");
+  if (currency === "HP" || currency === "HIVE") {
+    throw new Error(
+      `Invalid parameter: ${currency} can be an HiveEngine asset or VESTS`
+    );
+  }
   if (currency === "VESTS") {
     return [
       "delegate_vesting_shares",

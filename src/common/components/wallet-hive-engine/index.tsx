@@ -626,15 +626,6 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                             label: "",
                             items: [
                               {
-                                label: "Wallet Operations",
-                                onClick: () => {
-                                  window.open(
-                                    `https://www.proofofbrain.io/@${account.name}/transfers`,
-                                    "origPOB"
-                                  );
-                                },
-                              },
-                              {
                                 label: _t("wallet.delegate"),
                                 onClick: () => {
                                   this.openTransferDialog(

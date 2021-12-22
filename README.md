@@ -69,7 +69,7 @@ grant insert,select,delete,update on promotions to 'webadmin'@'localhost';
 
 ```
 
-###### USE_PRIVATE
+###### USE_PRIVATE (environment variable)
 
 You should set this to '0' unless you're part of the ecency team.
 
@@ -110,10 +110,11 @@ post as your new account [here](https://hivesigner.com/authorize/hivesigner).
 `$ cp src/client_config_default.js src/client_config.ts`
 `$ nano src/client_config.ts`
 
-###### HIVE_SIGNER_APP
+####### HIVE_SIGNER_APP
 
 As the corresponding constant to HIVE_SIGNER_CLIENT_SECRET,
 this should be set to the account username you have at Hive Signer. Do not use the '@' sign in the username.
+This should be set in the src/client_config.ts file.
 
 ###### Edit src/common/constants/site.json
 
@@ -132,7 +133,7 @@ chromium --disable-web-security --disable-gpu --user-data-dir=$HOME/userTmp http
 ##### Start website in dev
 
 In testing you will need a reverse-proxy server to receive on port 80 and then proxy for ports 2997-3000 as described
-in the configuration file.  You need to make a symlink from `proxy.apache-conf` into `/etc/apache2/sites-enabled`.
+in the configuration file. You need to make a symlink from `proxy.apache-conf` into `/etc/apache2/sites-enabled`.
 
 `$ make;`
 `$ node private-api/build/private-api-server.js &`
