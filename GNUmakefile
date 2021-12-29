@@ -1,11 +1,11 @@
 COMPILE_FLAGS=-std=c++17 -I /usr/local/src/boost_1_76_0
 LINK_FLAGS=-std=c++17 -L /usr/local/src/boost_1_76_0/stage/lib  -lboost_thread -lboost_system -lpthread -lboost_chrono
 
-debug: private-api/build/private-api-server.js private-api/build/relayserver.js private-api/build/promoter.js private-api/build/process.js runforever-dbg
+debug: most runforever-dbg
 
-production: private-api/build/runforever private-api/build/private-api-server.js private-api/build/runforever-dyn private-api/build/relayserver.js  private-api/build/promoter.js
+production: most private-api/build/runforever
 
-most:  private-api/build/runforever private-api/build/private-api-server.js private-api/build/runforever-dyn private-api/build/relayserver.js
+most:  private-api/build/private-api-server.js private-api/build/relayserver.js  private-api/build/promoter.js build/server.js
 
 syntax:
 	g++ -fsyntax-only src/runforever.cpp $(COMPILE_FLAGS)
@@ -56,5 +56,10 @@ private-api/build/process.js: private-api/src/process.ts private-api/src/notific
 private-api/build/pull-history-data.js: private-api/src/pull-history-data.ts private-api/src/notifications.ts
 	rm -f private-api/build/pull-history-data.js
 	tsc --OutDir private-api/build --lib es2021 --resolveJsonModule --esModuleInterop private-api/src/pull-history-data.ts
+
+# Because there is no way to efficiently update the Makefile for yarn build, 
+# it is intentionally set as a PHONY target.  So, it will always  be built.
+build/server.js: 
+	yarn build
 	
-.PHONY: syntax production clean most debug
+.PHONY: syntax production clean most debug build/server.js
