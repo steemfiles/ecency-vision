@@ -58,6 +58,82 @@ export const HIVE_ENGINE_TOKENS = [
   },
 ];
 
+type HELiquidAsset = "POB" | "WEED" | "TEST";
+type HEStakedAsset = "BP" | "WP" | "TP";
+export type LiquidAsset = "HIVE" | "HBD" | "TEST" | "HBD" | "TBD";
+export type StakedAsset = "HP" | "BP" | "TP" | "WP";
+export const tokenAliases: {
+  [apiName: LiquidAsset | StakedAsset]: {
+    liquidLong: string;
+    stakedLong: string;
+    stakedShort: StakedAsset | "";
+    liquidShort: LiquidAsset;
+  };
+} = {
+  POB: {
+    liquidLong: "Proof of Brain",
+    stakedLong: "Brain Power",
+    stakedShort: "BP",
+    liquidShort: "POB",
+  },
+
+  BP: {
+    liquidLong: "Proof of Brain",
+    stakedLong: "Brain Power",
+    stakedShort: "BP",
+    liquidShort: "POB",
+  },
+
+  HBD: {
+    liquidLong: "Hive Dollars",
+    stakedLong: "",
+    stakedShort: "",
+    liquidShort: "HBD",
+  },
+
+  TEST: {
+    liquidLong: "Test",
+    stakedLong: "Test Power",
+    stakedShort: "TP",
+    liquidShort: "TEST",
+  },
+
+  TP: {
+    liquidLong: "Test",
+    stakedLong: "Test Power",
+    stakedShort: "TP",
+    liquidShort: "TEST",
+  },
+
+  HIVE: {
+    liquidLong: "Hive",
+    stakedLong: "Hive Power",
+    stakedShort: "HP",
+    liquidShort: "HIVE",
+  },
+
+  HP: {
+    liquidLong: "Hive",
+    stakedLong: "Hive Power",
+    stakedShort: "HP",
+    liquidShort: "HIVE",
+  },
+
+  WEED: {
+    liquidLong: "Weed Cash",
+    stakedLong: "Weed Power",
+    liquidShort: "WEED",
+    stakedShort: "WP",
+  },
+
+  WP: {
+    liquidLong: "Weed Cash",
+    stakedLong: "Weed Power",
+    liquidShort: "WEED",
+    stakedShort: "WP",
+  },
+};
+
 // application settings
 export const DEFAULT_LANGUAGE = "en"; // used on application internationalization bootstrap
 export const DEFAULT_CURRENCY = "USD";

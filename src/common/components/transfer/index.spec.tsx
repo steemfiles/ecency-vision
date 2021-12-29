@@ -10,6 +10,8 @@ import {
   fullAccountInstance,
 } from "../../helper/test-helper";
 
+import { historicalPOBConfig, historicalPOBInfo } from "../../api/hive-engine";
+
 import TestRenderer from "react-test-renderer";
 
 jest.mock("moment", () => () => ({
@@ -328,6 +330,126 @@ describe("(10) Powering down", () => {
   };
 
   const component = TestRenderer.create(<Transfer {...props} />);
+
+  it("(1) Step 1", () => {
+    expect(component.toJSON()).toMatchSnapshot();
+  });
+});
+
+const HEProps = {
+  ...defProps,
+  activeUser: {
+    username: "foo",
+    data: {
+      ...fullAccountInstance,
+      name: "foo",
+      token_balances: [
+        {
+          _id: 184965,
+          account: "leprechaun",
+          symbol: "POB",
+          balance: 487.23231454,
+          stake: 1000.09083108,
+          pendingUnstake: 0,
+          delegationsIn: 0,
+          delegationsOut: 0,
+          pendingUndelegations: 0,
+        },
+        {
+          _id: 78816,
+          account: "foo",
+          symbol: "LEO",
+          balance: 6.818,
+          stake: 0,
+          pendingUnstake: 0,
+          delegationsIn: 0,
+          delegationsOut: 0,
+          pendingUndelegations: 0,
+        },
+        {
+          _id: 35962,
+          account: "foo",
+          symbol: "SAND",
+          balance: 1,
+          stake: 0,
+          pendingUnstake: 0,
+          delegationsIn: 0,
+          delegationsOut: 0,
+          pendingUndelegations: 0,
+        },
+      ],
+      token_delegations: [
+        {
+          _id: 6871,
+          from: "foo",
+          to: "fullcolorpy",
+          symbol: "POB",
+          quantity: "1.00000000",
+          created: 1631274507000,
+          updated: 1631274507000,
+        },
+        {
+          _id: 6872,
+          from: "foo",
+          to: "rentmoney",
+          symbol: "POB",
+          quantity: "1.00000000",
+          created: 1631274639000,
+          updated: 1631274639000,
+        },
+        {
+          _id: 6873,
+          from: "foo",
+          to: "comandoyeya",
+          symbol: "POB",
+          quantity: "1.00000000",
+          created: 1631274987000,
+          updated: 1631274987000,
+        },
+        {
+          _id: 6875,
+          from: "foo",
+          to: "marymmm",
+          symbol: "POB",
+          quantity: "1.00000000",
+          created: 1631275908000,
+          updated: 1631275908000,
+        },
+        {
+          _id: 6876,
+          from: "foo",
+          to: "jlufer",
+          symbol: "POB",
+          quantity: "1.00000000",
+          created: 1631276361000,
+          updated: 1631276361000,
+        },
+      ],
+    },
+    points: {
+      points: "10.000",
+      uPoints: "0.000",
+    },
+    hiveEngineBalances: [],
+  },
+  hiveEngineTokens: [
+    {
+      apiName: "POB",
+      liquidHumanName: "Proof of Brain",
+      stakedHumanName: "BP",
+      precision: 8,
+    },
+  ],
+};
+
+describe("(11) Transfer POB", () => {
+  const mode: TransferMode = "transfer";
+  const asset: TransferAsset = "POB";
+
+  const props = { ...HEProps, mode, asset };
+
+  const component = TestRenderer.create(<Transfer {...props} />);
+  const instance: any = component.getInstance();
 
   it("(1) Step 1", () => {
     expect(component.toJSON()).toMatchSnapshot();
