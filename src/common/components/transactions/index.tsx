@@ -398,16 +398,26 @@ export class TransactionRow extends Component<RowProps> {
         </>
       );
     }
-    if (
-      (tr.type === "market_sell" && (icon = arrowRightSvg)) ||
-      (tr.type === "market_buy" && (icon = arrowLeftSvg))
-    ) {
+    if (tr.type === "market_sell" && (icon = arrowRightSvg)) {
       flag = true;
       numbers = (
-        <>
-          Sold <span className="number"> {tr.quote}</span> for{" "}
-          <span className="number"> {tr.base}</span>
-        </>
+        <span className="number">
+          {_t("transactions.sold", { q: tr.quote })}
+        </span>
+      );
+      details = (
+        <span className="number">{_t("transactions.for", { b: tr.base })}</span>
+      );
+    }
+    if (tr.type === "market_buy" && (icon = arrowLeftSvg)) {
+      flag = true;
+      numbers = (
+        <span className="number">
+          {_t("transactions.bought", { q: tr.quote })}
+        </span>
+      );
+      details = (
+        <span className="number">{_t("transactions.for", { b: tr.base })}</span>
       );
     }
     if (tr.type === "return_vesting_delegation") {

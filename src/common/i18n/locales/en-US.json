@@ -692,7 +692,10 @@
     "type-limit_order_create": "New trade",
     "type-effective_comment_vote": "Effective vote",
     "type-tokens_undelegateDone": "Staked undelegated tokens returned",
-    "type-tokens_undelegateStart": "Staked tokens undelegated"
+    "type-tokens_undelegateStart": "Staked tokens undelegated",
+    "bought": "bought {{q}}",
+    "sold": "sold {{q}}",
+    "for": "for {{b}}"
   },
   "key-or-hot": {
     "sign": "Sign",
