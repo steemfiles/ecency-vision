@@ -53,6 +53,18 @@ bool verbose_threads = false;
 bool verbose = false;
 char const *fault = nullptr;
 
+std::string get_version() {
+	std::string out(raw_version);
+	size_t first_nl = out.find('\n');
+	size_t second_nl = out.find('\n', first_nl + 1);
+	size_t third_nl = out.find('\n', second_nl + 1);
+	if (third_nl == string::npos) {
+		return out;
+	} else {
+		return out.substr(0, third_nl);
+	}
+}
+
 // Makes an HTTP connection.  Returns true should it fail.
 bool connect_to_http_server(const char *name, const char *port,
                             const char *target) {
@@ -548,7 +560,7 @@ int main(int argc, char **argv) {
     } else if (strcmp(*argi, "--verbose") == 0) {
       verbose = true;
     } else if (strcmp(*argi, "--version") == 0) {
-      cerr << raw_version << endl;
+      cerr << get_version() << endl;
       return 0;
     } else {
       cerr << "Unknown option: \"" << *argi << '\"' << endl;
