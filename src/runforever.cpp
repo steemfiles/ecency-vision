@@ -56,7 +56,7 @@ bool verbose = false;
 char const * fault = nullptr;
 
 // Makes an HTTP connection.  Returns true should it fail.
-bool connect_to_http_server(const char* port, const char* target)
+bool connect_to_http_server(const char * name, const char* port, const char* target)
 {
 		auto const host = "127.0.0.1";
 		const int version = 11;
@@ -70,7 +70,7 @@ bool connect_to_http_server(const char* port, const char* target)
 		beast::tcp_stream stream(ioc);
 	
 		if (verbose) {
-			cerr << "Preparing to check server at port " << port << ".\n";
+			cerr << "Preparing to check " << name << " server at port " << port << ".\n";
 		}
 	
 		// Look up the domain name
@@ -80,18 +80,24 @@ bool connect_to_http_server(const char* port, const char* target)
 		stream.connect(results, ec);		
 		if (ec) {
 			if (verbose) {
-				cerr << "Unable to connect to server at port " << port << endl;
+				cerr << "Unable to connect to " << name << " server at port " << port << endl;
 			}
 			return true;
 		} else if (verbose) {
-			cerr << "Connected to server at port " << port << endl;
+			cerr << "Connected to " << name << " server at port " << port << endl;
 		}
 		
-		return (!!ec);
+		if (ec) {
+			if (verbose) {
+				cerr << "Error while closing the socket for " << name << " server" << endl;
+			}
+			return true;
+		} else
+			return false;
 }
 
 bool connect_to_private_api_server() {
-	return connect_to_http_server("2997", "/notifications/unread");
+	return connect_to_http_server("private-api", "2997", "/notifications/unread");
 }
 
 // Performs an HTTP GET and prints the response
@@ -101,6 +107,7 @@ bool connect_to_search_server()
 	auto const port = "2999";
 	auto const target = "/";
 	const int version = 11;
+	const char * name = "search";
 	
 	if (verbose) {
 		cerr << "Preparing to check search server at port " << port << ".\n";
@@ -132,7 +139,13 @@ bool connect_to_search_server()
 	// Gracefully close the socket
 	stream.socket().shutdown(tcp::socket::shutdown_both, ec);		
 			
-	return (!!ec);
+	if (ec) {
+		if (verbose) {
+			cerr << "Error while closing the socket for " << name << " server" << endl;
+		}
+		return true;
+	} else
+		return false;
 }
 
 // Performs an HTTP GET and prints the response
@@ -199,7 +212,13 @@ bool connect_to_page_server()
 		// Gracefully close the socket
 		stream.socket().shutdown(tcp::socket::shutdown_both, ec);		
 				
-		return (!!ec);
+	if (ec) {
+		if (verbose) {
+			cerr << "Error while closing the socket for " << name << " server" << endl;
+		}
+		return true;
+	} else
+		return false;
 }
 
 // Performs an HTTP GET and prints the response
@@ -247,15 +266,20 @@ bool connect_to_promoter_server()
 				cerr << "Unable to write header request to " << name << " server at port " << port << endl;
 			}
 			return true;
+		} else if (verbose) {
+			cerr << "Wrote header and sent request to " << name << " server at port " << port << endl;
 		}
 				
 		// Gracefully close the socket
 		stream.socket().shutdown(tcp::socket::shutdown_both, ec);
 
-		if (ec)
-			return true;
-		else
-			return false;
+	if (ec) {
+		if (verbose) {
+			cerr << "Error while closing the socket for " << name << " server" << endl;
+		}
+		return true;
+	} else
+		return false;
 }
 
 std::ostream& mainserverlogline() {
