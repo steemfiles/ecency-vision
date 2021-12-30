@@ -58,10 +58,40 @@ export const HIVE_ENGINE_TOKENS = [
   },
 ];
 
-type HELiquidAsset = "POB" | "WEED" | "TEST";
-type HEStakedAsset = "BP" | "WP" | "TP";
-export type LiquidAsset = "HIVE" | "HBD" | "TEST" | "HBD" | "TBD";
-export type StakedAsset = "HP" | "BP" | "TP" | "WP";
+type HELiquidAsset = "POB" | "VYB" | "WEED" | "TEST";
+type HEStakedAsset = "BPR" | "BPF" | "WP" | "TP";
+export type LiquidAsset =
+  | "HIVE"
+  | "HBD"
+  | "TEST"
+  | "HBD"
+  | "TBD"
+  | HELiquidAsset;
+export type StakedAsset = "HP" | "TP" | HEStakedAsset;
+
+const moreLocks = (input: {
+  [apiName: LiquidAsset | StakedAsset]: {
+    liquidLong: string;
+    stakedLong: string;
+    stakedShort: StakedAsset | "";
+    liquidShort: LiquidAsset;
+  };
+}): {
+  [apiName: LiquidAsset | StakedAsset]: {
+    liquidLong: string;
+    stakedLong: string;
+    stakedShort: StakedAsset | "";
+    liquidShort: LiquidAsset;
+  };
+} => {
+  for (const key in input) {
+    if (input[key].stakedShort != "")
+      input[input[key].stakedShort] = input[key];
+  }
+  console.log(input);
+  return input;
+};
+
 export const tokenAliases: {
   [apiName: LiquidAsset | StakedAsset]: {
     liquidLong: string;
@@ -69,7 +99,7 @@ export const tokenAliases: {
     stakedShort: StakedAsset | "";
     liquidShort: LiquidAsset;
   };
-} = {
+} = moreLocks({
   POB: {
     liquidLong: "Proof of Brain",
     stakedLong: "Brain Power",
@@ -77,11 +107,11 @@ export const tokenAliases: {
     liquidShort: "POB",
   },
 
-  BP: {
-    liquidLong: "Proof of Brain",
-    stakedLong: "Brain Power",
-    stakedShort: "BP",
-    liquidShort: "POB",
+  VYB: {
+    liquidLong: "Verify Your Brain",
+    stakedLong: "Verification Power",
+    stakedShort: "VP",
+    liquidShort: "VYB",
   },
 
   HBD: {
@@ -132,7 +162,7 @@ export const tokenAliases: {
     liquidShort: "WEED",
     stakedShort: "WP",
   },
-};
+});
 
 // application settings
 export const DEFAULT_LANGUAGE = "en"; // used on application internationalization bootstrap
