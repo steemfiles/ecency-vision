@@ -17,12 +17,16 @@
 #include <boost/beast/version.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/beast/http/parser.hpp>
+#include <boost/beast/http/buffer_body.hpp>
 #include <cstdlib>
 #include <iostream>
 #include <string>
 #include <sys/time.h>
 #include <functional>
 #include <memory>
+
+extern const char * raw_version;
 
 const char * page_server_cmd="node build/server.js";
 const char * promoter_server_cmd="node private-api/build/promoter.js";
@@ -34,7 +38,6 @@ const std::string cmds[3] = {page_server_cmd, promoter_server_cmd, primary_searc
 
 const char * rfc_2822_format = "%a, %d %b %Y %T %z";
 const char * RUNFOREVER_MANAGER_VERSION_STRING = "Runforever Manager/0.0";
-const bool verbose = false;
 
 namespace beast = boost::beast;     // from <boost/beast.hpp>
 namespace http = beast::http;       // from <boost/beast/http.hpp>
@@ -45,13 +48,14 @@ using namespace std;
 std::map<int, std::string> signal_names;
 std::fstream mainserverlog("server.log", std::ofstream::app);
 child * cptr = nullptr;
-bool both_running = false, keep_looping = true;
+bool all_running = false, keep_looping = true;
 bool restart_subserver = false;
 char datetime_string[200] = "";
 bool verbose_threads = false;
+bool verbose = false;
+char const * fault = nullptr;
 
-
-// Performs an HTTP GET and prints the response
+// Makes an HTTP connection.  Returns true should it fail.
 bool connect_to_http_server(const char* port, const char* target)
 {
 		auto const host = "127.0.0.1";
@@ -65,17 +69,25 @@ bool connect_to_http_server(const char* port, const char* target)
 		tcp::resolver resolver(ioc);
 		beast::tcp_stream stream(ioc);
 	
+		if (verbose) {
+			cerr << "Preparing to check server at port " << port << ".\n";
+		}
+	
 		// Look up the domain name
 		auto const results = resolver.resolve(host, port);
-	
+		
 		// Make the connection on the IP address we get from a lookup
 		stream.connect(results, ec);		
-		if (ec)
+		if (ec) {
+			if (verbose) {
+				cerr << "Unable to connect to server at port " << port << endl;
+			}
 			return true;
-	
-		// Gracefully close the socket
-		stream.socket().shutdown(tcp::socket::shutdown_both, ec);		
-		return false;
+		} else if (verbose) {
+			cerr << "Connected to server at port " << port << endl;
+		}
+		
+		return (!!ec);
 }
 
 bool connect_to_private_api_server() {
@@ -85,7 +97,42 @@ bool connect_to_private_api_server() {
 // Performs an HTTP GET and prints the response
 bool connect_to_search_server()
 {
-	return connect_to_http_server("2999", "/ping");
+	auto const host = "127.0.0.1";
+	auto const port = "2999";
+	auto const target = "/";
+	const int version = 11;
+	
+	if (verbose) {
+		cerr << "Preparing to check search server at port " << port << ".\n";
+	}
+	
+	boost::system::error_code ec;
+	
+	// The io_context is required for all I/O
+	net::io_context ioc;
+	
+	// These objects perform our I/O
+	tcp::resolver resolver(ioc);
+	beast::tcp_stream stream(ioc);
+	
+	// Look up the domain name
+	auto const results = resolver.resolve(host, port);
+	
+	// Make the connection on the IP address we get from a lookup
+	stream.connect(results, ec);		
+	if (ec) {
+		if (verbose) {
+			cerr << "Unable to connect to search server at port " << port << endl;
+		}
+		return true;
+	} else if (verbose) {
+		cerr << "Connected to search server at port " << port << endl;
+	}
+	
+	// Gracefully close the socket
+	stream.socket().shutdown(tcp::socket::shutdown_both, ec);		
+			
+	return (!!ec);
 }
 
 // Performs an HTTP GET and prints the response
@@ -95,6 +142,12 @@ bool connect_to_page_server()
 		auto const port = "3000";
 		auto const target = "/";
 		const int version = 11;
+		const char * name = "page";
+		
+		if (verbose) {
+			cerr << "Preparing to check " << name << " server at port " << port << ".\n";
+		}
+		
 		boost::system::error_code ec;
 	
 		// The io_context is required for all I/O
@@ -109,33 +162,44 @@ bool connect_to_page_server()
 	
 		// Make the connection on the IP address we get from a lookup
 		stream.connect(results, ec);		
-		if (ec)
+		if (ec) {
+			if (verbose) {
+				cerr << "Unable to connect to " << name << " server at port " << port << endl;
+			}
 			return true;
-	
+		}
+		
 		// Set up an HTTP GET request message
 		http::request<http::string_body> req{http::verb::get, target, version};
 		req.set(http::field::host, host);
 		req.set(http::field::user_agent, RUNFOREVER_MANAGER_VERSION_STRING);
 	
 		// Send the HTTP request to the remote host
-		http::write(stream, req);
+		http::write(stream, req, ec);
+		if (ec) {
+			if (verbose) {
+				cerr << "Unable to write header request to " << name << " server at port " << port << endl;
+			}
+			return true;
+		}
 	
 		// This buffer is used for reading and must be persisted
 		beast::flat_buffer buffer;
 	
 		// Declare a container to hold the response
 		http::response<http::dynamic_body> res;
-	
+		boost::beast::http::parser<true, beast::http::buffer_body> bp;
+		
 		// Receive the HTTP response
-		http::read(stream, buffer, res);
-				
+		http::read(stream, buffer, res, ec);
+		if (verbose) {
+			cerr << "Read from the " << name << " server on port " << port << ": "  << ec << endl;
+		}
+		
 		// Gracefully close the socket
-		stream.socket().shutdown(tcp::socket::shutdown_both, ec);
-
-		if (ec)
-			return true;
-		else
-			return false;
+		stream.socket().shutdown(tcp::socket::shutdown_both, ec);		
+				
+		return (!!ec);
 }
 
 // Performs an HTTP GET and prints the response
@@ -145,6 +209,7 @@ bool connect_to_promoter_server()
 		auto const port = "2998";
 		auto const target = "/getPromoted";
 		const int version = 11;
+		const char * name = "promotion";
 		boost::system::error_code ec;
 	
 		// The io_context is required for all I/O
@@ -154,30 +219,35 @@ bool connect_to_promoter_server()
 		tcp::resolver resolver(ioc);
 		beast::tcp_stream stream(ioc);
 	
+		if (verbose) {
+			cerr << "Preparing to check " << name << " server at port " << port << ".\n";
+		}
+		
 		// Look up the domain name
 		auto const results = resolver.resolve(host, port);
 	
 		// Make the connection on the IP address we get from a lookup
 		stream.connect(results, ec);		
-		if (ec)
+		if (ec) {
+			if (verbose) {
+				cerr << "Unable to connect to " << name << " server at port " << port << endl;
+			}
 			return true;
-	
+		}
+		
 		// Set up an HTTP GET request message
 		http::request<http::string_body> req{http::verb::get, target, version};
 		req.set(http::field::host, host);
 		req.set(http::field::user_agent, RUNFOREVER_MANAGER_VERSION_STRING);
 	
 		// Send the HTTP request to the remote host
-		http::write(stream, req);
-	
-		// This buffer is used for reading and must be persisted
-		beast::flat_buffer buffer;
-	
-		// Declare a container to hold the response
-		http::response<http::dynamic_body> res;
-	
-		// Receive the HTTP response
-		http::read(stream, buffer, res);
+		http::write(stream, req, ec);
+		if (ec) {
+			if (verbose) {
+				cerr << "Unable to write header request to " << name << " server at port " << port << endl;
+			}
+			return true;
+		}
 				
 		// Gracefully close the socket
 		stream.socket().shutdown(tcp::socket::shutdown_both, ec);
@@ -225,7 +295,7 @@ void forward_log(ipstream& ps, std::ostream& log, const boost::process::child* c
 	
 	std::string line;
 	char c;
-	while (both_running) {
+	while (all_running) {
 		if (verbose_threads)
 			cerr << "forwarding log" << endl;
 		
@@ -275,7 +345,7 @@ void set_to_exit(int signal) {
 
 void report_and_set_process_closed(int signal) {
 	report_and_continue(signal);
-	both_running = false;
+	all_running = false;
 }
 
 void init_signal_names() {
@@ -379,13 +449,14 @@ public:
 	}
 };
 
-void mind_server(child * child_ptr, const char * name,  bool (*connect)()) {
-	while (keep_looping && both_running) {
+void mind_server(child * child_ptr, const char * name, bool (*connect)()) {
+	while (keep_looping && all_running) {
 		if (verbose_threads)
 			cerr << "minding " << name << " server" << endl;
 		boost::this_thread::sleep_for(boost::chrono::seconds(5));
 		if ((*connect)()) {
 			mainserverlogline() << "Could not connect to " << name << " subserver" << std::endl;
+			fault = name;
 			break;
 		}
 		
@@ -397,11 +468,11 @@ void mind_server(child * child_ptr, const char * name,  bool (*connect)()) {
 		
 	}
 	
-	both_running = false;
+	all_running = false;
 }
 
 void mind_promoter_server(child ** child_ptr_ptr) {
-	while (keep_looping && both_running && child_ptr_ptr != nullptr) {
+	while (keep_looping && all_running && child_ptr_ptr != nullptr) {
 		if (verbose_threads)
 			cerr << "minding promoter server" << endl;
 		child& promoter = **child_ptr_ptr;
@@ -416,30 +487,49 @@ void mind_promoter_server(child ** child_ptr_ptr) {
 		boost::this_thread::sleep_for(boost::chrono::seconds(1));
 	}
 	
-	both_running = false;
+	all_running = false;
 }
 struct Service {
 	std::string service_name;
 	std::string interpreter;
-	std::string file_name;
+	std::string program;
+	std::string programLog;
 	child ** child_ptr_ptr;
 };
 
-Service privateAPI = {"privateAPI", "node", "private-api/build/private-api-server.js", nullptr};
+Service privateAPI = {"Private API", "node", "private-api/build/private-api-server.js", "private.log", nullptr};
 
 Service services[1] = { privateAPI };
 
 
 
-
-int main() {
+int main(int argc, char ** argv) {
+	
+	for (char ** argi = argv+1; argi < argv + argc; ++argi) {
+		if (strcmp(*argi, "--verbose-threads") == 0) {
+			verbose_threads = true;
+		} else if (strcmp(*argi, "--no-verbose-threads") == 0) {
+			verbose_threads = false;
+		} else if (strcmp(*argi, "--verbose") == 0) {
+			verbose = true;
+		} else if (strcmp(*argi, "--version") == 0) {
+			cerr << raw_version << endl;
+			return 0;
+		} else {
+			cerr << "Unknown option: \"" << *argi << '\"' << endl; 
+		}
+	}
+	
+	
+	
+	
 	bool current_directory_writable = access(".", W_OK) == 0;
 	// Check that this program can do everything it needs to do
 	{
 		bool all_checked_files_exist = true;
 		// Some checks
-		for (const char * file_name : {"server.pid", "subserver.pid", "server.log", "subserver.log"
-		                              }
+		for (const char * file_name : {"server.pid", "subserver.pid", "server.log", "subserver.log",
+		                              privateAPI.programLog.c_str() }
 		    ) {
 			bool file_name_exists = access(file_name, F_OK)==0;
 			all_checked_files_exist = all_checked_files_exist && file_name_exists;
@@ -479,8 +569,8 @@ int main() {
 			std::cerr << "Cannot find promoter.js to run." << std::endl;
 			keep_looping = false;
 		}
-		if (access(services[0].file_name.c_str(), R_OK)) {
-			std::cerr << "Cannot find " << services[0].file_name 
+		if (access(services[0].program.c_str(), R_OK)) {
+			std::cerr << "Cannot find " << services[0].program 
 				<< " to run." << std::endl;
 			keep_looping = false;
 		}
@@ -491,11 +581,11 @@ int main() {
 		exit(0);
 	}
 	
-	boost::thread keeping_time(keep_time);
 
 	mainserverlogline() << "Starting Manager" << std::endl;
 
 	init_signal_names();
+	boost::thread keeping_time(keep_time);
 
 	// Block certain signals for this process
 	signal(SIGBUS, set_to_exit);
@@ -522,6 +612,11 @@ int main() {
 		
 		if (!(keep_looping&=connect_to_private_api_server())) {
 			std::cerr << "Private API server already running.";
+			keep_looping = false;
+		}
+		
+		if (!(keep_looping&=connect_to_promoter_server())) {
+			std::cerr << "Promotion server already running.";
 			keep_looping = false;
 		}
 		
@@ -560,22 +655,21 @@ int main() {
 		pidfile search_pidfile("search.pid", search_server_ptr->id());
 		pidfile page_pidfile("page.pid", page_server_ptr->id());
 		pidfile promoter_pidfile("promoter.pid", promoter_server_ptr->id());
+		pidfile private_pidfile("private.pid", private_server_ptr->id());
 		
 		mainserverlogline() << "Running " << page_server_cmd << " [" << page_server_ptr->id() << "]" << std::endl;
 		mainserverlogline() << "Running " << search_server_cmd << " [" << search_server_ptr->id() << "]" << std::endl;
 		mainserverlogline() << "Running " << private_server_cmd << " [" << private_server_ptr->id() << "]" << std::endl;
+		mainserverlogline() << "Running " << promoter_server_cmd << " [" << promoter_server_ptr->id() << "]" << std::endl;
+		
 
 		child& page_server = *page_server_ptr;
 		child& search_server = *search_server_ptr;
-		child& promoter_server_cmd = *promoter_server_ptr;
 		
-		
-		both_running = true;
+		all_running = true;
 		
 		boost::this_thread::yield();
-		std::string line;
-
-		current_directory_writable = access(".", W_OK) == 0;
+		
 		subserverlog.open("subserver.log", std::fstream::app);
 		searchserverlog.open("search.log", std::fstream::app);
 		promoterlog.open("promoter.log", std::fstream::app);
@@ -586,15 +680,9 @@ int main() {
 		boost::thread log_page_forwarding([&](){forward_log(*page_server_pipe_stream, subserverlog, page_server_ptr);});
 		boost::thread log_search_forwarding(forward_search_log);
 		boost::thread log_promoter_forwarding(forward_promoter_log);
-		
-		
-		boost::this_thread::sleep_for(boost::chrono::seconds(10));
-		
-		
-		int col = 0;
 		boost::thread log_private_forwarding([&](){forward_log(*private_server_pipe_stream, privatelog, private_server_ptr);});	
-		
-		mainserverlogline() << "Waiting for servers to start..." << std::flush;
+			
+		mainserverlogline() << "Waiting for servers to start..." << std::flush;	
 		boost::this_thread::sleep_for(boost::chrono::seconds(10));
 		mainserverlog << "done." << std::endl;
 		
@@ -602,71 +690,64 @@ int main() {
 		boost::thread minding_page_server([&](){mind_server(page_server_ptr, "page", connect_to_page_server);});		
 		boost::thread minding_private_server([&](){mind_server(private_server_ptr, "private", connect_to_private_api_server);});
 		boost::thread minding_promoter_server([&](){mind_server(promoter_server_ptr, "promoter", connect_to_promoter_server);});
-		try {
-			
-			int col = 0;
-			try {
-				while (both_running) {
-					boost::this_thread::sleep_for(boost::chrono::seconds(5));
-				} // while
-			} catch (const boost::process::process_error& e) {
-				mainserverlogline() << "Process exception: " << e.what() << ".  Code:" << e.code() << std::endl;
-			}
+		try {		
+			while (all_running) {
+				boost::this_thread::sleep_for(boost::chrono::seconds(5));
+			} // while
+		} catch (const boost::process::process_error& e) {
+			mainserverlogline() << "Process exception: " << e.what() << ".  Code:" << e.code() << std::endl;
+
 		} catch (boost::wrapexcept<boost::system::system_error>& e) {
 			mainserverlogline() << "Exception caught (boost:system::system_error):" << e.what() << std::endl;
 		}
+		if (fault != nullptr) {
+			mainserverlogline() << "The " << fault << " process died.  Killing other subprocesses and starting again." << endl;			
+		}
+		
 		kill(page_server_ptr->id(), SIGKILL);					
 		page_server_ptr->wait();
-		mainserverlogline() << "Process page server  " << page_server_ptr->id() << " exited with status " << page_server_ptr->exit_code() << std::endl;
 		kill(search_server.id(), SIGKILL);
 		search_server.wait();
 		kill(promoter_server_ptr->id(), SIGKILL);
 		promoter_server_ptr->wait();
+		kill(private_server_ptr->id(), SIGKILL);
+		private_server_ptr->wait();
 		
 		log_page_forwarding.join();
 		log_search_forwarding.join();
 		log_promoter_forwarding.join();
+		log_private_forwarding.join();
 		
-		mainserverlogline() << "Process search server " << search_server.id() << " exited with status " << page_server.exit_code() << std::endl;
+		mainserverlogline() << "Process Page server  " << page_server_ptr->id() << " exited with status " << page_server_ptr->exit_code() << std::endl;
+		mainserverlogline() << "Process Search server " << search_server.id() << " exited with status " << page_server.exit_code() << std::endl;
 		mainserverlogline() << "Process Promoter server " << promoter_server_ptr->id() << " exited with status " << promoter_server_ptr->exit_code() << std::endl;
+		mainserverlogline() << "Process Private server " << private_server_ptr->id() << " exited with status " << private_server_ptr->exit_code() << std::endl;
 		
 		subserverlog.close();
 		searchserverlog.close();
 		promoterlog.close();
-		
-		page_server_pipe_stream->close();
-		search_server_pipe_stream->close();
-		promoter_server_pipe_stream->close();
-		
-		delete search_server_ptr;
-		delete page_server_ptr;
-		delete promoter_server_ptr;
-	
-		promoter_server_ptr = search_server_ptr = page_server_ptr = nullptr;
-		kill(private_server_ptr->id(), SIGKILL);
-		private_server_ptr->wait();
-		
-		
-		log_page_forwarding.join();
-		log_search_forwarding.join();
-		log_private_forwarding.join();
-		
-		mainserverlogline() << "Process search server " << search_server.id() << " exited with status " << page_server.exit_code() << std::endl;
-		mainserverlogline() << "Process private server " << private_server_ptr->id() << " exited with status " << private_server_ptr->exit_code() << std::endl;
-		
-		subserverlog.close();
-		searchserverlog.close();
 		privatelog.close();
 		
 		page_server_pipe_stream->close();
 		search_server_pipe_stream->close();
+		promoter_server_pipe_stream->close();
 		private_server_pipe_stream->close();
 		
 		delete search_server_ptr;
 		delete page_server_ptr;
+		delete promoter_server_ptr;
 		delete private_server_ptr;
 	
-		private_server_ptr = search_server_ptr = page_server_ptr = nullptr;
+		private_server_ptr = promoter_server_ptr 
+			= search_server_ptr = page_server_ptr = nullptr;
+			
+		delete page_server_pipe_stream;
+		delete search_server_pipe_stream;
+		delete promoter_server_pipe_stream;
+		delete private_server_pipe_stream;
+		
+		page_server_pipe_stream = search_server_pipe_stream
+			= promoter_server_pipe_stream = private_server_pipe_stream = nullptr;
 	}
 	unlink("manager.pid");
 	mainserverlogline() << "Exiting Master Server" << std::endl;

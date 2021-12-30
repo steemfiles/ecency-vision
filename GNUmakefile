@@ -1,17 +1,26 @@
 COMPILE_FLAGS=-std=c++17 -I /usr/local/src/boost_1_76_0
 LINK_FLAGS=-std=c++17 -L /usr/local/src/boost_1_76_0/stage/lib  -lboost_thread -lboost_system -lpthread -lboost_chrono
 
-debug: most runforever-dbg
+debug: runforever-dbg most
 
 production: most private-api/build/runforever
 
-most:  private-api/build/private-api-server.js private-api/build/relayserver.js  private-api/build/promoter.js build/server.js
+most:  private-api/build/private-api-server.js private-api/build/relayserver.js  private-api/build/promoter.js
+
+all: most private-api/build/runforever build/server.js runforever-dbg
 
 syntax:
 	g++ -fsyntax-only src/runforever.cpp $(COMPILE_FLAGS)
 
+raw_version.cpp: .git
+	sh extractver.sh
+	
 clean:
 	rm *.o runforever-dbg 
+
+	
+raw_version.o: raw_version.cpp
+	g++ raw_version.cpp -ggdb -c $(COMPILE_FLAGS) -o raw_version.o
 	
 runforever.o: src/runforever.cpp
 	g++ src/runforever.cpp -c $(COMPILE_FLAGS)
@@ -22,14 +31,14 @@ runforever-dbg.o: src/runforever.cpp
 listenlog-dbg.o: src/listenlog.cpp
 	g++ src/listenlog.cpp -ggdb -c -o listenlog-dbg.o  $(COMPILE_FLAGS)
 	
-private-api/build/runforever: runforever.o
-	g++ runforever.o -o private-api/build/runforever $(LINK_FLAGS) -static
+private-api/build/runforever: runforever.o raw_version.o
+	g++ runforever.o raw_version.o -o private-api/build/runforever $(LINK_FLAGS) -static
 
-private-api/build/runforever-dyn: runforever.o 
-	g++ runforever.o -o private-api/build/runforever-dyn $(LINK_FLAGS)
+private-api/build/runforever-dyn: runforever.o raw_version.o
+	g++ runforever.o raw_version.o -o private-api/build/runforever-dyn $(LINK_FLAGS)
 
-runforever-dbg: runforever-dbg.o
-	g++ -ggdb runforever-dbg.o -o runforever-dbg  $(LINK_FLAGS) -static
+runforever-dbg: runforever-dbg.o raw_version.o
+	g++ -ggdb runforever-dbg.o raw_version.o -o runforever-dbg  $(LINK_FLAGS) -static
 	
 listenlog-dbg: listenlog-dbg.o
 	g++ -ggdb listenlog-dbg.o -o listenlog-dbg  $(LINK_FLAGS) -static
