@@ -742,6 +742,7 @@ export class WalletHive extends BaseComponent<Props, State> {
             mode={transferMode!}
             asset={transferAsset!}
             onHide={this.closeTransferDialog}
+            hiveEngineTokensEnabled={hiveEngineTokens.map((z) => z.apiName)}
           />
         )}
 

@@ -25,6 +25,7 @@ import {
 import { LIQUID_TOKEN_UPPERCASE, HIVE_ENGINE_TOKENS } from "../client_config";
 import { TokenPropertiesMap } from "../common/store/hive-engine-tokens/types";
 import { langOptions } from "../common/i18n";
+import { tokenAliases } from "../common/api/hive-engine";
 const thirty_seconds = 30000;
 const one_minute = 60000;
 const five_minutes = 5 * one_minute;
@@ -130,6 +131,7 @@ const fetch_hive_engine_token_information =
             info: tokensInfos[token],
             config,
             hivePrice: prices[token],
+            aliases: tokenAliases[token],
           };
         }
         storedHiveEngineTokensProperties = {

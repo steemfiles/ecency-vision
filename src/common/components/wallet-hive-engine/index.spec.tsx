@@ -75,10 +75,18 @@ const defProps = {
   updateActiveUser: () => {},
   setSigningKey: () => {},
   fetchTransactions: () => {},
+  // !ts-ignore
   aPICoinName: "POB",
   coinName: "Proof of Brain",
   stakedCoinName: "Brain Power",
-  hiveEngineTokens: [],
+  hiveEngineTokens: [
+    {
+      apiName: "POB",
+      liquidHumanName: "Proof of Brain",
+      stakedHumanName: "Brain Power",
+      precision: 8,
+    },
+  ],
 };
 
 it("(1) Default Render", () => {

@@ -95,6 +95,7 @@ export class Purchase extends BaseComponent<Props, State> {
           asset={asset}
           mode="transfer"
           amount={`${amount}.000`}
+          hiveEngineTokensEnabled={[]}
           to="esteem.app"
           memo="estm-purchase"
         />

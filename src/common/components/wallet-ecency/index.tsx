@@ -499,6 +499,7 @@ export class WalletEcency extends BaseComponent<Props, State> {
               asset="POINT"
               activeUser={this.props.activeUser!}
               onHide={this.toggleTransfer}
+              hiveEngineTokensEnabled={[]}
             />
           )}
 

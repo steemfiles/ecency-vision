@@ -16,7 +16,7 @@ raw_version.cpp: .git
 	sh extractver.sh
 	
 clean:
-	rm *.o runforever-dbg 
+	rm *.o runforever-dbg
 
 	
 raw_version.o: raw_version.cpp

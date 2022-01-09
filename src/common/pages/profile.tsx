@@ -24,7 +24,7 @@ import WalletHive from "../components/wallet-hive";
 import WalletEcency from "../components/wallet-ecency";
 import WalletHiveEngine from "../components/wallet-hive-engine";
 import ScrollToTop from "../components/scroll-to-top";
-import { getAccountHEFull } from "../api/hive-engine";
+import { getAccountHEFull, tokenAliases } from "../api/hive-engine";
 import {
   HIVE_ENGINE_TOKENS,
   LIQUID_TOKEN_UPPERCASE,
@@ -275,7 +275,7 @@ class ProfilePage extends BaseComponent<Props, State> {
     })();
     const coinAPIName = coinInfo.apiName;
     const coinName = coinInfo.liquidHumanName;
-    const stakedCoinName = coinInfo.stakedHumanName;
+    const stakedCoinName = tokenAliases[coinAPIName].stakedShort;
     const aPICoinName = coinAPIName;
 
     return (
@@ -316,8 +316,6 @@ class ProfilePage extends BaseComponent<Props, State> {
               if (!coinInfo) {
                 return null;
               }
-              const coinName = coinInfo.liquidHumanName;
-              const stakedCoinName = coinInfo.stakedHumanName;
 
               if (section === "wallet" && coinAPIName != "HIVE") {
                 return (

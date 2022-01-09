@@ -63,7 +63,7 @@ export class TippingDialog extends Component<DialogProps> {
         {...this.props}
         activeUser={activeUser}
         transactions={transactions}
-        hiveEngineTokens={hiveEngineTokens}
+        hiveEngineTokensEnabled={hiveEngineTokens.map((t) => t.apiName)}
         asset={global.usePrivate ? "POINT" : HIVE_API_NAME}
         mode="transfer"
         amount={global.usePrivate ? "100.000" : "1.000"}

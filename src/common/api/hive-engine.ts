@@ -28,6 +28,20 @@ import {
   EntryVote,
 } from "../store/entries/types";
 const hiveSsc = new SSC("https://api.hive-engine.com/rpc");
+
+export type HELiquidAsset = "POB" | "VYB" | "WEED" | "TEST";
+export type HEStakedAsset = "VP" | "BP" | "WP" | "TP";
+export type LiquidAsset =
+  | "HIVE"
+  | "HBD"
+  | "TEST"
+  | "HBD"
+  | "TBD"
+  | "POINT"
+  | HELiquidAsset;
+export type StakedAsset = "HP" | "TP" | HEStakedAsset;
+type AssetType = LiquidAsset | StakedAsset;
+
 export interface TokenStatus {
   downvote_weight_multiplier: number;
   downvoting_power: number;
@@ -1449,3 +1463,104 @@ export const historicalPOBConfig: HiveEngineTokenConfig = {
   vote_regeneration_seconds: 432000,
   vote_window_days: 7,
 };
+
+const moreLocks = (input: {
+  [apiName: string]: {
+    liquidLong: string;
+    stakedLong: string;
+    stakedShort: StakedAsset | "";
+    liquidShort: LiquidAsset;
+  };
+}): {
+  [apiName: string]: {
+    liquidLong: string;
+    stakedLong: string;
+    stakedShort: StakedAsset | "";
+    liquidShort: LiquidAsset;
+  };
+} => {
+  for (const key in input) {
+    if (input[key].stakedShort != "")
+      input[input[key].stakedShort] = input[key];
+  }
+  return input;
+};
+
+export const tokenAliases: {
+  [apiName: string]: {
+    liquidLong: string;
+    stakedLong: string;
+    stakedShort: StakedAsset | "";
+    liquidShort: LiquidAsset;
+  };
+} = moreLocks({
+  POINT: {
+    liquidLong: "POINT",
+    liquidShort: "POINT",
+    stakedShort: "",
+    stakedLong: "",
+  },
+
+  POB: {
+    liquidLong: "Proof of Brain",
+    stakedLong: "Brain Power",
+    stakedShort: "BP",
+    liquidShort: "POB",
+  },
+
+  VYB: {
+    liquidLong: "Verify Your Brain",
+    stakedLong: "Verification Power",
+    stakedShort: "VP",
+    liquidShort: "VYB",
+  },
+
+  HBD: {
+    liquidLong: "Hive Dollars",
+    stakedLong: "",
+    stakedShort: "",
+    liquidShort: "HBD",
+  },
+
+  TEST: {
+    liquidLong: "Test",
+    stakedLong: "Test Power",
+    stakedShort: "TP",
+    liquidShort: "TEST",
+  },
+
+  TP: {
+    liquidLong: "Test",
+    stakedLong: "Test Power",
+    stakedShort: "TP",
+    liquidShort: "TEST",
+  },
+
+  HIVE: {
+    liquidLong: "Hive",
+    stakedLong: "Hive Power",
+    stakedShort: "HP",
+    liquidShort: "HIVE",
+  },
+
+  HP: {
+    liquidLong: "Hive",
+    stakedLong: "Hive Power",
+    stakedShort: "HP",
+    liquidShort: "HIVE",
+  },
+
+  WEED: {
+    liquidLong: "Weed Cash",
+    stakedLong: "Weed Power",
+    liquidShort: "WEED",
+    stakedShort: "WP",
+  },
+
+  WP: {
+    liquidLong: "Weed Cash",
+    stakedLong: "Weed Power",
+    liquidShort: "WEED",
+    stakedShort: "WP",
+  },
+});

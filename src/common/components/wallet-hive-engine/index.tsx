@@ -38,6 +38,13 @@ import {
   TokenStatus,
   getFineTransactions,
   getCoarseTransactions,
+  tokenAliases,
+  LiquidAsset,
+  StakedAsset,
+  getScotDataAsync,
+  TokenBalance,
+  isNonZeroBalance,
+  UnStake,
 } from "../../api/hive-engine";
 import HiveEngineWallet from "../../helper/hive-engine-wallet";
 import { getAccount, getConversionRequests } from "../../api/hive";
@@ -51,12 +58,7 @@ import parseAsset from "../../helper/parse-asset";
 import { _t } from "../../i18n";
 import { plusCircle } from "../../img/svg";
 import { resolveAny } from "dns";
-import {
-  getScotDataAsync,
-  TokenBalance,
-  isNonZeroBalance,
-  UnStake,
-} from "../../api/hive-engine";
+
 import HiveWallet from "../../helper/hive-wallet";
 import { HiveEngineStaticInfo } from "../../store/hive-engine-tokens/types";
 
@@ -393,7 +395,6 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
       stakedCoinName,
       hiveEngineTokens,
     } = this.props;
-    console.log({ hiveEngineTokens });
     const {
       claiming,
       claimed,
@@ -440,7 +441,6 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
       converting,
       aPICoinName
     );
-    console.log({ w });
     const balances = w.engineBalanceTable[this.props.aPICoinName] || {
       _id: 0,
       account: account.name,
@@ -453,7 +453,6 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
       pendingUndelegations: 0,
     };
     const { token_unstakes } = account as FullHiveEngineAccount;
-    console.log({ balances, transferAsset, transferMode, precision });
     if (token_unstakes) {
       let powerDownId;
       const token_unstake: undefined | UnStake =
@@ -534,7 +533,6 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                               {
                                 label: _t("wallet.transfer"),
                                 onClick: () => {
-                                  console.log(this.props.aPICoinName);
                                   this.openTransferDialog(
                                     "transfer",
                                     this.props.aPICoinName
@@ -595,7 +593,8 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                       <span>
                         {is_FullHiveEngineAccount(account)
                           ? formattedNumber(balances.balance, {
-                              fractionDigits: precision,
+                              maximumFractionDigits: precision,
+                              fractionDigits: 0,
                               suffix: this.props.aPICoinName,
                             })
                           : _t("wallet.loading")}
@@ -630,7 +629,8 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                 onClick: () => {
                                   this.openTransferDialog(
                                     "delegate",
-                                    this.props.aPICoinName
+                                    tokenAliases[this.props.aPICoinName]
+                                      .stakedShort
                                   );
                                 },
                               },
@@ -639,7 +639,8 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                                 onClick: () => {
                                   this.openTransferDialog(
                                     "power-down",
-                                    this.props.aPICoinName
+                                    tokenAliases[this.props.aPICoinName]
+                                      .stakedShort
                                   );
                                 },
                               },
@@ -662,7 +663,8 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
                       {is_FullHiveEngineAccount(account)
                         ? formattedNumber(balances.stake, {
                             suffix: this.props.aPICoinName,
-                            fractionDigits: precision,
+                            fractionDigits: 0,
+                            maximumFractionDigits: precision,
                           })
                         : _t("wallet.loading")}
                     </div>
@@ -816,6 +818,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
               LIQUID_TOKEN_balances={balances}
               LIQUID_TOKEN_precision={precision}
               onHide={this.closeTransferDialog}
+              hiveEngineTokensEnabled={hiveEngineTokens.map((z) => z.apiName)}
             />
           )}
           {this.state.delegatedList && (

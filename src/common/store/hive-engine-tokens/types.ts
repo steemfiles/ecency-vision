@@ -7,6 +7,12 @@ export interface TokenInfoConfigPriceTriple {
   config?: HiveEngineTokenConfig;
   info?: HiveEngineTokenInfo;
   hivePrice?: number;
+  aliases?: {
+    liquidLong: string;
+    stakedLong: string;
+    liquidShort: string;
+    stakedShort: string;
+  };
 }
 
 export interface TokenPropertiesMap {
