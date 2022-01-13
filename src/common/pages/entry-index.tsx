@@ -20,7 +20,6 @@ import DetectBottom from "../components/detect-bottom";
 import EntryListContent from "../components/entry-list";
 import TrendingTagsCard from "../components/trending-tags-card";
 import ScrollToTop from "../components/scroll-to-top";
-import MarketData from "../components/market-data";
 import DownloadTrigger from "../components/download-trigger";
 import LandingPage from "../components/landing-page";
 
@@ -209,24 +208,11 @@ class EntryIndexPage extends Component<PageProps, State> {
                 </div>
               </div>
               {loading && entryList.length > 0 ? <LinearProgress /> : ""}
-            </div>
+            </div /* entry-index-page*/>
             <div className="side-menu">
               {!global.isMobile && (
                 <>
-                  {1 !== this.state.step && <MarketData />}
-
                   <div className="menu-nav">
-                    <DownloadTrigger>
-                      <div className="downloads">
-                        <span className="label">{_t("g.downloads")}</span>
-                        <span className="icons">
-                          <span className="img-apple">{appleSvg}</span>
-                          <span className="img-google">{googleSvg}</span>
-                          <span className="img-desktop">{desktopSvg}</span>
-                        </span>
-                      </div>
-                    </DownloadTrigger>
-
                     <div className="text-menu">
                       <Link className="menu-item" to="/faq">
                         {_t("entry-index.faq")}
@@ -241,7 +227,7 @@ class EntryIndexPage extends Component<PageProps, State> {
                   </div>
                 </>
               )}
-            </div>
+            </div /* side-menu */>
           </div>
         )}
         <DetectBottom onBottom={this.bottomReached} />

@@ -1,7 +1,7 @@
-import React from "react";
+import React, { Fragment } from "react";
 
 import { History } from "history";
-
+import { Market } from "../market-data";
 import moment from "moment";
 
 import { Global } from "../../store/global/types";
@@ -50,6 +50,8 @@ import {
   isNonZeroBalance,
   is_FullHiveEngineAccount,
 } from "../../api/hive-engine";
+import * as ls from "../../util/local-storage";
+
 interface Props {
   history: History;
   global: Global;
@@ -76,7 +78,16 @@ interface State {
   transferAsset: null | TransferAsset;
   converting: number;
   collaterializedConverting: number;
+  epochIndex: number;
+  epoch: number;
 }
+
+const epochs: Array<[number, "years" | "months" | "weeks" | "days"]> = [
+  [2, "years"],
+  [6, "months"],
+  [6, "weeks"],
+  [10, "days"],
+];
 
 export class WalletHive extends BaseComponent<Props, State> {
   state: State = {
@@ -90,6 +101,8 @@ export class WalletHive extends BaseComponent<Props, State> {
     transferAsset: null,
     converting: 0,
     collaterializedConverting: 0,
+    epochIndex: 0,
+    epoch: 0,
   };
 
   componentDidMount() {
@@ -99,6 +112,24 @@ export class WalletHive extends BaseComponent<Props, State> {
   fetchConvertingAmount = () => {
     const { account } = this.props;
 
+    console.log({ epochIndex: ls.get("chart-epoch-index") });
+    let epochIndex: number = parseInt(ls.get("chart-epoch-index")) || 0;
+    if (isNaN(epochIndex) || epochIndex < 0 || epochIndex >= epochs.length) {
+      epochIndex = 0;
+    }
+
+    const fromTs = (() => {
+      const e = epochs[epochIndex];
+      try {
+        console.log(e);
+        return moment().subtract(e[0], e[1]).format("X");
+      } catch (e) {
+        console.log(e);
+      }
+      return "0";
+    })();
+
+    const epoch: number = parseInt(fromTs) || 0;
     getConversionRequests(account.name).then((r) => {
       if (r.length === 0) {
         return;
@@ -125,6 +156,8 @@ export class WalletHive extends BaseComponent<Props, State> {
     } catch (e) {
       console.log("This fails as 'not a function' error.  Is node broken?");
     }
+
+    this.setState({ epoch, epochIndex });
   };
 
   toggleDelegatedList = () => {
@@ -187,6 +220,18 @@ export class WalletHive extends BaseComponent<Props, State> {
     this.stateSet({ transfer: false, transferMode: null, transferAsset: null });
   };
 
+  advanceEpoch = () => {
+    const { epochIndex } = this.state;
+    const newEpochIndex = (epochIndex + 1) % epochs.length;
+    const epoch = parseInt(
+      moment()
+        .subtract(epochs[newEpochIndex][0], epochs[newEpochIndex][1])
+        .format("X")
+    );
+    ls.set("chart-epoch-index", `${newEpochIndex}`);
+    this.stateSet({ epochIndex: newEpochIndex, epoch });
+  };
+
   render() {
     const { global, dynamicProps, account, activeUser, hiveEngineTokens } =
       this.props;
@@ -198,7 +243,17 @@ export class WalletHive extends BaseComponent<Props, State> {
       transferMode,
       converting,
       collaterializedConverting,
+      epoch,
+      epochIndex,
     } = this.state;
+
+    const fromTs = `${epoch}`;
+    if (!epochs[epochIndex]) {
+      console.log({ epochs, epochIndex });
+      return null;
+    }
+
+    const epochName = `${epochs[epochIndex][0]} ${epochs[epochIndex][1]}`;
 
     if (!account.__loaded) {
       return null;
@@ -227,6 +282,7 @@ export class WalletHive extends BaseComponent<Props, State> {
         return [];
       }
     })();
+    const toNow = moment().format("X");
 
     return (
       <div className="wallet-hive">
@@ -727,12 +783,36 @@ export class WalletHive extends BaseComponent<Props, State> {
 
             {TransactionList({ ...this.props })}
           </div>
-          <WalletMenu
-            global={global}
-            username={account.name}
-            active="hive"
-            hiveEngineTokens={hiveEngineTokensNZ}
-          />
+          <div>
+            <WalletMenu
+              global={global}
+              username={account.name}
+              active="hive"
+              hiveEngineTokens={hiveEngineTokensNZ}
+            />
+            <div onClick={this.advanceEpoch}>
+              <Market
+                key={fromTs}
+                label={"HBD/USD last " + epochName}
+                coin="hive_dollar"
+                vsCurrency="usd"
+                fromTs={fromTs}
+                toTs={toNow}
+                formatter="0.000$"
+              />
+            </div>
+            <div onClick={this.advanceEpoch}>
+              <Market
+                key={fromTs}
+                label={"Hive/USD last " + epochName}
+                coin="hive"
+                vsCurrency="usd"
+                fromTs={fromTs}
+                toTs={toNow}
+                formatter="0.000$"
+              />
+            </div>
+          </div>
         </div>
 
         {transfer && (
