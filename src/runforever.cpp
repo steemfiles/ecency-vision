@@ -22,7 +22,7 @@
 #include <string>
 #include <sys/time.h>
 #include <unistd.h>
-
+#include <utility>
 extern const char *raw_version;
 
 const char *page_server_cmd = "node build/server.js";
@@ -54,15 +54,15 @@ bool verbose = false;
 char const *fault = nullptr;
 
 std::string get_version() {
-	std::string out(raw_version);
-	size_t first_nl = out.find('\n');
-	size_t second_nl = out.find('\n', first_nl + 1);
-	size_t third_nl = out.find('\n', second_nl + 1);
-	if (third_nl == string::npos) {
-		return out;
-	} else {
-		return out.substr(0, third_nl);
-	}
+  std::string out(raw_version);
+  size_t first_nl = out.find('\n');
+  size_t second_nl = out.find('\n', first_nl + 1);
+  size_t third_nl = out.find('\n', second_nl + 1);
+  if (third_nl == string::npos) {
+    return out;
+  } else {
+    return out.substr(0, third_nl);
+  }
 }
 
 // Makes an HTTP connection.  Returns true should it fail.
@@ -435,6 +435,65 @@ void init_signal_names() {
   signal_names[SIGKILL] = "SIGKILL";
 }
 
+const struct sigaction sigLogAction = {report_and_continue, (long int)0,
+                                       0xffffffff, SA_RESTART, (long int)0};
+
+const struct sigaction
+    sigRestartChildrenAction = {report_and_set_process_closed, 0, 0xffffffff,
+                                SA_RESTART, 0},
+
+    sigExitAllAction = {set_to_exit, 0, 0xffffffff, SA_RESTART, 0};
+
+void set_handlers() {
+  // Block certain signals for this process
+  struct sigaction old;
+  sigaction(SIGBUS, &sigLogAction, &old);
+  sigaction(SIGCHLD, &sigLogAction, &old);
+  sigaction(SIGCLD, &sigLogAction, &old);
+  sigaction(SIGCONT, &sigLogAction, &old);
+  // signal_names[SIGEMT
+  sigaction(SIGFPE, &sigLogAction, &old);
+  sigaction(SIGHUP, &sigLogAction, &old);
+  sigaction(SIGILL, &sigLogAction, &old);
+  // signal_names[SIGINF
+  sigaction(SIGINT, &sigExitAllAction, &old);
+  sigaction(SIGIO, &sigLogAction, &old);
+  sigaction(SIGIOT, &sigLogAction, &old);
+  // signal_names[SIGLOS
+  sigaction(SIGPIPE, &sigLogAction, &old);
+  sigaction(SIGPOLL, &sigLogAction, &old);
+  sigaction(SIGPROF, &sigLogAction, &old);
+  sigaction(SIGPWR, &sigExitAllAction, &old);
+  sigaction(SIGQUIT, &sigExitAllAction, &old);
+  sigaction(SIGSEGV, &sigExitAllAction, &old);
+  sigaction(SIGSTKFLT, &sigLogAction, &old);
+  sigaction(SIGSTOP, &sigLogAction, &old);
+  sigaction(SIGTSTP, &sigLogAction, &old);
+  sigaction(SIGSYS, &sigLogAction, &old);
+  sigaction(SIGTERM, &sigLogAction, &old);
+  // sigaction(SIGTRAP, &sigLogAction, &old);
+  sigaction(SIGTTIN, &sigLogAction, &old);
+  sigaction(SIGTTOU, &sigLogAction, &old);
+  // signal_names[SIGUNU
+  sigaction(SIGURG, &sigLogAction, &old);
+  sigaction(SIGUSR1, &sigLogAction, &old);
+  sigaction(SIGUSR2, &sigLogAction, &old);
+  sigaction(SIGVTALRM, &sigLogAction, &old);
+  sigaction(SIGXCPU, &sigLogAction, &old);
+  sigaction(SIGXFSZ, &sigLogAction, &old);
+  sigaction(SIGWINCH, &sigLogAction, &old);
+
+  sigaction(SIGABRT, &sigLogAction, &old);
+  // sigaction(SIGALRM, &sigLogAction, &old);
+  sigaction(SIGKILL, &sigLogAction, &old);
+
+  sigaction(SIGBUS, &sigExitAllAction, &old);
+  sigaction(SIGHUP, &sigLogAction, &old);
+  sigaction(SIGINT, &sigExitAllAction, &old);
+  sigaction(SIGTERM, &sigExitAllAction, &old);
+  sigaction(SIGABRT, &sigRestartChildrenAction, &old);
+}
+
 void keep_time() {
   time_t t;
   struct tm *tmp;
@@ -570,24 +629,61 @@ int main(int argc, char **argv) {
   bool current_directory_writable = access(".", W_OK) == 0;
   // Check that this program can do everything it needs to do
   {
+    bool hung_processes = false;
     bool all_checked_files_exist = true;
+    int pid_file_count = 0;
     // Some checks
-    for (const char *file_name :
-         {"server.pid", "subserver.pid", "server.log", "subserver.log",
-          privateAPI.programLog.c_str()}) {
-      bool file_name_exists = access(file_name, F_OK) == 0;
-      all_checked_files_exist = all_checked_files_exist && file_name_exists;
-      if (file_name_exists && access(file_name, W_OK)) {
-        std::cerr << file_name << " exists but is not writable" << std::endl;
-        keep_looping = false;
+    vector<pair<pid_t, const char *>> processes;
+    for (const char *file_name : {"manager.pid", "page.pid", "private.pid",
+                                  "promoter.pid", "search.pid"}) {
+      if (access(file_name, F_OK) == 0)
+        ++pid_file_count;
+      else
+        continue;
+      ifstream pidf(file_name);
+      pid_t pid_number;
+      pidf >> pid_number;
+      if (kill(pid_number, 0) == -1 && errno == ESRCH) {
+        // process does not exist!
+        hung_processes = true;
+        unlink(file_name);
+      } else {
+        processes.emplace_back(pid_number, file_name);
       }
-    } // for
+    }
 
-    if (!all_checked_files_exist) {
-      if (!current_directory_writable) {
-        std::cerr << "Current directory not writable" << std::endl;
-        keep_looping = false;
+    if (pid_file_count == 0) {
+      // no pid files... this is a clean start...
+
+    } else if (hung_processes) {
+      std::cerr << "Some processes hung.  Cleaning up" << std::endl;
+      bool processes_running = false;
+      for (const pair p : processes) {
+        if (kill(p.first, SIGTERM) == -1 && errno == ESRCH) {
+          unlink(p.second);
+        } else {
+          processes_running = true;
+        }
       }
+
+      if (processes_running) {
+        // okay give them time to terminate
+        boost::this_thread::sleep_for(boost::chrono::seconds(2));
+        // now kill them...
+        for (const pair p : processes) {
+          kill(p.first, SIGKILL);
+          unlink(p.second);
+        }
+      }
+    } else {
+      std::cerr << "Process and children already running";
+      std::cerr << "Exiting" << std::endl;
+      keep_looping = false;
+    }
+
+    if (!current_directory_writable) {
+      std::cerr << "Current directory not writable" << std::endl;
+      keep_looping = false;
     }
 
     if (access("build/server.js", R_OK)) {
@@ -628,45 +724,10 @@ int main(int argc, char **argv) {
 
   init_signal_names();
   boost::thread keeping_time(keep_time);
-
-  // Block certain signals for this process
-  signal(SIGBUS, set_to_exit);
-  signal(SIGHUP, report_and_continue);
-  signal(SIGINT, set_to_exit);
-  signal(SIGTERM, set_to_exit);
-  signal(SIGABRT, report_and_set_process_closed);
+  set_handlers();
   pidfile masterserver("manager.pid", getpid());
 
   for (; keep_looping;) {
-
-    std::cerr << "Checking for errant servers running.  ";
-
-    if (!(keep_looping = connect_to_search_server())) {
-      std::cerr << "Search server already running.  ";
-      keep_looping = false;
-    }
-
-    if (!(keep_looping &= connect_to_page_server())) {
-      std::cerr << "Page server already running.  ";
-      keep_looping = false;
-    }
-
-    if (!(keep_looping &= connect_to_private_api_server())) {
-      std::cerr << "Private API server already running.";
-      keep_looping = false;
-    }
-
-    if (!(keep_looping &= connect_to_promoter_server())) {
-      std::cerr << "Promotion server already running.";
-      keep_looping = false;
-    }
-
-    if (!keep_looping) {
-      std::cerr << std::endl;
-      exit(1);
-    }
-
-    std::cerr << "Check Succeeded" << std::endl;
     if (promoter_server_pipe_stream) {
       delete promoter_server_pipe_stream;
     }
