@@ -475,7 +475,7 @@ export interface HiveEngineTokenInfo {
   voting_enabled: boolean;
 }
 export interface HiveEngineTokenConfig {
-  allowlist_account: null;
+  allowlist_account: string | null;
   author_curve_exponent: number;
   author_reward_percentage: number;
   badge_fee: number;
@@ -487,10 +487,10 @@ export interface HiveEngineTokenConfig {
   downvote_power_consumption: number;
   downvote_regeneration_seconds: number;
   downvote_window_days: number;
-  enable_account_allowlist: null;
+  enable_account_allowlist: null | boolean;
   enable_account_muting: boolean;
   enable_comment_beneficiaries: boolean;
-  exclude_apps: null;
+  exclude_apps: null | string;
   exclude_apps_from_token_beneficiary: null | string;
   exclude_beneficiaries_accounts: null | string;
   exclude_tags: null | string;
@@ -502,7 +502,7 @@ export interface HiveEngineTokenConfig {
   hive_enabled: null | boolean;
   hive_engine_enabled: boolean;
   issue_token: boolean;
-  json_metadata_app_value: null;
+  json_metadata_app_value: string | null;
   json_metadata_key: string;
   json_metadata_value: string;
   max_auto_claim_amount: number;
