@@ -12,15 +12,15 @@ all: most private-api/build/runforever build/server.js runforever-dbg
 syntax:
 	g++ -fsyntax-only src/runforever.cpp $(COMPILE_FLAGS)
 
-raw_version.cpp: .git
+src/common/constants/gitversion.cpp src/common/constants/gitversion.ts: .git extractver.sh
 	sh extractver.sh
 	
 clean:
 	rm *.o runforever-dbg
 
 	
-raw_version.o: raw_version.cpp
-	g++ raw_version.cpp -ggdb -c $(COMPILE_FLAGS) -o raw_version.o
+raw_version.o: src/common/constants/gitversion.cpp
+	g++ src/common/constants/gitversion.cpp -ggdb -c $(COMPILE_FLAGS) -o raw_version.o
 	
 runforever.o: src/runforever.cpp
 	g++ src/runforever.cpp -c $(COMPILE_FLAGS)
@@ -43,26 +43,26 @@ runforever-dbg: runforever-dbg.o raw_version.o
 listenlog-dbg: listenlog-dbg.o
 	g++ -ggdb listenlog-dbg.o -o listenlog-dbg  $(LINK_FLAGS) -static
 
-private-api/build/relayserver.js: src/server/relayserver.ts
+private-api/build/relayserver.js: src/server/relayserver.ts src/common/constants/gitversion.ts
 	tsc --OutDir private-api/build src/server/relayserver.ts
 	
-private-api/build/promoter.js: src/server/promoter.ts
+private-api/build/promoter.js: src/server/promoter.ts  src/common/constants/gitversion.ts
 	rm -f .servers-build/promoter.js private-api/build/promoter.js
 	tsc --OutDir  private-api/build  --resolveJsonModule  --esModuleInterop src/server/promoter.ts
 	./node_modules/.bin/prettier --ignore-unknown --write src/server/promoter.ts
 	touch private-api/build/promote.js
 
-private-api/build/private-api-server.js: private-api/src/private-api-server.ts private-api/src/notifications.ts
+private-api/build/private-api-server.js: private-api/src/private-api-server.ts private-api/src/notifications.ts  src/common/constants/gitversion.ts
 	tsc --OutDir private-api/build  --resolveJsonModule --esModuleInterop private-api/src/private-api-server.ts 
 	./node_modules/.bin/prettier --ignore-unknown --write private-api/src/private-api-server.ts 
 	touch private-api/build/private-api-server.js
 
 
-private-api/build/process.js: private-api/src/process.ts private-api/src/notifications.ts
+private-api/build/process.js: private-api/src/process.ts private-api/src/notifications.ts  src/common/constants/gitversion.ts
 	rm -f private-api/build/process.js
 	-tsc --OutDir private-api/build --lib es2021 --resolveJsonModule --esModuleInterop private-api/src/process.ts | dd bs=1 skip=1122 status=none 2>&1
 	
-private-api/build/pull-history-data.js: private-api/src/pull-history-data.ts private-api/src/notifications.ts
+private-api/build/pull-history-data.js: private-api/src/pull-history-data.ts private-api/src/notifications.ts  src/common/constants/gitversion.ts
 	rm -f private-api/build/pull-history-data.js
 	tsc --OutDir private-api/build --lib es2021 --resolveJsonModule --esModuleInterop private-api/src/pull-history-data.ts
 

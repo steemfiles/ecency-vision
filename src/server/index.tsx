@@ -15,6 +15,7 @@ import fallbackHandler, {
 } from "./handlers/fallback";
 import { entryRssHandler, authorRssHandler } from "./handlers/rss";
 import * as authApi from "./handlers/auth-api";
+import version from "./handlers/version";
 import config from "../config";
 
 const server = express();
@@ -115,6 +116,8 @@ server
 
   // Health check script for docker swarm
   .get("^/healthcheck.json$", healthCheck)
+
+  .get("^/version", version)
 
   // For all others paths
   .get("*", fallbackHandler);

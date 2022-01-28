@@ -1,4 +1,3 @@
 #!/bin/sh
-git log | head -3 | sed 's|$|\\\\n\"\\n|g' | sed 's|^|\"|' >  /tmp/x.txt
-echo 'const char * raw_version = '`cat /tmp/x.txt`';' |  clang-format-12  > raw_version.cpp  
-rm /tmp/x.txt
+git log | head -3 | tee .ver | sed 's|^|\"|' | sed 's|$|\\n"|g' | sed '3s|$|;|' | sed '1s|^|const char * raw_version = |' | clang-format-12 > src/common/constants/gitversion.cpp
+git log | head -3 | sed 's|^|\"|' | sed '1,2s|$|\\n"+|g' | sed '3s|$|\\n";|' | sed '1s|^|export const raw_version : string = |'   | node node_modules/.bin/prettier --parser typescript > src/common/constants/gitversion.ts

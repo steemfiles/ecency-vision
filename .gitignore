@@ -27,3 +27,4 @@ src/common/constants/site.json
 runforever-dbg
 To_Do.txt
 *.js
+gitversion.*
