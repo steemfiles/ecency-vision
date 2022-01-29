@@ -48,6 +48,8 @@ export const WHITEPAPER_URL = "https://hive.io/hive-whitepaper.pdf";
 //           Base layer non liquid value
 export const VEST_TICKER = "VESTS";
 
+export const AAdsId: string | null = null;
+
 //           Hive-Engine Layer token (for API use)
 export const HIVE_ENGINE_TOKENS = [
   {

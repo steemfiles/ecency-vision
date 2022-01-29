@@ -20,7 +20,7 @@ import AuthContainer from "./pages/auth";
 import SubmitContainer from "./pages/submit";
 import SignUpContainer from "./pages/sign-up";
 import NotFound from "./components/404";
-
+import AAds from "./components/a-ads";
 import {
   AboutPageContainer,
   GuestPostPageContainer,
@@ -37,6 +37,7 @@ import routes from "./routes";
 const App = () => {
   return (
     <>
+      <AAds />
       <Switch>
         <Route
           exact={true}
