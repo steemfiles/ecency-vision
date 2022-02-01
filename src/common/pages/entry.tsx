@@ -391,12 +391,7 @@ class EntryPage extends BaseComponent<Props, State> {
       (activeUser && activeUser.username === entry.author) || false;
     const tokenScotPost: ScotPost | null =
       (entry?.he && entry?.he[LIQUID_TOKEN_UPPERCASE]) || null;
-    const isHidden: boolean =
-      (tokenScotPost &&
-        tokenScotPost.pending_token === 0 &&
-        tokenScotPost.total_payout_value === 0 &&
-        tokenScotPost.active_votes.length > 0) ||
-      false;
+    const isHidden: boolean = false;
     // There is no list of muted user in neither the info or the config of the token...
     const isMuted: boolean =
       (entry?.he &&
