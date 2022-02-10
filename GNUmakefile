@@ -7,6 +7,12 @@ production: most private-api/build/runforever
 
 most:  private-api/build/private-api-server.js private-api/build/relayserver.js  private-api/build/promoter.js
 
+debugrun: private-api/build/private-api-server.js private-api/build/relayserver.js  private-api/build/promoter.js runforever-dbg
+	node private-api/build/private-api-server.js &
+	node private-api/build/relayserver.js &
+	node private-api/build/promoter.js &
+	yarn start
+
 all: most private-api/build/runforever build/server.js runforever-dbg
 
 syntax:
