@@ -24,6 +24,7 @@ import WalletHive from "../components/wallet-hive";
 import WalletEcency from "../components/wallet-ecency";
 import WalletHiveEngine from "../components/wallet-hive-engine";
 import ScrollToTop from "../components/scroll-to-top";
+import { hiveClient } from "../api/hive";
 import { getAccountHEFull, tokenAliases } from "../api/hive-engine";
 import {
   HIVE_ENGINE_TOKENS,
@@ -47,19 +48,84 @@ interface Props extends PageProps {
   history: History;
 }
 interface State {
+  updating: boolean;
   loading: boolean;
   isDefaultPost: boolean;
+  most_recent_transaction_num: number;
+  updateTransactionsIntervalIdentifier: any;
 }
 class ProfilePage extends BaseComponent<Props, State> {
   state: State = {
     loading: false,
+    updating: false,
     isDefaultPost: false,
+    updateTransactionsIntervalIdentifier: 0,
+    most_recent_transaction_num: 0,
+  };
+
+  updateTransactionsPingHandler = () => {
+    // It would be nice to have an event for when new transactions relevant come to the blockchain
+    // Perhaps something integrated into the Javascript event system.
+    const { list, group } = this.props.transactions;
+    const { match, updateTransactions, fetchTransactions } = this.props;
+    let { username } = match.params;
+    const { updating } = this.state;
+
+    const user = username.replace("@", "");
+
+    if (list.length > 0) {
+      const most_recent_transaction_num =
+        this.state.most_recent_transaction_num || list[0].num;
+      if (!updating) {
+        this.setState({ updating: true });
+        // checking for new transactions.
+        hiveClient
+          .call("condenser_api", "get_account_history", [user, -1, 1])
+          .then((r: any) => {
+            if (r === null) return;
+            if (r.length === 0) return;
+            const x = r[0];
+            if (x[0] === most_recent_transaction_num) {
+              // no changes
+              this.setState({ updating: false });
+            } else {
+              // there are new transfers to add to the list.
+              console.log(
+                `updating txs for after ${most_recent_transaction_num}...`,
+                { x }
+              );
+              updateTransactions(username, group, most_recent_transaction_num);
+              this.setState({
+                updating: false,
+                most_recent_transaction_num: x[0],
+              });
+            }
+          })
+          .catch((e) => {
+            this.setState({ updating: false });
+          });
+      }
+    } else {
+      console.log("Update triggered but updating flag is set");
+    }
   };
   async componentDidMount() {
     await this.ensureAccount();
-    const { match, global, fetchEntries, fetchTransactions, fetchPoints } =
-      this.props;
+    const props = this.props;
+    const {
+      match,
+      global,
+      fetchEntries,
+      fetchTransactions,
+      fetchPoints,
+      transactions,
+      updateTransactions,
+    } = props;
     const { username, section } = match.params;
+    const { list } = transactions;
+
+    const most_recent_transaction_num = list.length ? list[0].num : 0;
+
     if (!section || (section && Object.keys(ProfileFilter).includes(section))) {
       // fetch posts
       fetchEntries(global.filter, global.tag, false);
@@ -68,7 +134,17 @@ class ProfilePage extends BaseComponent<Props, State> {
     fetchTransactions(username);
     // fetch points
     fetchPoints(username);
+
+    const updateTransactionsIntervalIdentifier = setInterval(
+      this.updateTransactionsPingHandler.bind(this),
+      15000
+    );
+    this.setState({
+      updateTransactionsIntervalIdentifier,
+      most_recent_transaction_num,
+    });
   }
+
   componentDidUpdate(prevProps: Readonly<Props>): void {
     const {
       match,
@@ -88,6 +164,7 @@ class ProfilePage extends BaseComponent<Props, State> {
     // username changed. re-fetch wallet transactions and points
     if (username !== prevMatch.params.username) {
       this.ensureAccount().then(() => {
+        this.setState({ most_recent_transaction_num: 0 });
         resetTransactions();
         fetchTransactions(username);
         resetPoints();
@@ -130,9 +207,13 @@ class ProfilePage extends BaseComponent<Props, State> {
   componentWillUnmount() {
     super.componentWillUnmount();
     const { resetTransactions, resetPoints } = this.props;
+    const { updateTransactionsIntervalIdentifier } = this.state;
     // reset transactions and points on unload
     resetTransactions();
     resetPoints();
+    if (updateTransactionsIntervalIdentifier != 0) {
+      clearInterval(updateTransactionsIntervalIdentifier);
+    }
   }
   ensureAccount = () => {
     const { match, accounts, addAccount } = this.props;
@@ -184,6 +265,7 @@ class ProfilePage extends BaseComponent<Props, State> {
     this.stateSet({ loading: true });
     this.ensureAccount()
       .then(() => {
+        this.setState({ most_recent_transaction_num: 0 });
         // reload transactions
         resetTransactions();
         fetchTransactions(username);
@@ -204,7 +286,7 @@ class ProfilePage extends BaseComponent<Props, State> {
       });
   };
   render() {
-    const { global, entries, accounts, match } = this.props;
+    const { global, entries, accounts, match, transactions } = this.props;
     const { loading } = this.state;
     const navBar = global.isElectron
       ? NavBarElectron({

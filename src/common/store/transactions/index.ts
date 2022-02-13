@@ -1,6 +1,6 @@
 import { Dispatch } from "redux";
 import { utils } from "@hiveio/dhive";
-
+import { hiveClient } from "../../api/hive";
 import {
   OperationGroup,
   Transaction,
@@ -11,6 +11,8 @@ import {
   FetchedAction,
   FetchErrorAction,
   ResetAction,
+  UpdateAction,
+  UpdatedAction,
 } from "./types";
 import { getAccountHistory } from "../../api/hive";
 
@@ -71,7 +73,10 @@ const ALL_ACCOUNT_OPERATIONS = [
 
 export const initialState: Transactions = {
   list: [],
+  // load and show that the loading is happening.
   loading: false,
+  // updating happens without any explicit show
+  // should also be true when loading.
   group: "",
 };
 
@@ -80,10 +85,39 @@ export default (
   action: Actions
 ): Transactions => {
   switch (action.type) {
+    case ActionTypes.UPDATED: {
+      const { last_transaction_id, transactions } = action;
+      if (action.group != state.group) {
+        // The user changed the group while this program was fetching
+        return state;
+      }
+      const old_list = state.list;
+      let throw_away_start: number = -1;
+      for (let i: number = 0; i < transactions.length; ++i) {
+        if (transactions[i].num === last_transaction_id) {
+          throw_away_start = i;
+        }
+      }
+
+      if (throw_away_start == 0) {
+        console.log("Nothing new....");
+        return state;
+      } else {
+        const list = (() => {
+          if (throw_away_start > 0) {
+            return [...transactions.slice(0, throw_away_start), ...old_list];
+          } else {
+            return [...transactions, ...old_list];
+          }
+        })();
+        return { ...state, list };
+      }
+    }
     case ActionTypes.FETCH: {
+      const { group } = action;
       return {
         ...state,
-        group: action.group,
+        group,
         list: [],
         loading: true,
       };
@@ -105,10 +139,35 @@ export default (
     case ActionTypes.RESET: {
       return { ...initialState };
     }
+    case ActionTypes.UPDATE: {
+      return state;
+    }
     default:
       return state;
   }
 };
+
+function filterForGroup(group: OperationGroup | "") {
+  switch (group) {
+    case "transfers":
+      return utils.makeBitMaskFilter(ACCOUNT_OPERATION_GROUPS["transfers"]);
+    case "market-orders":
+      return utils.makeBitMaskFilter(ACCOUNT_OPERATION_GROUPS["market-orders"]);
+    case "interests":
+      return utils.makeBitMaskFilter(ACCOUNT_OPERATION_GROUPS["interests"]);
+    case "stake-operations":
+      return utils.makeBitMaskFilter(
+        ACCOUNT_OPERATION_GROUPS["stake-operations"]
+      );
+    case "rewards":
+      return utils.makeBitMaskFilter(ACCOUNT_OPERATION_GROUPS["rewards"]);
+    //case "socials":
+    //  return utils.makeBitMaskFilter(ACCOUNT_OPERATION_GROUPS["socials"]);
+    //
+    default:
+      return utils.makeBitMaskFilter(ALL_ACCOUNT_OPERATIONS); // all
+  }
+}
 
 /* Actions */
 export const fetchTransactions =
@@ -117,38 +176,7 @@ export const fetchTransactions =
     dispatch(fetchAct(group));
 
     const name = username.replace("@", "");
-
-    let filters: any[] = [];
-    switch (group) {
-      case "transfers":
-        filters = utils.makeBitMaskFilter(
-          ACCOUNT_OPERATION_GROUPS["transfers"]
-        );
-        break;
-      case "market-orders":
-        filters = utils.makeBitMaskFilter(
-          ACCOUNT_OPERATION_GROUPS["market-orders"]
-        );
-        break;
-      case "interests":
-        filters = utils.makeBitMaskFilter(
-          ACCOUNT_OPERATION_GROUPS["interests"]
-        );
-        break;
-      case "stake-operations":
-        filters = utils.makeBitMaskFilter(
-          ACCOUNT_OPERATION_GROUPS["stake-operations"]
-        );
-        break;
-      case "rewards":
-        filters = utils.makeBitMaskFilter(ACCOUNT_OPERATION_GROUPS["rewards"]);
-        break;
-      //case "socials":
-      //  filters = utils.makeBitMaskFilter(ACCOUNT_OPERATION_GROUPS["socials"]);
-      //  break;
-      default:
-        filters = utils.makeBitMaskFilter(ALL_ACCOUNT_OPERATIONS); // all
-    }
+    const filters: any[] = filterForGroup(group);
 
     getAccountHistory(name, filters)
       .then((r) => {
@@ -175,6 +203,54 @@ export const fetchTransactions =
       })
       .catch(() => {
         console.log("catch");
+        dispatch(fetchErrorAct());
+      });
+  };
+
+export const updateTransactions =
+  (
+    username: string,
+    group: OperationGroup | "",
+    most_recent_transaction_num: number
+  ) =>
+  (dispatch: Dispatch) => {
+    dispatch(updateAct());
+
+    const name = username.replace("@", "");
+    const filters: any[] = filterForGroup(group);
+
+    hiveClient
+      .call("condenser_api", "get_account_history", [
+        name,
+        most_recent_transaction_num + 500,
+        500,
+        ...filters,
+      ])
+      .then((r: any) => {
+        console.log({ r });
+        const mapped: Transaction[] = r.map((x: any): Transaction[] | null => {
+          const { op } = x[1];
+          const { timestamp, trx_id } = x[1];
+          const opName = op[0];
+          const opData = op[1];
+
+          return {
+            num: x[0],
+            type: opName,
+            timestamp,
+            trx_id,
+            ...opData,
+          };
+        });
+
+        const transactions: Transaction[] = mapped
+          .filter((x) => x !== null)
+          .sort((a: any, b: any) => b.num - a.num);
+
+        dispatch(updatedAct(most_recent_transaction_num, group, transactions));
+      })
+      .catch((e) => {
+        console.log("catch", e);
         dispatch(fetchErrorAct());
       });
   };
@@ -207,5 +283,24 @@ export const fetchErrorAct = (): FetchErrorAction => {
 export const resetAct = (): ResetAction => {
   return {
     type: ActionTypes.RESET,
+  };
+};
+
+export const updateAct = (): UpdateAction => {
+  return {
+    type: ActionTypes.UPDATE,
+  };
+};
+
+export const updatedAct = (
+  last_transaction_id: number,
+  group: OperationGroup | "",
+  transactions: Transaction[]
+): UpdatedAction => {
+  return {
+    type: ActionTypes.UPDATED,
+    last_transaction_id,
+    group,
+    transactions,
   };
 };

@@ -54,7 +54,11 @@ import {
 } from "../store/discussion";
 import { addAccount } from "../store/accounts";
 import { addCommunity } from "../store/communities";
-import { fetchTransactions, resetTransactions } from "../store/transactions";
+import {
+  fetchTransactions,
+  resetTransactions,
+  updateTransactions,
+} from "../store/transactions";
 import { addUser, deleteUser } from "../store/users";
 import { setActiveUser, updateActiveUser } from "../store/active-user";
 import { toggleUIProp } from "../store/ui";
@@ -120,6 +124,11 @@ export interface PageProps {
 
   transactions: Transactions;
   fetchTransactions: (username: string, group?: OperationGroup | "") => void;
+  updateTransactions: (
+    username: string,
+    group: OperationGroup | "",
+    last_tx_id: number
+  ) => void;
   resetTransactions: () => void;
 
   users: User[];
@@ -188,6 +197,7 @@ export const pageMapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       addCommunity,
       fetchTransactions,
       resetTransactions,
+      updateTransactions,
       addUser,
       deleteUser,
       setActiveUser,

@@ -5,7 +5,9 @@ import defaults from "../constants/site.json";
 import { apiBase } from "./helper";
 
 export const getEmojiData = () =>
-  fetch(apiBase("/emoji.json")).then((response) => response.json());
+  fetch(apiBase("/emoji.json"))
+    .then((response) => response.json())
+    .catch((e) => {});
 
 export const uploadImage = async (
   file: File,

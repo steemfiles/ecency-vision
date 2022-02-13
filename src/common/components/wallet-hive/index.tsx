@@ -112,7 +112,6 @@ export class WalletHive extends BaseComponent<Props, State> {
   fetchConvertingAmount = () => {
     const { account } = this.props;
 
-    console.log({ epochIndex: ls.get("chart-epoch-index") });
     let epochIndex: number = parseInt(ls.get("chart-epoch-index")) || 0;
     if (isNaN(epochIndex) || epochIndex < 0 || epochIndex >= epochs.length) {
       epochIndex = 0;
@@ -121,7 +120,6 @@ export class WalletHive extends BaseComponent<Props, State> {
     const fromTs = (() => {
       const e = epochs[epochIndex];
       try {
-        console.log(e);
         return moment().subtract(e[0], e[1]).format("X");
       } catch (e) {
         console.log(e);

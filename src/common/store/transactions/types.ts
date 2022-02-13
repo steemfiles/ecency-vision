@@ -559,11 +559,14 @@ export type HECoarseTransaction =
   | HETokensStake
   | HECancelUnstake
   | HEMarketCancel;
+
 export enum ActionTypes {
   FETCH = "@transactions/FETCH",
   FETCHED = "@transactions/FETCHED",
   FETCH_ERROR = "@transactions/FETCH_ERROR",
   RESET = "@transactions/RESET",
+  UPDATE = "@transactions/UPDATE",
+  UPDATED = "@transactions/UPDATED",
 }
 export interface FetchAction {
   type: ActionTypes.FETCH;
@@ -579,8 +582,19 @@ export interface FetchErrorAction {
 export interface ResetAction {
   type: ActionTypes.RESET;
 }
+export interface UpdateAction {
+  type: ActionTypes.UPDATE;
+}
+export interface UpdatedAction {
+  type: ActionTypes.UPDATED;
+  group: OperationGroup | "";
+  last_transaction_id: number;
+  transactions: Transaction[];
+}
 export type Actions =
   | FetchAction
   | FetchedAction
   | FetchErrorAction
-  | ResetAction;
+  | ResetAction
+  | UpdateAction
+  | UpdatedAction;
