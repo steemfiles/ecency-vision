@@ -124,7 +124,7 @@ const fetch_hive_engine_token_information =
         for (const config of tokensConfigs) {
           const token = config.token;
           if (!tokensInfos[token] || !prices[token]) {
-            console.log("Cannot get info or price for ", token);
+            // console.log("Cannot get info or price for ", token);
             continue;
           }
           ret[token] = {

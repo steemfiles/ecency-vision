@@ -61,7 +61,7 @@ import { resolveAny } from "dns";
 
 import HiveWallet from "../../helper/hive-wallet";
 import { HiveEngineStaticInfo } from "../../store/hive-engine-tokens/types";
-
+import { initialState as transactionsInitialState } from "../../store/transactions";
 interface Props {
   history: History;
   global: Global;
@@ -121,7 +121,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     transferMode: null,
     transferAsset: null,
     converting: 0,
-    transactions: { list: [], loading: false, group: "" },
+    transactions: transactionsInitialState,
   };
   componentDidMount() {
     const { account, aPICoinName } = this.props;
@@ -169,7 +169,19 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
       .filter(this.keepTransaction.bind(this, transactions.group))
       .sort(this.compareTransactions);
     this.stateSet({
-      transactions: { list: ntxs, loading: false, group: transactions.group },
+      transactions: {
+        list: ntxs,
+        loading: false,
+        group: transactions.group,
+        newest:
+          ntxs.length && ntxs[0].num > transactions.newest
+            ? ntxs[0].num
+            : transactions.newest,
+        oldest:
+          ntxs.length && ntxs[ntxs.length - 1].num > transactions.oldest
+            ? ntxs[ntxs.length - 1].num
+            : transactions.oldest,
+      },
     });
   }
   handleCoarseTransactions(
@@ -185,16 +197,31 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
         .filter(this.keepTransaction.bind(this, transactions.group));
       const { list } = transactions;
       this.stateSet({
-        transactions: { list: txs, loading: false, group: transactions.group },
+        transactions: {
+          list: txs,
+          loading: false,
+          group: transactions.group,
+          newest:
+            txs.length && txs[0].num > transactions.newest
+              ? txs[0].num
+              : transactions.newest,
+          oldest:
+            txs.length && txs[txs.length - 1].num > transactions.oldest
+              ? txs[txs.length - 1].num
+              : transactions.oldest,
+        },
       });
     } catch (e) {
       error("Unknown transaction type error.");
       console.log(e);
+
       this.stateSet({
         transactions: {
           list: transactions.list,
           loading: false,
           group: transactions.group,
+          newest: transactions.newest,
+          oldest: transactions.oldest,
         },
       });
     }
@@ -207,7 +234,7 @@ export class WalletHiveEngine extends BaseComponent<Props, State> {
     const { transactions } = this.state;
     const { list } = transactions;
     this.stateSet({
-      transactions: { list: [], loading: true, group: group || "" },
+      transactions: { ...transactionsInitialState, loading: true },
     });
     if (group === "rewards")
       getFineTransactions(symbol, name, group === "rewards" ? 200 : 10, 0)

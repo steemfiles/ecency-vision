@@ -536,6 +536,8 @@ export interface Transactions {
   list: Transaction[];
   loading: boolean;
   group: OperationGroup | "";
+  newest: number;
+  oldest: number;
 }
 export type HECoarseTransaction =
   | HEMarketCloseOrder
@@ -565,8 +567,9 @@ export enum ActionTypes {
   FETCHED = "@transactions/FETCHED",
   FETCH_ERROR = "@transactions/FETCH_ERROR",
   RESET = "@transactions/RESET",
-  UPDATE = "@transactions/UPDATE",
+  SET_OLDEST_TX = "@transactions/SET_OLDEST_TX",
   UPDATED = "@transactions/UPDATED",
+  GET = "@transactions/GET",
 }
 export interface FetchAction {
   type: ActionTypes.FETCH;
@@ -575,6 +578,8 @@ export interface FetchAction {
 export interface FetchedAction {
   type: ActionTypes.FETCHED;
   transactions: Transaction[];
+  oldest: number;
+  newest: number;
 }
 export interface FetchErrorAction {
   type: ActionTypes.FETCH_ERROR;
@@ -582,19 +587,25 @@ export interface FetchErrorAction {
 export interface ResetAction {
   type: ActionTypes.RESET;
 }
-export interface UpdateAction {
-  type: ActionTypes.UPDATE;
+export interface SetOldestTxAction {
+  type: ActionTypes.SET_OLDEST_TX;
+  oldest: number;
+}
+export interface GetAction {
+  type: ActionTypes.GET;
 }
 export interface UpdatedAction {
   type: ActionTypes.UPDATED;
   group: OperationGroup | "";
-  last_transaction_id: number;
+  newest: number | null;
+  oldest: number | null;
   transactions: Transaction[];
 }
 export type Actions =
+  | GetAction
   | FetchAction
   | FetchedAction
   | FetchErrorAction
   | ResetAction
-  | UpdateAction
+  | SetOldestTxAction
   | UpdatedAction;

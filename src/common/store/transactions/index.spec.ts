@@ -51,7 +51,7 @@ it("5- fetched", () => {
       type: "transfer_to_vesting",
     },
   ];
-  state = reducer(state, fetchedAct(list));
+  state = reducer(state, fetchedAct(list, 3204035, 3204009));
   expect(state).toMatchSnapshot();
 });
 

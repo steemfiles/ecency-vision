@@ -10,8 +10,9 @@ import {
   FetchAction,
   FetchedAction,
   FetchErrorAction,
+  GetAction,
   ResetAction,
-  UpdateAction,
+  SetOldestTxAction,
   UpdatedAction,
 } from "./types";
 import { getAccountHistory } from "../../api/hive";
@@ -75,9 +76,9 @@ export const initialState: Transactions = {
   list: [],
   // load and show that the loading is happening.
   loading: false,
-  // updating happens without any explicit show
-  // should also be true when loading.
   group: "",
+  newest: 0,
+  oldest: 1e18,
 };
 
 export default (
@@ -85,24 +86,35 @@ export default (
   action: Actions
 ): Transactions => {
   switch (action.type) {
+    case ActionTypes.GET: {
+      return { ...state, loading: true };
+    }
     case ActionTypes.UPDATED: {
-      const { last_transaction_id, transactions } = action;
+      let { newest, oldest } = action;
+      const { transactions } = action;
       if (action.group != state.group) {
         // The user changed the group while this program was fetching
-        return state;
+        return { ...state, loading: false };
       }
       const old_list = state.list;
       let throw_away_start: number = -1;
-      for (let i: number = 0; i < transactions.length; ++i) {
-        if (transactions[i].num === last_transaction_id) {
-          throw_away_start = i;
+      if (newest != null) {
+        for (let i: number = 0; i < transactions.length; ++i) {
+          if (transactions[i].num === newest) {
+            throw_away_start = i;
+          }
         }
       }
 
-      if (throw_away_start == 0) {
+      if (oldest) {
+        const list = [...old_list, ...transactions];
+
+        return { ...state, list, oldest, loading: false };
+      } else if (newest && throw_away_start == 0) {
         console.log("Nothing new....");
+
         return state;
-      } else {
+      } else if (newest) {
         const list = (() => {
           if (throw_away_start > 0) {
             return [...transactions.slice(0, throw_away_start), ...old_list];
@@ -110,8 +122,10 @@ export default (
             return [...transactions, ...old_list];
           }
         })();
-        return { ...state, list };
+        return { ...state, list, newest, loading: false };
       }
+
+      return state;
     }
     case ActionTypes.FETCH: {
       const { group } = action;
@@ -123,24 +137,29 @@ export default (
       };
     }
     case ActionTypes.FETCHED: {
+      const { oldest, newest } = state;
       return {
         ...state,
         list: action.transactions,
         loading: false,
+        oldest,
+        newest: action.transactions.length
+          ? action.transactions[0].num
+          : newest,
       };
     }
     case ActionTypes.FETCH_ERROR: {
       return {
-        ...state,
-        list: [],
-        loading: false,
+        ...initialState,
+        group: state.group,
       };
     }
     case ActionTypes.RESET: {
       return { ...initialState };
     }
-    case ActionTypes.UPDATE: {
-      return state;
+    case ActionTypes.SET_OLDEST_TX: {
+      const { oldest } = action;
+      return { ...state, oldest, loading: false };
     }
     default:
       return state;
@@ -170,6 +189,24 @@ function filterForGroup(group: OperationGroup | "") {
 }
 
 /* Actions */
+const handleCommonActionError =
+  (username: string, group: OperationGroup | "", e: { message: string }) =>
+  (dispatch: Dispatch) => {
+    if (
+      e.message.startsWith(
+        "total_processed_items < 2000: Could not find filtered operation in 2000 operations, to continue searching, set start="
+      )
+    ) {
+      const segments = e.message.split(/=/);
+      const newStart = parseInt(segments[1]);
+      dispatch(setOldestTransactionAct(newStart));
+      getMoreTransactions(username, group, newStart);
+    } else {
+      console.log("catch", e);
+      dispatch(fetchErrorAct());
+    }
+  };
+
 export const fetchTransactions =
   (username: string, group: OperationGroup | "" = "") =>
   (dispatch: Dispatch) => {
@@ -199,11 +236,35 @@ export const fetchTransactions =
           .filter((x) => x !== null)
           .sort((a: any, b: any) => b.num - a.num);
 
-        dispatch(fetchedAct(transactions));
+        let newest: number = initialState.newest;
+        let oldest: number = initialState.oldest;
+        if (transactions.length) {
+          console.log("here", transactions[transactions.length - 1], oldest);
+          if (transactions[0].num > newest) {
+            newest = transactions[0].num;
+          }
+          if (transactions[transactions.length - 1].num < oldest) {
+            oldest = transactions[transactions.length - 1].num;
+          }
+          console.log({ oldest, newest });
+        }
+
+        dispatch(fetchedAct(transactions, oldest, newest));
       })
-      .catch(() => {
-        console.log("catch");
-        dispatch(fetchErrorAct());
+      .catch((e) => {
+        if (
+          e.message.startsWith(
+            "total_processed_items < 2000: Could not find filtered operation in 2000 operations, to continue searching, set start="
+          )
+        ) {
+          const segments = e.message.split(/=/);
+          const newStart = parseInt(segments[1]);
+          dispatch(setOldestTransactionAct(newStart));
+          getMoreTransactions(username, group, newStart);
+        } else {
+          console.log("catch", e);
+          dispatch(fetchErrorAct());
+        }
       });
   };
 
@@ -214,7 +275,7 @@ export const updateTransactions =
     most_recent_transaction_num: number
   ) =>
   (dispatch: Dispatch) => {
-    dispatch(updateAct());
+    dispatch(getAct());
 
     const name = username.replace("@", "");
     const filters: any[] = filterForGroup(group);
@@ -247,11 +308,78 @@ export const updateTransactions =
           .filter((x) => x !== null)
           .sort((a: any, b: any) => b.num - a.num);
 
-        dispatch(updatedAct(most_recent_transaction_num, group, transactions));
+        dispatch(
+          updatedAct(null, most_recent_transaction_num, group, transactions)
+        );
       })
       .catch((e) => {
         console.log("catch", e);
         dispatch(fetchErrorAct());
+      });
+  };
+
+export const getMoreTransactions =
+  (
+    username: string,
+    group: OperationGroup | "",
+    oldest_transaction_num: number
+  ) =>
+  (dispatch: Dispatch) => {
+    dispatch(getAct());
+
+    const name = username.replace("@", "");
+    const filters: any[] = filterForGroup(group);
+
+    console.log("Searching from ", oldest_transaction_num - 1);
+    hiveClient
+      .call("condenser_api", "get_account_history", [
+        name,
+        oldest_transaction_num + -1,
+        500,
+        ...filters,
+      ])
+      .then((r: any) => {
+        const mapped: Transaction[] = r.map((x: any): Transaction[] | null => {
+          const { op } = x[1];
+          const { timestamp, trx_id } = x[1];
+          const opName = op[0];
+          const opData = op[1];
+
+          return {
+            num: x[0],
+            type: opName,
+            timestamp,
+            trx_id,
+            ...opData,
+          };
+        });
+
+        const transactions: Transaction[] = mapped
+          .filter((x) => x !== null)
+          .sort((a: any, b: any) => b.num - a.num);
+
+        if (transactions.length) {
+          const new_oldest = transactions[transactions.length - 1].num;
+          dispatch(updatedAct(new_oldest, null, group, transactions));
+        } else {
+          // do nothing...
+          dispatch(updatedAct(null, null, group, []));
+        }
+      })
+      .catch((e) => {
+        if (
+          e.message.startsWith(
+            "total_processed_items < 2000: Could not find filtered operation in 2000 operations, to continue searching, set start="
+          )
+        ) {
+          const segments = e.message.split(/=/);
+          const newStart = parseInt(segments[1]);
+          dispatch(setOldestTransactionAct(newStart));
+          getMoreTransactions(username, group, newStart);
+        } else {
+          console.log("catch", e);
+          dispatch(fetchErrorAct());
+        }
       });
   };
 
@@ -267,10 +395,22 @@ export const fetchAct = (group: OperationGroup | ""): FetchAction => {
   };
 };
 
-export const fetchedAct = (transactions: Transaction[]): FetchedAction => {
+export const fetchedAct = (
+  transactions: Transaction[],
+  oldest: number,
+  newest: number
+): FetchedAction => {
   return {
     type: ActionTypes.FETCHED,
     transactions,
+    oldest,
+    newest,
+  };
+};
+
+export const getAct = (): GetAction => {
+  return {
+    type: ActionTypes.GET,
   };
 };
 
@@ -286,20 +426,23 @@ export const resetAct = (): ResetAction => {
   };
 };
 
-export const updateAct = (): UpdateAction => {
+export const setOldestTransactionAct = (oldest: number): SetOldestTxAction => {
   return {
-    type: ActionTypes.UPDATE,
+    type: ActionTypes.SET_OLDEST_TX,
+    oldest,
   };
 };
 
 export const updatedAct = (
-  last_transaction_id: number,
+  oldest: number | null,
+  newest: number | null,
   group: OperationGroup | "",
   transactions: Transaction[]
 ): UpdatedAction => {
   return {
     type: ActionTypes.UPDATED,
-    last_transaction_id,
+    newest,
+    oldest,
     group,
     transactions,
   };

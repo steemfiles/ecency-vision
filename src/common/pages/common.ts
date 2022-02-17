@@ -58,6 +58,7 @@ import {
   fetchTransactions,
   resetTransactions,
   updateTransactions,
+  getMoreTransactions,
 } from "../store/transactions";
 import { addUser, deleteUser } from "../store/users";
 import { setActiveUser, updateActiveUser } from "../store/active-user";
@@ -129,6 +130,11 @@ export interface PageProps {
     group: OperationGroup | "",
     last_tx_id: number
   ) => void;
+  getMoreTransactions: (
+    username: string,
+    group: OperationGroup | "",
+    lowest_tx_id: number
+  ) => void;
   resetTransactions: () => void;
 
   users: User[];
@@ -198,6 +204,7 @@ export const pageMapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       fetchTransactions,
       resetTransactions,
       updateTransactions,
+      getMoreTransactions,
       addUser,
       deleteUser,
       setActiveUser,

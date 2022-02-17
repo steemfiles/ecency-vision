@@ -66,8 +66,13 @@ class ProfilePage extends BaseComponent<Props, State> {
   updateTransactionsPingHandler = () => {
     // It would be nice to have an event for when new transactions relevant come to the blockchain
     // Perhaps something integrated into the Javascript event system.
-    const { list, group } = this.props.transactions;
-    const { match, updateTransactions, fetchTransactions } = this.props;
+    const { list, group, oldest } = this.props.transactions;
+    const {
+      match,
+      updateTransactions,
+      fetchTransactions,
+      getMoreTransactions,
+    } = this.props;
     let { username } = match.params;
     const { updating } = this.state;
 
@@ -76,6 +81,7 @@ class ProfilePage extends BaseComponent<Props, State> {
     if (list.length > 0) {
       const most_recent_transaction_num =
         this.state.most_recent_transaction_num || list[0].num;
+      const oldest_transaction_num = list[list.length - 1].num;
       if (!updating) {
         this.setState({ updating: true });
         // checking for new transactions.
@@ -88,6 +94,7 @@ class ProfilePage extends BaseComponent<Props, State> {
             if (x[0] === most_recent_transaction_num) {
               // no changes
               this.setState({ updating: false });
+              //getMoreTransactions(username, group, Math.min(oldest, oldest_transaction_num));
             } else {
               // there are new transfers to add to the list.
               console.log(
@@ -119,7 +126,6 @@ class ProfilePage extends BaseComponent<Props, State> {
       fetchTransactions,
       fetchPoints,
       transactions,
-      updateTransactions,
     } = props;
     const { username, section } = match.params;
     const { list } = transactions;
@@ -241,13 +247,44 @@ class ProfilePage extends BaseComponent<Props, State> {
     }
   };
   bottomReached = () => {
-    const { global, entries, fetchEntries } = this.props;
+    console.log("bottom reached!");
+    const {
+      global,
+      entries,
+      fetchEntries,
+      fetchTransactions,
+      getMoreTransactions,
+      transactions,
+      match,
+    } = this.props;
     const { filter, tag } = global;
-    const groupKey = makeGroupKey(filter, tag);
-    const data = entries[groupKey];
-    const { loading, hasMore } = data;
-    if (!loading && hasMore) {
-      fetchEntries(filter, tag, true);
+    const { list, oldest, group } = transactions;
+    const { section = ProfileFilter.blog } = match.params;
+    const { loading } = this.state;
+    if (section == "hive") {
+      const username = match.params.username.replace("@", "");
+      if (!loading && username) {
+        if (list.length) {
+          const oldest_transaction_num = list[list.length - 1].num;
+          console.log("getting more from", {
+            group,
+            oldest,
+            oldest_transaction_num,
+          });
+          getMoreTransactions(
+            username,
+            group,
+            Math.min(oldest, oldest_transaction_num)
+          );
+        }
+      }
+    } else {
+      const groupKey = makeGroupKey(filter, tag);
+      const data = entries[groupKey];
+      const { loading, hasMore } = data;
+      if (!loading && hasMore) {
+        fetchEntries(filter, tag, true);
+      }
     }
   };
   reload = () => {
@@ -414,11 +451,16 @@ class ProfilePage extends BaseComponent<Props, State> {
                 );
               }
               if (section === "hive") {
-                return WalletHive({
-                  ...this.props,
-                  hiveEngineTokens: HIVE_ENGINE_TOKENS,
-                  account,
-                });
+                return (
+                  <>
+                    {WalletHive({
+                      ...this.props,
+                      hiveEngineTokens: HIVE_ENGINE_TOKENS,
+                      account,
+                    })}
+                    <DetectBottom onBottom={this.bottomReached} />
+                  </>
+                );
               }
               if (section === "points") {
                 return WalletEcency({
