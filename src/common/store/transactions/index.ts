@@ -107,12 +107,23 @@ export default (
       }
 
       if (oldest) {
-        const list = [...old_list, ...transactions];
+        let nums_present: { [n: number]: boolean } = {};
+        let new_list = [...old_list];
+        new_list.forEach(function (value) {
+          nums_present[value.num] = true;
+        });
+
+        transactions.forEach(function (value) {
+          if (!nums_present[value.num]) {
+            new_list.push(value);
+          }
+        });
+        const list = new_list;
+        //.sort((a: any, b: any) => b.num - a.num);
 
         return { ...state, list, oldest, loading: false };
       } else if (newest && throw_away_start == 0) {
         console.log("Nothing new....");
-
         return state;
       } else if (newest) {
         const list = (() => {
@@ -259,8 +270,8 @@ export const fetchTransactions =
         ) {
           const segments = e.message.split(/=/);
           const newStart = parseInt(segments[1]);
-          dispatch(setOldestTransactionAct(newStart));
-          getMoreTransactions(username, group, newStart);
+          dispatch(setOldestTransactionAct(newStart - 1));
+          getMoreTransactions(username, group, newStart - 1);
         } else {
           console.log("catch", e);
           dispatch(fetchErrorAct());
@@ -330,8 +341,8 @@ export const getMoreTransactions =
     const name = username.replace("@", "");
     const filters: any[] = filterForGroup(group);
 
-    console.log("Searching from ", oldest_transaction_num - 1);
-    hiveClient
+    console.log("Searching from ", oldest_transaction_num + 1);
+    return hiveClient
       .call("condenser_api", "get_account_history", [
         name,
         oldest_transaction_num + -1,

@@ -260,23 +260,24 @@ class ProfilePage extends BaseComponent<Props, State> {
     const { filter, tag } = global;
     const { list, oldest, group } = transactions;
     const { section = ProfileFilter.blog } = match.params;
-    const { loading } = this.state;
+    const { loading, updating } = this.state;
     if (section == "hive") {
       const username = match.params.username.replace("@", "");
-      if (!loading && username) {
-        if (list.length) {
-          const oldest_transaction_num = list[list.length - 1].num;
-          console.log("getting more from", {
-            group,
-            oldest,
-            oldest_transaction_num,
-          });
-          getMoreTransactions(
-            username,
-            group,
-            Math.min(oldest, oldest_transaction_num)
-          );
-        }
+      if (!loading && !updating && username && list.length) {
+        this.setState({ updating: true });
+        const oldest_transaction_num = list[list.length - 1].num;
+        console.log("getting more from", {
+          group,
+          oldest,
+          oldest_transaction_num,
+        });
+        getMoreTransactions(
+          username,
+          group,
+          Math.min(oldest, oldest_transaction_num)
+        ).finally(() => {
+          this.setState({ updating: false });
+        });
       }
     } else {
       const groupKey = makeGroupKey(filter, tag);
