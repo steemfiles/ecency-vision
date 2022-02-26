@@ -134,7 +134,7 @@ export interface PageProps {
     username: string,
     group: OperationGroup | "",
     lowest_tx_id: number
-  ) => Promise<void>;
+  ) => void;
   resetTransactions: () => void;
 
   users: User[];

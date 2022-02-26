@@ -275,9 +275,10 @@ class ProfilePage extends BaseComponent<Props, State> {
           username,
           group,
           Math.min(oldest, oldest_transaction_num)
-        ).finally(() => {
+        );
+        setTimeout(() => {
           this.setState({ updating: false });
-        });
+        }, 500);
       }
     } else {
       const groupKey = makeGroupKey(filter, tag);
