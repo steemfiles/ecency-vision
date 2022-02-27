@@ -50,6 +50,7 @@ const server = express()
     console.info(`Shutting down because of ${signal}`);
     server.close(() => {
       console.error("Server closed gracefully");
+      process.exit(0);
     });
   });
 });
