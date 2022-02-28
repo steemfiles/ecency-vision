@@ -482,6 +482,7 @@
     "success-sub-title": "Transaction successful"
   },
   "transactions": {
+    "type-limit_order_cancel": "Limit Order Cancelled",
     "title": "History",
     "type-curation_reward": "Curation Reward",
     "type-author_reward": "Author Reward",

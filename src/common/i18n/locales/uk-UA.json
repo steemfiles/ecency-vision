@@ -616,6 +616,7 @@
     "success-sub-title": "Операція успішна"
   },
   "transactions": {
+    "type-limit_order_cancel": "Limit Order Cancelled",
     "title": "Історія",
     "group-all": "All History",
     "group-transfers": "Transfers",

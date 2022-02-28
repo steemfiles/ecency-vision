@@ -616,6 +616,7 @@
     "success-sub-title": "交易成功"
   },
   "transactions": {
+    "type-limit_order_cancel": "Limit Order Cancelled",
     "title": "历史",
     "group-all": "所有历史",
     "group-transfers": "转账",

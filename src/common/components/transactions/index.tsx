@@ -333,6 +333,19 @@ export class TransactionRow extends Component<RowProps> {
         </span>
       );
     }
+    if (tr.type === "limit_order_cancel") {
+      flag = true;
+      icon = closeSvg;
+      numbers = (
+        <span className="number">
+          #
+          {formattedNumber(tr.orderid, {
+            fractionDigits: 0,
+            maximumFractionDigits: 0,
+          })}
+        </span>
+      );
+    }
     if (tr.type === "producer_reward") {
       flag = true;
       icon = pickAxeSvg;

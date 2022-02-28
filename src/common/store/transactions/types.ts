@@ -470,6 +470,11 @@ export interface LimitOrderCreate extends BaseTransaction {
   min_to_receive: string;
   expiration: string;
 }
+export interface LimitOrderCancel extends BaseTransaction {
+  type: "limit_order_cancel";
+  owner: string;
+  orderid: string;
+}
 export interface FillVestingWithdraw extends BaseTransaction {
   type: "fill_vesting_withdraw";
   from_account: string;
@@ -523,6 +528,7 @@ export type Transaction =
   | RecurrentTransfers
   | FillRecurrentTransfers
   | LimitOrderCreate
+  | LimitOrderCancel
   | FillVestingWithdraw
   | EffectiveCommentVote;
 export type OperationGroup =
