@@ -37,6 +37,7 @@ import {
   pageMapStateToProps,
 } from "./common";
 import { History } from "history";
+import * as ls from "../util/local-storage";
 
 interface MatchParams {
   username: string;
@@ -57,9 +58,24 @@ class ProfilePage extends BaseComponent<Props, State> {
   };
   async componentDidMount() {
     await this.ensureAccount();
-    const { match, global, fetchEntries, fetchTransactions, fetchPoints } =
-      this.props;
-    const { username, section } = match.params;
+    const props = this.props;
+    const {
+      match,
+      global,
+      fetchEntries,
+      fetchTransactions,
+      fetchPoints,
+      transactions,
+    } = props;
+    const { username } = match.params;
+    console.log(match.params.section, ls.get("profile-section"));
+    const section = match.params.section || ls.get("profile-section");
+    const { list } = transactions;
+    if (match.params.section != ls.get("profile-section")) {
+      ls.set("profile-section", section);
+    }
+    const most_recent_transaction_num = list.length ? list[0].num : 0;
+
     if (!section || (section && Object.keys(ProfileFilter).includes(section))) {
       // fetch posts
       fetchEntries(global.filter, global.tag, false);
@@ -82,8 +98,9 @@ class ProfilePage extends BaseComponent<Props, State> {
     } = this.props;
     const { match: prevMatch, entries } = prevProps;
 
-    const { username, section } = match.params;
+    const { username } = match.params;
     const { isDefaultPost } = this.state;
+    const section = match.params.section || ls.get("profile-section");
 
     // username changed. re-fetch wallet transactions and points
     if (username !== prevMatch.params.username) {
@@ -95,6 +112,9 @@ class ProfilePage extends BaseComponent<Props, State> {
       });
     }
     // Wallet and points are not a correct filter to fetch posts
+    if (section === "hive") {
+      history.push(`/${username}/wallet?token=hive`);
+    }
     if (section && !Object.keys(ProfileFilter).includes(section)) {
       return;
     }
@@ -180,7 +200,9 @@ class ProfilePage extends BaseComponent<Props, State> {
       resetPoints,
       fetchPoints,
     } = this.props;
-    const { username, section } = match.params;
+    const { username } = match.params;
+    const section = match.params.section || ls.get("profile-section");
+
     this.stateSet({ loading: true });
     this.ensureAccount()
       .then(() => {
@@ -222,7 +244,8 @@ class ProfilePage extends BaseComponent<Props, State> {
       );
     }
     const username = match.params.username.replace("@", "");
-    const { section = ProfileFilter.blog } = match.params;
+    const section =
+      match.params.section || ls.get("profile-section") || ProfileFilter.blog;
     const account = accounts.find((x) => x.name === username);
     if (!account) {
       return NotFound({ ...this.props });
@@ -260,11 +283,24 @@ class ProfilePage extends BaseComponent<Props, State> {
         const params_string = window.location.search.slice(1);
         const params_list = params_string.split("&");
         const settings = params_list.map((x) => x.split("="));
-        let aPICoinName: string = LIQUID_TOKEN_UPPERCASE;
+        let aPICoinName: string =
+          ls.get("profile-wallet-token") ?? LIQUID_TOKEN_UPPERCASE;
+        const oldAPICoinName = aPICoinName;
         for (const setting of settings) {
           if (setting[0] === "aPICoinName" || setting[0] === "token") {
             aPICoinName = setting[1].toUpperCase();
           }
+        }
+        if (section === "wallet" && aPICoinName !== oldAPICoinName) {
+          ls.set("profile-wallet-token", aPICoinName);
+        }
+
+        if (aPICoinName === "HIVE") {
+          return {
+            apiName: "HIVE",
+            liquidHumanName: "Hive",
+            stakedShort: "HP",
+          };
         }
         const coinInfo =
           HIVE_ENGINE_TOKENS.find((ki) => ki.apiName == aPICoinName) ??
@@ -331,7 +367,10 @@ class ProfilePage extends BaseComponent<Props, State> {
                   </div>
                 );
               }
-              if (section === "hive") {
+              if (
+                section === "hive" ||
+                (section === "wallet" && coinAPIName == "HIVE")
+              ) {
                 return WalletHive({
                   ...this.props,
                   hiveEngineTokens: HIVE_ENGINE_TOKENS,
