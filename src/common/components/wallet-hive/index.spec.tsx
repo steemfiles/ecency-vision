@@ -26,10 +26,12 @@ import {
   HIVE_HUMAN_NAME_UPPERCASE,
 } from "../../api/hive";
 
-jest.mock("moment", () => () => ({
+const moment = {
   fromNow: () => "in 5 days",
   format: () => "10 days ago",
-}));
+  subtract: () => moment,
+};
+jest.mock("moment", () => () => moment);
 
 let MOCK_MODE = 1;
 
