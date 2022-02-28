@@ -28,6 +28,7 @@ import {
 
 jest.mock("moment", () => () => ({
   fromNow: () => "in 5 days",
+  format: () => "10 days ago",
 }));
 
 let MOCK_MODE = 1;
