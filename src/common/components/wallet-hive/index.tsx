@@ -282,6 +282,7 @@ export class WalletHive extends BaseComponent<Props, State> {
         return [];
       }
     })();
+    try {
     const toNow = moment().format("X");
 
     return (
@@ -851,6 +852,9 @@ export class WalletHive extends BaseComponent<Props, State> {
         )}
       </div>
     );
+    } catch (e) {
+      return e.message;
+    }
   }
 }
 
