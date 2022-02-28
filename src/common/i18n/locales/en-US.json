@@ -641,6 +641,7 @@
     "success-sub-title": "Transaction successful"
   },
   "transactions": {
+    "type-limit_order_cancel": "Limit Order Cancelled",
     "title": "History",
     "group-all": "All History",
     "group-transfers": "Transfers",

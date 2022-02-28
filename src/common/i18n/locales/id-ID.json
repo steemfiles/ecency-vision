@@ -616,6 +616,7 @@
     "success-sub-title": "Transaksinya berhasil"
   },
   "transactions": {
+    "type-limit_order_cancel": "Limit Order Cancelled",
     "title": "Riwayat",
     "group-all": "Semua riwayat",
     "group-transfers": "Transfer",

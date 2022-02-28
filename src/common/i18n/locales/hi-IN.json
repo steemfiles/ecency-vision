@@ -616,6 +616,7 @@
     "success-sub-title": "लेन-देन सफल है"
   },
   "transactions": {
+    "type-limit_order_cancel": "Limit Order Cancelled",
     "title": "इतिहास",
     "group-all": "सारा इतिहास",
     "group-transfers": "स्थानांतरण",

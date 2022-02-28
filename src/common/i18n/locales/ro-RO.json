@@ -616,6 +616,7 @@
     "success-sub-title": "Transfer efectuat cu succes"
   },
   "transactions": {
+    "type-limit_order_cancel": "Limit Order Cancelled",
     "title": "Istoric",
     "group-all": "All History",
     "group-transfers": "Transfers",

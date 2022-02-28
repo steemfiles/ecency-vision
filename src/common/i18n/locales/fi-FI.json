@@ -616,6 +616,7 @@
     "success-sub-title": "Siirto onnistui"
   },
   "transactions": {
+    "type-limit_order_cancel": "Limit Order Cancelled",
     "title": "Historia",
     "group-all": "Koko Historia",
     "group-transfers": "Siirrot",
