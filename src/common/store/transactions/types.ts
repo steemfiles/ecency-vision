@@ -10,8 +10,8 @@ export function validateOrderType(s: string) {
 interface BaseTransaction {
   num: number;
   type: string;
-  timestamp: string;
-  trx_id: string;
+  timestamp: string;   // dates in the standard form of 1970-01-01T00:00:00'
+  trx_id: string;      
 }
 export interface HEBaseFineTransaction {
   account: string;
