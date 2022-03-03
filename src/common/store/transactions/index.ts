@@ -129,7 +129,6 @@ export default (
         });
         const list = new_list;
         //.sort((a: any, b: any) => b.num - a.num);
-
         return { ...state, list, oldest, loading: false };
       } else if (newest && throw_away_start == 0) {
         console.log("Nothing new....");
@@ -158,7 +157,7 @@ export default (
       };
     }
     case ActionTypes.FETCHED: {
-      const { oldest, newest } = state;
+      const { oldest, newest, group } = state;
       return {
         ...state,
         list: action.transactions,
@@ -288,11 +287,12 @@ export const fetchTransactions =
         ) {
           const segments = e.message.split(/=/);
           const newStart = parseInt(segments[1]);
+          const limit = 498 >= newStart ? newStart + 1 : 500;
           hiveClient
             .call("condenser_api", "get_account_history", [
               name,
               newStart,
-              500,
+              limit,
               ...filters,
             ])
             .then(handleFetch);
