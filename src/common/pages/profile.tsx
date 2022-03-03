@@ -112,9 +112,9 @@ class ProfilePage extends BaseComponent<Props, State> {
           .catch((e) => {
             this.setState({ updating: false });
           });
+      } else {
+        console.log("Update triggered but updating flag is set");
       }
-    } else {
-      console.log("Update triggered but updating flag is set");
     }
   };
 
