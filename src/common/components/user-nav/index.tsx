@@ -53,7 +53,10 @@ class WalletBadge extends Component<{
               : _t("user-nav.wallet")
           }
         >
-          <Link to={`/@${activeUser.username}/hive`} className="user-wallet">
+          <Link
+            to={`/@${activeUser.username}/wallet?token=hive`}
+            className="user-wallet"
+          >
             {hasUnclaimedRewards && <span className="reward-badge" />}
             {hiveSvg}
           </Link>
@@ -111,7 +114,10 @@ class HiveEngineBadge extends Component<{
     }
     return (
       <>
-        <Link to={`/@${activeUser.username}/wallet`} className="user-points">
+        <Link
+          to={`/@${activeUser.username}/wallet?token=${coinName.toLowerCase()}`}
+          className="user-points"
+        >
           {hasUnclaimedToken && <span className="reward-badge" />}
           {this.props.children}
         </Link>
