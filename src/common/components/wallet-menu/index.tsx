@@ -46,7 +46,7 @@ export default class WalletMenu extends Component<Props> {
         </Fragment>
         <Link
           className={_c(`menu-item hive ${active === "hive" ? "active" : ""}`)}
-          to={`/@${username}/hive`}
+          to={`/@${username}/wallet?token=hive`}
         >
           <span className="title">Hive</span>
           <span className="sub-title">Wallet</span>

@@ -117,6 +117,30 @@ class ProfilePage extends BaseComponent<Props, State> {
       console.log("Update triggered but updating flag is set");
     }
   };
+
+  getTokenFromURL(): string | null {
+    const { match } = this.props;
+    const { section } = match.params;
+    if (section === "hive") {
+      return "HIVE";
+    }
+    if (section !== "wallet") {
+      return null;
+    }
+    try {
+      const params_string = window.location.search.slice(1);
+      const params_list = params_string.split("&");
+      const settings = params_list.map((x) => x.split("="));
+      for (const setting of settings) {
+        if (setting[0] === "aPICoinName" || setting[0] === "token") {
+          return setting[1].toUpperCase();
+        }
+      }
+      return null;
+    } catch (e) {}
+    return null;
+  }
+
   async componentDidMount() {
     await this.ensureAccount();
     const props = this.props;
@@ -184,8 +208,16 @@ class ProfilePage extends BaseComponent<Props, State> {
       });
     }
     // Wallet and points are not a correct filter to fetch posts
-    if (section === "hive") {
-      history.push(`/${username}/wallet?token=hive`);
+    if (
+      section === "hive" ||
+      (section === "wallet" && this.getTokenFromURL() === null)
+    ) {
+      const token =
+        section === "hive"
+          ? "hive"
+          : ls.get("profile-wallet-token") ?? LIQUID_TOKEN_UPPERCASE;
+      ls.set("profile-wallet-token", token.toUpperCase());
+      history.push(`/${username}/wallet?token=${token.toLowerCase()}`);
     }
     if (section && !Object.keys(ProfileFilter).includes(section)) {
       return;
@@ -272,7 +304,10 @@ class ProfilePage extends BaseComponent<Props, State> {
       match.params.section || ls.get("profile-section") || ProfileFilter.blog;
 
     const { loading, updating } = this.state;
-    if (section == "hive") {
+    if (
+      section == "hive" ||
+      (section === "wallet" && this.getTokenFromURL() === "HIVE")
+    ) {
       const username = match.params.username.replace("@", "");
       if (!loading && !updating && username && list.length) {
         this.setState({ updating: true });
