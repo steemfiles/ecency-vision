@@ -16,6 +16,7 @@ import {
   UpdatedAction,
 } from "./types";
 import { getAccountHistory } from "../../api/hive";
+import * as ls from "../../util/local-storage";
 
 const ops = utils.operationOrders;
 
@@ -76,7 +77,15 @@ export const initialState: Transactions = {
   list: [],
   // load and show that the loading is happening.
   loading: false,
-  group: "",
+  group: (() => {
+    try {
+      const t = ls.get("profile-transactions-group");
+      return JSON.parse(t);
+    } catch (e) {
+      console.error(e.message);
+      return "";
+    }
+  })(),
   newest: 0,
   oldest: 1e18,
 };
@@ -140,6 +149,7 @@ export default (
     }
     case ActionTypes.FETCH: {
       const { group } = action;
+      ls.set("profile-transactions-group", JSON.stringify(group));
       return {
         ...state,
         group,
@@ -223,46 +233,54 @@ export const fetchTransactions =
   (dispatch: Dispatch) => {
     dispatch(fetchAct(group));
 
+    const handleFetch = (r: Array<any>) => {
+      console.log("fetching Txs");
+      const mapped: Array<Transaction> = r.map((x: any): Transaction => {
+        const { op } = x[1];
+        const { timestamp, trx_id } = x[1];
+        const opName = op[0];
+        const opData = op[1];
+
+        return {
+          num: x[0],
+          type: opName,
+          timestamp,
+          trx_id,
+          ...opData,
+        };
+      });
+
+      const transactions: Transaction[] = mapped
+        .filter((x) => x !== null)
+        .sort((a: any, b: any) => b.num - a.num);
+
+      let newest: number = initialState.newest;
+      let oldest: number = initialState.oldest;
+      if (transactions.length) {
+        console.log("here", transactions[transactions.length - 1], oldest);
+        if (transactions[0].num > newest) {
+          newest = transactions[0].num;
+        }
+        if (transactions[transactions.length - 1].num < oldest) {
+          oldest = transactions[transactions.length - 1].num;
+        }
+        console.log({ transactions, oldest, newest });
+      } else {
+        // empty...
+        console.log("No transactions returned but no exception thrown");
+      }
+
+      dispatch(fetchedAct(transactions, oldest, newest));
+    };
+
     const name = username.replace("@", "");
     const filters: any[] = filterForGroup(group);
+    console.log(filters);
 
     getAccountHistory(name, filters)
-      .then((r) => {
-        const mapped: Transaction[] = r.map((x: any): Transaction[] | null => {
-          const { op } = x[1];
-          const { timestamp, trx_id } = x[1];
-          const opName = op[0];
-          const opData = op[1];
-
-          return {
-            num: x[0],
-            type: opName,
-            timestamp,
-            trx_id,
-            ...opData,
-          };
-        });
-
-        const transactions: Transaction[] = mapped
-          .filter((x) => x !== null)
-          .sort((a: any, b: any) => b.num - a.num);
-
-        let newest: number = initialState.newest;
-        let oldest: number = initialState.oldest;
-        if (transactions.length) {
-          console.log("here", transactions[transactions.length - 1], oldest);
-          if (transactions[0].num > newest) {
-            newest = transactions[0].num;
-          }
-          if (transactions[transactions.length - 1].num < oldest) {
-            oldest = transactions[transactions.length - 1].num;
-          }
-          console.log({ oldest, newest });
-        }
-
-        dispatch(fetchedAct(transactions, oldest, newest));
-      })
+      .then(handleFetch)
       .catch((e) => {
+        console.error(e.message);
         if (
           e.message.startsWith(
             "total_processed_items < 2000: Could not find filtered operation in 2000 operations, to continue searching, set start="
@@ -270,8 +288,20 @@ export const fetchTransactions =
         ) {
           const segments = e.message.split(/=/);
           const newStart = parseInt(segments[1]);
-          dispatch(setOldestTransactionAct(newStart - 1));
-          getMoreTransactions(username, group, newStart - 1);
+          hiveClient
+            .call("condenser_api", "get_account_history", [
+              name,
+              newStart,
+              500,
+              ...filters,
+            ])
+            .then(handleFetch);
+        } else if (
+          e.message.startsWith(
+            "args.start >= args.limit-1: start must be greater than or equal to limit-1 (start is 0-based index)"
+          )
+        ) {
+          dispatch(setOldestTransactionAct(0));
         } else {
           console.log("catch", e);
           dispatch(fetchErrorAct());
@@ -294,8 +324,8 @@ export const updateTransactions =
     hiveClient
       .call("condenser_api", "get_account_history", [
         name,
-        most_recent_transaction_num + 500,
-        500,
+        most_recent_transaction_num + 900,
+        900,
         ...filters,
       ])
       .then((r: any) => {
@@ -325,7 +355,19 @@ export const updateTransactions =
       })
       .catch((e) => {
         console.log("catch", e);
-        dispatch(fetchErrorAct());
+        if (
+          e.message.startsWith(
+            "total_processed_items < 2000: Could not find filtered operation in 2000 operations, to continue searching, set start="
+          )
+        ) {
+          const segments = e.message.split(/=/);
+          const newStart = parseInt(segments[1]);
+          dispatch(setOldestTransactionAct(newStart));
+          getMoreTransactions(username, group, newStart);
+        } else {
+          console.log("catch", e);
+          dispatch(fetchErrorAct());
+        }
       });
   };
 
@@ -333,7 +375,8 @@ export const getMoreTransactions =
   (
     username: string,
     group: OperationGroup | "",
-    oldest_transaction_num: number
+    oldest_transaction_num: number,
+    initialFetch: boolean = false
   ) =>
   (dispatch: Dispatch) => {
     dispatch(getAct());
@@ -342,11 +385,26 @@ export const getMoreTransactions =
     const filters: any[] = filterForGroup(group);
 
     console.log("Searching from ", oldest_transaction_num + 1);
+    if (oldest_transaction_num <= 0) {
+      dispatch(updatedAct(null, null, group, []));
+      return;
+    }
+
+    const startingPoint = oldest_transaction_num - 1;
+    const limit = (() => {
+      const tentativeLimit = 500;
+      if (tentativeLimit - startingPoint >= 2) {
+        return startingPoint + 1;
+      } else {
+        return tentativeLimit;
+      }
+    })();
+
     return hiveClient
       .call("condenser_api", "get_account_history", [
         name,
-        oldest_transaction_num + -1,
-        500,
+        startingPoint,
+        limit,
         ...filters,
       ])
       .then((r: any) => {
@@ -387,6 +445,12 @@ export const getMoreTransactions =
           const newStart = parseInt(segments[1]);
           dispatch(setOldestTransactionAct(newStart));
           getMoreTransactions(username, group, newStart);
+        } else if (
+          e.message.startsWith(
+            "args.start >= args.limit-1: start must be greater than or equal to limit-1 (start is 0-based index)"
+          )
+        ) {
+          dispatch(setOldestTransactionAct(0));
         } else {
           console.log("catch", e);
           dispatch(fetchErrorAct());
