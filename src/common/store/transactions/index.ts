@@ -256,14 +256,12 @@ export const fetchTransactions =
       let newest: number = initialState.newest;
       let oldest: number = initialState.oldest;
       if (transactions.length) {
-        console.log("here", transactions[transactions.length - 1], oldest);
         if (transactions[0].num > newest) {
           newest = transactions[0].num;
         }
         if (transactions[transactions.length - 1].num < oldest) {
           oldest = transactions[transactions.length - 1].num;
         }
-        console.log({ transactions, oldest, newest });
       } else {
         // empty...
         console.log("No transactions returned but no exception thrown");
