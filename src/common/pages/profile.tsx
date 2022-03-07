@@ -94,22 +94,24 @@ class ProfilePage extends BaseComponent<Props, State> {
             const x = r[0];
             if (x[0] === most_recent_transaction_num) {
               // no changes
+              //console.log(`The most recent transaction number is still ${most_recent_transaction_num}`);
               this.setState({ updating: false });
               //getMoreTransactions(username, group, Math.min(oldest, oldest_transaction_num));
             } else {
               // there are new transfers to add to the list.
               console.log(
-                `updating txs for after ${most_recent_transaction_num}...`,
+                `Updating txs for after ${most_recent_transaction_num}...`,
                 { x }
               );
-              updateTransactions(username, group, most_recent_transaction_num);
               this.setState({
-                updating: false,
                 most_recent_transaction_num: x[0],
+                updating: false,
               });
+              updateTransactions(username, group, most_recent_transaction_num);
+              this.ensureAccount();
             }
           })
-          .catch((e) => {
+          .finally(() => {
             this.setState({ updating: false });
           });
       } else {
@@ -174,6 +176,8 @@ class ProfilePage extends BaseComponent<Props, State> {
       this.updateTransactionsPingHandler.bind(this),
       15000
     );
+
+    // Using a stream of blocks uses more bandwidth than polling history / 15s.
     this.setState({
       updateTransactionsIntervalIdentifier,
       most_recent_transaction_num,
@@ -219,6 +223,19 @@ class ProfilePage extends BaseComponent<Props, State> {
       ls.set("profile-wallet-token", token.toUpperCase());
       history.push(`/${username}/wallet?token=${token.toLowerCase()}`);
     }
+
+    {
+      const prevTransactions = prevProps.transactions;
+      const { transactions } = this.props;
+      if (
+        prevTransactions.list.length === 0 ||
+        (transactions.list.length !== 0 &&
+          prevTransactions.list[0].num != transactions.list[0].num)
+      ) {
+        // do nothing
+      }
+    }
+
     if (section && !Object.keys(ProfileFilter).includes(section)) {
       return;
     }

@@ -93,6 +93,7 @@ export async function getPrices(
   let obj: any = {
     "SWAP.HIVE": 1,
   };
+
   try {
     const others = await hiveSsc.find("market", "tradesHistory", {
       type: "buy",
