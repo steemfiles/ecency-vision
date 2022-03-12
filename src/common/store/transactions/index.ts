@@ -78,13 +78,19 @@ export const initialState: Transactions = {
   // load and show that the loading is happening.
   loading: false,
   group: (() => {
-    try {
-      const t = ls.get("profile-transactions-group");
-      return JSON.parse(t);
-    } catch (e) {
-      console.error(e.message);
-      return "";
+    const storedText = ls.get("profile-transactions-group") || "";
+    if (storedText !== "") {
+      try {
+        console.log(storedText);
+        const parsedText = JSON.parse(storedText);
+        if (Object.keys(ACCOUNT_OPERATION_GROUPS).includes(parsedText)) {
+          return parsedText;
+        }
+      } catch (e) {
+        console.error(e.message, `"${storedText}"`);
+      }
     }
+    return "";
   })(),
   newest: 0,
   oldest: 1e18,

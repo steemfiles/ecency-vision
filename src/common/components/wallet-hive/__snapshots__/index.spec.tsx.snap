@@ -271,7 +271,7 @@ exports[`(1) Default Render 1`] = `
       >
         <a
           className="menu-item hive active"
-          href="/@user1/hive"
+          href="/@user1/wallet?token=hive"
           onClick={[Function]}
         >
           <span
@@ -661,7 +661,7 @@ exports[`(2) Render with converting HBD 1`] = `
       >
         <a
           className="menu-item hive active"
-          href="/@user1/hive"
+          href="/@user1/wallet?token=hive"
           onClick={[Function]}
         >
           <span
@@ -1039,7 +1039,7 @@ exports[`(3) usePrivate = false 1`] = `
       >
         <a
           className="menu-item hive active"
-          href="/@user1/hive"
+          href="/@user1/wallet?token=hive"
           onClick={[Function]}
         >
           <span

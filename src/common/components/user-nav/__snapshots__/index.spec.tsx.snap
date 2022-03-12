@@ -6,7 +6,7 @@ exports[`(1) Default render 1`] = `
 >
   <a
     className="user-wallet"
-    href="/@foo/hive"
+    href="/@foo/wallet?token=hive"
     onClick={[Function]}
     title="Wallet"
   >
@@ -23,7 +23,7 @@ exports[`(1) Default render 1`] = `
   </a>
   <a
     className="user-points"
-    href="/@foo/wallet"
+    href="/@foo/wallet?token=pob"
     onClick={[Function]}
   >
     <img
@@ -75,7 +75,7 @@ exports[`(2) Has rewards  1`] = `
 >
   <a
     className="user-wallet"
-    href="/@foo/hive"
+    href="/@foo/wallet?token=hive"
     onClick={[Function]}
     title="You have unclaimed rewards"
   >
@@ -95,7 +95,7 @@ exports[`(2) Has rewards  1`] = `
   </a>
   <a
     className="user-points"
-    href="/@foo/wallet"
+    href="/@foo/wallet?token=pob"
     onClick={[Function]}
   >
     <img
@@ -147,7 +147,7 @@ exports[`(3) usePrivate = false 1`] = `
 >
   <a
     className="user-wallet"
-    href="/@foo/hive"
+    href="/@foo/wallet?token=hive"
     onClick={[Function]}
     title="Wallet"
   >
@@ -164,7 +164,7 @@ exports[`(3) usePrivate = false 1`] = `
   </a>
   <a
     className="user-points"
-    href="/@foo/wallet"
+    href="/@foo/wallet?token=pob"
     onClick={[Function]}
   >
     <img
