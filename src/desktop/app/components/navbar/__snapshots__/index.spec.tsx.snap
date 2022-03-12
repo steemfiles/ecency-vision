@@ -1012,7 +1012,7 @@ exports[`(4) With active user 1`] = `
     >
       <a
         className="user-wallet"
-        href="/@foo/hive"
+        href="/@foo/wallet?token=hive"
         onClick={[Function]}
         title="Wallet"
       >
@@ -1029,7 +1029,7 @@ exports[`(4) With active user 1`] = `
       </a>
       <a
         className="user-points"
-        href="/@foo/wallet"
+        href="/@foo/wallet?token=pob"
         onClick={[Function]}
       >
         <img
@@ -1311,7 +1311,7 @@ exports[`(5) With active user && usePrivate = false 1`] = `
     >
       <a
         className="user-wallet"
-        href="/@foo/hive"
+        href="/@foo/wallet?token=hive"
         onClick={[Function]}
         title="Wallet"
       >
@@ -1328,7 +1328,7 @@ exports[`(5) With active user && usePrivate = false 1`] = `
       </a>
       <a
         className="user-points"
-        href="/@foo/wallet"
+        href="/@foo/wallet?token=pob"
         onClick={[Function]}
       >
         <img

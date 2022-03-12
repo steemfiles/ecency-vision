@@ -1214,13 +1214,15 @@ export class Transfer extends BaseComponent<Props, State> {
                             (this.parseFloat(amount) / 4) * antiLogPrecision
                           ) / antiLogPrecision;
                         // FormattedNumber cannot display numbers that are so small the format() function displays scientific notation.
-                        console.log({
-                          amount,
-                          asset,
-                          precision,
-                          antiLogPrecision,
-                          perodicAmountToGet,
-                        });
+                        if (amount != "" && isNaN(perodicAmountToGet)) {
+                          console.log({
+                            amount,
+                            asset,
+                            precision,
+                            antiLogPrecision,
+                            perodicAmountToGet,
+                          });
+                        }
 
                         if (
                           !isNaN(perodicAmountToGet) &&
@@ -1240,7 +1242,6 @@ export class Transfer extends BaseComponent<Props, State> {
                       } else {
                         const periodicQuantityOfHiveToGet =
                           Math.round((Number(amount) / 13) * 1000) / 1000;
-                        console.log({ amount, periodicQuantityOfHiveToGet });
                         if (
                           !isNaN(periodicQuantityOfHiveToGet) &&
                           periodicQuantityOfHiveToGet > 0
