@@ -34,6 +34,7 @@ import {
   earthSvg,
   calendarRangeSvg,
   rssSvg,
+  mailSvg,
 } from "../../img/svg";
 
 import { EditPic } from "../community-card";
@@ -163,6 +164,16 @@ export class ProfileCard extends Component<Props, State> {
           <div className="basic-info">
             {account.profile?.name && (
               <div className="full-name">{account.profile.name}</div>
+            )}
+            {account.profile?.email_address && (
+              <div className="extra-props">
+                <a
+                  target="mail"
+                  href={"mailto:" + account.profile.email_address}
+                >
+                  {mailSvg}
+                </a>
+              </div>
             )}
             {account.profile?.about && (
               <div className="about">{account.profile.about}</div>

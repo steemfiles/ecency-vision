@@ -431,6 +431,7 @@
     "no-posts-found": "कुछ भी नहीं मिला!"
   },
   "profile-edit": {
+    "email-address": "Email Address",
     "title": "रूपरेखा",
     "name": "प्रदर्शित होने वाला नाम",
     "about": "के बारे में",
