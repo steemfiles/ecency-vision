@@ -38,6 +38,7 @@ interface State {
   inProgress: boolean;
   uploading: boolean;
   changed: boolean;
+  emailAddress: string;
 }
 
 const pureState = (props: Props): State => {
@@ -56,6 +57,7 @@ const pureState = (props: Props): State => {
     location: profile.location || "",
     coverImage: profile.cover_image || "",
     profileImage: profile.profile_image || "",
+    emailAddress: profile.email_address || "",
   };
 };
 
@@ -88,14 +90,22 @@ export default class ProfileEdit extends BaseComponent<Props, State> {
   update = () => {
     const { activeUser, addAccount, updateActiveUser } = this.props;
 
-    const { name, about, location, website, coverImage, profileImage } =
-      this.state;
+    const {
+      name,
+      about,
+      location,
+      website,
+      coverImage,
+      profileImage,
+      emailAddress,
+    } = this.state;
 
     const newProfile = {
       name,
       about,
       cover_image: coverImage,
       profile_image: profileImage,
+      email_address: emailAddress,
       website,
       location,
     };
@@ -131,6 +141,7 @@ export default class ProfileEdit extends BaseComponent<Props, State> {
       inProgress,
       uploading,
       changed,
+      emailAddress,
     } = this.state;
 
     const spinner = (
@@ -257,6 +268,19 @@ export default class ProfileEdit extends BaseComponent<Props, State> {
                 value={location}
                 maxLength={30}
                 data-var="location"
+                onChange={this.valueChanged}
+              />
+            </Form.Group>
+          </Col>
+          <Col lg={6} xl={4}>
+            <Form.Group>
+              <Form.Label>{_t("profile-edit.email-address")}</Form.Label>
+              <Form.Control
+                type="text"
+                disabled={inProgress}
+                value={emailAddress}
+                maxLength={100}
+                data-var="emailAddress"
                 onChange={this.valueChanged}
               />
             </Form.Group>

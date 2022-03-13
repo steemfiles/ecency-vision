@@ -8,6 +8,7 @@ export interface AccountProfile {
   name?: string;
   profile_image?: string;
   website?: string;
+  email_address?: string;
 }
 
 export interface AccountFollowStats {
