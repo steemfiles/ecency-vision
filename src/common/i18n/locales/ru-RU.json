@@ -431,6 +431,7 @@
     "no-posts-found": "Ничего не найдено!"
   },
   "profile-edit": {
+    "email-address": "Email Address",
     "title": "Профиль",
     "name": "Показать имя",
     "about": "О себе",

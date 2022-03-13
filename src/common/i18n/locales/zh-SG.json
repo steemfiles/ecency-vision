@@ -318,6 +318,7 @@
     "proposals": "Proposals"
   },
   "profile-edit": {
+    "email-address": "Email Address",
     "title": "Profile",
     "name": "Display Name",
     "about": "About",

@@ -434,6 +434,7 @@
     "no-posts-found": "Found nothing!"
   },
   "profile-edit": {
+    "email-address": "Email Address",
     "title": "Profile",
     "name": "Display Name",
     "about": "About",

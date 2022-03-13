@@ -213,6 +213,28 @@ exports[`(1) Default render 1`] = `
         />
       </div>
     </div>
+    <div
+      className="col-xl-4 col-lg-6"
+    >
+      <div
+        className="form-group"
+      >
+        <label
+          className="form-label"
+        >
+          Email Address
+        </label>
+        <input
+          className="form-control"
+          data-var="emailAddress"
+          disabled={false}
+          maxLength={100}
+          onChange={[Function]}
+          type="text"
+          value=""
+        />
+      </div>
+    </div>
   </div>
 </div>
 `;
