@@ -25,7 +25,6 @@ import defaults from "../../constants/site.json";
 import { votingPower } from "../../api/hive";
 
 import { _t } from "../../i18n";
-
 import {
   formatListBulledttedSvg,
   accountMultipleSvg,
@@ -35,6 +34,7 @@ import {
   calendarRangeSvg,
   rssSvg,
   mailSvg,
+  discordSvg,
 } from "../../img/svg";
 
 import { EditPic } from "../community-card";
@@ -53,6 +53,9 @@ interface State {
   followersList: boolean;
   followingList: boolean;
 }
+
+const emailRegex =
+  /^[a-z0-9][a-z0-9._%+-]{0,63}@(?:[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?\.){1,8}[a-z]{2,63}$/;
 
 export class ProfileCard extends Component<Props, State> {
   state: State = {
@@ -165,21 +168,36 @@ export class ProfileCard extends Component<Props, State> {
             {account.profile?.name && (
               <div className="full-name">{account.profile.name}</div>
             )}
-            {account.profile?.email_address && (
-              <div className="extra-props">
-                <a
-                  target="mail"
-                  href={"mailto:" + account.profile.email_address}
-                >
-                  {mailSvg}
-                </a>
-              </div>
-            )}
             {account.profile?.about && (
               <div className="about">{account.profile.about}</div>
             )}
           </div>
         )}
+
+        {account.profile?.email_address ||
+          (account.profile?.discord_id && (
+            <div className="extra-props">
+              {account.profile?.email_address ===
+              undefined ? null : emailRegex.test(
+                  account.profile?.email_address
+                ) ? (
+                <a
+                  target="mail"
+                  href={"mailto:" + account.profile?.email_address}
+                >
+                  {mailSvg} {account.profile?.email_address}
+                </a>
+              ) : (
+                <span>{account.profile?.email_address}</span>
+              )}
+
+              {account.profile?.discord_id && (
+                <a target="discord" href="https://discord.com/">
+                  {discordSvg} {account.profile.discord_id || ""}
+                </a>
+              )}
+            </div>
+          ))}
 
         {account.__loaded && (
           <div className="stats">

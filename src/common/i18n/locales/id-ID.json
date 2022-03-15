@@ -431,6 +431,7 @@
     "no-posts-found": "Tidak ditemukan apa-apa!"
   },
   "profile-edit": {
+    "discord-id": "Discord Id",
     "email-address": "Email Address",
     "title": "Profil",
     "name": "Tampilkan Nama",
