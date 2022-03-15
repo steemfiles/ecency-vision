@@ -23,7 +23,6 @@ import EntryShare, {
 } from "../entry-share";
 import MuteBtn from "../mute-btn";
 import Promote from "../promote";
-import Boost from "../boost";
 import ModalConfirm from "../modal-confirm";
 import { error, success } from "../feedback";
 import DropDown, { MenuItem } from "../dropdown";
@@ -85,7 +84,6 @@ interface State {
   unpin: boolean;
   mute: boolean;
   promote: boolean;
-  boost: boolean;
 }
 
 export class EntryMenu extends BaseComponent<Props, State> {
@@ -98,7 +96,6 @@ export class EntryMenu extends BaseComponent<Props, State> {
     unpin: false,
     mute: false,
     promote: false,
-    boost: false,
   };
 
   toggleCross = () => {
@@ -139,11 +136,6 @@ export class EntryMenu extends BaseComponent<Props, State> {
   togglePromote = () => {
     const { promote } = this.state;
     this.stateSet({ promote: !promote });
-  };
-
-  toggleBoost = () => {
-    const { boost } = this.state;
-    this.stateSet({ boost: !boost });
   };
 
   getCommunity = (): Community | null => {
@@ -371,18 +363,6 @@ export class EntryMenu extends BaseComponent<Props, State> {
       ];
     }
 
-    if (global.usePrivate && !isComment) {
-      menuItems = [
-        ...menuItems,
-        {
-          label: _t("entry-menu.boost"),
-          onClick:
-            activeUser !== null ? this.toggleBoost : this.toggleLoginModal,
-          icon: rocketLaunchSvg,
-        },
-      ];
-    }
-
     if (global.isElectron) {
       menuItems = [
         ...menuItems,
@@ -401,17 +381,8 @@ export class EntryMenu extends BaseComponent<Props, State> {
       items: menuItems,
     };
 
-    const {
-      cross,
-      share,
-      editHistory,
-      delete_,
-      pin,
-      unpin,
-      mute,
-      promote,
-      boost,
-    } = this.state;
+    const { cross, share, editHistory, delete_, pin, unpin, mute, promote } =
+      this.state;
     const community = this.getCommunity();
 
     return (
@@ -530,14 +501,6 @@ export class EntryMenu extends BaseComponent<Props, State> {
             activeUser={activeUser}
             entry={entry}
             onHide={this.togglePromote}
-          />
-        )}
-        {activeUser && boost && (
-          <Boost
-            {...this.props}
-            activeUser={activeUser}
-            entry={entry}
-            onHide={this.toggleBoost}
           />
         )}
       </div>
