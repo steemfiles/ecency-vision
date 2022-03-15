@@ -39,7 +39,11 @@ interface State {
   uploading: boolean;
   changed: boolean;
   emailAddress: string;
+  discordId: string;
 }
+
+const emailRegex =
+  /^[a-z0-9][a-z0-9._%+-]{0,63}@(?:[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?\.){1,8}[a-z]{2,63}$/;
 
 const pureState = (props: Props): State => {
   const profile =
@@ -57,7 +61,12 @@ const pureState = (props: Props): State => {
     location: profile.location || "",
     coverImage: profile.cover_image || "",
     profileImage: profile.profile_image || "",
-    emailAddress: profile.email_address || "",
+    emailAddress:
+      (emailRegex.test(profile.email_address || "") && profile.email_address) ||
+      "",
+    discordId:
+      (/^[a-z0-9#]+$/.test(profile.discord_id || "") && profile.discord_id) ||
+      "",
   };
 };
 
@@ -98,6 +107,7 @@ export default class ProfileEdit extends BaseComponent<Props, State> {
       coverImage,
       profileImage,
       emailAddress,
+      discordId,
     } = this.state;
 
     const newProfile = {
@@ -106,6 +116,7 @@ export default class ProfileEdit extends BaseComponent<Props, State> {
       cover_image: coverImage,
       profile_image: profileImage,
       email_address: emailAddress,
+      discord_id: discordId,
       website,
       location,
     };
@@ -142,6 +153,7 @@ export default class ProfileEdit extends BaseComponent<Props, State> {
       uploading,
       changed,
       emailAddress,
+      discordId,
     } = this.state;
 
     const spinner = (
@@ -281,6 +293,19 @@ export default class ProfileEdit extends BaseComponent<Props, State> {
                 value={emailAddress}
                 maxLength={100}
                 data-var="emailAddress"
+                onChange={this.valueChanged}
+              />
+            </Form.Group>
+          </Col>
+          <Col lg={6} xl={4}>
+            <Form.Group>
+              <Form.Label>{_t("profile-edit.discord-id")}</Form.Label>
+              <Form.Control
+                type="text"
+                disabled={inProgress}
+                value={discordId}
+                maxLength={30}
+                data-var="discordId"
                 onChange={this.valueChanged}
               />
             </Form.Group>

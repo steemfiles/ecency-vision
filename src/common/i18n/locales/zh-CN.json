@@ -431,6 +431,7 @@
     "no-posts-found": "找不到任何东西！"
   },
   "profile-edit": {
+    "discord-id": "Discord Id",
     "email-address": "Email Address",
     "title": "个人信息",
     "name": "显示名字",

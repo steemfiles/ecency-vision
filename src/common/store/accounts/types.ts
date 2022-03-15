@@ -9,6 +9,7 @@ export interface AccountProfile {
   profile_image?: string;
   website?: string;
   email_address?: string;
+  discord_id?: string;
 }
 
 export interface AccountFollowStats {

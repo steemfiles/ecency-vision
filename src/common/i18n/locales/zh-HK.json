@@ -318,6 +318,7 @@
     "proposals": "Proposals"
   },
   "profile-edit": {
+    "discord-id": "Discord Id",
     "email-address": "Email Address",
     "title": "Profile",
     "name": "Display Name",
