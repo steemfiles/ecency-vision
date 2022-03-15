@@ -23,7 +23,6 @@ import Transfer from "../transfer";
 import Tooltip from "../tooltip";
 import Purchase from "../purchase";
 import Promote from "../promote";
-import Boost from "../boost";
 
 import LinearProgress from "../linear-progress";
 import WalletMenu from "../wallet-menu";
@@ -195,7 +194,6 @@ interface State {
   claiming: boolean;
   purchase: boolean;
   promote: boolean;
-  boost: boolean;
   transfer: boolean;
 }
 
@@ -204,7 +202,6 @@ export class WalletEcency extends BaseComponent<Props, State> {
     claiming: false,
     purchase: false,
     promote: false,
-    boost: false,
     transfer: false,
   };
 
@@ -253,11 +250,6 @@ export class WalletEcency extends BaseComponent<Props, State> {
     this.setState({ transfer: !transfer });
   };
 
-  toggleBoost = () => {
-    const { boost } = this.state;
-    this.setState({ boost: !boost });
-  };
-
   filterChanged = (
     e: React.ChangeEvent<typeof FormControl & HTMLInputElement>
   ) => {
@@ -267,7 +259,7 @@ export class WalletEcency extends BaseComponent<Props, State> {
   };
 
   render() {
-    const { claiming, transfer, purchase, promote, boost } = this.state;
+    const { claiming, transfer, purchase, promote } = this.state;
     const { global, activeUser, account, points, hiveEngineTokens } =
       this.props;
 
@@ -292,10 +284,6 @@ export class WalletEcency extends BaseComponent<Props, State> {
         {
           label: _t("points.promote"),
           onClick: this.togglePromote,
-        },
-        {
-          label: _t("points.boost"),
-          onClick: this.toggleBoost,
         },
       ],
     };
@@ -515,13 +503,6 @@ export class WalletEcency extends BaseComponent<Props, State> {
               {...this.props}
               activeUser={this.props.activeUser!}
               onHide={this.togglePromote}
-            />
-          )}
-          {boost && (
-            <Boost
-              {...this.props}
-              activeUser={this.props.activeUser!}
-              onHide={this.toggleBoost}
             />
           )}
         </div>
