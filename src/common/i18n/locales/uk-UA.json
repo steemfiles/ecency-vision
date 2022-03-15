@@ -431,6 +431,7 @@
     "no-posts-found": "Found nothing!"
   },
   "profile-edit": {
+    "discord-id": "Discord Id",
     "email-address": "Email Address",
     "title": "Профіль",
     "name": "Відображуване ім'я",
