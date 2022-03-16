@@ -153,6 +153,8 @@ class ProfilePage extends BaseComponent<Props, State> {
       fetchTransactions,
       fetchPoints,
       transactions,
+      activeUser,
+      history,
     } = props;
     const { username } = match.params;
     console.log(match.params.section, ls.get("profile-section"));
@@ -160,6 +162,17 @@ class ProfilePage extends BaseComponent<Props, State> {
     const { list } = transactions;
     if (match.params.section != ls.get("profile-section")) {
       ls.set("profile-section", section);
+    }
+    if (
+      section === "settings" &&
+      username &&
+      (!activeUser ||
+        !activeUser.data ||
+        activeUser.data.name !== username.replace("@", ""))
+    ) {
+      console.log([activeUser && activeUser.data, username]);
+      ls.set("profile-section", "blog");
+      history.push(`/${username}/blog`);
     }
     const most_recent_transaction_num = list.length ? list[0].num : 0;
 
