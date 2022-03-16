@@ -90,6 +90,9 @@ exports[`(2) Render with loaded data 1`] = `
     </div>
   </div>
   <div
+    className="extra-props"
+  />
+  <div
     className="stats"
   >
     <div
@@ -284,6 +287,9 @@ exports[`(3) Should show profile edits 1`] = `
       Lorem ipsum dolor sit amet
     </div>
   </div>
+  <div
+    className="extra-props"
+  />
   <div
     className="stats"
   >

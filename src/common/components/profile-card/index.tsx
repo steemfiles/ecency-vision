@@ -174,30 +174,19 @@ export class ProfileCard extends Component<Props, State> {
           </div>
         )}
 
-        {account.profile?.email_address ||
-          (account.profile?.discord_id && (
-            <div className="extra-props">
-              {account.profile?.email_address ===
-              undefined ? null : emailRegex.test(
-                  account.profile?.email_address
-                ) ? (
-                <a
-                  target="mail"
-                  href={"mailto:" + account.profile?.email_address}
-                >
-                  {mailSvg} {account.profile?.email_address}
-                </a>
-              ) : (
-                <span>{account.profile?.email_address}</span>
-              )}
+        <div className="extra-props">
+          {account.profile?.email_address && (
+            <a target="mail" href={"mailto:" + account.profile?.email_address}>
+              {mailSvg} {account.profile?.email_address}
+            </a>
+          )}
 
-              {account.profile?.discord_id && (
-                <a target="discord" href="https://discord.com/">
-                  {discordSvg} {account.profile.discord_id || ""}
-                </a>
-              )}
-            </div>
-          ))}
+          {account.profile?.discord_id && (
+            <span>
+              {discordSvg} {account.profile?.discord_id || ""}
+            </span>
+          )}
+        </div>
 
         {account.__loaded && (
           <div className="stats">
