@@ -184,19 +184,6 @@ export default class ProfileEdit extends BaseComponent<Props, State> {
           </Col>
           <Col lg={6} xl={4}>
             <Form.Group>
-              <Form.Label>{_t("profile-edit.about")}</Form.Label>
-              <Form.Control
-                type="text"
-                disabled={inProgress}
-                value={about}
-                maxLength={160}
-                data-var="about"
-                onChange={this.valueChanged}
-              />
-            </Form.Group>
-          </Col>
-          <Col lg={6} xl={4}>
-            <Form.Group>
               <Form.Label>{_t("profile-edit.profile-image")}</Form.Label>
               <InputGroup className="mb-3">
                 <Form.Control
@@ -311,6 +298,25 @@ export default class ProfileEdit extends BaseComponent<Props, State> {
             </Form.Group>
           </Col>
         </Form.Row>
+        <Form.Row>
+          <Col lg={4} xl={12}>
+            <Form.Group>
+              <Form.Label>{_t("profile-edit.about")}</Form.Label>
+              <Form.Control
+                className={`the-editor accepts-emoji ${
+                  about.length > 20 ? "expanded" : ""
+                }`}
+                as="textarea"
+                disabled={inProgress}
+                data-var="about"
+                value={about}
+                onChange={this.valueChanged}
+                rows={8}
+              />
+            </Form.Group>
+          </Col>
+        </Form.Row>
+
         {changed && (
           <Button onClick={this.update} disabled={inProgress || uploading}>
             {inProgress && spinner} {_t("g.update")}
