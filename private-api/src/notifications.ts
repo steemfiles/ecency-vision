@@ -193,7 +193,6 @@ export function process(
   username: string
 ) {
   let notifications: Array<ApiNotification> = [];
-  let read: 0 | 1 = 0;
   let lastReadTime: null | number = null;
   if (defensive && !rh.history) {
     console.log("abnormally returning early because rh.history is undefined", {
@@ -216,7 +215,7 @@ export function process(
         id: `voter ${voter} voted for ${author}/${permlink} at ${timestamp}`,
         timestamp,
         source: voter,
-        read: 0,
+        read: lastReadTime !== null && lastReadTime < ts ? 1 : 0,
         ts,
         gk: "rvotes",
         gkf: false,
@@ -245,7 +244,7 @@ export function process(
           id: `The user ${author} replied with ${author}/${permlink} at ${timestamp}`,
           timestamp,
           source: author,
-          read,
+          read: lastReadTime !== null && lastReadTime < ts ? 1 : 0,
           ts,
           gk: "replies",
           gkf: false,
@@ -271,7 +270,7 @@ export function process(
         id: `${from} transfered to ${to} @ ${timestamp}`,
         timestamp,
         source: from,
-        read,
+        read: lastReadTime !== null && lastReadTime < ts ? 1 : 0,
         ts,
         gk: NotificationFilter.TRANSFERS,
         gkf: false,
@@ -280,16 +279,16 @@ export function process(
         amount:
           parseInt(amount.amount) * Math.pow(10, -precision) +
           (amount.nai === "@@000000013"
-            ? " Hive"
-            : nai === "@@000000021"
             ? " HBD"
+            : nai === "@@000000021"
+            ? " Hive"
             : " Unknown Currency"),
         memo,
       };
       notifications.push(tn);
     } else if (type === "custom_json_operation") {
       const { id, json } = value;
-      if (id === "notify" && read === 0) {
+      if (id === "notify" && lastReadTime !== null && lastReadTime < ts) {
         try {
           const payload = JSON.parse(json) as Array<any>;
           if (
@@ -297,7 +296,6 @@ export function process(
             payload[0] === "setLastRead" &&
             payload[1]?.date
           ) {
-            read = 1;
             lastReadTime = new Date(payload[1].date).getTime();
           }
         } catch (e) {
@@ -328,7 +326,6 @@ export function process(
   //     }
   //   }
   // }
-  read = 0;
   for (const hn of rn) {
     // most recent first
     const { id, type, date, msg, url } = hn;
@@ -336,9 +333,9 @@ export function process(
 
     //console.log(`${msg} is `, (ts > lastReadTime) ? 'newer' : 'older', 'than the last read time');
 
-    if (lastReadTime !== null && ts < lastReadTime) {
-      read = 1;
-    }
+    //if ((lastReadTime !== null) && (ts < lastReadTime)) {
+    //  read = 1;
+    //}
 
     if (type === "mention") {
       const [discard, author, permlink] = url.split(/[@\/]/);
@@ -362,7 +359,7 @@ export function process(
         const mn: ApiMentionNotification = {
           id,
           source,
-          read,
+          read: lastReadTime !== null && lastReadTime < ts ? 1 : 0,
           timestamp: date,
           ts,
           gk,
@@ -398,7 +395,7 @@ export function process(
         const fn: ApiFollowNotification = {
           id: msg,
           source: m[1],
-          read,
+          read: lastReadTime !== null && lastReadTime < ts ? 1 : 0,
           timestamp: date,
           ts,
           gk: "follows",
@@ -451,7 +448,7 @@ export function process(
       const rn: ApiReblogNotification = {
         id: msg,
         source: account,
-        read,
+        read: lastReadTime !== null && lastReadTime < ts ? 1 : 0,
         timestamp: date,
         ts,
         gk: "reblogs",
