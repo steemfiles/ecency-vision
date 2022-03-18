@@ -1,3 +1,5 @@
+import moment from "moment";
+
 const defensive = false;
 export enum NotificationFilter {
   VOTES = "rvotes",
@@ -105,6 +107,27 @@ interface BaseAPiNotification {
   ts: number; // unix timestamp
   gk: string; // group key
   gkf: boolean; // group key flag. true when a new group started
+}
+
+function ToGroup(ts: number, timestamp: string): string {
+  const hour = 3600000;
+  const nowDate = new Date();
+  const thenDate = new Date(ts);
+  const diff: number = (nowDate.getTime() - ts) / hour;
+  const day = 24;
+  if (diff < 1) {
+    return "recent";
+  } else if (diff < 24 && nowDate.getDay() == thenDate.getDay()) {
+    return Math.floor(diff) + " hours";
+  } else if (
+    diff < 96 &&
+    [-6, 1].includes(nowDate.getDay() - thenDate.getDay())
+  ) {
+    return "Yesterday";
+  } else {
+    const date = timestamp.split(/T/)[0];
+    return date;
+  }
 }
 
 export interface ApiVoteNotification extends BaseAPiNotification {
@@ -217,7 +240,7 @@ export function process(
         source: voter,
         read: lastReadTime !== null && lastReadTime < ts ? 1 : 0,
         ts,
-        gk: "rvotes",
+        gk: ToGroup(ts, timestamp),
         gkf: false,
         type: weight === 0 ? "unvote" : "vote",
         voter,
@@ -227,6 +250,7 @@ export function process(
         title: null,
         img_url: null,
       };
+
       notifications.push(vp);
     } else if (type === "comment_operation") {
       const {
@@ -246,7 +270,7 @@ export function process(
           source: author,
           read: lastReadTime !== null && lastReadTime < ts ? 1 : 0,
           ts,
-          gk: "replies",
+          gk: ToGroup(ts, timestamp),
           gkf: false,
           type: "reply",
           parent_author,
@@ -272,7 +296,7 @@ export function process(
         source: from,
         read: lastReadTime !== null && lastReadTime < ts ? 1 : 0,
         ts,
-        gk: NotificationFilter.TRANSFERS,
+        gk: ToGroup(ts, timestamp),
         gkf: false,
         type: "transfer",
         to,
@@ -306,26 +330,6 @@ export function process(
       console.log(op);
     } // if
   } // for
-  // let ni = 0;
-  // for (const hn of rn) {
-  //   if (hn.type === "reply_comment") {
-  //     let an: ApiNotification;
-  //     for (
-  //       ni = 0;
-  //       ni < notifications.length &&
-  //       ((an = notifications[ni]).type !== "reply" ||
-  //         hn.url !== `${an.author}/${an.permlink}`);
-  //       ++ni
-  //     );
-  //     if (
-  //       ni < notifications.length &&
-  //       an.type === "reply" &&
-  //       hn.url === `${an.author}/${an.permlink}`
-  //     ) {
-  //       an.id = hn.id + "";
-  //     }
-  //   }
-  // }
   for (const hn of rn) {
     // most recent first
     const { id, type, date, msg, url } = hn;
@@ -353,7 +357,7 @@ export function process(
         img_url = null;
       const id = `${msg} at ${date}`;
       const source = account;
-      const gk = "mentions";
+      const gk = ToGroup(ts, date);
       const gkf = false;
       if (account !== null && source !== null) {
         const mn: ApiMentionNotification = {
@@ -391,6 +395,7 @@ export function process(
       const source = m[1];
       const follower = source;
       const following = username;
+      const gk = ToGroup(ts, date);
       if (m !== null && m.length > 1) {
         const fn: ApiFollowNotification = {
           id: msg,
@@ -398,7 +403,7 @@ export function process(
           read: lastReadTime !== null && lastReadTime < ts ? 1 : 0,
           timestamp: date,
           ts,
-          gk: "follows",
+          gk,
           gkf: false,
           type,
           follower,
@@ -444,6 +449,7 @@ export function process(
           return ["", ""];
         }
       })();
+      const gk = ToGroup(ts, date);
 
       const rn: ApiReblogNotification = {
         id: msg,
@@ -451,7 +457,7 @@ export function process(
         read: lastReadTime !== null && lastReadTime < ts ? 1 : 0,
         timestamp: date,
         ts,
-        gk: "reblogs",
+        gk,
         gkf: false,
 
         type: "reblog",
@@ -470,9 +476,22 @@ export function process(
       console.log(hn);
     } // if
   } // for
-  return notifications.sort((a: ApiNotification, b: ApiNotification) => {
-    return b.ts - a.ts;
-  });
+  notifications = notifications.sort(
+    (a: ApiNotification, b: ApiNotification) => {
+      return b.ts - a.ts;
+    }
+  );
+  if (notifications.length) {
+    notifications[0].gkf = true;
+  }
+  for (let ni = 0; ni < notifications.length - 1; ++ni) {
+    const nj = notifications[ni];
+    const nk = notifications[ni + 1];
+    nk.gkf =
+      nj.gk != nk.gk &&
+      moment.utc(nk.timestamp).fromNow() != moment.utc(nj.timestamp).fromNow();
+  }
+  return notifications;
 } // fn
 
 export default process;
