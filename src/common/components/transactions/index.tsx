@@ -193,7 +193,7 @@ export class TransactionRow extends Component<RowProps> {
             </>
           ) : null}
           <>
-            <strong> @ {tr.from}</strong> -&gt; <strong> @ {tr.to}</strong>
+            <strong> @ {tr.from}</strong> &#10230; <strong> @ {tr.to}</strong>
           </>
         </span>
       );
@@ -222,7 +222,7 @@ export class TransactionRow extends Component<RowProps> {
               </Tsx>
               <br />
               <br />
-              <strong> @ {tr.from}</strong> -&gt; <strong> @ {tr.to}</strong>
+              <strong> @ {tr.from}</strong> &#10230; <strong> @ {tr.to}</strong>
             </>
           ) : (
             <>
@@ -234,7 +234,7 @@ export class TransactionRow extends Component<RowProps> {
               </Tsx>
               <br />
               <br />
-              <strong> @ {tr.from}</strong> -&gt; <strong> @ {tr.to}</strong>
+              <strong> @ {tr.from}</strong> &#10230; <strong> @ {tr.to}</strong>
             </>
           )}
         </span>
@@ -310,7 +310,7 @@ export class TransactionRow extends Component<RowProps> {
       details = tr.from_account ? (
         <span>
           <strong>
-            @ {tr.from_account} -&gt; @ {tr.to_account}
+            @ {tr.from_account} &#10230; @ {tr.to_account}
           </strong>
         </span>
       ) : null;
@@ -320,7 +320,7 @@ export class TransactionRow extends Component<RowProps> {
       icon = reOrderHorizontalSvg;
       numbers = (
         <span className="number">
-          {tr.current_pays} = {tr.open_pays}
+          {tr.current_pays} &#10230; {tr.open_pays}
         </span>
       );
     }
@@ -329,7 +329,7 @@ export class TransactionRow extends Component<RowProps> {
       icon = reOrderHorizontalSvg;
       numbers = (
         <span className="number">
-          {tr.amount_to_sell} = {tr.min_to_receive}
+          {tr.amount_to_sell} &#10230; {tr.min_to_receive}
         </span>
       );
     }
@@ -368,14 +368,14 @@ export class TransactionRow extends Component<RowProps> {
       icon = reOrderHorizontalSvg;
       numbers = (
         <span className="number">
-          {tr.amount_in} = {tr.amount_out}
+          {tr.amount_in} &#10230; {tr.amount_out}
         </span>
       );
     }
     if (tr.type === "collateralized_convert") {
       flag = true;
       icon = reOrderHorizontalSvg;
-      numbers = <span className="number"> {tr.amount}</span>;
+      numbers = <span className="number"> {tr.amount} </span>;
     }
     if (tr.type === "market_closeOrder") {
       flag = true;
@@ -415,7 +415,7 @@ export class TransactionRow extends Component<RowProps> {
       flag = true;
       numbers = (
         <span className="number">
-          {_t("transactions.sold", { q: tr.quote })}
+          {_t("transactions.sold", { q: tr.quote })} &roarr; {tr.base}
         </span>
       );
       details = (
@@ -527,7 +527,8 @@ export class TransactionRow extends Component<RowProps> {
         <>
           {amount.amount > 0 && (
             <span className="number">
-              {formattedNumber(amount.amount, { suffix: HIVE_HUMAN_NAME })}
+              {formattedNumber(amount.amount, { suffix: HIVE_HUMAN_NAME })}{" "}
+              &#10230; {DOLLAR_HUMAN_NAME}
             </span>
           )}
         </>
