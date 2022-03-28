@@ -440,7 +440,7 @@ const struct sigaction sigLogAction = {report_and_continue, (long int)0,
 
 const struct sigaction
     sigRestartChildrenAction = {report_and_set_process_closed, 0, 0xffffffff,
-                                SA_RESTART, 0},
+                                SA_RESTART | SA_NOCLDSTOP, 0},
 
     sigExitAllAction = {set_to_exit, 0, 0xffffffff, SA_RESTART, 0};
 
@@ -448,8 +448,8 @@ void set_handlers() {
   // Block certain signals for this process
   struct sigaction old;
   sigaction(SIGBUS, &sigLogAction, &old);
-  sigaction(SIGCHLD, &sigLogAction, &old);
-  sigaction(SIGCLD, &sigLogAction, &old);
+  // sigaction(SIGCHLD, &sigLogAction, &old);
+  sigaction(SIGCLD, &sigRestartChildrenAction, &old);
   sigaction(SIGCONT, &sigLogAction, &old);
   // signal_names[SIGEMT
   sigaction(SIGFPE, &sigLogAction, &old);
