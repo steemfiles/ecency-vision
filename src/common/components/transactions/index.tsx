@@ -415,7 +415,7 @@ export class TransactionRow extends Component<RowProps> {
       flag = true;
       numbers = (
         <span className="number">
-          {_t("transactions.sold", { q: tr.quote })} &roarr; {tr.base}
+          {_t("transactions.sold", { q: tr.quote })} &#10230; {tr.base}
         </span>
       );
       details = (
