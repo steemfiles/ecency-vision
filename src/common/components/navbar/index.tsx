@@ -182,6 +182,23 @@ export class NavBar extends Component<Props, State> {
       this.props?.location?.pathname?.startsWith("/created") ||
       this.props?.location?.pathname?.startsWith("/trending");
 
+    const textMenu = (
+      <div className="text-menu">
+        <Link className="menu-item" to="/discover">
+          {_t("navbar.discover")}
+        </Link>
+        <Link className="menu-item" to="/communities">
+          {_t("navbar.communities")}
+        </Link>
+      </div>
+    );
+
+    const discordLink = (
+      <a href="https://discord.gg/8vBmmtS9ZU" target="discord">
+        <img src={discordLogo} className="logo" alt="discord" />
+      </a>
+    );
+
     return (
       <>
         {floating && <div className="nav-bar-rep" />}
@@ -197,6 +214,7 @@ export class NavBar extends Component<Props, State> {
               <Link to={"/created/" + site.communityUsername}>
                 <img src={logo} className="logo" alt="Logo" />
               </Link>
+              {discordLink}
               {activeUser !== null ? (
                 <Link to={logoHref} className="logo">
                   <img src={hiveLogo} className="logo" width="5%" alt="Logo" />
@@ -217,6 +235,9 @@ export class NavBar extends Component<Props, State> {
             }`
           )}
         >
+          {
+            false // for wide displays
+          }
           <div className="nav-bar-inner">
             <div
               style={{ display: "flex", flexDirection: "row" }}
@@ -225,6 +246,10 @@ export class NavBar extends Component<Props, State> {
               <Link to={"/created/" + site.communityUsername}>
                 <img src={logo} className="logo" alt="Logo" />
               </Link>
+              <div className="logo" style={{ color: "red" }}>
+                {discordLink}
+              </div>
+
               {activeUser !== null ? (
                 <Link to={logoHref}>
                   {" "}
@@ -240,13 +265,20 @@ export class NavBar extends Component<Props, State> {
                   />
                 </div>
               )}
-              <a href="https://discord.gg/8vBmmtS9ZU" target="discord">
-                <img src={discordLogo} className="logo" alt="discord" />
-              </a>
+              <Link
+                style={{ display: "none" }}
+                to={"/created/" + site.communityUsername}
+              >
+                <img src={logo} className="logo" alt="Logo" />
+              </Link>
             </div>
+
             <div className="flex-spacer" />
+            {textMenu}
             {(step !== 1 || transparentVerify) && (
-              <div className="search-bar">{Search({ ...this.props })}</div>
+              <>
+                <div className="search-bar">{Search({ ...this.props })}</div>
+              </>
             )}
             <div className="switch-menu">
               {SwitchLang({ ...this.props })}
