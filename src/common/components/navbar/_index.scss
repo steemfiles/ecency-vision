@@ -150,6 +150,9 @@
     }
 
     .text-menu {
+      @media (max-width: 1000px) {
+        display: none;
+      }
       @include nav-text-menu;
       margin-bottom: 20px;
 
@@ -265,11 +268,11 @@
       top: 0;
       height: 64px;
       width: 100%;
-      animation: anim-fadein .3s;
+      animation: anim-fadein 0.3s;
 
       @include themify(day) {
         background: $white-two;
-        box-shadow: 0 .5rem 1rem rgba($gray-500, .15)
+        box-shadow: 0 0.5rem 1rem rgba($gray-500, 0.15);
       }
 
       @include themify(night) {
@@ -285,7 +288,8 @@
 }
 
 // Custom dropdown colors
-.nav-bar, .nav-bar-sm {
+.nav-bar,
+.nav-bar-sm {
   .custom-dropdown {
     .dropdown-btn {
       @include themify(day) {
