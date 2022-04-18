@@ -121,33 +121,30 @@ export default (
         }
       }
 
-      if (oldest) {
-        let nums_present: { [n: number]: boolean } = {};
-        let new_list = [...old_list];
-        new_list.forEach(function (value) {
-          nums_present[value.num] = true;
-        });
-
-        transactions.forEach(function (value) {
-          if (!nums_present[value.num]) {
-            new_list.push(value);
-          }
-        });
-        const list = new_list;
-        //.sort((a: any, b: any) => b.num - a.num);
-        return { ...state, list, oldest, loading: false };
-      } else if (newest && throw_away_start == 0) {
+      if (newest && throw_away_start == 0) {
         console.log("Nothing new....");
         return state;
-      } else if (newest) {
-        const list = (() => {
-          if (throw_away_start > 0) {
-            return [...transactions.slice(0, throw_away_start), ...old_list];
-          } else {
-            return [...transactions, ...old_list];
+      } else {
+        let nums_present: { [n: number]: boolean } = {};
+        let list: Transaction[] = [];
+        const includeInList = (value: Transaction) => {
+          if (!nums_present[value.num]) {
+            nums_present[value.num] = true;
+            list.push(value);
           }
-        })();
-        return { ...state, list, newest, loading: false };
+        };
+
+        if (oldest) {
+          // include loaded transactions *after*
+          old_list.forEach(includeInList);
+          transactions.forEach(includeInList);
+          return { ...state, list, oldest, loading: false };
+        } else if (newest) {
+          // include loaded transactions *before*
+          transactions.forEach(includeInList);
+          old_list.forEach(includeInList);
+          return { ...state, list, newest, loading: false };
+        }
       }
 
       return state;
