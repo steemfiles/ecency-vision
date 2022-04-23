@@ -18,6 +18,15 @@ const minimumPeriodBetweenFetches = 20000;
 const historyLimit = 999;
 const notificationLimit = 99;
 
+// returns the filter for a given notification type
+function plural(ins: string) {
+  if (ins.length === 0) return ins;
+  if (ins === "vote") return "rvotes";
+  if (ins[ins.length - 1] === "y") return ins.slice(0, ins.length - 1) + "ies";
+  if (ins == "unfollow" || ins === "ignore") return "follows";
+  return ins + "s";
+}
+
 interface User {
   history: Array<unknown>;
   hiveNotifications: Array<unknown>;
@@ -197,9 +206,11 @@ const server = http
             lres.end();
           } else if (url === "/notifications") {
             console.log({ since, filter });
+            console.log(notifications.map((n) => n.type));
             notifications = notifications.filter(
               (n) =>
-                (!since || n.timestamp > since) && (!filter || n.gk === filter)
+                (!since || n.timestamp > since) &&
+                (!filter || plural(n.type) === filter)
             );
             lres.write(JSON.stringify(notifications) + "\n");
             lres.end();
