@@ -313,7 +313,7 @@ exports[`(5) transfer 1`] = `
          @ 
         user1
       </strong>
-       -&gt; 
+       ⟶ 
       <strong>
          @ 
         user2
@@ -382,7 +382,7 @@ exports[`(6) transfer_to_vesting 1`] = `
          @ 
         user1
       </strong>
-       -&gt; 
+       ⟶ 
       <strong>
          @ 
         user2
@@ -486,7 +486,7 @@ exports[`(8) fill_order 1`] = `
       className="number"
     >
       foo
-       = 
+       ⟶ 
       bar
     </span>
   </div>
@@ -649,7 +649,7 @@ exports[`(11) transfer_to_savings 1`] = `
          @ 
         talhasch
       </strong>
-       -&gt; 
+       ⟶ 
       <strong>
          @ 
         talhasch
@@ -698,7 +698,7 @@ exports[`(12) fill_convert_request 1`] = `
       className="number"
     >
       1.507 HBD
-       = 
+       ⟶ 
       10.920 HIVE
     </span>
   </div>
