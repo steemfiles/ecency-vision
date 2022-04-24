@@ -37,6 +37,16 @@ Array [
           src="bluebrain-logo-circle.webp"
         />
       </a>
+      <a
+        href="https://discord.gg/8vBmmtS9ZU"
+        target="discord"
+      >
+        <img
+          alt="discord"
+          className="logo"
+          src="discord-logo-transparent-better.png"
+        />
+      </a>
       <div
         onClick={[Function]}
       >
@@ -75,6 +85,25 @@ Array [
           />
         </a>
         <div
+          className="logo"
+          style={
+            Object {
+              "color": "red",
+            }
+          }
+        >
+          <a
+            href="https://discord.gg/8vBmmtS9ZU"
+            target="discord"
+          >
+            <img
+              alt="discord"
+              className="logo"
+              src="discord-logo-transparent-better.png"
+            />
+          </a>
+        </div>
+        <div
           className="brand"
           onClick={[Function]}
         >
@@ -86,19 +115,42 @@ Array [
           />
         </div>
         <a
-          href="https://discord.gg/8vBmmtS9ZU"
-          target="discord"
+          href="/created/hive-150329"
+          onClick={[Function]}
+          style={
+            Object {
+              "display": "none",
+            }
+          }
         >
           <img
-            alt="discord"
+            alt="Logo"
             className="logo"
-            src="discord-logo-transparent-better.png"
+            src="bluebrain-logo-circle.webp"
           />
         </a>
       </div>
       <div
         className="flex-spacer"
       />
+      <div
+        className="text-menu"
+      >
+        <a
+          className="menu-item"
+          href="/discover"
+          onClick={[Function]}
+        >
+          Discover
+        </a>
+        <a
+          className="menu-item"
+          href="/communities"
+          onClick={[Function]}
+        >
+          Communities
+        </a>
+      </div>
       <div
         className="search-bar"
       >
@@ -294,6 +346,16 @@ Array [
           src="bluebrain-logo-circle.webp"
         />
       </a>
+      <a
+        href="https://discord.gg/8vBmmtS9ZU"
+        target="discord"
+      >
+        <img
+          alt="discord"
+          className="logo"
+          src="discord-logo-transparent-better.png"
+        />
+      </a>
       <div
         onClick={[Function]}
       >
@@ -332,6 +394,25 @@ Array [
           />
         </a>
         <div
+          className="logo"
+          style={
+            Object {
+              "color": "red",
+            }
+          }
+        >
+          <a
+            href="https://discord.gg/8vBmmtS9ZU"
+            target="discord"
+          >
+            <img
+              alt="discord"
+              className="logo"
+              src="discord-logo-transparent-better.png"
+            />
+          </a>
+        </div>
+        <div
           className="brand"
           onClick={[Function]}
         >
@@ -343,19 +424,42 @@ Array [
           />
         </div>
         <a
-          href="https://discord.gg/8vBmmtS9ZU"
-          target="discord"
+          href="/created/hive-150329"
+          onClick={[Function]}
+          style={
+            Object {
+              "display": "none",
+            }
+          }
         >
           <img
-            alt="discord"
+            alt="Logo"
             className="logo"
-            src="discord-logo-transparent-better.png"
+            src="bluebrain-logo-circle.webp"
           />
         </a>
       </div>
       <div
         className="flex-spacer"
       />
+      <div
+        className="text-menu"
+      >
+        <a
+          className="menu-item"
+          href="/discover"
+          onClick={[Function]}
+        >
+          Discover
+        </a>
+        <a
+          className="menu-item"
+          href="/communities"
+          onClick={[Function]}
+        >
+          Communities
+        </a>
+      </div>
       <div
         className="search-bar"
       >
@@ -552,6 +656,16 @@ Array [
         />
       </a>
       <a
+        href="https://discord.gg/8vBmmtS9ZU"
+        target="discord"
+      >
+        <img
+          alt="discord"
+          className="logo"
+          src="discord-logo-transparent-better.png"
+        />
+      </a>
+      <a
         className="logo"
         href="/@foo/feed"
         onClick={[Function]}
@@ -590,6 +704,25 @@ Array [
             src="bluebrain-logo-circle.webp"
           />
         </a>
+        <div
+          className="logo"
+          style={
+            Object {
+              "color": "red",
+            }
+          }
+        >
+          <a
+            href="https://discord.gg/8vBmmtS9ZU"
+            target="discord"
+          >
+            <img
+              alt="discord"
+              className="logo"
+              src="discord-logo-transparent-better.png"
+            />
+          </a>
+        </div>
         <a
           href="/@foo/feed"
           onClick={[Function]}
@@ -603,19 +736,42 @@ Array [
           />
         </a>
         <a
-          href="https://discord.gg/8vBmmtS9ZU"
-          target="discord"
+          href="/created/hive-150329"
+          onClick={[Function]}
+          style={
+            Object {
+              "display": "none",
+            }
+          }
         >
           <img
-            alt="discord"
+            alt="Logo"
             className="logo"
-            src="discord-logo-transparent-better.png"
+            src="bluebrain-logo-circle.webp"
           />
         </a>
       </div>
       <div
         className="flex-spacer"
       />
+      <div
+        className="text-menu"
+      >
+        <a
+          className="menu-item"
+          href="/discover"
+          onClick={[Function]}
+        >
+          Discover
+        </a>
+        <a
+          className="menu-item"
+          href="/communities"
+          onClick={[Function]}
+        >
+          Communities
+        </a>
+      </div>
       <div
         className="search-bar"
       >
@@ -858,6 +1014,16 @@ Array [
         />
       </a>
       <a
+        href="https://discord.gg/8vBmmtS9ZU"
+        target="discord"
+      >
+        <img
+          alt="discord"
+          className="logo"
+          src="discord-logo-transparent-better.png"
+        />
+      </a>
+      <a
         className="logo"
         href="/@foo/feed"
         onClick={[Function]}
@@ -896,6 +1062,25 @@ Array [
             src="bluebrain-logo-circle.webp"
           />
         </a>
+        <div
+          className="logo"
+          style={
+            Object {
+              "color": "red",
+            }
+          }
+        >
+          <a
+            href="https://discord.gg/8vBmmtS9ZU"
+            target="discord"
+          >
+            <img
+              alt="discord"
+              className="logo"
+              src="discord-logo-transparent-better.png"
+            />
+          </a>
+        </div>
         <a
           href="/@foo/feed"
           onClick={[Function]}
@@ -909,19 +1094,42 @@ Array [
           />
         </a>
         <a
-          href="https://discord.gg/8vBmmtS9ZU"
-          target="discord"
+          href="/created/hive-150329"
+          onClick={[Function]}
+          style={
+            Object {
+              "display": "none",
+            }
+          }
         >
           <img
-            alt="discord"
+            alt="Logo"
             className="logo"
-            src="discord-logo-transparent-better.png"
+            src="bluebrain-logo-circle.webp"
           />
         </a>
       </div>
       <div
         className="flex-spacer"
       />
+      <div
+        className="text-menu"
+      >
+        <a
+          className="menu-item"
+          href="/discover"
+          onClick={[Function]}
+        >
+          Discover
+        </a>
+        <a
+          className="menu-item"
+          href="/communities"
+          onClick={[Function]}
+        >
+          Communities
+        </a>
+      </div>
       <div
         className="search-bar"
       >
