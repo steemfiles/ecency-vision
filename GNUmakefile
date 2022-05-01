@@ -23,28 +23,33 @@ src/common/constants/gitversion.cpp src/common/constants/gitversion.ts: .git ext
 	
 clean:
 	rm *.o runforever-dbg
-
 	
 raw_version.o: src/common/constants/gitversion.cpp
 	g++ src/common/constants/gitversion.cpp -ggdb -c $(COMPILE_FLAGS) -o raw_version.o
 	
-runforever.o: src/runforever.cpp
+pidfile.o: src/pidfile.hpp src/pidfile.cpp
+	g++ src/pidfile.cpp -ggdb -c $(COMPILE_FLAGS) -o pidfile.o
+	
+abstractservice.o: src/abstractservice.hpp src/abstractservice.cpp
+	g++ src/abstractservice.cpp -ggdb -c $(COMPILE_FLAGS) -o abstractservice.o
+	
+runforever.o: src/runforever.cpp src/runforever.hpp src/abstractservice.hpp src/pidfile.hpp
 	g++ src/runforever.cpp -c $(COMPILE_FLAGS)
 
-runforever-dbg.o: src/runforever.cpp
+runforever-dbg.o: src/runforever.cpp src/runforever.hpp src/abstractservice.hpp src/pidfile.hpp
 	g++ src/runforever.cpp -ggdb -c -o runforever-dbg.o  $(COMPILE_FLAGS)
 
 listenlog-dbg.o: src/listenlog.cpp
 	g++ src/listenlog.cpp -ggdb -c -o listenlog-dbg.o  $(COMPILE_FLAGS)
 	
-private-api/build/runforever: runforever.o raw_version.o
-	g++ runforever.o raw_version.o -o private-api/build/runforever $(LINK_FLAGS) -static
+private-api/build/runforever: runforever.o raw_version.o pidfile.o abstractservice.o
+	g++ runforever.o raw_version.o abstractservice.o pidfile.o -o private-api/build/runforever $(LINK_FLAGS) -static
 
-private-api/build/runforever-dyn: runforever.o raw_version.o
-	g++ runforever.o raw_version.o -o private-api/build/runforever-dyn $(LINK_FLAGS)
+private-api/build/runforever-dyn: runforever.o raw_version.o pidfile.o abstractservice.o
+	g++ runforever.o raw_version.o abstractservice.o pidfile.o -o private-api/build/runforever-dyn $(LINK_FLAGS)
 
-runforever-dbg: runforever-dbg.o raw_version.o
-	g++ -ggdb runforever-dbg.o raw_version.o -o runforever-dbg  $(LINK_FLAGS) -static
+runforever-dbg: raw_version.o abstractservice.o runforever-dbg.o pidfile.o
+	g++ -ggdb runforever-dbg.o raw_version.o abstractservice.o pidfile.o -o runforever-dbg  $(LINK_FLAGS) -static
 	
 listenlog-dbg: listenlog-dbg.o
 	g++ -ggdb listenlog-dbg.o -o listenlog-dbg  $(LINK_FLAGS) -static
