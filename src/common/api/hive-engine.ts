@@ -29,7 +29,13 @@ import {
 } from "../store/entries/types";
 const hiveSsc = new SSC("https://api.hive-engine.com/rpc");
 
-export type HELiquidAsset = "POB" | "VYB" | "WEED" | "TEST";
+export type HELiquidAsset =
+  | "POB"
+  | "VYB"
+  | "WEED"
+  | "SWAP.HIVE"
+  | "SWAP.HBD"
+  | "TEST";
 export type HEStakedAsset = "VP" | "BP" | "WP" | "TP";
 export type LiquidAsset =
   | "HIVE"
@@ -1563,5 +1569,19 @@ export const tokenAliases: {
     stakedLong: "Weed Power",
     liquidShort: "WEED",
     stakedShort: "WP",
+  },
+
+  "SWAP.HIVE": {
+    liquidLong: "Hive on Hive Engine",
+    stakedLong: "",
+    liquidShort: "SWAP.HIVE",
+    stakedShort: "",
+  },
+
+  "SWAP.HBD": {
+    liquidLong: "Hive Backed Dollars on Hive Engine",
+    stakedLong: "",
+    liquidShort: "HBD",
+    stakedShort: "",
   },
 });

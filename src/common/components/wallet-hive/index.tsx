@@ -50,6 +50,7 @@ import {
   isNonZeroBalance,
   is_FullHiveEngineAccount,
 } from "../../api/hive-engine";
+import { HIVE_HUMAN_NAME, DOLLAR_HUMAN_NAME } from "../../api/hive";
 import * as ls from "../../util/local-storage";
 
 interface Props {
@@ -281,575 +282,590 @@ export class WalletHive extends BaseComponent<Props, State> {
       }
     })();
     try {
-    const toNow = moment().format("X");
+      const toNow = moment().format("X");
 
-    return (
-      <div className="wallet-hive">
-        <div className="wallet-main">
-          <div className="wallet-info">
-            {w.hasUnclaimedRewards && !claimed && (
-              <div className="unclaimed-rewards">
-                <div className="title">{_t("wallet.unclaimed-rewards")}</div>
-                <div className="rewards">
-                  {w.rewardHiveBalance > 0 && (
-                    <span className="reward-type">{`${w.rewardHiveBalance} ${HIVE_API_NAME}`}</span>
-                  )}
-                  {w.rewardHbdBalance > 0 && (
-                    <span className="reward-type">{`${w.rewardHbdBalance} ${DOLLAR_API_NAME}`}</span>
-                  )}
-                  {w.rewardVestingHive > 0 && (
-                    <span className="reward-type">{`${w.rewardVestingHive} HP`}</span>
-                  )}
-                  {isMyPage && (
-                    <Tooltip content={_t("wallet.claim-reward-balance")}>
-                      <a
-                        className={`claim-btn ${claiming ? "in-progress" : ""}`}
-                        onClick={this.claimRewardBalance}
-                      >
-                        {plusCircle}
-                      </a>
-                    </Tooltip>
-                  )}
+      return (
+        <div className="wallet-hive">
+          <div className="wallet-main">
+            <div className="wallet-info">
+              {w.hasUnclaimedRewards && !claimed && (
+                <div className="unclaimed-rewards">
+                  <div className="title">{_t("wallet.unclaimed-rewards")}</div>
+                  <div className="rewards">
+                    {w.rewardHiveBalance > 0 && (
+                      <span className="reward-type">{`${w.rewardHiveBalance} ${HIVE_API_NAME}`}</span>
+                    )}
+                    {w.rewardHbdBalance > 0 && (
+                      <span className="reward-type">{`${w.rewardHbdBalance} ${DOLLAR_API_NAME}`}</span>
+                    )}
+                    {w.rewardVestingHive > 0 && (
+                      <span className="reward-type">{`${w.rewardVestingHive} HP`}</span>
+                    )}
+                    {isMyPage && (
+                      <Tooltip content={_t("wallet.claim-reward-balance")}>
+                        <a
+                          className={`claim-btn ${
+                            claiming ? "in-progress" : ""
+                          }`}
+                          onClick={this.claimRewardBalance}
+                        >
+                          {plusCircle}
+                        </a>
+                      </Tooltip>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            <div className="balance-row estimated alternative">
-              <div className="balance-info">
-                <div className="title">{_t("wallet.estimated")}</div>
-                <div className="description">
-                  {_t("wallet.estimated-description")}
+              <div className="balance-row estimated alternative">
+                <div className="balance-info">
+                  <div className="title">{_t("wallet.estimated")}</div>
+                  <div className="description">
+                    {_t("wallet.estimated-description")}
+                  </div>
+                </div>
+                <div className="balance-values">
+                  <div className="amount amount-bold">
+                    <FormattedCurrency
+                      {...this.props}
+                      value={w.estimatedValue}
+                      fixAt={3}
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="balance-values">
-                <div className="amount amount-bold">
-                  <FormattedCurrency
-                    {...this.props}
-                    value={w.estimatedValue}
-                    fixAt={3}
-                  />
-                </div>
-              </div>
-            </div>
 
-            <div className="balance-row hive">
-              <div className="balance-info">
-                <div className="title">{HIVE_HUMAN_NAME_UPPERCASE}</div>
-                <div className="description">
-                  {_t("wallet.hive-description")}
+              <div className="balance-row hive">
+                <div className="balance-info">
+                  <div className="title">{HIVE_HUMAN_NAME_UPPERCASE}</div>
+                  <div className="description">
+                    {_t("wallet.hive-description")}
+                  </div>
+                </div>
+                <div className="balance-values">
+                  <div className="amount">
+                    {(() => {
+                      if (isMyPage) {
+                        const dropDownConfig = {
+                          history: this.props.history,
+                          label: "",
+                          items: [
+                            {
+                              label: _t("wallet.transfer"),
+                              onClick: () => {
+                                this.openTransferDialog(
+                                  "transfer",
+                                  HIVE_API_NAME
+                                );
+                              },
+                            },
+                            {
+                              label: _t("wallet.transfer-to-savings"),
+                              onClick: () => {
+                                this.openTransferDialog(
+                                  "transfer-saving",
+                                  HIVE_API_NAME
+                                );
+                              },
+                            },
+                            {
+                              label: _t("wallet.power-up"),
+                              onClick: () => {
+                                this.openTransferDialog(
+                                  "power-up",
+                                  HIVE_API_NAME
+                                );
+                              },
+                            },
+                            {
+                              label: "Borrow new HBD against Hive",
+                              onClick: () => {
+                                this.openTransferDialog(
+                                  "borrow",
+                                  DOLLAR_API_NAME
+                                );
+                              },
+                            },
+                            {
+                              label: _t("wallet.trade-internal-market"),
+                              onClick: () => {
+                                window.open(
+                                  `https://wallet.hive.blog/market`,
+                                  "HiveDEx"
+                                );
+                              },
+                            },
+                            {
+                              label: _t("wallet.trade-on-Blocktrades"),
+                              onClick: () => {
+                                window.open(
+                                  `https://blocktrades.us/`,
+                                  "BlockTrades"
+                                );
+                              },
+                            },
+                            {
+                              label: _t("wallet.trade-on-Upbit"),
+                              onClick: () => {
+                                window.open(`https://upbit.com/`, "UpBit");
+                              },
+                            },
+                            {
+                              label: _t("wallet.trade-on-BitTrex"),
+                              onClick: () => {
+                                window.open(
+                                  `https://global.bittrex.com/`,
+                                  "BitTrex"
+                                );
+                              },
+                            },
+                          ],
+                        };
+                        return (
+                          <div className="amount-actions">
+                            <DropDown {...dropDownConfig} float="right" />
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+
+                    <span>
+                      {formattedNumber(w.balance, {
+                        suffix: HIVE_HUMAN_NAME_UPPERCASE,
+                      })}
+                    </span>
+                  </div>
+                  {collaterializedConverting > 0 && (
+                    <div className="amount amount-passive converting-hbd">
+                      <Tooltip content={_t("wallet.collateral-hive-amount")}>
+                        <span>
+                          {"+"}{" "}
+                          {formattedNumber(collaterializedConverting, {
+                            suffix: HIVE_HUMAN_NAME_UPPERCASE,
+                          })}
+                        </span>
+                      </Tooltip>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="balance-values">
-                <div className="amount">
+
+              <div className="balance-row hive-power alternative">
+                <div className="balance-info">
+                  <div className="title">
+                    {_t(TEST_NET ? "wallet.test-power" : "wallet.hive-power")}
+                  </div>
+                  <div className="description">
+                    {_t(
+                      TEST_NET
+                        ? "wallet.test-power-description"
+                        : "wallet.hive-power-description"
+                    )}
+                  </div>
+                </div>
+
+                <div className="balance-values">
+                  <div className="amount">
+                    {(() => {
+                      if (isMyPage) {
+                        const dropDownConfig = {
+                          history: this.props.history,
+                          label: "",
+                          items: [
+                            {
+                              label: _t("wallet.delegate"),
+                              onClick: () => {
+                                this.openTransferDialog(
+                                  "delegate",
+                                  TEST_NET ? "TP" : "HP"
+                                );
+                              },
+                            },
+                            {
+                              label: _t("wallet.power-down"),
+                              onClick: () => {
+                                this.openTransferDialog(
+                                  "power-down",
+                                  TEST_NET ? "TP" : "HP"
+                                );
+                              },
+                            },
+                            {
+                              label: _t("wallet.withdraw-routes"),
+                              onClick: () => {
+                                this.toggleWithdrawRoutes();
+                              },
+                            },
+                          ],
+                        };
+                        return (
+                          <div className="amount-actions">
+                            <DropDown {...dropDownConfig} float="right" />
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                    {formattedNumber(
+                      vestsToHp(w.vestingShares, hivePerMVests),
+                      {
+                        suffix: TEST_NET ? "TP" : "HP",
+                      }
+                    )}
+                  </div>
+
+                  {w.vestingSharesDelegated > 0 && (
+                    <div className="amount amount-passive delegated-shares">
+                      <Tooltip content={_t("wallet.hive-power-delegated")}>
+                        <span
+                          className="amount-btn"
+                          onClick={this.toggleDelegatedList}
+                        >
+                          {formattedNumber(
+                            vestsToHp(w.vestingSharesDelegated, hivePerMVests),
+                            { prefix: "-", suffix: TEST_NET ? "TP" : "HP" }
+                          )}
+                        </span>
+                      </Tooltip>
+                    </div>
+                  )}
+
                   {(() => {
-                    if (isMyPage) {
-                      const dropDownConfig = {
-                        history: this.props.history,
-                        label: "",
-                        items: [
-                          {
-                            label: _t("wallet.transfer"),
-                            onClick: () => {
-                              this.openTransferDialog(
-                                "transfer",
-                                HIVE_API_NAME
-                              );
-                            },
-                          },
-                          {
-                            label: _t("wallet.transfer-to-savings"),
-                            onClick: () => {
-                              this.openTransferDialog(
-                                "transfer-saving",
-                                HIVE_API_NAME
-                              );
-                            },
-                          },
-                          {
-                            label: _t("wallet.power-up"),
-                            onClick: () => {
-                              this.openTransferDialog(
-                                "power-up",
-                                HIVE_API_NAME
-                              );
-                            },
-                          },
-                          {
-                            label: "Borrow new HBD against Hive",
-                            onClick: () => {
-                              this.openTransferDialog(
-                                "borrow",
-                                DOLLAR_API_NAME
-                              );
-                            },
-                          },
-                          {
-                            label: _t("wallet.trade-internal-market"),
-                            onClick: () => {
-                              window.open(
-                                `https://wallet.hive.blog/market`,
-                                "HiveDEx"
-                              );
-                            },
-                          },
-                          {
-                            label: _t("wallet.trade-on-Blocktrades"),
-                            onClick: () => {
-                              window.open(
-                                `https://blocktrades.us/`,
-                                "BlockTrades"
-                              );
-                            },
-                          },
-                          {
-                            label: _t("wallet.trade-on-Upbit"),
-                            onClick: () => {
-                              window.open(`https://upbit.com/`, "UpBit");
-                            },
-                          },
-                          {
-                            label: _t("wallet.trade-on-BitTrex"),
-                            onClick: () => {
-                              window.open(
-                                `https://global.bittrex.com/`,
-                                "BitTrex"
-                              );
-                            },
-                          },
-                        ],
-                      };
+                    if (w.vestingSharesReceived <= 0) {
+                      return null;
+                    }
+
+                    const strReceived = formattedNumber(
+                      vestsToHp(w.vestingSharesReceived, hivePerMVests),
+                      { prefix: "+", suffix: TEST_NET ? "TP" : "HP" }
+                    );
+
+                    if (global.usePrivate) {
                       return (
-                        <div className="amount-actions">
-                          <DropDown {...dropDownConfig} float="right" />
+                        <div className="amount amount-passive received-shares">
+                          <Tooltip content={_t("wallet.hive-power-received")}>
+                            <span
+                              className="amount-btn"
+                              onClick={this.toggleReceivedList}
+                            >
+                              {strReceived}
+                            </span>
+                          </Tooltip>
                         </div>
                       );
                     }
-                    return null;
-                  })()}
 
-                  <span>
-                    {formattedNumber(w.balance, {
-                      suffix: HIVE_HUMAN_NAME_UPPERCASE,
-                    })}
-                  </span>
-                </div>
-                {collaterializedConverting > 0 && (
-                  <div className="amount amount-passive converting-hbd">
-                    <Tooltip content={_t("wallet.collateral-hive-amount")}>
-                      <span>
-                        {"+"}{" "}
-                        {formattedNumber(collaterializedConverting, {
-                          suffix: HIVE_HUMAN_NAME_UPPERCASE,
-                        })}
-                      </span>
-                    </Tooltip>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="balance-row hive-power alternative">
-              <div className="balance-info">
-                <div className="title">
-                  {_t(TEST_NET ? "wallet.test-power" : "wallet.hive-power")}
-                </div>
-                <div className="description">
-                  {_t(
-                    TEST_NET
-                      ? "wallet.test-power-description"
-                      : "wallet.hive-power-description"
-                  )}
-                </div>
-              </div>
-
-              <div className="balance-values">
-                <div className="amount">
-                  {(() => {
-                    if (isMyPage) {
-                      const dropDownConfig = {
-                        history: this.props.history,
-                        label: "",
-                        items: [
-                          {
-                            label: _t("wallet.delegate"),
-                            onClick: () => {
-                              this.openTransferDialog("delegate", "HP");
-                            },
-                          },
-                          {
-                            label: _t("wallet.power-down"),
-                            onClick: () => {
-                              this.openTransferDialog("power-down", "HP");
-                            },
-                          },
-                          {
-                            label: _t("wallet.withdraw-routes"),
-                            onClick: () => {
-                              this.toggleWithdrawRoutes();
-                            },
-                          },
-                        ],
-                      };
-                      return (
-                        <div className="amount-actions">
-                          <DropDown {...dropDownConfig} float="right" />
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
-                  {formattedNumber(vestsToHp(w.vestingShares, hivePerMVests), {
-                    suffix: "HP",
-                  })}
-                </div>
-
-                {w.vestingSharesDelegated > 0 && (
-                  <div className="amount amount-passive delegated-shares">
-                    <Tooltip content={_t("wallet.hive-power-delegated")}>
-                      <span
-                        className="amount-btn"
-                        onClick={this.toggleDelegatedList}
-                      >
-                        {formattedNumber(
-                          vestsToHp(w.vestingSharesDelegated, hivePerMVests),
-                          { prefix: "-", suffix: "HP" }
-                        )}
-                      </span>
-                    </Tooltip>
-                  </div>
-                )}
-
-                {(() => {
-                  if (w.vestingSharesReceived <= 0) {
-                    return null;
-                  }
-
-                  const strReceived = formattedNumber(
-                    vestsToHp(w.vestingSharesReceived, hivePerMVests),
-                    { prefix: "+", suffix: "HP" }
-                  );
-
-                  if (global.usePrivate) {
                     return (
                       <div className="amount amount-passive received-shares">
                         <Tooltip content={_t("wallet.hive-power-received")}>
-                          <span
-                            className="amount-btn"
-                            onClick={this.toggleReceivedList}
-                          >
-                            {strReceived}
-                          </span>
+                          <span className="amount">{strReceived}</span>
                         </Tooltip>
                       </div>
                     );
-                  }
+                  })()}
 
-                  return (
-                    <div className="amount amount-passive received-shares">
-                      <Tooltip content={_t("wallet.hive-power-received")}>
-                        <span className="amount">{strReceived}</span>
+                  {w.nextVestingSharesWithdrawal > 0 && (
+                    <div className="amount amount-passive next-power-down-amount">
+                      <Tooltip content={_t("wallet.next-power-down-amount")}>
+                        <span>
+                          {formattedNumber(
+                            vestsToHp(
+                              w.nextVestingSharesWithdrawal,
+                              hivePerMVests
+                            ),
+                            { prefix: "-", suffix: TEST_NET ? "TP" : "HP" }
+                          )}
+                        </span>
                       </Tooltip>
                     </div>
-                  );
-                })()}
+                  )}
 
-                {w.nextVestingSharesWithdrawal > 0 && (
-                  <div className="amount amount-passive next-power-down-amount">
-                    <Tooltip content={_t("wallet.next-power-down-amount")}>
-                      <span>
-                        {formattedNumber(
-                          vestsToHp(
-                            w.nextVestingSharesWithdrawal,
-                            hivePerMVests
-                          ),
-                          { prefix: "-", suffix: "HP" }
-                        )}
-                      </span>
-                    </Tooltip>
-                  </div>
-                )}
-
-                {(w.vestingSharesDelegated > 0 ||
-                  w.vestingSharesReceived > 0 ||
-                  w.nextVestingSharesWithdrawal > 0) && (
-                  <div className="amount total-hive-power">
-                    <Tooltip content={_t("wallet.hive-power-total")}>
-                      <span>
-                        {formattedNumber(
-                          vestsToHp(w.vestingSharesTotal, hivePerMVests),
-                          { prefix: "=", suffix: "HP" }
-                        )}
-                      </span>
-                    </Tooltip>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="balance-row hive-dollars">
-              <div className="balance-info">
-                <div className="title">
-                  {_t(TEST_NET ? "wallet.test-dollars" : "wallet.hive-dollars")}
-                </div>
-                <div className="description">
-                  {_t(
-                    TEST_NET
-                      ? "wallet.test-dollars-description"
-                      : "wallet.hive-dollars-description"
+                  {(w.vestingSharesDelegated > 0 ||
+                    w.vestingSharesReceived > 0 ||
+                    w.nextVestingSharesWithdrawal > 0) && (
+                    <div className="amount total-hive-power">
+                      <Tooltip content={_t("wallet.hive-power-total")}>
+                        <span>
+                          {formattedNumber(
+                            vestsToHp(w.vestingSharesTotal, hivePerMVests),
+                            { prefix: "=", suffix: TEST_NET ? "TP" : "HP" }
+                          )}
+                        </span>
+                      </Tooltip>
+                    </div>
                   )}
                 </div>
               </div>
-              <div className="balance-values">
-                <div className="amount">
-                  {(() => {
-                    if (isMyPage) {
-                      const dropDownConfig = {
-                        history: this.props.history,
-                        label: "",
-                        items: [
-                          {
-                            label: _t("wallet.transfer"),
-                            onClick: () => {
-                              this.openTransferDialog(
-                                "transfer",
-                                DOLLAR_API_NAME
-                              );
-                            },
-                          },
-                          {
-                            label: _t("wallet.transfer-to-savings"),
-                            onClick: () => {
-                              this.openTransferDialog(
-                                "transfer-saving",
-                                DOLLAR_API_NAME
-                              );
-                            },
-                          },
-                          {
-                            label: _t("wallet.convert"),
-                            onClick: () => {
-                              this.openTransferDialog(
-                                "convert",
-                                DOLLAR_API_NAME
-                              );
-                            },
-                          },
-                          {
-                            label: _t("wallet.trade-internal-market"),
-                            onClick: () => {
-                              window.open(
-                                `https://wallet.hive.blog/market`,
-                                "HiveDEx"
-                              );
-                            },
-                          },
-                          {
-                            label: _t("wallet.trade-on-Blocktrades"),
-                            onClick: () => {
-                              window.open(
-                                `https://blocktrades.us/`,
-                                "BlockTrades"
-                              );
-                            },
-                          },
-                          {
-                            label: _t("wallet.trade-on-Upbit"),
-                            onClick: () => {
-                              window.open(`https://upbit.com/`, "UpBit");
-                            },
-                          },
-                          {
-                            label: _t("wallet.trade-on-BitTrex"),
-                            onClick: () => {
-                              window.open(
-                                `https://global.bittrex.com/`,
-                                "BitTrex"
-                              );
-                            },
-                          },
-                        ],
-                      };
 
-                      return (
-                        <div className="amount-actions">
-                          <DropDown {...dropDownConfig} float="right" />
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
-                  <span>{formattedNumber(w.hbdBalance, { prefix: "$" })}</span>
-                </div>
-
-                {converting > 0 && (
-                  <div className="amount amount-passive converting-hbd">
-                    <Tooltip content={_t("wallet.converting-hbd-amount")}>
-                      <span>
-                        {"+"} {formattedNumber(converting, { prefix: "$" })}
-                      </span>
-                    </Tooltip>
+              <div className="balance-row hive-dollars">
+                <div className="balance-info">
+                  <div className="title">
+                    {_t(
+                      TEST_NET ? "wallet.test-dollars" : "wallet.hive-dollars"
+                    )}
                   </div>
-                )}
-              </div>
-            </div>
+                  <div className="description">
+                    {_t(
+                      TEST_NET
+                        ? "wallet.test-dollars-description"
+                        : "wallet.hive-dollars-description"
+                    )}
+                  </div>
+                </div>
+                <div className="balance-values">
+                  <div className="amount">
+                    {(() => {
+                      if (isMyPage) {
+                        const dropDownConfig = {
+                          history: this.props.history,
+                          label: "",
+                          items: [
+                            {
+                              label: _t("wallet.transfer"),
+                              onClick: () => {
+                                this.openTransferDialog(
+                                  "transfer",
+                                  DOLLAR_API_NAME
+                                );
+                              },
+                            },
+                            {
+                              label: _t("wallet.transfer-to-savings"),
+                              onClick: () => {
+                                this.openTransferDialog(
+                                  "transfer-saving",
+                                  DOLLAR_API_NAME
+                                );
+                              },
+                            },
+                            {
+                              label: _t("wallet.convert"),
+                              onClick: () => {
+                                this.openTransferDialog(
+                                  "convert",
+                                  DOLLAR_API_NAME
+                                );
+                              },
+                            },
+                            {
+                              label: _t("wallet.trade-internal-market"),
+                              onClick: () => {
+                                window.open(
+                                  `https://wallet.hive.blog/market`,
+                                  "HiveDEx"
+                                );
+                              },
+                            },
+                            {
+                              label: _t("wallet.trade-on-Blocktrades"),
+                              onClick: () => {
+                                window.open(
+                                  `https://blocktrades.us/`,
+                                  "BlockTrades"
+                                );
+                              },
+                            },
+                            {
+                              label: _t("wallet.trade-on-Upbit"),
+                              onClick: () => {
+                                window.open(`https://upbit.com/`, "UpBit");
+                              },
+                            },
+                            {
+                              label: _t("wallet.trade-on-BitTrex"),
+                              onClick: () => {
+                                window.open(
+                                  `https://global.bittrex.com/`,
+                                  "BitTrex"
+                                );
+                              },
+                            },
+                          ],
+                        };
 
-            <div className="balance-row savings alternative">
-              <div className="balance-info">
-                <div className="title">{_t("wallet.savings")}</div>
-                <div className="description">
-                  {_t("wallet.savings-description")}
+                        return (
+                          <div className="amount-actions">
+                            <DropDown {...dropDownConfig} float="right" />
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                    <span>
+                      {formattedNumber(w.hbdBalance, { prefix: "$" })}
+                    </span>
+                  </div>
+
+                  {converting > 0 && (
+                    <div className="amount amount-passive converting-hbd">
+                      <Tooltip content={_t("wallet.converting-hbd-amount")}>
+                        <span>
+                          {"+"} {formattedNumber(converting, { prefix: "$" })}
+                        </span>
+                      </Tooltip>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="balance-values">
-                <div className="amount">
-                  {(() => {
-                    if (isMyPage) {
-                      const dropDownConfig = {
-                        history: this.props.history,
-                        label: "",
-                        items: [
-                          {
-                            label: _t("wallet.withdraw-hive"),
-                            onClick: () => {
-                              this.openTransferDialog(
-                                "withdraw-saving",
-                                HIVE_API_NAME
-                              );
-                            },
-                          },
-                        ],
-                      };
 
-                      return (
-                        <div className="amount-actions">
-                          <DropDown {...dropDownConfig} float="right" />
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
-                  <span>
-                    {formattedNumber(w.savingBalance, {
+              <div className="balance-row savings alternative">
+                <div className="balance-info">
+                  <div className="title">{_t("wallet.savings")}</div>
+                  <div className="description">
+                    {_t("wallet.savings-description")}
+                  </div>
+                </div>
+                <div className="balance-values">
+                  <div className="amount">
+                    {(() => {
+                      if (isMyPage) {
+                        const dropDownConfig = {
+                          history: this.props.history,
+                          label: "",
+                          items: [
+                            {
+                              label: _t("wallet.withdraw-hive"),
+                              onClick: () => {
+                                this.openTransferDialog(
+                                  "withdraw-saving",
+                                  HIVE_API_NAME
+                                );
+                              },
+                            },
+                          ],
+                        };
+
+                        return (
+                          <div className="amount-actions">
+                            <DropDown {...dropDownConfig} float="right" />
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                    <span>
+                      {formattedNumber(w.savingBalance, {
+                        suffix: HIVE_HUMAN_NAME_UPPERCASE,
+                      })}
+                    </span>
+                  </div>
+                  <div className="amount">
+                    {(() => {
+                      if (isMyPage) {
+                        const dropDownConfig = {
+                          history: this.props.history,
+                          label: "",
+                          items: [
+                            {
+                              label: _t("wallet.withdraw-hbd"),
+                              onClick: () => {
+                                this.openTransferDialog(
+                                  "withdraw-saving",
+                                  DOLLAR_API_NAME
+                                );
+                              },
+                            },
+                          ],
+                        };
+
+                        return (
+                          <div className="amount-actions">
+                            <DropDown {...dropDownConfig} float="right" />
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+
+                    <span>
+                      {formattedNumber(w.savingBalanceHbd, { prefix: "$" })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {w.isPoweringDown && (
+                <div className="next-power-down">
+                  {_t("wallet.next-power-down", {
+                    time: moment(w.nextVestingWithdrawalDate).fromNow(),
+                    amount: formattedNumber(w.nextVestingSharesWithdrawalHive, {
                       suffix: HIVE_HUMAN_NAME_UPPERCASE,
-                    })}
-                  </span>
+                    }),
+                  })}
                 </div>
-                <div className="amount">
-                  {(() => {
-                    if (isMyPage) {
-                      const dropDownConfig = {
-                        history: this.props.history,
-                        label: "",
-                        items: [
-                          {
-                            label: _t("wallet.withdraw-hbd"),
-                            onClick: () => {
-                              this.openTransferDialog(
-                                "withdraw-saving",
-                                DOLLAR_API_NAME
-                              );
-                            },
-                          },
-                        ],
-                      };
+              )}
 
-                      return (
-                        <div className="amount-actions">
-                          <DropDown {...dropDownConfig} float="right" />
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
-
-                  <span>
-                    {formattedNumber(w.savingBalanceHbd, { prefix: "$" })}
-                  </span>
-                </div>
+              {TransactionList({ ...this.props })}
+            </div>
+            <div>
+              <WalletMenu
+                global={global}
+                username={account.name}
+                active="hive"
+                hiveEngineTokens={hiveEngineTokensNZ}
+              />
+              <div onClick={this.advanceEpoch}>
+                <Market
+                  key={fromTs}
+                  label={"HBD/USD last " + epochName}
+                  coin="hive_dollar"
+                  vsCurrency="usd"
+                  fromTs={fromTs}
+                  toTs={toNow}
+                  formatter="0.000$"
+                />
+              </div>
+              <div onClick={this.advanceEpoch}>
+                <Market
+                  key={fromTs}
+                  label={"Hive/USD last " + epochName}
+                  coin="hive"
+                  vsCurrency="usd"
+                  fromTs={fromTs}
+                  toTs={toNow}
+                  formatter="0.000$"
+                />
               </div>
             </div>
-
-            {w.isPoweringDown && (
-              <div className="next-power-down">
-                {_t("wallet.next-power-down", {
-                  time: moment(w.nextVestingWithdrawalDate).fromNow(),
-                  amount: formattedNumber(w.nextVestingSharesWithdrawalHive, {
-                    suffix: HIVE_HUMAN_NAME_UPPERCASE,
-                  }),
-                })}
-              </div>
-            )}
-
-            {TransactionList({ ...this.props })}
           </div>
-          <div>
-            <WalletMenu
-              global={global}
-              username={account.name}
-              active="hive"
-              hiveEngineTokens={hiveEngineTokensNZ}
+
+          {transfer && (
+            <Transfer
+              {...this.props}
+              activeUser={activeUser!}
+              mode={transferMode!}
+              asset={transferAsset!}
+              onHide={this.closeTransferDialog}
+              hiveEngineTokensEnabled={hiveEngineTokens.map((z) => z.apiName)}
             />
-            <div onClick={this.advanceEpoch}>
-              <Market
-                key={fromTs}
-                label={"HBD/USD last " + epochName}
-                coin="hive_dollar"
-                vsCurrency="usd"
-                fromTs={fromTs}
-                toTs={toNow}
-                formatter="0.000$"
-              />
-            </div>
-            <div onClick={this.advanceEpoch}>
-              <Market
-                key={fromTs}
-                label={"Hive/USD last " + epochName}
-                coin="hive"
-                vsCurrency="usd"
-                fromTs={fromTs}
-                toTs={toNow}
-                formatter="0.000$"
-              />
-            </div>
-          </div>
+          )}
+
+          {this.state.delegatedList && (
+            <DelegatedVesting
+              {...this.props}
+              account={account}
+              onHide={this.toggleDelegatedList}
+            />
+          )}
+
+          {this.state.receivedList && (
+            <ReceivedVesting
+              {...this.props}
+              account={account}
+              onHide={this.toggleReceivedList}
+            />
+          )}
+
+          {this.state.withdrawRoutes && (
+            <WithdrawRoutes
+              {...this.props}
+              activeUser={activeUser!}
+              onHide={this.toggleWithdrawRoutes}
+            />
+          )}
         </div>
-
-        {transfer && (
-          <Transfer
-            {...this.props}
-            activeUser={activeUser!}
-            mode={transferMode!}
-            asset={transferAsset!}
-            onHide={this.closeTransferDialog}
-            hiveEngineTokensEnabled={hiveEngineTokens.map((z) => z.apiName)}
-          />
-        )}
-
-        {this.state.delegatedList && (
-          <DelegatedVesting
-            {...this.props}
-            account={account}
-            onHide={this.toggleDelegatedList}
-          />
-        )}
-
-        {this.state.receivedList && (
-          <ReceivedVesting
-            {...this.props}
-            account={account}
-            onHide={this.toggleReceivedList}
-          />
-        )}
-
-        {this.state.withdrawRoutes && (
-          <WithdrawRoutes
-            {...this.props}
-            activeUser={activeUser!}
-            onHide={this.toggleWithdrawRoutes}
-          />
-        )}
-      </div>
-    );
+      );
     } catch (e) {
       return e.message;
     }
