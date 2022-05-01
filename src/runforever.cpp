@@ -4,6 +4,9 @@
  unaffected by SIGHUP.
  **/
 
+#include "runforever.hpp"
+#include "abstractservice.hpp"
+#include "pidfile.hpp"
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core.hpp>
@@ -18,13 +21,14 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <set>
 #include <signal.h>
 #include <string>
 #include <sys/time.h>
 #include <unistd.h>
 #include <utility>
 extern const char *raw_version;
-
+std::string fault;
 const char *page_server_cmd = "node build/server.js";
 const char *promoter_server_cmd = "node private-api/build/promoter.js";
 const char *private_server_cmd = "node private-api/build/private-api-server.js";
@@ -44,6 +48,11 @@ using tcp = net::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 using namespace boost::process;
 using namespace std;
 std::map<int, std::string> signal_names;
+std::set<AbstractService *> &operator<<(std::set<AbstractService *> &s,
+                                        const AbstractService *p) {
+  s.insert(s.cbegin(), (AbstractService *)p);
+  return s;
+}
 std::fstream mainserverlog("server.log", std::ofstream::app);
 child *cptr = nullptr;
 bool all_running = false, keep_looping = true;
@@ -51,7 +60,6 @@ bool restart_subserver = false;
 char datetime_string[200] = "";
 bool verbose_threads = false;
 bool verbose = false;
-char const *fault = nullptr;
 
 std::string get_version() {
   std::string out(raw_version);
@@ -64,6 +72,8 @@ std::string get_version() {
     return out.substr(0, third_nl);
   }
 }
+
+PrivateAPIService privateAPIService;
 
 // Makes an HTTP connection.  Returns true should it fail.
 bool connect_to_http_server(const char *name, const char *port,
@@ -113,13 +123,10 @@ bool connect_to_private_api_server() {
   return connect_to_http_server("private-api", "2997", "/notifications/unread");
 }
 
-// Performs an HTTP GET and prints the response
-bool connect_to_search_server() {
+// Performs an TCP Connection and prints errors
+bool connect_to_tcp_port(const char *name, const char *port) {
   auto const host = "127.0.0.1";
-  auto const port = "2999";
-  auto const target = "/";
   const int version = 11;
-  const char *name = "search";
 
   if (verbose) {
     cerr << "Preparing to check search server at port " << port << ".\n";
@@ -159,6 +166,11 @@ bool connect_to_search_server() {
     return true;
   } else
     return false;
+}
+
+// Performs an TCP Connection to the search server and prints errors
+bool connect_to_search_server() {
+  return connect_to_tcp_port("search", "2999");
 }
 
 // Performs an HTTP GET and prints the response
@@ -331,6 +343,7 @@ ipstream *page_server_pipe_stream = nullptr,
 std::ofstream subserverlog, searchserverlog, privatelog, promoterlog;
 child *page_server_ptr, *search_server_ptr, *private_server_ptr,
     *promoter_server_ptr;
+
 void forward_log(ipstream &ps, std::ostream &log,
                  const boost::process::child *cptr) {
   time_t t;
@@ -382,9 +395,6 @@ void set_to_exit(int signal) {
   report_and_continue(signal);
   mainserverlogline() << "Caught signal " << signal_names[signal] << "."
                       << std::endl;
-  if (cptr) {
-    kill(cptr->id(), SIGTERM);
-  }
   keep_looping = false;
 }
 
@@ -448,9 +458,10 @@ void set_handlers() {
   // Block certain signals for this process
   struct sigaction old;
   sigaction(SIGBUS, &sigLogAction, &old);
+  // blocking these will prevent children from finishing properly.
   // sigaction(SIGCHLD, &sigLogAction, &old);
-  sigaction(SIGCLD, &sigRestartChildrenAction, &old);
-  sigaction(SIGCONT, &sigLogAction, &old);
+  // sigaction(SIGCLD, &sigRestartChildrenAction, &old);
+  // sigaction(SIGCONT, &sigLogAction, &old);
   // signal_names[SIGEMT
   sigaction(SIGFPE, &sigLogAction, &old);
   sigaction(SIGHUP, &sigLogAction, &old);
@@ -460,15 +471,15 @@ void set_handlers() {
   sigaction(SIGIO, &sigLogAction, &old);
   sigaction(SIGIOT, &sigLogAction, &old);
   // signal_names[SIGLOS
-  sigaction(SIGPIPE, &sigLogAction, &old);
+  sigaction(SIGPIPE, &sigExitAllAction, &old);
   sigaction(SIGPOLL, &sigLogAction, &old);
   sigaction(SIGPROF, &sigLogAction, &old);
   sigaction(SIGPWR, &sigExitAllAction, &old);
   sigaction(SIGQUIT, &sigExitAllAction, &old);
   sigaction(SIGSEGV, &sigExitAllAction, &old);
   sigaction(SIGSTKFLT, &sigLogAction, &old);
-  sigaction(SIGSTOP, &sigLogAction, &old);
-  sigaction(SIGTSTP, &sigLogAction, &old);
+  // sigaction(SIGSTOP, &sigLogAction, &old);
+  // sigaction(SIGTSTP, &sigLogAction, &old);
   sigaction(SIGSYS, &sigLogAction, &old);
   sigaction(SIGTERM, &sigLogAction, &old);
   // sigaction(SIGTRAP, &sigLogAction, &old);
@@ -478,20 +489,31 @@ void set_handlers() {
   sigaction(SIGURG, &sigLogAction, &old);
   sigaction(SIGUSR1, &sigLogAction, &old);
   sigaction(SIGUSR2, &sigLogAction, &old);
-  sigaction(SIGVTALRM, &sigLogAction, &old);
+
+  // irtual alarm clock (4.2BSD)
+  // sigaction(SIGVTALRM, &sigLogAction, &old);
+
+  // too much CPU time used.
   sigaction(SIGXCPU, &sigLogAction, &old);
+
+  // the following might be a good place to drop the log files.
   sigaction(SIGXFSZ, &sigLogAction, &old);
+
+  //  Window resize signal
   sigaction(SIGWINCH, &sigLogAction, &old);
 
-  sigaction(SIGABRT, &sigLogAction, &old);
+  // sigaction(SIGABRT, &sigLogAction, &old);
+  // SIGALRM is used by the thread library, best we leave that alone.
   // sigaction(SIGALRM, &sigLogAction, &old);
   sigaction(SIGKILL, &sigLogAction, &old);
 
   sigaction(SIGBUS, &sigExitAllAction, &old);
+
+  // Happens when you log out after starting:  Trap it.
   sigaction(SIGHUP, &sigLogAction, &old);
   sigaction(SIGINT, &sigExitAllAction, &old);
   sigaction(SIGTERM, &sigExitAllAction, &old);
-  sigaction(SIGABRT, &sigRestartChildrenAction, &old);
+  // sigaction(SIGABRT, &sigRestartChildrenAction, &old);
 }
 
 void keep_time() {
@@ -503,8 +525,8 @@ void keep_time() {
     boost::this_thread::sleep_for(boost::chrono::milliseconds(1));
   }
   while (keep_looping) {
-    if (verbose_threads)
-      cerr << "keeping time..." << endl;
+    // if (verbose_threads)
+    //  cerr << "keeping time..." << endl;
 
     if ((t = time(NULL)) != ((time_t)-1)) {
 
@@ -539,21 +561,6 @@ void check_connectivity() {
 }
 std::string search_server_location;
 std::string search_server_cmd;
-
-class pidfile {
-  char const *filename;
-
-public:
-  pidfile(char const *const p_filename, pid_t const p_id)
-      : filename(p_filename) {
-    std::ofstream fs(p_filename);
-    fs << p_id << std::endl;
-    fs.close();
-  }
-
-  ~pidfile() { unlink(filename); }
-};
-
 void mind_server(child *child_ptr, const char *name, bool (*connect)()) {
   while (keep_looping && all_running) {
     if (verbose_threads)
@@ -576,11 +583,11 @@ void mind_server(child *child_ptr, const char *name, bool (*connect)()) {
   all_running = false;
 }
 
-void mind_promoter_server(child **child_ptr_ptr) {
-  while (keep_looping && all_running && child_ptr_ptr != nullptr) {
+void mind_promoter_server(child **child_ptr) {
+  while (keep_looping && all_running && child_ptr != nullptr) {
     if (verbose_threads)
       cerr << "minding promoter server" << endl;
-    child &promoter = **child_ptr_ptr;
+    child &promoter = **child_ptr;
     if (connect_to_promoter_server()) {
       mainserverlogline() << "Could not connect to promoter server"
                           << std::endl;
@@ -595,19 +602,8 @@ void mind_promoter_server(child **child_ptr_ptr) {
 
   all_running = false;
 }
-struct Service {
-  std::string service_name;
-  std::string interpreter;
-  std::string program;
-  std::string programLog;
-  child **child_ptr_ptr;
-};
 
-Service privateAPI = {"Private API", "node",
-                      "private-api/build/private-api-server.js", "private.log",
-                      nullptr};
-
-Service services[1] = {privateAPI};
+AbstractService *services[1] = {&privateAPIService};
 
 int main(int argc, char **argv) {
 
@@ -618,13 +614,31 @@ int main(int argc, char **argv) {
       verbose_threads = false;
     } else if (strcmp(*argi, "--verbose") == 0) {
       verbose = true;
+    } else if (strcmp(*argi, "--verbose-threads") == 0) {
+      verbose_threads = true;
     } else if (strcmp(*argi, "--version") == 0) {
       cerr << get_version() << endl;
       return 0;
-    } else {
+    } else if (strncmp(*argi, "--", 2) == 0) {
       cerr << "Unknown option: \"" << *argi << '\"' << endl;
+    } else if (**argi == '-') {
+      for (char const *c = &(*argi)[1]; *c; ++c) {
+        switch (*c) {
+        case 'v':
+          verbose = true;
+          break;
+        case 't':
+          verbose_threads = true;
+          break;
+        default:
+          cerr << "Unknown option: \"" << c << '\"' << endl;
+          return 0;
+        } // switch
+      }
     }
-  }
+  } // for
+
+  down << &privateAPIService;
 
   bool current_directory_writable = access(".", W_OK) == 0;
   // Check that this program can do everything it needs to do
@@ -634,52 +648,37 @@ int main(int argc, char **argv) {
     int pid_file_count = 0;
     // Some checks
     vector<pair<pid_t, const char *>> processes;
-    for (const char *file_name : {"manager.pid", "page.pid", "private.pid",
-                                  "promoter.pid", "search.pid"}) {
-      if (access(file_name, F_OK) == 0)
+    for (AbstractService *a_ptr : services) {
+      const char *file_name = a_ptr->getPIDFilename().c_str();
+      if (access(file_name, F_OK) == 0) {
         ++pid_file_count;
-      else
+      } else if (!a_ptr->connect()) {
+        std::cerr << "Unable to close server: " << a_ptr->serviceName()
+                  << ".  Missing PID file." << std::endl;
+        keep_looping = false;
         continue;
+      }
       ifstream pidf(file_name);
       pid_t pid_number;
       pidf >> pid_number;
       if (kill(pid_number, 0) == -1 && errno == ESRCH) {
-        // process does not exist!
-        hung_processes = true;
+        // process does not exist! Stale PID
         unlink(file_name);
       } else {
-        processes.emplace_back(pid_number, file_name);
-      }
-    }
-
-    if (pid_file_count == 0) {
-      // no pid files... this is a clean start...
-
-    } else if (hung_processes) {
-      std::cerr << "Some processes hung.  Cleaning up" << std::endl;
-      bool processes_running = false;
-      for (const pair p : processes) {
-        if (kill(p.first, SIGTERM) == -1 && errno == ESRCH) {
-          unlink(p.second);
-        } else {
-          processes_running = true;
-        }
-      }
-
-      if (processes_running) {
-        // okay give them time to terminate
+        // process is running close it nicely first, then not.
+        kill(pid_number, SIGTERM);
         boost::this_thread::sleep_for(boost::chrono::seconds(2));
-        // now kill them...
-        for (const pair p : processes) {
-          kill(p.first, SIGKILL);
-          unlink(p.second);
-        }
+        kill(pid_number, SIGKILL);
+        // connect returns true when it doesn't work
+        unlink(file_name);
       }
-    } else {
-      std::cerr << "Process and children already running";
-      std::cerr << "Exiting" << std::endl;
-      keep_looping = false;
-    }
+      if (!a_ptr->connect()) {
+        std::cerr << "Unable to close server: " << a_ptr->serviceName()
+                  << ".  PID file was out of date or corrupted." << std::endl;
+        keep_looping = false;
+        continue;
+      }
+    } // for
 
     if (!current_directory_writable) {
       std::cerr << "Current directory not writable" << std::endl;
@@ -709,9 +708,9 @@ int main(int argc, char **argv) {
       std::cerr << "Cannot find promoter.js to run." << std::endl;
       keep_looping = false;
     }
-    if (access(services[0].program.c_str(), R_OK)) {
-      std::cerr << "Cannot find " << services[0].program << " to run."
-                << std::endl;
+    char const *t;
+    if (access((t = services[0]->programFile()), R_OK)) {
+      std::cerr << "Cannot find " << t << " to run." << std::endl;
       keep_looping = false;
     }
   }
@@ -728,19 +727,19 @@ int main(int argc, char **argv) {
   pidfile masterserver("manager.pid", getpid());
 
   for (; keep_looping;) {
+    for (auto i = down.begin(); i != down.end(); ++i) {
+      (*i)->reStart();
+    }
+    down.clear();
+
+    cerr << '.';
+
     if (promoter_server_pipe_stream) {
       delete promoter_server_pipe_stream;
     }
     promoter_server_pipe_stream = new ipstream();
     promoter_server_ptr =
         new child(promoter_server_cmd, std_out > *promoter_server_pipe_stream);
-
-    if (private_server_pipe_stream) {
-      delete private_server_pipe_stream;
-    }
-    private_server_pipe_stream = new ipstream();
-    private_server_ptr =
-        new child(private_server_cmd, std_out > *private_server_pipe_stream);
 
     if (page_server_pipe_stream) {
       delete page_server_pipe_stream;
@@ -759,14 +758,11 @@ int main(int argc, char **argv) {
     pidfile search_pidfile("search.pid", search_server_ptr->id());
     pidfile page_pidfile("page.pid", page_server_ptr->id());
     pidfile promoter_pidfile("promoter.pid", promoter_server_ptr->id());
-    pidfile private_pidfile("private.pid", private_server_ptr->id());
 
     mainserverlogline() << "Running " << page_server_cmd << " ["
                         << page_server_ptr->id() << "]" << std::endl;
     mainserverlogline() << "Running " << search_server_cmd << " ["
                         << search_server_ptr->id() << "]" << std::endl;
-    mainserverlogline() << "Running " << private_server_cmd << " ["
-                        << private_server_ptr->id() << "]" << std::endl;
     mainserverlogline() << "Running " << promoter_server_cmd << " ["
                         << promoter_server_ptr->id() << "]" << std::endl;
 
@@ -780,7 +776,6 @@ int main(int argc, char **argv) {
     subserverlog.open("subserver.log", std::fstream::app);
     searchserverlog.open("search.log", std::fstream::app);
     promoterlog.open("promoter.log", std::fstream::app);
-    privatelog.open("private.log", std::fstream::app);
 
     cptr = &page_server;
 
@@ -789,9 +784,6 @@ int main(int argc, char **argv) {
     });
     boost::thread log_search_forwarding(forward_search_log);
     boost::thread log_promoter_forwarding(forward_promoter_log);
-    boost::thread log_private_forwarding([&]() {
-      forward_log(*private_server_pipe_stream, privatelog, private_server_ptr);
-    });
 
     mainserverlogline() << "Waiting for servers to start..." << std::flush;
     boost::this_thread::sleep_for(boost::chrono::seconds(10));
@@ -803,15 +795,15 @@ int main(int argc, char **argv) {
     boost::thread minding_page_server([&]() {
       mind_server(page_server_ptr, "page", connect_to_page_server);
     });
-    boost::thread minding_private_server([&]() {
-      mind_server(private_server_ptr, "private", connect_to_private_api_server);
-    });
     boost::thread minding_promoter_server([&]() {
       mind_server(promoter_server_ptr, "promoter", connect_to_promoter_server);
     });
+
     try {
-      while (all_running) {
-        boost::this_thread::sleep_for(boost::chrono::seconds(5));
+      while (all_running && down.empty()) {
+        cerr << "inner loop" << endl;
+        boost::this_thread::yield();
+        boost::this_thread::sleep_for(boost::chrono::seconds(1));
       } // while
     } catch (const boost::process::process_error &e) {
       mainserverlogline() << "Process exception: " << e.what()
@@ -821,26 +813,47 @@ int main(int argc, char **argv) {
       mainserverlogline() << "Exception caught (boost:system::system_error):"
                           << e.what() << std::endl;
     }
-    if (fault != nullptr) {
-      mainserverlogline()
-          << "The " << fault
-          << " process died.  Killing other subprocesses and starting again."
-          << endl;
+
+    if (down.size()) {
+      mainserverlogline() << "The following processes are down:";
+      for (const AbstractService *v : down) {
+        mainserverlog << v->serviceName() << ", ";
+      }
+      mainserverlog << ".  Closing....";
+
+      for (AbstractService *v : down) {
+        v->close();
+        mainserverlog << ".";
+      }
+      mainserverlog << "done." << endl;
     }
 
-    kill(page_server_ptr->id(), SIGKILL);
-    page_server_ptr->wait();
-    kill(search_server.id(), SIGKILL);
-    search_server.wait();
-    kill(promoter_server_ptr->id(), SIGKILL);
-    promoter_server_ptr->wait();
-    kill(private_server_ptr->id(), SIGKILL);
-    private_server_ptr->wait();
+    all_running = false;
+
+    int ignored;
+    if (kill(page_server_ptr->id(), SIGTERM) == 0 || errno != ESRCH) {
+      boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+      kill(page_server_ptr->id(), SIGKILL);
+      waitpid(page_server_ptr->id(), &ignored, WNOHANG);
+    }
+
+    if (kill(search_server_ptr->id(), SIGTERM) == 0 || errno != ESRCH) {
+      boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+      kill(search_server_ptr->id(), SIGKILL);
+      waitpid(search_server_ptr->id(), &ignored, WNOHANG);
+    }
+
+    if (kill(promoter_server_ptr->id(), SIGTERM) == 0 || errno != ESRCH) {
+      boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+      kill(promoter_server_ptr->id(), SIGKILL);
+      waitpid(promoter_server_ptr->id(), &ignored, WNOHANG);
+    }
 
     log_page_forwarding.join();
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(5));
     log_search_forwarding.join();
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(5));
     log_promoter_forwarding.join();
-    log_private_forwarding.join();
 
     mainserverlogline() << "Process Page server  " << page_server_ptr->id()
                         << " exited with status "
@@ -851,36 +864,38 @@ int main(int argc, char **argv) {
     mainserverlogline() << "Process Promoter server "
                         << promoter_server_ptr->id() << " exited with status "
                         << promoter_server_ptr->exit_code() << std::endl;
-    mainserverlogline() << "Process Private server " << private_server_ptr->id()
-                        << " exited with status "
-                        << private_server_ptr->exit_code() << std::endl;
 
     subserverlog.close();
     searchserverlog.close();
     promoterlog.close();
-    privatelog.close();
 
     page_server_pipe_stream->close();
     search_server_pipe_stream->close();
     promoter_server_pipe_stream->close();
-    private_server_pipe_stream->close();
 
     delete search_server_ptr;
     delete page_server_ptr;
     delete promoter_server_ptr;
-    delete private_server_ptr;
 
-    private_server_ptr = promoter_server_ptr = search_server_ptr =
-        page_server_ptr = nullptr;
+    promoter_server_ptr = search_server_ptr = page_server_ptr = nullptr;
 
     delete page_server_pipe_stream;
     delete search_server_pipe_stream;
     delete promoter_server_pipe_stream;
-    delete private_server_pipe_stream;
 
     page_server_pipe_stream = search_server_pipe_stream =
-        promoter_server_pipe_stream = private_server_pipe_stream = nullptr;
+        promoter_server_pipe_stream = nullptr;
+
+    if (down.size()) {
+      cerr << "Something is down" << endl;
+    }
   }
+  privateAPIService.stop();
+  while (privateAPIService.running()) {
+    boost::this_thread::yield();
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+  }
+  privateAPIService.close();
   unlink("manager.pid");
   mainserverlogline() << "Exiting Master Server" << std::endl;
 }
