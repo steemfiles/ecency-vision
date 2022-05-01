@@ -1,4 +1,1 @@
-[
-  "http://testnet.openhive.network:8091",
-  "ws://testnet.openhive.network:8090"
-]
+["https://testnet.openhive.network", "ws://testnet.openhive.network"]

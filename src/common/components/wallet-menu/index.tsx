@@ -9,7 +9,7 @@ import { HiveEngineStaticInfo } from "../../store/hive-engine-tokens/types";
 import _c from "../../util/fix-class-names";
 
 import { hiveSvg } from "../../img/svg";
-
+import { HIVE_HUMAN_NAME } from "../../api/hive";
 interface Props {
   global: Global;
   username: string;
@@ -48,7 +48,7 @@ export default class WalletMenu extends Component<Props> {
           className={_c(`menu-item hive ${active === "hive" ? "active" : ""}`)}
           to={`/@${username}/hive`}
         >
-          <span className="title">Hive</span>
+          <span className="title">{HIVE_HUMAN_NAME}</span>
           <span className="sub-title">Wallet</span>
           <span className="platform-logo">{hiveSvg}</span>
         </Link>
