@@ -34,10 +34,10 @@ abstractservice.o: src/abstractservice.hpp src/abstractservice.cpp
 	g++ src/abstractservice.cpp -ggdb -c $(COMPILE_FLAGS) -o abstractservice.o
 	
 runforever.o: src/runforever.cpp src/runforever.hpp src/abstractservice.hpp src/pidfile.hpp
-	g++ src/runforever.cpp -c $(COMPILE_FLAGS)
+	g++ src/runforever.cpp -c -DNDEBUG $(COMPILE_FLAGS)
 
 runforever-dbg.o: src/runforever.cpp src/runforever.hpp src/abstractservice.hpp src/pidfile.hpp
-	g++ src/runforever.cpp -ggdb -c -o runforever-dbg.o  $(COMPILE_FLAGS)
+	g++ src/runforever.cpp -UNDEBUG -ggdb -c -o runforever-dbg.o  $(COMPILE_FLAGS)
 
 listenlog-dbg.o: src/listenlog.cpp
 	g++ src/listenlog.cpp -ggdb -c -o listenlog-dbg.o  $(COMPILE_FLAGS)
