@@ -21,7 +21,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <utility>
-bool connect_to_http_server(const char *, const char *, const char *);
 
 namespace beast = boost::beast; // from <boost/beast.hpp>
 namespace http = beast::http;   // from <boost/beast/http.hpp>
@@ -31,13 +30,6 @@ using namespace boost::process;
 using namespace std;
 
 class AbstractService {
-protected:
-  void validate() const;
-  void init();
-  void destroy();
-  virtual const char *port() const;
-  virtual const char *target() const;
-  std::string service_name;
   std::string base_name;
   std::string interpreter;
   std::string program;
@@ -50,19 +42,43 @@ protected:
   ipstream *pipe_stream_ptr;
   bool mindingFlag;
   bool _stopped;
+  // initialize the object and start minding the process it spawns.
+  void init();
+
+  // mind the child server process.  This should be run in another thread and
+  // is. Inherited classes simply have to make this check that the child server
+  // process is running and that connections to it is possible.
   virtual void mind_server();
 
+protected:
+  std::string service_name;
+  // returns the port number as a string
+  virtual const char *port() const;
+  // returns the HTTP target as a string (in the base class "")
+  virtual const char *target() const;
+
 public:
-  bool isGood() const;
-  virtual bool connect() const;
+  // ensure data is consistent in the object,
+  // if it isn't, a std::runtime_error exception is thrown.
+  void validate() const;
+  // connect to the child server process.  Return true if connection fails.
+  virtual bool connect() const = 0;
+  // return the PID filename as a std::string.
   std::string getPIDFilename() const;
+  // return the human readable service name
   std::string serviceName() const;
+
+public:
+  // is the child running?
   bool running() const;
-  void onClosed();
+  // close the child server process, if running and set a flag so the
+  // mind_server method will terminate
   void close();
-  void start();
+  // set a flag so the mind_server method will terminate.
   void stop();
+  // return the programFile as a string.  The caller should not free the string.
   virtual const char *programFile() const;
+  // start for the first time or start again the child server process.
   void reStart();
   AbstractService(const char *name, const char *basename_p,
                   const char *interpreter_p, const char *program_p);
@@ -74,13 +90,29 @@ extern set<AbstractService *> down;
 extern bool all_running, keep_looping;
 extern std::string fault;
 
-class PrivateAPIService : public AbstractService {
+class TCPValidatedService : public AbstractService {
+  char const *_port;
+
 protected:
   const char *port() const override;
+
+public:
+  TCPValidatedService(const char *name_p, const char *basename_p,
+                      const char *interpreter_p, const char *program_p,
+                      const char *port_p);
+  virtual bool connect() const override;
+};
+
+class HTTPValidatedService : public TCPValidatedService {
+  char const *_target;
+
+protected:
   const char *target() const override;
 
 public:
-  PrivateAPIService();
+  HTTPValidatedService(const char *name_p, const char *basename_p,
+                       const char *interpreter_p, const char *program_p,
+                       const char *port_p, const char *target_p);
   virtual bool connect() const override;
 };
 
