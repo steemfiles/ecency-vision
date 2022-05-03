@@ -12,4 +12,5 @@ void forward_log(boost::process::ipstream &ps, std::ostream &log,
                  const boost::process::child *cptr);
 std::set<AbstractService *> &operator<<(std::set<AbstractService *> &s,
                                         const AbstractService *p);
+extern const char *RUNFOREVER_MANAGER_VERSION_STRING;
 #endif

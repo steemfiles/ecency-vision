@@ -26,7 +26,7 @@ void AbstractService::mind_server() {
   _stopped = !(mindingFlag = true);
   while (!!mindingFlag) {
     if (verbose_threads)
-      cerr << "minding " << service_name << " server " << endl;
+      mainserverlogline() << "minding " << service_name << " server " << endl;
     boost::this_thread::sleep_for(boost::chrono::milliseconds(3400));
     if (connect()) {
       mainserverlogline() << "Could not connect to " << service_name
@@ -55,7 +55,7 @@ void AbstractService::init() {
               log_filename = base_name + ".log";
   pipe_stream_ptr = new ipstream();
   if (verbose) {
-    std::cerr << "executing '" << cmd << '\'' << std::endl;
+    mainserverlogline() << "executing '" << cmd << '\'' << std::endl;
   }
   child_ptr = new child(cmd.c_str(), std_out > *pipe_stream_ptr);
   pid_ptr = new pidfile(getPIDFilename().c_str(), child_ptr->id());
@@ -66,10 +66,9 @@ void AbstractService::init() {
 
   log_forward_thread_ptr = new boost::thread([&]() {
     try {
-      cerr << "Attempting to forward log" << endl;
       forward_log(*pipe_stream_ptr, *lout_ptr, child_ptr);
     } catch (std::exception e) {
-      cerr << "Threw an exception " << e.what() << endl;
+      mainserverlogline() << "Threw an exception " << e.what() << endl;
     }
   });
 
@@ -79,32 +78,12 @@ void AbstractService::init() {
 
   validate();
 }
-void AbstractService::destroy() {
-  validate();
-  if (!_stopped)
-    return;
-  if (pipe_stream_ptr != nullptr) {
-    delete log_forward_thread_ptr;
-    delete server_minding_thread_ptr;
-    delete pipe_stream_ptr;
-    delete child_ptr;
-    delete lout_ptr;
-    delete pid_ptr;
-  }
-  pipe_stream_ptr = nullptr;
-  child_ptr = nullptr;
-  pid_ptr = nullptr;
-  pipe_stream_ptr = nullptr;
-  server_minding_thread_ptr = log_forward_thread_ptr = nullptr;
-  validate();
-}
 
 bool AbstractService::running() const {
   validate();
   return !_stopped;
 }
 
-void AbstractService::onClosed() { validate(); }
 void AbstractService::close() {
   validate();
   if (pipe_stream_ptr != nullptr) {
@@ -173,7 +152,27 @@ const char *AbstractService::target() const {
   return "";
 }
 
-bool AbstractService::connect() const {
+static char pbuf[1024];
+
+const char *AbstractService::programFile() const {
+  char const *p = program.c_str();
+  if (p == nullptr)
+    throw validation_failed;
+  char *q = pbuf;
+  while (*q++ = *p++)
+    ;
+  return pbuf;
+}
+
+TCPValidatedService::TCPValidatedService(const char *name_p,
+                                         const char *basename_p,
+                                         const char *interpreter_p,
+                                         const char *program_p,
+                                         const char *port_p)
+    : AbstractService(name_p, basename_p, interpreter_p, program_p),
+      _port(port_p) {}
+
+bool TCPValidatedService::connect() const {
   validate();
   char const *const host = "127.0.0.1";
   const int version = 11;
@@ -193,51 +192,109 @@ bool AbstractService::connect() const {
   stream.connect(results, ec);
   if (ec) {
     if (verbose_threads) {
-      cerr << "Unable to connect to " << service_name << " server at port "
-           << port() << endl;
+      mainserverlogline() << "Unable to connect to " << service_name
+                          << " server at port " << port() << endl;
     }
     return true;
   }
 
   if (ec) {
     if (verbose) {
-      cerr << "Error while closing the socket for " << service_name << " server"
-           << endl;
+      mainserverlogline() << "Error while closing the socket for "
+                          << service_name << " server" << endl;
     }
     return true;
   } else
     return false;
 }
 
-static char pbuf[1024];
+const char *TCPValidatedService::port() const { return _port; }
 
-const char *AbstractService::programFile() const {
-  char const *p = program.c_str();
-  if (p == nullptr)
-    throw validation_failed;
-  strcpy(pbuf, "XXXXXXXXXXX");
-  char *q = pbuf;
-  while (*q++ = *p++)
-    ;
-  return pbuf;
+bool HTTPValidatedService::connect() const {
+  // Performs an HTTP GET and prints the response
+  auto const host = "127.0.0.1";
+  auto const port = "3000";
+  auto const target = "/";
+  const int version = 11;
+  const char *name = "page";
+  validate();
+
+  if (verbose) {
+    mainserverlogline() << "Preparing to check " << name << " server at port "
+                        << port << ".\n";
+  }
+
+  boost::system::error_code ec;
+
+  // The io_context is required for all I/O
+  net::io_context ioc;
+
+  // These objects perform our I/O
+  tcp::resolver resolver(ioc);
+  beast::tcp_stream stream(ioc);
+
+  // Look up the domain name
+  auto const results = resolver.resolve(host, port);
+
+  // Make the connection on the IP address we get from a lookup
+  stream.connect(results, ec);
+  if (ec) {
+    if (verbose) {
+      mainserverlogline() << "Unable to connect to " << name
+                          << " server at port " << port << endl;
+    }
+    return true;
+  }
+
+  // Set up an HTTP GET request message
+  http::request<http::string_body> req{http::verb::get, target, version};
+  req.set(http::field::host, host);
+  req.set(http::field::user_agent, RUNFOREVER_MANAGER_VERSION_STRING);
+
+  // Send the HTTP request to the remote host
+  http::write(stream, req, ec);
+  if (ec) {
+    if (verbose) {
+      mainserverlogline() << "Unable to write header request to " << name
+                          << " server at port " << port << endl;
+    }
+    return true;
+  }
+
+  // This buffer is used for reading and must be persisted
+  beast::flat_buffer buffer;
+
+  // Declare a container to hold the response
+  http::response<http::dynamic_body> res;
+  boost::beast::http::parser<true, beast::http::buffer_body> bp;
+
+  // Receive the HTTP response
+  http::read(stream, buffer, res, ec);
+  if (verbose) {
+    mainserverlogline() << "Read from the " << name << " server on port "
+                        << port << ": " << ec << endl;
+  }
+
+  // Gracefully close the socket
+  stream.socket().shutdown(tcp::socket::shutdown_both, ec);
+
+  if (ec) {
+    if (verbose) {
+      mainserverlogline() << "Error while closing the socket for " << name
+                          << " server" << endl;
+    }
+    return true;
+  } else
+    return false;
 }
 
-bool PrivateAPIService::connect() const {
-  validate();
-  return connect_to_http_server("private-api", "2997", "/notifications/unread");
-}
-PrivateAPIService::PrivateAPIService()
-    : AbstractService("Private API", "private", "node",
-                      "private-api/build/private-api-server.js") {
-  validate();
-}
+const char *HTTPValidatedService::target() const { return _target; }
 
-const char *PrivateAPIService::port() const {
-  validate();
-  return "2997";
-}
+HTTPValidatedService::HTTPValidatedService(
+    const char *name_p, const char *basename_p, const char *interpreter_p,
+    const char *program_p, const char *port_p, const char *target_p)
+    : TCPValidatedService(name_p, basename_p, interpreter_p, program_p, port_p),
+      _target(target_p) {
 
-const char *PrivateAPIService::target() const {
   validate();
-  return "/notifications/unread";
 }
