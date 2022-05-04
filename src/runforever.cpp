@@ -28,7 +28,7 @@
 #include <unistd.h>
 #include <utility>
 #define cerr #error "Use  of cerr out of initial start";//
-
+using namespace std;
 extern const char *raw_version;
 std::string fault;
 const std::string primary_search_location = "private-api/build/relayserver.js";
