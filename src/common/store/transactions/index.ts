@@ -65,9 +65,19 @@ export const ACCOUNT_OPERATION_GROUPS: Record<OperationGroup, number[]> = {
   //],
 };
 
-const ALL_ACCOUNT_OPERATIONS = [
-  ...Object.values(ACCOUNT_OPERATION_GROUPS),
-].flat();
+const ALL_ACCOUNT_VALUES_OF_VALUES: Array<Array<number>> = Object.values(
+  ACCOUNT_OPERATION_GROUPS
+);
+
+const flat = function (that: Array<Array<number>>): Array<number> {
+  var acc: Array<number> = [];
+  for (let i = 0; i < that.length; ++i) {
+    acc = [...that[i], ...acc];
+  }
+  return acc;
+};
+
+const ALL_ACCOUNT_OPERATIONS = flat(ALL_ACCOUNT_VALUES_OF_VALUES);
 
 export const initialState: Transactions = {
   list: [],
