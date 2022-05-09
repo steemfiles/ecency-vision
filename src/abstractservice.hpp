@@ -69,11 +69,12 @@ public:
   std::string serviceName() const;
 
 public:
-  // is the child running?
+  // is the child running ior are the threads running?
   bool running() const;
   // close the child server process, if running and set a flag so the
-  // mind_server method will terminate
-  void close();
+  // mind_server method will terminate.  Returns true if still running or
+  // if one thread is still running.
+  bool close();
   // set a flag so the mind_server method will terminate.
   void stop();
   // return the programFile as a string.  The caller should not free the string.

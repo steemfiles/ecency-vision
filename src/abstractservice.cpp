@@ -1,5 +1,6 @@
 #include "abstractservice.hpp"
 #include "runforever.hpp"
+#include <signal.h>
 #include <stdexcept>
 
 std::runtime_error validation_failed("invalid service object");
@@ -23,26 +24,31 @@ std::string AbstractService::serviceName() const {
 }
 void AbstractService::mind_server() {
   validate();
-  _stopped = !(mindingFlag = true);
-  while (!!mindingFlag) {
-    if (verbose_threads)
-      mainserverlogline() << "minding " << service_name << " server " << endl;
-    boost::this_thread::sleep_for(boost::chrono::milliseconds(3400));
-    if (connect()) {
-      mainserverlogline() << "Could not connect to " << service_name
-                          << " subserver" << std::endl;
-      fault = service_name;
-      down << (this);
-      break;
+  try {
+    mindingFlag = true;
+    _stopped = false;
+    while (!!mindingFlag) {
+      if (verbose_threads)
+        mainserverlogline() << "minding " << service_name << " server " << endl;
+      boost::this_thread::sleep_for(boost::chrono::milliseconds(3400));
+      if (connect()) {
+        mainserverlogline() << "Could not connect to " << service_name
+                            << " subserver" << std::endl;
+        fault = service_name;
+        down << (this);
+        break;
+      }
+
+      if (!child_ptr->running()) {
+        down << (this);
+        break;
+      }
     }
 
-    if (!child_ptr->running()) {
-      down << (this);
-      break;
-    }
+    _stopped = true;
+  } catch (boost::thread_interrupted &) {
+    mindingFlag = false;
   }
-
-  _stopped = true;
 
   validate();
 }
@@ -65,6 +71,8 @@ void AbstractService::init() {
   lout_ptr->open(log_filename, std::fstream::app);
 
   log_forward_thread_ptr = new boost::thread([&]() {
+    set_handlers();
+
     try {
       forward_log(*pipe_stream_ptr, *lout_ptr, child_ptr);
     } catch (std::exception e) {
@@ -74,7 +82,10 @@ void AbstractService::init() {
 
   mindingFlag = true;
   _stopped = false;
-  server_minding_thread_ptr = new boost::thread([&]() { mind_server(); });
+  server_minding_thread_ptr = new boost::thread([&]() {
+    set_handlers();
+    mind_server();
+  });
 
   validate();
 }
@@ -84,7 +95,7 @@ bool AbstractService::running() const {
   return !_stopped;
 }
 
-void AbstractService::close() {
+bool AbstractService::close() {
   validate();
   if (pipe_stream_ptr != nullptr) {
     if (!_stopped)
@@ -99,7 +110,10 @@ void AbstractService::close() {
       boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
       waitpid(child_id, &status, WNOHANG);
     }
+    log_forward_thread_ptr->interrupt();
+    server_minding_thread_ptr->interrupt();
     log_forward_thread_ptr->join();
+    server_minding_thread_ptr->join();
     if (verbose_threads)
       mainserverlogline() << "Process " << service_name << " server  "
                           << child_ptr->id() << " exited with status "
@@ -107,8 +121,8 @@ void AbstractService::close() {
     lout_ptr->close();
     pipe_stream_ptr->close();
 
-    delete server_minding_thread_ptr;
-    delete log_forward_thread_ptr;
+    delete server_minding_thread_ptr, log_forward_thread_ptr;
+
     server_minding_thread_ptr = log_forward_thread_ptr = nullptr;
 
     delete child_ptr;
@@ -121,11 +135,14 @@ void AbstractService::close() {
     lout_ptr = nullptr;
   }
   validate();
+  return _stopped;
 }
 void AbstractService::reStart() {
   validate();
-  if (!running())
+  if (!running()) {
+    close();
     init();
+  }
   validate();
 }
 AbstractService::AbstractService(const char *name, const char *basename_p,

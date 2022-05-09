@@ -3,6 +3,7 @@
 #include <boost/process.hpp>
 #include <boost/thread.hpp>
 #include <iostream>
+void set_handlers();
 extern bool verbose_threads;
 extern bool verbose;
 extern std::string fault;
