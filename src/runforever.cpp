@@ -115,16 +115,16 @@ void forward_log(ipstream &ps, std::ostream &log,
 
   std::string line;
   char c;
-  while (all_running) {
-    boost::this_thread::yield();
-    try {
+  try {
+    while (all_running) {
+      boost::this_thread::yield();
       boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
       if (keep_looping && ps && std::getline(ps, line) && !line.empty()) {
         log << "[" << cptr->id() << "; " << datetime_string << "] " << line
             << std::endl;
       }
-    } catch (...) {
     }
+  } catch (boost::thread_interrupted &) {
   }
 }
 
@@ -139,8 +139,6 @@ void report_and_continue(int signal) {
 
 void set_to_exit(int signal) {
   report_and_continue(signal);
-  mainserverlogline() << "Caught signal " << signal_names[signal] << "."
-                      << std::endl;
   keep_looping = false;
 }
 
@@ -251,7 +249,7 @@ void set_handlers() {
   // sigaction(SIGABRT, &sigLogAction, &old);
   // SIGALRM is used by the thread library, best we leave that alone.
   // sigaction(SIGALRM, &sigLogAction, &old);
-  sigaction(SIGKILL, &sigLogAction, &old);
+  // sigaction(SIGKILL, &sigLogAction, &old);
 
   sigaction(SIGBUS, &sigExitAllAction, &old);
 
@@ -451,6 +449,7 @@ int main(int argc, char **argv) {
       (*i)->reStart();
     }
     down.clear();
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(500));
 
     all_running = true;
 
@@ -467,36 +466,17 @@ int main(int argc, char **argv) {
       mainserverlogline() << "Exception caught (boost:system::system_error):"
                           << e.what() << std::endl;
     }
-
-    if (down.size()) {
-      mainserverlogline() << "The following processes are down:";
-      for (const AbstractService *v : down) {
-        mainserverlog << v->serviceName() << ", ";
-      }
-      mainserverlog << ".  Closing....";
-
-      for (AbstractService *v : down) {
-        v->close();
-        mainserverlog << ".";
-      }
-      mainserverlog << "done." << endl;
-    }
-
-    all_running = false;
   }
-  privateAPIService.stop();
-  promoterService.stop();
-  pageAPIService.stop();
-  searchRelayService.stop();
-  while (privateAPIService.running() || promoterService.running() ||
-         pageAPIService.running() || searchRelayService.running()) {
+
+  // terminate all children processes
+  while ((privateAPIService.running() && privateAPIService.close()) ||
+         (promoterService.running() && promoterService.close()) ||
+         (pageAPIService.running() && pageAPIService.close()) ||
+         (searchRelayService.running() && searchRelayService.close())) {
     boost::this_thread::yield();
-    boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(500));
   }
-  privateAPIService.close();
-  promoterService.close();
-  pageAPIService.close();
-  searchRelayService.close();
+
   unlink("manager.pid");
   mainserverlogline() << "Exiting Master Server" << std::endl;
 }
