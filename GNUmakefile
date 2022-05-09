@@ -18,29 +18,8 @@ all: most private-api/build/runforever build/server.js runforever-dbg
 syntax:
 	g++ -fsyntax-only src/runforever.cpp $(COMPILE_FLAGS)
 
-src/common/constants/gitversion.cpp src/common/constants/gitversion.ts: .git extractver.sh
-	sh extractver.sh
-	
 clean:
-	rm *.o runforever-dbg
-	
-raw_version.o: src/common/constants/gitversion.cpp
-	g++ src/common/constants/gitversion.cpp -ggdb -c $(COMPILE_FLAGS) -o raw_version.o
-	
-pidfile.o: src/pidfile.hpp src/pidfile.cpp
-	g++ src/pidfile.cpp -ggdb -c $(COMPILE_FLAGS) -o pidfile.o
-	
-abstractservice.o: src/abstractservice.hpp src/abstractservice.cpp
-	g++ src/abstractservice.cpp -ggdb -c $(COMPILE_FLAGS) -o abstractservice.o
-	
-runforever.o: src/runforever.cpp src/runforever.hpp src/abstractservice.hpp src/pidfile.hpp
-	g++ src/runforever.cpp -c -DNDEBUG $(COMPILE_FLAGS)
-
-runforever-dbg.o: src/runforever.cpp src/runforever.hpp src/abstractservice.hpp src/pidfile.hpp
-	g++ src/runforever.cpp -UNDEBUG -ggdb -c -o runforever-dbg.o  $(COMPILE_FLAGS)
-
-listenlog-dbg.o: src/listenlog.cpp
-	g++ src/listenlog.cpp -ggdb -c -o listenlog-dbg.o  $(COMPILE_FLAGS)
+	rm -f *.o runforever-dbg private-api/build/runforever private-api/build/runforever
 	
 private-api/build/runforever: runforever.o raw_version.o pidfile.o abstractservice.o
 	g++ runforever.o raw_version.o abstractservice.o pidfile.o -o private-api/build/runforever $(LINK_FLAGS) -static
@@ -48,8 +27,8 @@ private-api/build/runforever: runforever.o raw_version.o pidfile.o abstractservi
 private-api/build/runforever-dyn: runforever.o raw_version.o pidfile.o abstractservice.o
 	g++ runforever.o raw_version.o abstractservice.o pidfile.o -o private-api/build/runforever-dyn $(LINK_FLAGS)
 
-runforever-dbg: raw_version.o abstractservice.o runforever-dbg.o pidfile.o
-	g++ -ggdb runforever-dbg.o raw_version.o abstractservice.o pidfile.o -o runforever-dbg  $(LINK_FLAGS) -static
+runforever-dbg: raw_version-gdb.o abstractservice-gdb.o runforever-dbg.o pidfile-gdb.o
+	g++ -ggdb runforever-dbg.o raw_version-gdb.o abstractservice-gdb.o pidfile-gdb.o -o runforever-dbg  $(LINK_FLAGS) -static
 	
 listenlog-dbg: listenlog-dbg.o
 	g++ -ggdb listenlog-dbg.o -o listenlog-dbg  $(LINK_FLAGS) -static
@@ -76,6 +55,36 @@ private-api/build/process.js: private-api/src/process.ts private-api/src/notific
 private-api/build/pull-history-data.js: private-api/src/pull-history-data.ts private-api/src/notifications.ts  src/common/constants/gitversion.ts
 	rm -f private-api/build/pull-history-data.js
 	tsc --OutDir private-api/build --lib es2021 --resolveJsonModule --esModuleInterop private-api/src/pull-history-data.ts
+src/common/constants/gitversion.cpp src/common/constants/gitversion.ts: .git extractver.sh
+	sh extractver.sh
+	
+raw_version-gdb.o: src/common/constants/gitversion.cpp
+	g++ src/common/constants/gitversion.cpp -ggdb -c $(COMPILE_FLAGS) -o raw_version-gdb.o
+	
+raw_version.o: src/common/constants/gitversion.cpp
+	g++ src/common/constants/gitversion.cpp -DNDEBUG  -O2 -c $(COMPILE_FLAGS) -o raw_version.o
+	
+pidfile-gdb.o: src/pidfile.hpp src/pidfile.cpp
+	g++ src/pidfile.cpp -ggdb -c $(COMPILE_FLAGS) -o pidfile-gdb.o
+	
+pidfile.o: src/pidfile.hpp src/pidfile.cpp
+	g++ src/pidfile.cpp -DNDEBUG -O3 -c $(COMPILE_FLAGS) -o pidfile.o
+	
+abstractservice-gdb.o: src/abstractservice.hpp src/abstractservice.cpp
+	g++ src/abstractservice.cpp -ggdb -c $(COMPILE_FLAGS) -o abstractservice-gdb.o
+	
+abstractservice.o: src/abstractservice.hpp src/abstractservice.cpp
+	g++ src/abstractservice.cpp -DNDEBUG -O3 -c $(COMPILE_FLAGS) -o abstractservice.o
+	
+runforever.o: src/runforever.cpp src/runforever.hpp src/abstractservice.hpp src/pidfile.hpp
+	g++ src/runforever.cpp -c -O3 -DNDEBUG $(COMPILE_FLAGS)
+
+runforever-dbg.o: src/runforever.cpp src/runforever.hpp src/abstractservice.hpp src/pidfile.hpp
+	g++ src/runforever.cpp -UNDEBUG -ggdb -c -o runforever-dbg.o  $(COMPILE_FLAGS)
+
+listenlog-dbg.o: src/listenlog.cpp
+	g++ src/listenlog.cpp -ggdb -c -o listenlog-dbg.o  $(COMPILE_FLAGS)
+	
 
 # Because there is no way to efficiently update the Makefile for yarn build, 
 # it is intentionally set as a PHONY target.  So, it will always  be built.
