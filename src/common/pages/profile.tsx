@@ -294,9 +294,11 @@ class ProfilePage extends BaseComponent<Props, State> {
     } else {
       const groupKey = makeGroupKey(filter, tag);
       const data = entries[groupKey];
-      const { loading, hasMore } = data;
-      if (!loading && hasMore) {
-        fetchEntries(filter, tag, true);
+      if (data) {
+        const { loading, hasMore } = data;
+        if (!loading && hasMore) {
+          fetchEntries(filter, tag, true);
+        }
       }
     }
   };
