@@ -334,19 +334,24 @@ class ProfilePage extends BaseComponent<Props, State> {
       match.params.section || ls.get("profile-section") || ProfileFilter.blog;
 
     const { loading, updating } = this.state;
+
     if (
       section == "hive" ||
       (section === "wallet" && this.getTokenFromURL() === "HIVE")
     ) {
       const username = match.params.username.replace("@", "");
-      if (!loading && !updating && username && list.length) {
+      if (!loading && !updating && username) {
         this.setState({ updating: true });
-        const oldest_transaction_num = list[list.length - 1].num;
+        const oldest_transaction_num = (() => {
+          if (list.length) return list[list.length - 1].num;
+          return 1e18;
+        })();
         console.log("getting more from", {
           group,
           oldest,
           oldest_transaction_num,
         });
+        if (list.length < 4) console.log({ list });
         getMoreTransactions(
           username,
           group,
@@ -357,6 +362,7 @@ class ProfilePage extends BaseComponent<Props, State> {
         }, 500);
       }
     } else {
+      console.log("Not getting more ");
       const groupKey = makeGroupKey(filter, tag);
       const data = entries[groupKey];
       if (data) {

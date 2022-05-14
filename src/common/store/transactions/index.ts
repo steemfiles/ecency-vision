@@ -20,6 +20,17 @@ import * as ls from "../../util/local-storage";
 
 const ops = utils.operationOrders;
 
+interface HiveRPCError {
+  name: "RPCError";
+  jse_shortmsg: string;
+  jse_info: {
+    code: number;
+    name: string;
+    message: string;
+    stack: Array<{ data: { sequence: number } }>;
+  };
+}
+
 export const ACCOUNT_OPERATION_GROUPS: Record<OperationGroup, number[]> = {
   transfers: [
     ops.transfer,
@@ -246,7 +257,6 @@ export const fetchTransactions =
     dispatch(fetchAct(group));
 
     const handleFetch = (r: Array<any>) => {
-      console.log("fetching Txs");
       const mapped: Array<Transaction> = r.map((x: any): Transaction => {
         const { op } = x[1];
         const { timestamp, trx_id } = x[1];
@@ -283,41 +293,27 @@ export const fetchTransactions =
       dispatch(fetchedAct(transactions, oldest, newest));
     };
 
+    const handleError = (e: HiveRPCError) => {
+      const jse_info = e.jse_info;
+      const code = jse_info.code;
+      if (code === 10) {
+        const newStart = jse_info.stack[0].data.sequence;
+        getMoreTransactions(username, group, newStart)(dispatch);
+      } else if (
+        e.jse_shortmsg.startsWith(
+          "args.start >= args.limit-1: start must be greater than or equal to limit-1 (start is 0-based index)"
+        )
+      ) {
+        dispatch(setOldestTransactionAct(0));
+      } else {
+        dispatch(fetchErrorAct());
+      }
+    };
+
     const name = username.replace("@", "");
     const filters: any[] = filterForGroup(group);
-    console.log(filters);
 
-    getAccountHistory(name, filters)
-      .then(handleFetch)
-      .catch((e) => {
-        console.error(e.message);
-        if (
-          e.message.startsWith(
-            "total_processed_items < 2000: Could not find filtered operation in 2000 operations, to continue searching, set start="
-          )
-        ) {
-          const segments = e.message.split(/=/);
-          const newStart = parseInt(segments[1]);
-          const limit = 498 >= newStart ? newStart + 1 : 500;
-          hiveClient
-            .call("condenser_api", "get_account_history", [
-              name,
-              newStart,
-              limit,
-              ...filters,
-            ])
-            .then(handleFetch);
-        } else if (
-          e.message.startsWith(
-            "args.start >= args.limit-1: start must be greater than or equal to limit-1 (start is 0-based index)"
-          )
-        ) {
-          dispatch(setOldestTransactionAct(0));
-        } else {
-          console.log("catch", e);
-          dispatch(fetchErrorAct());
-        }
-      });
+    getAccountHistory(name, filters).then(handleFetch).catch(handleError);
   };
 
 export const updateTransactions =
@@ -364,14 +360,13 @@ export const updateTransactions =
           updatedAct(null, most_recent_transaction_num, group, transactions)
         );
       })
-      .catch((e) => {
-        console.log("catch", e);
+      .catch((e: HiveRPCError) => {
         if (
-          e.message.startsWith(
+          e.jse_shortmsg.startsWith(
             "total_processed_items < 2000: Could not find filtered operation in 2000 operations, to continue searching, set start="
           )
         ) {
-          const segments = e.message.split(/=/);
+          const segments = e.jse_shortmsg.split(/=/);
           const newStart = parseInt(segments[1]);
           dispatch(setOldestTransactionAct(newStart));
           getMoreTransactions(username, group, newStart);
@@ -446,18 +441,17 @@ export const getMoreTransactions =
           dispatch(updatedAct(null, null, group, []));
         }
       })
-      .catch((e) => {
+      .catch((e: HiveRPCError) => {
         if (
-          e.message.startsWith(
+          e.jse_shortmsg.startsWith(
             "total_processed_items < 2000: Could not find filtered operation in 2000 operations, to continue searching, set start="
           )
         ) {
-          const segments = e.message.split(/=/);
+          const segments = e.jse_shortmsg.split(/=/);
           const newStart = parseInt(segments[1]);
           dispatch(setOldestTransactionAct(newStart));
-          getMoreTransactions(username, group, newStart);
         } else if (
-          e.message.startsWith(
+          e.jse_shortmsg.startsWith(
             "args.start >= args.limit-1: start must be greater than or equal to limit-1 (start is 0-based index)"
           )
         ) {
