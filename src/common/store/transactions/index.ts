@@ -157,14 +157,22 @@ export default (
 
         if (oldest) {
           // include loaded transactions *after*
+          let newest = state.newest;
+          if (newest < oldest) {
+            newest = oldest;
+          }
           old_list.forEach(includeInList);
           transactions.forEach(includeInList);
-          return { ...state, list, oldest, loading: false };
+          return { ...state, newest, list, oldest, loading: false };
         } else if (newest) {
           // include loaded transactions *before*
           transactions.forEach(includeInList);
           old_list.forEach(includeInList);
-          return { ...state, list, newest, loading: false };
+          let { oldest } = state;
+          if (oldest > newest) {
+            oldest = newest;
+          }
+          return { ...state, oldest, list, newest, loading: false };
         }
       }
 
@@ -465,6 +473,10 @@ export const getMoreTransactions =
 
 export const resetTransactions = () => (dispatch: Dispatch) => {
   dispatch(resetAct());
+};
+
+export const setTransactions = (t: Transactions) => (dispatch: Dispatch) => {
+  dispatch(updatedAct(t.oldest, t.newest, t.group, t.list));
 };
 
 /* Action Creators */
