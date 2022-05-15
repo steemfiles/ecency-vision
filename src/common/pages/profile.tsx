@@ -55,6 +55,7 @@ interface State {
   most_recent_transaction_num: number;
   updateTransactionsIntervalIdentifier: any;
   getOlderTransactionsIntervalIdentifier: any;
+  requiredListLength: number;
 }
 class ProfilePage extends BaseComponent<Props, State> {
   state: State = {
@@ -64,6 +65,7 @@ class ProfilePage extends BaseComponent<Props, State> {
     updateTransactionsIntervalIdentifier: 0,
     getOlderTransactionsIntervalIdentifier: 0,
     most_recent_transaction_num: 0,
+    requiredListLength: 5,
   };
 
   updateTransactionsPingHandler = () => {
@@ -149,7 +151,8 @@ class ProfilePage extends BaseComponent<Props, State> {
     const props = this.props;
     const { transactions, getMoreTransactions, match } = props;
     let { username } = match.params;
-    if (transactions.list.length < 5 && !this.state.updating) {
+    const { requiredListLength, updating } = this.state;
+    if (transactions.list.length < requiredListLength && !updating) {
       this.setState({ updating: true });
       getMoreTransactions(username, transactions.group, transactions.oldest);
       this.setState({ updating: false });
@@ -201,13 +204,13 @@ class ProfilePage extends BaseComponent<Props, State> {
 
     const updateTransactionsIntervalIdentifier = setInterval(
       this.updateTransactionsPingHandler.bind(this),
-      15000
+      5000
     );
 
     const setState = this.setState;
     const getOlderTransactionsIntervalIdentifier = setInterval(
       this.addOlder.bind(this),
-      10000
+      1000
     );
 
     // Using a stream of blocks uses more bandwidth than polling history / 15s.
@@ -360,32 +363,28 @@ class ProfilePage extends BaseComponent<Props, State> {
     const section =
       match.params.section || ls.get("profile-section") || ProfileFilter.blog;
 
-    const { loading, updating } = this.state;
+    const { loading, updating, requiredListLength } = this.state;
 
     if (
       section == "hive" ||
       (section === "wallet" && this.getTokenFromURL() === "HIVE")
     ) {
       const username = match.params.username.replace("@", "");
-      if (!loading && !updating && username) {
-        this.setState({ updating: true });
-        const oldest_transaction_num = (() => {
-          if (list.length) return list[list.length - 1].num;
-          return 1e18;
-        })();
-        console.log("getting more from", {
-          group,
-          oldest,
-          oldest_transaction_num,
+      if (
+        !loading &&
+        !updating &&
+        username &&
+        list.length >= requiredListLength
+      ) {
+        const { getOlderTransactionsIntervalIdentifier } = this.state;
+        clearInterval(getOlderTransactionsIntervalIdentifier);
+        this.setState({
+          requiredListLength: requiredListLength + 4,
+          getOlderTransactionsIntervalIdentifier: setInterval(
+            this.addOlder.bind(this),
+            1000
+          ),
         });
-        setTimeout(() => {
-          getMoreTransactions(
-            username,
-            group,
-            Math.min(oldest, oldest_transaction_num)
-          );
-          this.setState({ updating: false });
-        }, 0);
       }
     } else {
       console.log("Not getting more ");
