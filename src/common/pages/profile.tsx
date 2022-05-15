@@ -54,6 +54,7 @@ interface State {
   isDefaultPost: boolean;
   most_recent_transaction_num: number;
   updateTransactionsIntervalIdentifier: any;
+  getOlderTransactionsIntervalIdentifier: any;
 }
 class ProfilePage extends BaseComponent<Props, State> {
   state: State = {
@@ -61,6 +62,7 @@ class ProfilePage extends BaseComponent<Props, State> {
     updating: false,
     isDefaultPost: false,
     updateTransactionsIntervalIdentifier: 0,
+    getOlderTransactionsIntervalIdentifier: 0,
     most_recent_transaction_num: 0,
   };
 
@@ -143,6 +145,17 @@ class ProfilePage extends BaseComponent<Props, State> {
     return null;
   }
 
+  addOlder() {
+    const props = this.props;
+    const { transactions, getMoreTransactions, match } = props;
+    let { username } = match.params;
+    if (transactions.list.length < 5 && !this.state.updating) {
+      this.setState({ updating: true });
+      getMoreTransactions(username, transactions.group, transactions.oldest);
+      this.setState({ updating: false });
+    }
+  }
+
   async componentDidMount() {
     await this.ensureAccount();
     const props = this.props;
@@ -155,6 +168,7 @@ class ProfilePage extends BaseComponent<Props, State> {
       transactions,
       activeUser,
       history,
+      getMoreTransactions,
     } = props;
     const { username } = match.params;
     console.log(match.params.section, ls.get("profile-section"));
@@ -190,10 +204,17 @@ class ProfilePage extends BaseComponent<Props, State> {
       15000
     );
 
+    const setState = this.setState;
+    const getOlderTransactionsIntervalIdentifier = setInterval(
+      this.addOlder.bind(this),
+      10000
+    );
+
     // Using a stream of blocks uses more bandwidth than polling history / 15s.
     this.setState({
       updateTransactionsIntervalIdentifier,
       most_recent_transaction_num,
+      getOlderTransactionsIntervalIdentifier,
     });
   }
 
@@ -284,12 +305,18 @@ class ProfilePage extends BaseComponent<Props, State> {
   componentWillUnmount() {
     super.componentWillUnmount();
     const { resetTransactions, resetPoints } = this.props;
-    const { updateTransactionsIntervalIdentifier } = this.state;
+    const {
+      getOlderTransactionsIntervalIdentifier,
+      updateTransactionsIntervalIdentifier,
+    } = this.state;
     // reset transactions and points on unload
     resetTransactions();
     resetPoints();
     if (updateTransactionsIntervalIdentifier != 0) {
       clearInterval(updateTransactionsIntervalIdentifier);
+    }
+    if (getOlderTransactionsIntervalIdentifier != 0) {
+      clearInterval(getOlderTransactionsIntervalIdentifier);
     }
   }
   ensureAccount = () => {
@@ -351,15 +378,14 @@ class ProfilePage extends BaseComponent<Props, State> {
           oldest,
           oldest_transaction_num,
         });
-        if (list.length < 4) console.log({ list });
-        getMoreTransactions(
-          username,
-          group,
-          Math.min(oldest, oldest_transaction_num)
-        );
         setTimeout(() => {
+          getMoreTransactions(
+            username,
+            group,
+            Math.min(oldest, oldest_transaction_num)
+          );
           this.setState({ updating: false });
-        }, 500);
+        }, 0);
       }
     } else {
       console.log("Not getting more ");
