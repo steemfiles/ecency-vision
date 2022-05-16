@@ -380,7 +380,7 @@ export class WalletHive extends BaseComponent<Props, State> {
                               },
                             },
                             {
-                              label: "Borrow new HBD against Hive",
+                              label: _t("wallet.convert-hive-to-hbd"),
                               onClick: () => {
                                 this.openTransferDialog(
                                   "borrow",
