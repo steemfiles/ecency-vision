@@ -20,15 +20,33 @@ syntax:
 
 clean:
 	rm -f *.o runforever-dbg private-api/build/runforever private-api/build/runforever
-	
+
 private-api/build/runforever: runforever.o raw_version.o pidfile.o abstractservice.o
 	g++ runforever.o raw_version.o abstractservice.o pidfile.o -o private-api/build/runforever $(LINK_FLAGS) -static
 
 private-api/build/runforever-dyn: runforever.o raw_version.o pidfile.o abstractservice.o
 	g++ runforever.o raw_version.o abstractservice.o pidfile.o -o private-api/build/runforever-dyn $(LINK_FLAGS)
-
+	
 runforever-dbg: raw_version-gdb.o abstractservice-gdb.o runforever-dbg.o pidfile-gdb.o
 	g++ -ggdb runforever-dbg.o raw_version-gdb.o abstractservice-gdb.o pidfile-gdb.o -o runforever-dbg  $(LINK_FLAGS) -static
+	
+raw_version.o: src/common/constants/gitversion.cpp
+	g++ src/common/constants/gitversion.cpp -ggdb -c $(COMPILE_FLAGS) -o raw_version.o
+	
+pidfile.o: src/pidfile.hpp src/pidfile.cpp
+	g++ src/pidfile.cpp -ggdb -c $(COMPILE_FLAGS) -o pidfile.o
+	
+abstractservice.o: src/abstractservice.hpp src/abstractservice.cpp
+	g++ src/abstractservice.cpp -ggdb -c $(COMPILE_FLAGS) -o abstractservice.o
+	
+runforever.o: src/runforever.cpp src/runforever.hpp src/abstractservice.hpp src/pidfile.hpp
+	g++ src/runforever.cpp -c -DNDEBUG $(COMPILE_FLAGS)
+
+runforever-dbg.o: src/runforever.cpp src/runforever.hpp src/abstractservice.hpp src/pidfile.hpp
+	g++ src/runforever.cpp -UNDEBUG -ggdb -c -o runforever-dbg.o  $(COMPILE_FLAGS)
+
+listenlog-dbg.o: src/listenlog.cpp
+	g++ src/listenlog.cpp -ggdb -c -o listenlog-dbg.o  $(COMPILE_FLAGS)
 	
 listenlog-dbg: listenlog-dbg.o
 	g++ -ggdb listenlog-dbg.o -o listenlog-dbg  $(LINK_FLAGS) -static

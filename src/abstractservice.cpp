@@ -123,6 +123,8 @@ bool AbstractService::close() {
 
     delete server_minding_thread_ptr, log_forward_thread_ptr;
 
+    delete server_minding_thread_ptr;
+    delete log_forward_thread_ptr;
     server_minding_thread_ptr = log_forward_thread_ptr = nullptr;
 
     delete child_ptr;
