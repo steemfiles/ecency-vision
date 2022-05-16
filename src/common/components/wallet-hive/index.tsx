@@ -396,6 +396,15 @@ export class WalletHive extends BaseComponent<Props, State> {
                               },
                             },
                             {
+                              label: _t("wallet.trade-on-Ionomy"),
+                              onClick: () => {
+                                window.open(
+                                  `https://exchange.ionomy.com/en/markets/busd-hive`,
+                                  "Ionomy"
+                                );
+                              },
+                            },
+                            {
                               label: _t("wallet.trade-on-Blocktrades"),
                               onClick: () => {
                                 window.open(
@@ -654,6 +663,15 @@ export class WalletHive extends BaseComponent<Props, State> {
                                 window.open(
                                   `https://wallet.hive.blog/market`,
                                   "HiveDEx"
+                                );
+                              },
+                            },
+                            {
+                              label: _t("wallet.trade-on-Ionomy"),
+                              onClick: () => {
+                                window.open(
+                                  `https://exchange.ionomy.com/en/markets/busd-hbd`,
+                                  "Ionomy"
                                 );
                               },
                             },
