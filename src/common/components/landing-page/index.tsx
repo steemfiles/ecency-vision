@@ -1,4 +1,5 @@
 import React, { FormEvent, useState } from "react";
+import { Link } from "react-router-dom";
 import htmlParse from "html-react-parser";
 import { subscribeEmail } from "../../api/private-api";
 import { _t } from "../../i18n";
@@ -668,12 +669,27 @@ const LandingPage = (props: any) => {
       <p>{site.description}</p>
       Read{" "}
       <h2>
-        <a href={site.landingPage}>The Beginner's Guide to Proof of Brain.</a>
+        {site.pinnedArticles.map((pa) => (
+          <Link key={pa.url} className="menu-item" to={pa.url}>
+            {pa.title}
+          </Link>
+        ))}
       </h2>
       <hr />
-      <h2>
-        <a href="/covid-19/@leprechaun/covid-19-information">Covid-19 Guide</a>
-      </h2>
+      <div>
+        <div>
+          <Link className="menu-item" to="/created">
+            New Posts
+          </Link>
+          : These are posts that are the most recent.
+        </div>
+        <div>
+          <Link className="menu-item" to="/trending">
+            Trending Posts
+          </Link>
+          : These are posts that have the most potential rewards.
+        </div>
+      </div>
     </div>
   );
 };

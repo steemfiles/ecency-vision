@@ -22,7 +22,7 @@ import TrendingTagsCard from "../components/trending-tags-card";
 import ScrollToTop from "../components/scroll-to-top";
 import DownloadTrigger from "../components/download-trigger";
 import LandingPage from "../components/landing-page";
-
+import site from "../constants/site.json";
 import { _t } from "../i18n";
 
 import _c from "../util/fix-class-names";
@@ -223,6 +223,11 @@ class EntryIndexPage extends Component<PageProps, State> {
                       <Link className="menu-item" to="/privacy-policy">
                         {_t("entry-index.pp")}
                       </Link>
+                      {site.pinnedArticles.map((pa) => (
+                        <Link key={pa.url} className="menu-item" to={pa.url}>
+                          {pa.title}
+                        </Link>
+                      ))}
                     </div>
                   </div>
                 </>
