@@ -40,6 +40,7 @@ import {
 } from "../../img/svg";
 
 const logo = require("../../img/bluebrain-logo-circle.webp");
+const questionMarkLogo = require("../../img/questionMark.png");
 const hiveLogo = require("../../img/hiveLogo.png");
 const discordLogo = require("../../img/discord-logo-transparent-better.png");
 
@@ -224,6 +225,14 @@ export class NavBar extends Component<Props, State> {
                   <img src={hiveLogo} className="logo" width="5%" alt="Logo" />
                 </div>
               )}
+              <Link to={site.landingPage} className="logo">
+                <img
+                  src={questionMarkLogo}
+                  className="logo"
+                  width="5%"
+                  alt="Logo"
+                />
+              </Link>
             </div>
           </div>
         )}
@@ -265,6 +274,15 @@ export class NavBar extends Component<Props, State> {
                   />
                 </div>
               )}
+              <Link to={site.landingPage} className="logo">
+                <img
+                  src={questionMarkLogo}
+                  className="logo"
+                  width="5%"
+                  alt="Logo"
+                />
+              </Link>
+
               <Link
                 style={{ display: "none" }}
                 to={"/created/" + site.communityUsername}
