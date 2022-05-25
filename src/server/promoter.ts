@@ -1,11 +1,39 @@
+// This daemon is specific to proofofbrain.blog.
+
 // Importing things from common hoses the compilation process.
 // That's why there is a lot of duplicate declarations here.
 
 import * as http from "http";
 import * as net from "net";
 import axios from "axios";
+import * as mysql from "mysql";
+import {
+  Client,
+  PrivateKey,
+  RCAPI,
+  utils,
+  DEFAULT_CHAIN_ID,
+  DEFAULT_ADDRESS_PREFIX,
+} from "@hiveio/dhive";
+const SSC = require("sscjs");
+const hiveSsc = new SSC("https://api.hive-engine.com/rpc");
 
 const precision = 8;
+
+const author = process.env.PROMOTER;
+const key: PrivateKey | null = (function () {
+  try {
+    if (!process.env.PROMOTERPOSTINGKEY) throw { message: "not set" };
+    return PrivateKey.from(process.env.PROMOTERPOSTINGKEY);
+  } catch (e) {
+    console.warn("PROMOTERPOSTINGKEY variable not set");
+    return null;
+  }
+})();
+
+if (!author) {
+  console.warn("PROMOTER variable not set");
+}
 
 export function validateEntry(e: any): void {
   let missing_keys: Array<string> = [];
@@ -165,17 +193,6 @@ export function validateEntries(es: Array<any>) {
 // insert into promotions (tx, permlink, start, end) values ('000000000000000000000000000000000000', '@krishool/save-australia-or-public-health-and-well-being-bill-live-instagram-broadcast', now(), date_add(now(), interval 1000 second));
 // select date_add(now(), interval 1000 second);
 
-import * as mysql from "mysql";
-import {
-  Client,
-  RCAPI,
-  utils,
-  DEFAULT_CHAIN_ID,
-  DEFAULT_ADDRESS_PREFIX,
-} from "@hiveio/dhive";
-const SSC = require("sscjs");
-const hiveSsc = new SSC("https://api.hive-engine.com/rpc");
-
 export interface RawTokenBalance {
   _id: number;
   account: string;
@@ -277,122 +294,272 @@ interface Block {
   transactions: Array<Transaction>;
 }
 
+interface errT {
+  config: unknown;
+  request: unknown;
+  response: {
+    statusText: string;
+    status: number;
+    headers: { [id: string]: string };
+    config: { [id: string]: any };
+    request: { [id: string]: any };
+    data: string;
+  };
+  isAxiosError: boolean;
+  toJSON: () => unknown;
+}
+
+let oldBlockNumber: number | null = null;
+let savedStatusText: string = "";
+let savedStatus: number = 0;
+let errCount: number = 0;
 // Watching Hive Engine transaction stream to insert promotions based on valid
 // payments.  Watch out the stream sometimes include invalid transactions.
-{
+function handle_new_posts() {
   hiveSsc
-    .stream((err: unknown | null, result: Block | null) => {
+    .stream((err: errT | null, result: Block | null) => {
       if (err) {
-        console.error(err);
+        const { response } = err;
+        const { statusText, status } = response;
+        if (errCount != 0 && statusText != savedStatusText) {
+          console.error(
+            `Error fetching current block ${errCount} x ${savedStatusText}`
+          );
+          errCount = 0;
+          savedStatus = status;
+          savedStatusText = statusText;
+        } else if (statusText == savedStatusText) {
+          ++errCount;
+        }
         return;
       }
+      if (errCount != 0) {
+        console.error(
+          `Error fetching current block ${errCount} x ${savedStatusText}`
+        );
+        errCount = 0;
+        savedStatus = 0;
+        savedStatusText = "";
+      }
+
       if (!result) {
         return;
       }
 
       const { transactions, blockNumber } = result;
+      if (oldBlockNumber !== null && oldBlockNumber + 1 < blockNumber) {
+        console.log(
+          `${
+            blockNumber - oldBlockNumber + 1
+          } blocks skipped from ${oldBlockNumber} to ${blockNumber}.`
+        );
+      }
+      oldBlockNumber = blockNumber;
 
       if (transactions.length == 0) return;
 
       for (const transaction of transactions) {
         const { action, contract, sender, payload } = transaction;
-        if (action != "transfer" || contract != "tokens" || !payload) {
-          continue;
-        }
-        const details = JSON.parse(payload);
-        const { transactionId } = transaction;
-
-        const { symbol, to, quantity, memo } = details;
-        if (!symbol || !to || !quantity || !memo || !memo.match) continue;
-
-        if (to !== "proofofbrainblog") {
-          //console.info(`payment not meant for proofofbrainblog`);
-          continue;
-        }
-
-        if (symbol != "POB") {
-          console.log(`payment not in POB!`);
-          continue;
-        }
-
-        if (quantity + 0 === quantity) {
-          console.log(
-            `quantity (${JSON.stringify(
-              quantity
-            )}) is supposed to be a string not a number`
-          );
-          continue;
-        }
-
-        const m = /([0-9]|([1-9][0-9]+))(\.[0-9]+)/.exec(quantity);
-        if (m === null) {
-          console.log(`Non numeric quantity used: '${quantity}'`);
-          continue;
-        }
-
-        const dotLocation = quantity.indexOf(".");
         if (
-          dotLocation != -1 &&
-          dotLocation + 1 + precision < quantity.length
+          author &&
+          key &&
+          action == "comment" &&
+          contract == "comments" &&
+          payload
         ) {
-          console.log("Invalid amount of POB: " + quantity);
-          continue;
-        }
+          try {
+            const postDetails = JSON.parse(payload);
+            const { jsonMetadata } = postDetails;
+            if (jsonMetadata === null) {
+              continue;
+            }
 
-        const matched = memo.match(/promote @(.+)\/(.+) for (.+) seconds/);
+            const { tags } = jsonMetadata;
 
-        try {
-          if (!matched) {
-            // reject this tx
-            throw Error(`Invalid memo: ${memo}`);
-          }
+            const grand_parent_permlink = postDetails.parentPermlink;
+            if (
+              grand_parent_permlink !== undefined &&
+              grand_parent_permlink.indexOf("hive-") !== 0
+            )
+              continue;
+            if (!tags || !tags.length) continue;
+            const parent_author = postDetails.author;
+            const parent_permlink = postDetails.permlink;
+            const json_metadata =
+              '{"tags":["proofofbrain.blog"],"app":"proofofbrain.blog"}';
+            const permlink =
+              "re-" + parent_permlink + new Date().getTime() + "z";
+            const parent_category = tags[0];
+            const title = "";
+            let body: string;
+            if (
+              tags.includes("introduction") ||
+              tags.includes("introducemyself") ||
+              tags.includes("introduceyourself")
+            ) {
+              console.log(
+                `replying to ` +
+                  `https://www.proofofbrain.blog/${parent_category}/@${parent_author}/${parent_permlink}`
+              );
+              // new user.  Give them a welcome...
+              body =
+                (tags.includes("proofofbrain") || tags.includes("pob")
+                  ? `Welcome to the Proof of Brain community.`
+                  : `Welcome to Hive.`) +
+                ` Take a look at this guide:
+                https://www.proofofbrain.blog/hive-150329/@leprechaun/the-absolute-beginner-s-guide-to-proof-of-brain.  It's a about how to use the Proof of Brain interfaces for brand new users.  Much of it  applies to Hive at large.`;
+            } else if (tags.includes("binance")) {
+              console.log(
+                `replying to ` +
+                  `https://www.proofofbrain.blog/${parent_category}/@${parent_author}/${parent_permlink}`
+              );
+              body = `Let's talk about Binance:
+* Binance Improperly used users' funds to take over the Steem blockchain
+* Binance does not always refund your money - violating our property
+* Binance is almost constantly with Hive in maintenance mode.
+* Binance will never return any Hive Dollars you send to it
+* [This user](/@coininstant) [sent Hive to Binance](/binance/@coininstant/omg-binance-wants-me-to-make-a-video-if-my-transaction-to-get-my-money), and they refuse to refund it!
 
-          const memo_time = parseInt(matched[3]);
-          const permlink = matched[2];
-          const author = matched[1];
-          const calculated_payment = memo_time * price_rate;
-          const calculated_time = quantity / price_rate;
-          if (calculated_payment > quantity) {
-            // reject this transaction...
-            throw Error(
-              `Insufficient payment: Should have been ${calculated_payment} but was only ${quantity}`
-            );
-          }
+Read about it [here](/hive-150329/@leprechaun/a-call-for-binance-posts)
 
-          const insert_promotion = (post_data: string) => {
-            const post_data_string = JSON.stringify(post_data);
-            const stmt = con.query(
-              "insert into promotions values (?, ?, ?, ?, now(), date_add(now(), interval ? second), ?)",
-              [
-                blockNumber,
-                transactionId,
-                author,
-                permlink,
-                memo_time,
-                post_data_string,
-              ],
-              function (error, result) {
-                if (error) {
-                  // should return funds here.
-                  console.error(error);
-                } else {
-                  console.log("Accepted");
+Ionomy, HitBTC, and Bittrex have always credited my account when there was a mistake in the memo after communicating with support.  
+`;
+            } else {
+              continue;
+            }
+            hiveClient.broadcast
+              .comment(
+                {
+                  author: author,
+                  title: title,
+                  body: body,
+                  parent_author: parent_author,
+                  parent_permlink: parent_permlink,
+                  permlink: permlink,
+                  json_metadata: json_metadata,
+                },
+                key
+              )
+              .then(
+                function (result) {
+                  console.log(
+                    "Replied to",
+                    `https://www.proofofbrain.blog/${parent_category}/` +
+                      `@${parent_author}/${parent_permlink} in block: `,
+                    result.block_num
+                  );
+                },
+                function (error: object) {
+                  console.log(`Cannot reply:`, error);
+                  console.log(Object.keys(error));
                 }
-              }
-            );
-          };
+              );
+          } catch (e) {
+            console.log("Exception:", e.message);
+          }
+        } else if (action == "transfer" && contract == "tokens" && payload) {
+          const details = JSON.parse(payload);
+          const { transactionId } = transaction;
 
-          hiveClient
-            .call("condenser_api", "get_content", [author, permlink])
-            .then(insert_promotion);
-        } catch (e) {
-          console.error(e.message);
-          // should return funds here.
+          const { symbol, to, quantity, memo } = details;
+          if (!symbol || !to || !quantity || !memo || !memo.match) continue;
+
+          if (to !== "proofofbrainblog") {
+            //console.info(`payment not meant for proofofbrainblog`);
+            continue;
+          }
+
+          if (symbol != "POB") {
+            console.log(`payment not in POB!`);
+            continue;
+          }
+
+          if (quantity + 0 === quantity) {
+            console.log(
+              `quantity (` +
+                JSON.stringify(quantity) +
+                `) is supposed to be a string not a number`
+            );
+            continue;
+          }
+
+          const m = /([0-9]|([1-9][0-9]+))(\.[0-9]+)/.exec(quantity);
+          if (m === null) {
+            console.log(`Non numeric quantity used: '${quantity}'`);
+            continue;
+          }
+
+          const dotLocation = quantity.indexOf(".");
+          if (
+            dotLocation != -1 &&
+            dotLocation + 1 + precision < quantity.length
+          ) {
+            console.log("Invalid amount of POB: " + quantity);
+            continue;
+          }
+
+          const matched = memo.match(/promote @(.+)\/(.+) for (.+) seconds/);
+
+          try {
+            if (!matched) {
+              // reject this tx
+              throw Error(`Invalid memo: ${memo}`);
+            }
+
+            const memo_time = parseInt(matched[3]);
+            const permlink = matched[2];
+            const author = matched[1];
+            const calculated_payment = memo_time * price_rate;
+            const calculated_time = quantity / price_rate;
+            if (calculated_payment > quantity) {
+              // reject this transaction...
+              throw Error(
+                `Insufficient payment: Should have been ${calculated_payment} but was only ${quantity}`
+              );
+            }
+
+            const insert_promotion = (post_data: string) => {
+              const post_data_string = JSON.stringify(post_data);
+              const stmt = con.query(
+                "insert into promotions values (?, ?, ?, ?, now(), date_add(now(), interval ? second), ?)",
+                [
+                  blockNumber,
+                  transactionId,
+                  author,
+                  permlink,
+                  memo_time,
+                  post_data_string,
+                ],
+                function (error, result) {
+                  if (error) {
+                    // should return funds here.
+                    console.error(error);
+                  } else {
+                    console.log("Accepted");
+                  }
+                }
+              );
+            };
+
+            hiveClient
+              .call("condenser_api", "get_content", [author, permlink])
+              .then(insert_promotion);
+          } catch (e) {
+            console.error(e.message);
+            // should return funds here.
+          }
         }
       } // for
     })
-    .catch(console.error);
+    .catch((x: any) => {
+      const statusText = x?.response?.statusText;
+      console.log(`Unable to stream blocks: ${statusText}...`);
+      console.log("Will try again in 50 minutes.");
+      setTimeout(handle_new_posts, 6000000);
+    });
 }
+
+handle_new_posts();
 
 // Public facing HTTP client to respond to webpage front end clients.
 {

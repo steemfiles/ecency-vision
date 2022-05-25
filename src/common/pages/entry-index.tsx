@@ -24,7 +24,7 @@ import DownloadTrigger from "../components/download-trigger";
 import LandingPage from "../components/landing-page";
 import site from "../constants/site.json";
 import { _t } from "../i18n";
-
+import { PINNED_ARTICLES } from "../../client_config";
 import _c from "../util/fix-class-names";
 
 import capitalize from "../util/capitalize";
@@ -38,8 +38,6 @@ import {
   pageMapStateToProps,
   PageProps,
 } from "./common";
-
-import { PINNED_ARTICLES } from "../../client_config";
 
 interface State {
   step: number;

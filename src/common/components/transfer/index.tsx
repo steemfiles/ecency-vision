@@ -195,7 +195,11 @@ const getLiquid = (asset: TransferAsset, mode: TransferMode) => {
 };
 
 const getStakedAsset = (asset: TransferAsset) => {
-  return tokenAliases[asset].stakedShort;
+  try {
+    return tokenAliases[asset].stakedShort;
+  } catch (e) {
+    return asset + "P";
+  }
 };
 
 const pureState = (props: Props): State => {

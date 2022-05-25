@@ -48,6 +48,8 @@ the thing. :)
 - SEARCH_API_SECRET
 - SEARCH_API_ADDR
 - `USE_PRIVATE` - if instance has private api address and auth (0 or 1 value)
+- PROMOTER
+- PROMOTERPOSTINGKEY
 
 ###### MARIADB_PASSWORD
 
@@ -91,6 +93,15 @@ Example:
 ```
 
 Now 'Mzg0MA==' should work. The object passed in should be a long hexadecimal number.
+
+###### PROMOTER
+
+This should be the Hive ID you are using to 
+promote Hive.  I decided this should be your account that you open quite often because users will reply to your posts.  We should make sure it is not too spammy.  The promoter daemon validates that payments were paid to the proofofbrainblog so that other processes can display them as promoted.  It also replies to introduceyourself posts.  Telling them about proofofbrain.blog.
+
+###### PROMOTERPOSTINGKEY
+
+The private posting key for the promoter account in WIF format.  It will begin with the digit '5'.
 
 ###### SEARCH_API_ADDR and SEARCH_API_SECRET
 

@@ -40,12 +40,11 @@ private-api/build/promoter.js: src/server/promoter.ts  src/common/constants/gitv
 	rm -f .servers-build/promoter.js private-api/build/promoter.js
 	tsc --OutDir  private-api/build  --resolveJsonModule  --esModuleInterop src/server/promoter.ts
 	./node_modules/.bin/prettier --ignore-unknown --write src/server/promoter.ts
-	touch private-api/build/promote.js
+	tsc --OutDir  private-api/build  --resolveJsonModule  --esModuleInterop src/server/promoter.ts
 
 private-api/build/private-api-server.js: private-api/src/private-api-server.ts private-api/src/notifications.ts  src/common/constants/gitversion.ts
-	tsc --OutDir private-api/build  --resolveJsonModule --esModuleInterop private-api/src/private-api-server.ts 
-	./node_modules/.bin/prettier --ignore-unknown --write private-api/src/private-api-server.ts 
-	touch private-api/build/private-api-server.js
+	./node_modules/.bin/prettier --ignore-unknown --write private-api/src/private-api-server.ts
+	tsc --OutDir private-api/build  --resolveJsonModule --esModuleInterop private-api/src/private-api-server.ts 	 
 
 
 private-api/build/process.js: private-api/src/process.ts private-api/src/notifications.ts  src/common/constants/gitversion.ts
