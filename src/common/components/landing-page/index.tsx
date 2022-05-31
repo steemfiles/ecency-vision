@@ -9,6 +9,7 @@ import LinearProgress from "../linear-progress";
 import { apiBase } from "../../api/helper";
 import { handleInvalid, handleOnInput } from "../../util/input-util";
 import site from "../../constants/site.json";
+import { PINNED_ARTICLES } from "../../../client_config";
 
 const LandingPage = (props: any) => {
   const { global } = props;
@@ -669,11 +670,12 @@ const LandingPage = (props: any) => {
       <p>{site.description}</p>
       Read{" "}
       <h2>
-        {site.pinnedArticles.map((pa) => (
-          <Link key={pa.url} className="menu-item" to={pa.url}>
-            {pa.title}
-          </Link>
-        ))}
+        {PINNED_ARTICLES &&
+          PINNED_ARTICLES.map((pa: { url: string; title: string }) => (
+            <Link key={pa.url} className="menu-item" to={pa.url}>
+              {pa.title}
+            </Link>
+          ))}
       </h2>
       <hr />
       <div>

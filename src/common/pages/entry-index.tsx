@@ -39,6 +39,8 @@ import {
   PageProps,
 } from "./common";
 
+import { PINNED_ARTICLES } from "../../client_config";
+
 interface State {
   step: number;
 }
@@ -223,7 +225,7 @@ class EntryIndexPage extends Component<PageProps, State> {
                       <Link className="menu-item" to="/privacy-policy">
                         {_t("entry-index.pp")}
                       </Link>
-                      {site.pinnedArticles.map((pa) => (
+                      {PINNED_ARTICLES.map((pa) => (
                         <Link key={pa.url} className="menu-item" to={pa.url}>
                           {pa.title}
                         </Link>
