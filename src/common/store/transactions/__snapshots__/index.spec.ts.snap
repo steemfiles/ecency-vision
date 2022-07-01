@@ -5,8 +5,6 @@ Object {
   "group": "",
   "list": Array [],
   "loading": false,
-  "newest": 0,
-  "oldest": 1000000000000000000,
 }
 `;
 
@@ -15,8 +13,6 @@ Object {
   "group": "",
   "list": Array [],
   "loading": true,
-  "newest": 0,
-  "oldest": 1000000000000000000,
 }
 `;
 
@@ -25,8 +21,6 @@ Object {
   "group": "",
   "list": Array [],
   "loading": false,
-  "newest": 0,
-  "oldest": 1000000000000000000,
 }
 `;
 
@@ -35,8 +29,6 @@ Object {
   "group": "transfers",
   "list": Array [],
   "loading": true,
-  "newest": 0,
-  "oldest": 1000000000000000000,
 }
 `;
 
@@ -65,8 +57,6 @@ Object {
     },
   ],
   "loading": false,
-  "newest": 3204035,
-  "oldest": 1000000000000000000,
 }
 `;
 
@@ -75,7 +65,5 @@ Object {
   "group": "",
   "list": Array [],
   "loading": false,
-  "newest": 0,
-  "oldest": 1000000000000000000,
 }
 `;
