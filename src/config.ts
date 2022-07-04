@@ -7,8 +7,6 @@ export default {
   hsClientSecret:
     process.env.HIVESIGNER_CLIENT_SECRET || "hivesignerclientsecret",
   hsClientId: process.env.HIVESIGNER_CLIENT_ID || "steemfiles",
-  promoterId: process.env.PROMOTER,
-  promoterPostingKey: process.env.PROMOTERPOSTINGKEY,
   searchApiAddr: process.env.SEARCH_API_ADDR || "https://api.search.com",
   searchApiToken: process.env.SEARCH_API_SECRET || "searchApiSecret",
 };

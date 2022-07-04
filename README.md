@@ -20,12 +20,17 @@ Please run pre-commit-hook.sh before committing
 - g++ 9.3 (other versions probably work)
 - boost 1.76 (other versions probably work)
 - mariadb or mysql
+- clang-format-12
 
 ##### Clone
 
 `$ git clone https://github.com/steemfiles/ecency-vision`
 `$ cd ecency-vision`
-`$ git checkout POB-vision`
+`$ git checkout no-dynamic-txes`
+
+##### Place Hooks
+
+`$ cp hooks/* .git/hooks`
 
 ##### Install dependencies
 
