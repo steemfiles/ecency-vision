@@ -146,129 +146,132 @@ const LandingPage = (props: any) => {
     setLoading(false);
   };
 
-  if (site.base === "https://www.ecency.com")
-    return (
-      <div className="landing-wrapper">
-        <div className="top-bg" />
-        <img
-          className="tob-bg-illustration-light"
-          src={BgHeroLight}
-          alt="algaes"
-          loading="lazy"
-        />
-        <img
-          className="tob-bg-illustration-dark"
-          src={BgHeroDark}
-          alt="algaes"
-          loading="lazy"
-        />
-        <div className="tob-bg-algae" />
-        <div className="tob-bg-fishes" />
-        <div className="sections first-section">
-          <h1>{_t("landing-page.welcome-text")}</h1>
-          <div>
-            <p>{_t("landing-page.what-is-ecency")}</p>
-            <p>{_t("landing-page.powered-by-hive")}</p>
-          </div>
-          <button
-            className="get-started"
-            onClick={() => props.changeState({ step: 2 })}
-          >
-            {_t("landing-page.get-started")}
-          </button>
-          <a className="scroll-down" href="#earn-money">
-            {scrollDown}
-          </a>
-        </div>
-        <div className="sections second-section" id="earn-money">
-          <div className="part-top">
-            <div className="inner">
-              <img src={EarnMoney} alt="earn-money" loading="lazy" />
-              <div className="text-group visible">
-                <h2>{_t("landing-page.earn-money")}</h2>
-                <p>
-                  {_t("landing-page.earn-money-block-chain-based")}
-                  <span>
-                    <a href="https://signup.hive.io/" target="signup">
-                      {_t("landing-page.join-us")}
-                    </a>
-                  </span>
-                  {_t("landing-page.various-digital-tokens")}
-                </p>
-                <a className="link-read-more" href="/faq">
-                  {_t("landing-page.read-more")}
-                </a>
-              </div>
-            </div>
-          </div>
+  const showStats = site.base === "https://www.ecency.com";
+  const offerPhoneApp = site.base === "https://www.ecency.com";
 
-          <div className="part-bottom">
-            <div className="inner">
-              <div className="text-group">
-                <h2>{_t("landing-page.true-ownership")}</h2>
-                <p>{_t("landing-page.true-ownership-desc")}</p>
-              </div>
-              <div className="image-wrapper">
-                <img
-                  className="landing-floating-image"
-                  src={WhaleCatchsFish}
-                  alt="whale"
-                  loading="lazy"
-                />
-              </div>
+  return (
+    <div className="landing-wrapper">
+      <div className="top-bg" />
+      <img
+        className="tob-bg-illustration-light"
+        src={BgHeroLight}
+        alt="algaes"
+        loading="lazy"
+      />
+      <img
+        className="tob-bg-illustration-dark"
+        src={BgHeroDark}
+        alt="algaes"
+        loading="lazy"
+      />
+      <div className="tob-bg-algae" />
+      <div className="tob-bg-fishes" />
+      <div className="sections first-section">
+        <h1>{_t("landing-page.welcome-text")}</h1>
+        <div>
+          <p>{_t("landing-page.what-is-ecency")}</p>
+          <p>{_t("landing-page.powered-by-hive")}</p>
+        </div>
+        <button
+          className="get-started"
+          onClick={() => props.changeState({ step: 2 })}
+        >
+          {_t("landing-page.get-started")}
+        </button>
+        <a className="scroll-down" href="#earn-money">
+          {scrollDown}
+        </a>
+      </div>
+      <div className="sections second-section" id="earn-money">
+        <div className="part-top">
+          <div className="inner">
+            <img src={EarnMoney} alt="earn-money" loading="lazy" />
+            <div className="text-group visible">
+              <h2>{_t("landing-page.earn-money")}</h2>
+              <p>
+                {_t("landing-page.earn-money-block-chain-based")}
+                <span>
+                  <a href="https://signup.hive.io/" target="signup">
+                    {_t("landing-page.join-us")}
+                  </a>
+                </span>
+                {_t("landing-page.various-digital-tokens")}
+              </p>
+              <a className="link-read-more" href="/faq">
+                {_t("landing-page.read-more")}
+              </a>
             </div>
           </div>
         </div>
 
-        <div className="sections third-section">
-          <div className="part-top">
-            <div className="inner">
-              <div className="img-wrapper">
-                <img
-                  className="decentralization-img"
-                  src={Decentralization}
-                  alt="decentralization"
-                  loading="lazy"
-                />
-              </div>
-              <div className="text-group visible">
-                <h2>{_t("landing-page.decentralization")}</h2>
-                <p>
-                  <span>
-                    <a href="https://hive.io" target="_blank">
-                      {_t("landing-page.hive-blockchain")}
-                    </a>
-                  </span>{" "}
-                  {_t("landing-page.decentralization-desc")}
-                </p>
-              </div>
+        <div className="part-bottom">
+          <div className="inner">
+            <div className="text-group">
+              <h2>{_t("landing-page.true-ownership")}</h2>
+              <p>{_t("landing-page.true-ownership-desc")}</p>
             </div>
-          </div>
-          <div className="part-bottom">
-            <div className="inner">
-              <div className="text-group">
-                <h2>{_t("landing-page.open-source")}</h2>
-                <p>{_t("landing-page.open-source-desc")}</p>
-                <a
-                  className="no-break"
-                  target="signup"
-                  href="/https://signup.hive.io/"
-                >
-                  {_t("landing-page.feel-free-join")}
-                </a>
-              </div>
-              <div className="img-wrapper">
-                <img
-                  className="mechanic"
-                  src={MechanicFish}
-                  alt="mechanic"
-                  loading="lazy"
-                />
-              </div>
+            <div className="image-wrapper">
+              <img
+                className="landing-floating-image"
+                src={WhaleCatchsFish}
+                alt="whale"
+                loading="lazy"
+              />
             </div>
           </div>
         </div>
+      </div>
 
+      <div className="sections third-section">
+        <div className="part-top">
+          <div className="inner">
+            <div className="img-wrapper">
+              <img
+                className="decentralization-img"
+                src={Decentralization}
+                alt="decentralization"
+                loading="lazy"
+              />
+            </div>
+            <div className="text-group visible">
+              <h2>{_t("landing-page.decentralization")}</h2>
+              <p>
+                <span>
+                  <a href="https://hive.io" target="_blank">
+                    {_t("landing-page.hive-blockchain")}
+                  </a>
+                </span>{" "}
+                {_t("landing-page.decentralization-desc")}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="part-bottom">
+          <div className="inner">
+            <div className="text-group">
+              <h2>{_t("landing-page.open-source")}</h2>
+              <p>{_t("landing-page.open-source-desc")}</p>
+              <a
+                className="no-break"
+                target="signup"
+                href="https://signup.hive.io/"
+              >
+                {_t("landing-page.feel-free-join")}
+              </a>
+            </div>
+            <div className="img-wrapper">
+              <img
+                className="mechanic"
+                src={MechanicFish}
+                alt="mechanic"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {(showStats || offerPhoneApp) && (
         <div className="sections fourth-section">
           <div className="part-top">
             <span className="mask" />
@@ -307,193 +310,177 @@ const LandingPage = (props: any) => {
                   loading="lazy"
                 />
               </div>
-              <ul>
-                <li>
-                  <h3>92M</h3>
-                  <p>{_t("landing-page.posts")}</p>
-                </li>
-                <li>
-                  <h3>300K</h3>
-                  <p>{_t("landing-page.unique-visitors")}</p>
-                </li>
-              </ul>
-              <ul>
-                <li>
-                  <h3>15M</h3>
-                  <p>{_t("landing-page.points-distrubuted")}</p>
-                </li>
-                <li>
-                  <h3>25K</h3>
-                  <p>{_t("landing-page.new-users")}</p>
-                </li>
-              </ul>
             </div>
           </div>
-          <div className="part-bottom">
-            <div className="inner">
-              <span />
-              <span />
-              <img
-                src={PhoneDarkPc}
-                alt="dark phone image"
-                className="phone-bg phone-dark-pc"
-                loading="lazy"
-              />
-              <img
-                src={PhoneDarkTablet}
-                alt="dark phone image"
-                className="phone-bg phone-dark-tablet"
-                loading="lazy"
-              />
-              <img
-                src={PhoneLightPc}
-                alt="light phone image"
-                className="phone-bg phone-light-pc"
-                loading="lazy"
-              />
-              <img
-                src={PhoneLightTablet}
-                alt="light phone image"
-                className="phone-bg phone-light-tablet"
-                loading="lazy"
-              />
+          {offerPhoneApp && (
+            <div className="part-bottom">
+              <div className="inner">
+                <span />
+                <span />
+                <img
+                  src={PhoneDarkPc}
+                  alt="dark phone image"
+                  className="phone-bg phone-dark-pc"
+                  loading="lazy"
+                />
+                <img
+                  src={PhoneDarkTablet}
+                  alt="dark phone image"
+                  className="phone-bg phone-dark-tablet"
+                  loading="lazy"
+                />
+                <img
+                  src={PhoneLightPc}
+                  alt="light phone image"
+                  className="phone-bg phone-light-pc"
+                  loading="lazy"
+                />
+                <img
+                  src={PhoneLightTablet}
+                  alt="light phone image"
+                  className="phone-bg phone-light-tablet"
+                  loading="lazy"
+                />
 
-              <img
-                src={BubbleLeftTop}
-                alt="bubble"
-                className="bubble-bg bubble-left-top"
-                loading="lazy"
-              />
-              <img
-                src={BubbleLeftBottom}
-                alt="bubble"
-                className="bubble-bg bubble-left-bottom"
-                loading="lazy"
-              />
-              <img
-                src={BubbleLCenter}
-                alt="bubble"
-                className="bubble-bg bubble-center"
-                loading="lazy"
-              />
-              <img
-                src={BubbleRightTop}
-                alt="bubble"
-                className="bubble-bg bubble-right-top"
-                loading="lazy"
-              />
-              <img
-                src={BubbleLRightBottom}
-                alt="bubble"
-                className="bubble-bg bubble-right-bottom"
-                loading="lazy"
-              />
+                <img
+                  src={BubbleLeftTop}
+                  alt="bubble"
+                  className="bubble-bg bubble-left-top"
+                  loading="lazy"
+                />
+                <img
+                  src={BubbleLeftBottom}
+                  alt="bubble"
+                  className="bubble-bg bubble-left-bottom"
+                  loading="lazy"
+                />
+                <img
+                  src={BubbleLCenter}
+                  alt="bubble"
+                  className="bubble-bg bubble-center"
+                  loading="lazy"
+                />
+                <img
+                  src={BubbleRightTop}
+                  alt="bubble"
+                  className="bubble-bg bubble-right-top"
+                  loading="lazy"
+                />
+                <img
+                  src={BubbleLRightBottom}
+                  alt="bubble"
+                  className="bubble-bg bubble-right-bottom"
+                  loading="lazy"
+                />
 
-              <img
-                src={LeftFishes}
-                alt="fishes"
-                className="download-fishes left-fishes"
-                loading="lazy"
-              />
-              <img
-                src={DownloadDarkFishes}
-                alt="fish"
-                className="download-fishes right-dark-fishes"
-                loading="lazy"
-              />
-              <img
-                src={FishOne}
-                alt="fish"
-                className="download-fishes right-small"
-                loading="lazy"
-              />
-              <img
-                src={FishTwo}
-                alt="fish"
-                className="download-fishes right-big"
-                loading="lazy"
-              />
+                <img
+                  src={LeftFishes}
+                  alt="fishes"
+                  className="download-fishes left-fishes"
+                  loading="lazy"
+                />
+                <img
+                  src={DownloadDarkFishes}
+                  alt="fish"
+                  className="download-fishes right-dark-fishes"
+                  loading="lazy"
+                />
+                <img
+                  src={FishOne}
+                  alt="fish"
+                  className="download-fishes right-small"
+                  loading="lazy"
+                />
+                <img
+                  src={FishTwo}
+                  alt="fish"
+                  className="download-fishes right-big"
+                  loading="lazy"
+                />
 
-              <div className="text-group">
-                <h2>{_t("landing-page.download-our-application")}</h2>
-                <p>{_t("landing-page.download-our-application-desc")}</p>
-                <a
-                  className="windows"
-                  href="https://desktop.ecency.com/"
-                  target="blank"
-                >
-                  <img
-                    src={
-                      props?.global?.theme === "day"
-                        ? DownloadWindows
-                        : DownloadWindowsWhite
-                    }
-                    alt="Download for Windows"
-                  />
-                  {_t("landing-page.download-for-windows")}
-                </a>
-                <a href="https://ios.ecency.com/" target="blank">
-                  <img
-                    src={
-                      props?.global?.theme === "day"
-                        ? DownloadIPhone
-                        : DownloadIPhoneWhite
-                    }
-                    alt="Download for IOS"
-                  />
-                  {_t("landing-page.download-for-ios")}
-                </a>
-                <a href="https://android.ecency.com/" target="blank">
-                  <img
-                    src={
-                      props?.global?.theme === "day"
-                        ? DownloadAndroid
-                        : DownloadAndroidWhite
-                    }
-                    alt="Download for Android"
-                  />
-                  {_t("landing-page.download-for-android")}
-                </a>
+                <div className="text-group">
+                  <h2>{_t("landing-page.download-our-application")}</h2>
+                  <p>{_t("landing-page.download-our-application-desc")}</p>
+                  <a
+                    className="windows"
+                    href="https://desktop.ecency.com/"
+                    target="blank"
+                  >
+                    <img
+                      src={
+                        props?.global?.theme === "day"
+                          ? DownloadWindows
+                          : DownloadWindowsWhite
+                      }
+                      alt="Download for Windows"
+                    />
+                    {_t("landing-page.download-for-windows")}
+                  </a>
+                  <a href="https://ios.ecency.com/" target="blank">
+                    <img
+                      src={
+                        props?.global?.theme === "day"
+                          ? DownloadIPhone
+                          : DownloadIPhoneWhite
+                      }
+                      alt="Download for IOS"
+                    />
+                    {_t("landing-page.download-for-ios")}
+                  </a>
+                  <a href="https://android.ecency.com/" target="blank">
+                    <img
+                      src={
+                        props?.global?.theme === "day"
+                          ? DownloadAndroid
+                          : DownloadAndroidWhite
+                      }
+                      alt="Download for Android"
+                    />
+                    {_t("landing-page.download-for-android")}
+                  </a>
+                </div>
               </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="sections fifth-section" id="about">
+        <div className="part-top">
+          <div className="inner">
+            <div className="text-group">
+              <h2>{_t("landing-page.our-history")}</h2>
+              <p>{htmlParse(_t("landing-page.our-history-p-one"))}</p>
+              <p>{_t("landing-page.our-history-p-two")}</p>
+            </div>
+            <img
+              className="our-history"
+              src={OurHistory}
+              alt="Our History"
+              loading="lazy"
+            />
+          </div>
+        </div>
+        <div className="part-bottom">
+          <div className="inner">
+            <img
+              className="our-vision"
+              src={OurVision}
+              alt="Our Vision"
+              loading="lazy"
+            />
+
+            <div className="text-group">
+              <h2>{_t("landing-page.our-vision")}</h2>
+              <p>{htmlParse(_t("landing-page.our-vision-p-one"))}</p>
+              <p>{htmlParse(_t("landing-page.our-vision-p-two"))}</p>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="sections fifth-section" id="about">
-          <div className="part-top">
-            <div className="inner">
-              <div className="text-group">
-                <h2>{_t("landing-page.our-history")}</h2>
-                <p>{htmlParse(_t("landing-page.our-history-p-one"))}</p>
-                <p>{_t("landing-page.our-history-p-two")}</p>
-              </div>
-              <img
-                className="our-history"
-                src={OurHistory}
-                alt="Our History"
-                loading="lazy"
-              />
-            </div>
-          </div>
-          <div className="part-bottom">
-            <div className="inner">
-              <img
-                className="our-vision"
-                src={OurVision}
-                alt="Our Vision"
-                loading="lazy"
-              />
-
-              <div className="text-group">
-                <h2>{_t("landing-page.our-vision")}</h2>
-                <p>{htmlParse(_t("landing-page.our-vision-p-one"))}</p>
-                <p>{htmlParse(_t("landing-page.our-vision-p-two"))}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="sections sixth-section">
+      <div className="sections sixth-section">
+        {false && (
           <div className="part-top">
             <div className="inner">
               <div className="text-group">
@@ -552,6 +539,8 @@ const LandingPage = (props: any) => {
               </div>
             </div>
           </div>
+        )}
+        {false && (
           <div className="part-bottom">
             <span className="left-fishes" />
             <img
@@ -659,37 +648,14 @@ const LandingPage = (props: any) => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    );
-
-  return (
-    <div>
-      <h1>Welcome to {site.name}!</h1>
-      <h2>{site.title}</h2>
-      <p>{site.description}</p>
-      Read{" "}
-      <h2>
-        {PINNED_ARTICLES &&
-          PINNED_ARTICLES.map((pa: { url: string; title: string }) => (
-            <Link key={pa.url} className="menu-item" to={pa.url}>
-              {pa.title}
-            </Link>
-          ))}
-      </h2>
-      <hr />
-      <div>
-        <div>
-          <Link className="menu-item" to="/created">
-            New Posts
-          </Link>
-          : These are posts that are the most recent.
-        </div>
-        <div>
-          <Link className="menu-item" to="/trending">
-            Trending Posts
-          </Link>
-          : These are posts that have the most potential rewards.
+        )}
+        <div className="sections first-section">
+          <button
+            className="get-started"
+            onClick={() => props.changeState({ step: 2 })}
+          >
+            {_t("landing-page.get-started")}
+          </button>
         </div>
       </div>
     </div>

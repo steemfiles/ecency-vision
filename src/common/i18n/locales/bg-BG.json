@@ -1010,7 +1010,7 @@
       "page-title": "Proof of Brain FAQ",
       "page-sub-title": "Таблица на съдържанието",
       "what-is-ecency-header": "Какво е Proof of Brain?",
-      "what-is-ecency-body": "<p>Proof of Brain е <a href=\"https://conservapedia.com/Blockchain\" target=\"_blank\" rel=\"noopener noreferrer\">блокчейн</a> социална мрежа управлявана от <a href=\"https://hive.io\" target=\"_blank\" rel=\"noopener noreferrer\">Hive</a>.</p><p>Proof of Brain e домът на свободата на словото и награждаващите общности за създателите на съдържание.</p><p>Проектът е създаден от <a class=\"push-link\" href=\"/@good-karma\">@good-karma</a> през Август 2016 като алтернативна социална мрежа, която е нецензурирана, контролирана от потребителите, незаглушаваща и с отворен код. В момента има много <a class=\"push-link\" href=\"/contributors\">много независими и доброволни сътрудници</a> които искат да поддържата визията и духа на свободното слово.</p><p>Proof of Brain помага да се вкарат маси от хора в Блокчейн технологиите, където на потребителите им се заплаща за времето, ресурсите, и да се учат докато се наслаждават на социалните аспекти на блокчейн. Чрез улесненото използване, потребителите не само се учат, но и също така стават инвеститори, иноватори на новият интернет.</p>",
+      "what-is-ecency-body": "<p>Proof of Brain is a <a href=\"https://conservapedia.com/Blockchain\" target=\"_blank\" rel=\"noopener noreferrer\">blockchain</a> based social network community - powered by <a href=\"https://hive.io\" target=\"_blank\" rel=\"noopener noreferrer\">Hive</a>.</p><p>Proof of Brain is home of free speech and rewarding communities for content creators.</p><p>Ecency was founded by <a class=\"push-link\" href=\"/@good-karma\">@good-karma</a> in August 2016 as an alternative social network that's uncensored, user controled, immutable and opensource. The source code was taken by <a href=\"@leprechaun\">@leprechaun</a> and modified for use with Hive-Engine token Proof of Brain.  Currently there are <a class=\"push-link\" href=\"/contributors\">many independent and voluntary contributors</a> wanting to keep vision and spirit of free speech.</p><p>Proof of Brain helps onboarding masses into Blockchain technology where users are getting paid for their time, resources and learn while enjoying social aspects of blockchain. Through ease of use, users not only learn but also become investors, innovators of the new internet.</p>",
       "what-is-hive-header": "Какво е Hive блокчейн?",
       "what-is-hive-body": "<p>Hive е блокчейн който е създаден да бъде бърза, без такси, децентрализирана, нецензурирана платформа за Web 3.0 приложения, със вградени черти където заинтересованите страни могат да залагат, гласуват, постват, играят игри, търгуват - всичко това без посредници(децентрализирано). Жетоните в Hive блокчейн се наричат HIVE, HIVE ДОЛАРИ, HIVE Стойност/сила.</p>",
       "what-is-difference-header": "Каква е разликата от други Социални Мрежи?",
@@ -1113,7 +1113,7 @@
     "download-for-ios": "Download for IOS",
     "download-for-android": "Download for Android",
     "our-history": "Our History",
-    "our-history-p-one": "<b>Proof of Brain</b> (previously Esteem) started out in 2016, founder <span> <a href=\"/@good-karma\" class=\"push-link\"> @good-karma </a></span> started implementing a mobile application that would revolutionize the way you interact and create, build, engage online. With time grew to something much bigger.",
+    "our-history-p-one": "The <span> <a href=\"/@proofofbrainio\">founder</a></span> of the Proof of Brain community wanted an upgrade from the existing web interface.  Using <b>Ecency</b> source code as a base,  <span> <a href=\"/@leprechaun\">@leprechaun</a></span> adapted it to allow access to HIVE, HBD, POB and other tokens.",
     "our-history-p-two": "Since then we have been continuing to build for Web 3.0 and improve our blockchain-based social network, making sure apps are as accessible as possible, secure and in many languages the world speaks.",
     "our-vision": "Our Vision",
     "our-vision-p-one": "We want to bring a secure and rewarding blockchain experience to all people. Social media without any limits and censorship, where only you control your own account and your communities. Secured by blockchain, powered by people.",
@@ -1139,6 +1139,6 @@
     "copy-rights": "©2021 Proof of Brain. All right reserved.",
     "success-message-subscribe": "A verification link has been sent to your email account!",
     "validation-email": "A valid email is required",
-    "error-occured": "A server error has been occured."
+    "error-occured": "A server error has occured."
   }
 }
