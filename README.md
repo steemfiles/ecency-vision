@@ -1,6 +1,6 @@
-# [Ecency vision][ecency_vision] – Ecency Web/Desktop client
+# [Proof of Brain vision][ecency_vision] – Ecency Web/Desktop client
 
-![ecency](https://ecency.com/assets/github-cover.png)
+![ProofofBrain](https://proofofbrain.blog/assets/github-cover.png)
 
 Immutable, decentralized, uncensored, rewarding communities powered by Hive.
 
