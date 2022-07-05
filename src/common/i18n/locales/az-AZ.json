@@ -256,6 +256,9 @@
     "sort-percent": "Faiz"
   },
   "entry": {
+    "self_voted": "self voted",
+    "payment_refused": "payment refused",
+
     "via-app": "<span class=\"app-name\">{{app}}</span> ilə",
     "author-reputation": "Müəllifin nüfuzu",
     "comment-entry-title": "You are viewing a single comment's thread from: ",

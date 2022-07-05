@@ -256,6 +256,9 @@
     "sort-percent": "Porsyento"
   },
   "entry": {
+    "self_voted": "self voted",
+    "payment_refused": "payment refused",
+
     "via-app": "via <span class=\"app-name\">{{app}}</span>",
     "author-reputation": "Author's reputation",
     "comment-entry-title": "Tinitingnan mo ngayon ang nag-iisang komento sa thread na galing kay: ",

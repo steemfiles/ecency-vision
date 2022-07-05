@@ -99,6 +99,29 @@
 
         @include tag;
       }
+      
+      .post-info {
+        border-radius: 10px;
+        padding: 2px 8px;
+        flex-shrink: 0;
+        display: none;
+        @media (min-width: $sm-break) {
+            display:block;
+        }
+
+        @include tag;
+        
+        @include themify(day) {
+          color: darken($silver, 35);
+        }
+    
+        @include themify(night) {
+          color: darken($silver, 10);
+          background-color: darken($silver, 50);
+        }
+        
+        border: none;
+      }
 
       .space {
         flex-grow: 1;

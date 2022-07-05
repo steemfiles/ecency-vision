@@ -256,6 +256,8 @@
     "sort-percent": "Persentase"
   },
   "entry": {
+    "self_voted": "self voted",
+    "payment_refused": "payment refused",
     "via-app": "root <span class=\"app-name\">{{app}}</span>",
     "author-reputation": "Author's reputation",
     "comment-entry-title": "Teungoh neu kalon komen saboh utas dari: ",

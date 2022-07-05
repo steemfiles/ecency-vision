@@ -256,6 +256,9 @@
     "sort-percent": "Persentasi"
   },
   "entry": {
+    "self_voted": "self voted",
+    "payment_refused": "payment refused",
+
     "via-app": "melalui <span class=\"app-name\">{{app}}</span>",
     "author-reputation": "Reputasi pengarang",
     "comment-entry-title": "Anda melihat sebuah komentar tunggal dari: ",

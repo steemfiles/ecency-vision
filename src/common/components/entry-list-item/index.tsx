@@ -49,8 +49,10 @@ const fallbackImage = require("../../img/fallback.png");
 const noImage = require("../../img/noimage.svg");
 const nsfwImage = require("../../img/nsfw.png");
 
+import formattedNumber from "../../util/formatted-number";
 import defaults from "../../constants/site.json";
 import { TokenPropertiesMap } from "../../store/hive-engine-tokens/types";
+import { LIQUID_TOKEN_UPPERCASE } from "../../../client_config";
 
 setProxyBase(defaults.imageServer);
 
@@ -148,7 +150,6 @@ export default class EntryListItem extends Component<Props, State> {
       order,
     } = this.props;
     const crossPost = !!theEntry.original_entry;
-
     const entry = theEntry.original_entry || theEntry;
 
     const imgGrid: string =
@@ -175,7 +176,7 @@ export default class EntryListItem extends Component<Props, State> {
 
     const isVisited = false;
     const isPinned = community && !!entry.stats?.is_pinned;
-
+    const { listStyle, currency } = global;
     let reBlogged: string | undefined;
     if (asAuthor && asAuthor !== entry.author && !isChild) {
       reBlogged = asAuthor;
@@ -186,7 +187,7 @@ export default class EntryListItem extends Component<Props, State> {
     }
 
     let thumb: JSX.Element | null = null;
-    if (global.listStyle === "grid") {
+    if (listStyle === "grid") {
       thumb = (
         <img
           src={imgGrid}
@@ -199,7 +200,7 @@ export default class EntryListItem extends Component<Props, State> {
         />
       );
     }
-    if (global.listStyle === "row") {
+    if (listStyle === "row") {
       thumb = (
         <picture>
           <source srcSet={imgRow} media="(min-width: 576px)" />
@@ -218,7 +219,24 @@ export default class EntryListItem extends Component<Props, State> {
       entry.json_metadata.tags && entry.json_metadata.tags.includes("nsfw");
 
     const cls = `entry-list-item ${promoted ? "promoted-item" : ""}`;
-
+    const self_vote_entry = entry.active_votes.find(
+      (x) => x.voter == entry.author
+    );
+    const self_vote = self_vote_entry ? self_vote_entry.rshares : false;
+    const hp_portion = 100 * (1 - entry.percent_hbd / 20000);
+    const he = entry.he && entry.he[LIQUID_TOKEN_UPPERCASE];
+    const muted = he && he.muted;
+    const pending_token: string = (() => {
+      if (currency == LIQUID_TOKEN_UPPERCASE && he && he.pending_token) {
+        const pending_tokens: number = he.pending_token || 0;
+        return formattedNumber(pending_tokens / 100000000, {
+          suffix: LIQUID_TOKEN_UPPERCASE,
+        });
+      } else {
+        return "";
+      }
+    })();
+    const max_payout: number = parseFloat(entry.max_accepted_payout);
     return (
       <div className={_c(cls)}>
         {(() => {
@@ -320,6 +338,20 @@ export default class EntryListItem extends Component<Props, State> {
             <span className="date" title={dateFormatted}>
               {dateRelative}
             </span>
+            {self_vote && (
+              <div className="post-info">{_t("entry.self_voted")}</div>
+            )}
+            {max_payout > 0 && (
+              <div className="post-info">{hp_portion}% HP</div>
+            )}
+            <div className="post-info">{entry.json_metadata?.app}</div>
+            {max_payout == 0 ? (
+              <div className="post-info">{_t("entry.payment_refused")}</div>
+            ) : (
+              max_payout < 1000 && (
+                <div className="post-info">&le; {max_payout} HBD</div>
+              )
+            )}
           </div>
           <div className="item-header-features">
             {isPinned && (
@@ -425,10 +457,15 @@ export default class EntryListItem extends Component<Props, State> {
               ...this.props,
               afterVote: this.afterVote,
             })}
-            {EntryPayout({
-              ...this.props,
-              entry,
-            })}
+            &nbsp;
+            {currency == LIQUID_TOKEN_UPPERCASE ? (
+              <span className="post-info">{pending_token} &nbsp;&nbsp;</span>
+            ) : (
+              EntryPayout({
+                ...this.props,
+                entry,
+              })
+            )}
             {EntryVotes({
               ...this.props,
               entry,

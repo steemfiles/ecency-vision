@@ -256,6 +256,9 @@
     "sort-percent": "Percentage"
   },
   "entry": {
+    "self_voted": "self voted",
+    "payment_refused": "payment refused",
+
     "via-app": "via <span class=\"app-name\">{{app}}</span>",
     "author-reputation": "Author's reputation",
     "comment-entry-title": "Vous visualisez le fil de discussion d'un seul commentaire à partir de : ",

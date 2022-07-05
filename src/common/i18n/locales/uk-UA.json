@@ -256,6 +256,9 @@
     "sort-percent": "Відсоток"
   },
   "entry": {
+    "self_voted": "self voted",
+    "payment_refused": "payment refused",
+
     "via-app": "через <span class=\"app-name\">{{app}}</span>",
     "author-reputation": "Author's reputation",
     "comment-entry-title": "Ви переглядаєте гілку одного коментаря з: ",

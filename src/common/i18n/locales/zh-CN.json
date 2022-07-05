@@ -256,6 +256,9 @@
     "sort-percent": "百分比"
   },
   "entry": {
+    "self_voted": "self voted",
+    "payment_refused": "payment refused",
+
     "via-app": "通过 <span class=\"app-name\">{{app}}</span>",
     "author-reputation": "作者的信誉积分",
     "comment-entry-title": "您正在查看的评论来自： ",

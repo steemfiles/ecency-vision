@@ -256,6 +256,9 @@
     "sort-percent": "Процент"
   },
   "entry": {
+    "self_voted": "self voted",
+    "payment_refused": "payment refused",
+
     "via-app": "чрез <span class=\"app-name\">{{app}}</span>",
     "author-reputation": "Author's reputation",
     "comment-entry-title": "Разглеждате само този коментар от поста на: ",

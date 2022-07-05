@@ -256,6 +256,9 @@
     "sort-percent": "Prozent"
   },
   "entry": {
+    "self_voted": "self voted",
+    "payment_refused": "payment refused",
+
     "via-app": "über <span class=\"app-name\">{{app}}</span>",
     "author-reputation": "Author's reputation",
     "comment-entry-title": "Du siehst das Thema eines einzelnen Kommentars von: ",

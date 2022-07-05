@@ -256,6 +256,9 @@
     "sort-percent": "Ποσοστό"
   },
   "entry": {
+    "self_voted": "self voted",
+    "payment_refused": "payment refused",
+
     "via-app": "μέσω<span class=\"app-name\">{{app}}</span>",
     "author-reputation": "Author's reputation",
     "comment-entry-title": "Βλέπετε ένα μοναδικό νήμα απο: ",

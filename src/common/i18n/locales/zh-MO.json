@@ -171,6 +171,9 @@
     "sort-percent": "Percentage"
   },
   "entry": {
+    "self_voted": "self voted",
+    "payment_refused": "payment refused",
+
     "via-app": "via <span class=\"app-name\">{{app}}</span>",
     "comment-entry-title": "You are viewing a single comment's thread from: ",
     "comment-entry-go-root": "View the full context",

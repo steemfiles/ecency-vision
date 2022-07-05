@@ -256,6 +256,9 @@
     "sort-percent": "Prosenttiosuus"
   },
   "entry": {
+    "self_voted": "self voted",
+    "payment_refused": "payment refused",
+
     "via-app": "<span class=\"app-name\">{{app}}</span> kautta",
     "author-reputation": "Author's reputation",
     "comment-entry-title": "Katselet yhtä kommenttiketjua: ",

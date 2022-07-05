@@ -256,6 +256,9 @@
     "sort-percent": "प्रतिशत"
   },
   "entry": {
+    "self_voted": "self voted",
+    "payment_refused": "payment refused",
+
     "via-app": "<span class=\"app-name\"> {{app}} </span> के माध्यम से",
     "author-reputation": "लेखक की प्रतिष्ठा",
     "comment-entry-title": "आप किसी एकल टिप्पणी के सूत्र को देख रहे हैं: ",

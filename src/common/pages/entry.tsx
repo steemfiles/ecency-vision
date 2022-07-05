@@ -90,6 +90,7 @@ import {
   HIVE_ENGINE_TOKENS,
 } from "../../client_config";
 import { setHiveEngineTokensProperties } from "../store/global";
+import formattedNumber from "../util/formatted-number";
 
 setProxyBase(defaults.imageServer);
 
@@ -424,6 +425,25 @@ class EntryPage extends BaseComponent<Props, State> {
       tag: isCommunity(tags[0]) ? tags[1] : tags[0],
       keywords: tags.join(", "),
     };
+
+    const self_vote_entry = entry.active_votes.find(
+      (x) => x.voter == entry.author
+    );
+    const self_vote = self_vote_entry ? self_vote_entry.rshares : false;
+    const hp_portion = 100 * (1 - entry.percent_hbd / 20000);
+    const he = entry.he && entry.he[LIQUID_TOKEN_UPPERCASE];
+    const muted = he && he.muted;
+    const pending_token: string = (() => {
+      if (he && he.pending_token) {
+        const pending_tokens: number = he.pending_token || 0;
+        return formattedNumber(pending_tokens / 100000000, {
+          suffix: LIQUID_TOKEN_UPPERCASE,
+        });
+      } else {
+        return "";
+      }
+    })();
+    const max_payout: number = parseFloat(entry.max_accepted_payout);
 
     return (
       <>
@@ -787,6 +807,30 @@ class EntryPage extends BaseComponent<Props, State> {
                                 </div>
                               </div>
                               <span className="flex-spacer" />
+                              {self_vote && (
+                                <div className="post-info">
+                                  {_t("entry.self_voted")}
+                                </div>
+                              )}
+                              <span className="flex-spacer" />
+                              {max_payout > 0 && (
+                                <div className="post-info">
+                                  {hp_portion}% HP
+                                </div>
+                              )}
+                              <span className="flex-spacer" />
+                              {max_payout == 0 ? (
+                                <div className="post-info">
+                                  {_t("entry.payment_refused")}
+                                </div>
+                              ) : (
+                                max_payout < 1000 && (
+                                  <div className="post-info">
+                                    &le; {max_payout} HBD
+                                  </div>
+                                )
+                              )}
+                              <span className="flex-spacer" />
                               {global.usePrivate &&
                                 BookmarkBtn({
                                   ...this.props,
@@ -900,6 +944,8 @@ class EntryPage extends BaseComponent<Props, State> {
                           entry,
                           afterVote: this.afterVote,
                         })}
+                        {pending_token}
+                        &nbsp;
                         {EntryPayout({
                           ...this.props,
                           entry,
