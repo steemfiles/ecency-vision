@@ -93,10 +93,6 @@ class ProfilePage extends BaseComponent<Props, State> {
       // fetch posts
       fetchEntries(global.filter, global.tag, false);
     }
-    // fetch wallet transactions
-    fetchTransactions(username);
-    // fetch points
-    fetchPoints(username);
   }
   componentDidUpdate(prevProps: Readonly<Props>): void {
     const {

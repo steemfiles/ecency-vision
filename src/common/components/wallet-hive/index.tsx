@@ -107,6 +107,9 @@ export class WalletHive extends BaseComponent<Props, State> {
   };
 
   componentDidMount() {
+    const { account, fetchTransactions } = this.props;
+    const { name } = account;
+    fetchTransactions( name, "" );
     this.fetchConvertingAmount();
   }
 
