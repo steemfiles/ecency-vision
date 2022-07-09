@@ -121,10 +121,11 @@ const fetch_hive_engine_token_information =
       } // for
 
       if (tokensInfos && tokensConfigs && prices) {
+        const noInfoTokens : Array<string> = [];
         for (const config of tokensConfigs) {
           const token = config.token;
           if (!tokensInfos[token] || !prices[token]) {
-            console.log("Cannot get info or price for ", token);
+            noInfoTokens.push(token);
             continue;
           }
           ret[token] = {
@@ -134,6 +135,8 @@ const fetch_hive_engine_token_information =
             aliases: tokenAliases[token],
           };
         }
+        console.log("Cannot get info or price for", noInfoTokens.join(', ') );
+        
         storedHiveEngineTokensProperties = {
           ...storedHiveEngineTokensProperties,
           ...ret,
