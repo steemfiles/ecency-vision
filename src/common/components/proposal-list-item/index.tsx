@@ -57,23 +57,27 @@ export class ProposalListItem extends Component<Props, State> {
     votes: false,
   };
 
-  shouldComponentUpdate(
-    nextProps: Readonly<Props>,
-    nextState: Readonly<{}>,
-    nextContext: any
-  ): boolean {
-    return (
-      !isEqual(this.state, nextState) ||
-      !isEqual(
-        this.props.activeUser?.username,
-        nextProps.activeUser?.username
-      ) ||
-      !isEqual(
-        this.props.dynamicProps.hivePerMVests,
-        nextProps.dynamicProps.hivePerMVests
-      )
-    );
-  }
+  //shouldComponentUpdate(
+  //  nextProps: Readonly<Props>,
+  //  nextState: Readonly<{}>,
+  //  nextContext: any
+  //): boolean {
+  //  return (
+  //    !isEqual(this.state, nextState) ||
+  //    !isEqual(
+  //      this.props.activeUser?.username,
+  //      nextProps.activeUser?.username
+  //    ) ||
+  //    !isEqual(
+  //      this.props.dynamicProps.hivePerMVests,
+  //      nextProps.dynamicProps.hivePerMVests
+  //    ) ||
+  //    isEqual(
+  //      this.props.proposal,
+  //      nextProps.proposal
+  //    )
+  //  );
+  //}
 
   toggleVotes = () => {
     const { votes } = this.state;

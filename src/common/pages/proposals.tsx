@@ -36,8 +36,15 @@ import NotFound from "../components/404";
 import { _t } from "../i18n";
 import { Tsx } from "../i18n/helper";
 
-import { getProposals, Proposal, getPost, getAccount } from "../api/hive";
-
+import {
+  getProposals,
+  Proposal,
+  getPost,
+  getAccount,
+  hiveClient,
+  DOLLAR_API_NAME,
+} from "../api/hive";
+import { FullAccount } from "../store/accounts/types";
 import {
   PageProps,
   pageMapDispatchToProps,
@@ -48,7 +55,7 @@ import parseAsset from "../helper/parse-asset";
 import parseDate from "../helper/parse-date";
 
 import { closeSvg } from "../img/svg";
-import { DOLLAR_API_NAME } from "../api/hive";
+import { info } from "../components/feedback";
 
 enum Filter {
   ALL = "all",
@@ -66,6 +73,23 @@ interface State {
   filter: Filter;
   loading: boolean;
   inProgress: boolean;
+  timeoutHandle: any;
+  lastBlockHash: string;
+}
+
+interface update_proposal_votes_operation {
+  voter: string;
+  proposal_ids: Array<number>;
+  approve: boolean;
+  extensions: Array<unknown>;
+}
+
+interface remove_proposal_operation {
+  proposal_owner: string;
+
+  /// IDs of proposals to be removed. Nonexisting IDs are ignored.
+  proposal_ids: Array<number>;
+  extensions: Array<unknown>;
 }
 
 class ProposalsPage extends BaseComponent<PageProps, State> {
@@ -78,49 +102,160 @@ class ProposalsPage extends BaseComponent<PageProps, State> {
     filter: Filter.ALL,
     loading: true,
     inProgress: false,
+    timeoutHandle: null,
+    lastBlockHash: "",
   };
+
+  processBlock(block: any) {
+    const { dynamicProps } = this.props;
+    const { proposals_, proposals, lastBlockHash, timeoutHandle } = this.state;
+    if (timeoutHandle == null) {
+      return;
+    }
+    if (lastBlockHash == block.transaction_merkle_root) {
+      console.error("repeated block to processBlock");
+      return;
+    }
+    this.setState({ lastBlockHash: block.transaction_merkle_root });
+    let x = 0;
+    while (x < block.transactions.length) {
+      for (let y = 0; y < block.transactions[x].operations.length; ++y) {
+        const opt = block.transactions[x].operations[y][0];
+        if (opt == "update_proposal_votes") {
+          const opupv = block.transactions[x].operations[
+            y
+          ][1] as update_proposal_votes_operation;
+          // shallow copy...
+          const new_proposals_ = [...proposals_];
+          const new_proposals = [...proposals];
+          const changedProposals = new_proposals_.filter((p) =>
+            opupv.proposal_ids.includes(p.id)
+          );
+
+          console.log(
+            `${opupv.voter} is changing hir vote for proposals:`,
+            changedProposals
+          );
+          const setState = this.setState.bind(this);
+          getAccount(opupv.voter).then((accountInfo) => {
+            const vesting_shares: number =
+              1e6 *
+              Number(accountInfo.vesting_shares.split(/ /)[0]); /* µVESTS */
+            console.log(accountInfo);
+            for (let p of changedProposals) {
+              const votesHP =
+                (Number(p.total_votes /* µVESTS */) / 1e12) *
+                dynamicProps.hivePerMVests; /* HP */
+              const strVotes = numeral(votesHP).format("0.00,") + " HP";
+              const newVotes =
+                Number(p.total_votes) /* µVESTS */ +
+                (opupv.approve ? 1 : -1) * vesting_shares; /* µVESTS */
+              const newVotesHP = (newVotes / 1e12) * dynamicProps.hivePerMVests;
+              const newStrVotes = numeral(newVotesHP).format("0.00,") + " HP";
+              console.log({
+                "old total votes": p.total_votes,
+                "new total votes": newVotes,
+              });
+              console.log(
+                `Old votes for #${p.id} ${strVotes}.  New votes ${newStrVotes}`
+              );
+              p.total_votes = JSON.stringify(newVotes);
+            }
+            console.log({
+              proposals_: new_proposals_,
+              proposals: new_proposals,
+            });
+            setState({
+              proposals_: new_proposals_,
+              proposals: new_proposals,
+            });
+            info(
+              `${opupv.voter} ` + opupv.approve
+                ? "approved"
+                : "removed approval for" +
+                    ` proposals ${JSON.stringify(opupv.proposal_ids)}`
+            );
+          });
+        } else if (opt == "create_proposal") {
+          // very rare
+          this.load();
+        } else if (opt == "update_proposal") {
+          // very rare
+          this.load();
+        } else if (opt == "remove_proposal") {
+          // very rare
+          this.load();
+        } // if
+      } // for
+      x += 1;
+    } // while
+  }
+
+  watchBlockchain() {
+    console.log("watching blockchain...");
+    const stream = hiveClient.blockchain.getBlockStream({});
+    stream.on("data", this.processBlock.bind(this));
+  }
 
   componentDidMount() {
     this.load();
+    const timeoutHandle = setTimeout(this.watchBlockchain.bind(this), 5000);
+    console.log({ timeoutHandle });
+    this.setState({ timeoutHandle });
   }
+
+  componentWillUnmount() {
+    if (this.state.timeoutHandle !== null) {
+      clearTimeout(this.state.timeoutHandle);
+      this.setState({ timeoutHandle: null });
+    }
+  }
+
+  sortProposals = (proposals: Array<Proposal>) => {
+    // put expired proposals in the end of the list
+    const expired = proposals.filter((x: Proposal) => x.status === "expired");
+    const others = proposals.filter((x: Proposal) => x.status !== "expired");
+
+    return [...others, ...expired];
+  };
+
+  setStateProposals = (proposals: Array<Proposal>) => {
+    // get return proposal's total votes
+    const minVotes = Number(
+      proposals.find((x: Proposal) => x.id === 0)?.total_votes || 0
+    );
+    // find eligible proposals and
+    const eligible = proposals.filter(
+      (x: Proposal) =>
+        x.id > 0 && Number(x.total_votes) >= minVotes && x.status !== "expired"
+    );
+    //  add up total votes
+    const dailyFunded =
+      eligible.reduce(
+        (a: number, b: Proposal) => a + Number(b.daily_pay.amount),
+        0
+      ) / 1000;
+
+    this.stateSet({ proposals, proposals_: proposals, dailyFunded });
+
+    return getAccount("hive.fund");
+  };
+
+  processBudgets = (fund: FullAccount) => {
+    const totalBudget = parseAsset(fund.hbd_balance).amount;
+    const dailyBudget = totalBudget / 100;
+    this.stateSet({ totalBudget, dailyBudget });
+  };
 
   load = () => {
     this.stateSet({ loading: true });
     getProposals()
-      .then((proposals) => {
-        // put expired proposals in the end of the list
-        const expired = proposals.filter((x) => x.status === "expired");
-        const others = proposals.filter((x) => x.status !== "expired");
-
-        return [...others, ...expired];
-      })
-      .then((proposals) => {
-        // get return proposal's total votes
-        const minVotes = Number(
-          proposals.find((x) => x.id === 0)?.total_votes || 0
-        );
-        // find eligible proposals and
-        const eligible = proposals.filter(
-          (x) =>
-            x.id > 0 &&
-            Number(x.total_votes) >= minVotes &&
-            x.status !== "expired"
-        );
-        //  add up total votes
-        const dailyFunded =
-          eligible.reduce((a, b) => a + Number(b.daily_pay.amount), 0) / 1000;
-
-        this.stateSet({ proposals, proposals_: proposals, dailyFunded });
-
-        return getAccount("hive.fund");
-      })
-      .then((fund) => {
-        const totalBudget = parseAsset(fund.hbd_balance).amount;
-        const dailyBudget = totalBudget / 100;
-        this.stateSet({ totalBudget, dailyBudget });
-      })
+      .then(this.sortProposals.bind(this))
+      .then(this.setStateProposals.bind(this))
+      .then(this.processBudgets.bind(this))
       .finally(() => {
-        this.stateSet({ loading: false });
+        console.log(this.state.proposals_);
+        this.setState({ loading: false });
       });
   };
 
@@ -142,9 +277,14 @@ class ProposalsPage extends BaseComponent<PageProps, State> {
         proposals = [
           ...proposals_.filter(
             (x) =>
-              ["ecency", "good-karma", "hivesearcher", "hivesigner"].includes(
-                x.creator
-              ) && x.status === "active"
+              [
+                "leprechaun",
+                "proofofbrainblog",
+                "ecency",
+                "good-karma",
+                "hivesearcher",
+                "hivesigner",
+              ].includes(x.creator) && x.status === "active"
           ),
         ];
         break;
@@ -173,6 +313,7 @@ class ProposalsPage extends BaseComponent<PageProps, State> {
       dailyFunded,
       filter,
       inProgress,
+      lastBlockHash,
     } = this.state;
 
     const navBar = global.isElectron
@@ -205,6 +346,9 @@ class ProposalsPage extends BaseComponent<PageProps, State> {
             <Tsx k="proposals.page-description">
               <div className="header-description" />
             </Tsx>
+            <div className="header-description">
+              Block Hash: {lastBlockHash}
+            </div>
             <div className="funding-numbers">
               <div className="funding-number">
                 <div className="value">
