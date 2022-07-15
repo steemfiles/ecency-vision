@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, BrowserRouter } from "react-router-dom";
 
 import EntryIndexContainer from "./pages/entry-index";
 import ProfileContainer from "./pages/profile";
@@ -36,7 +36,7 @@ import routes from "./routes";
 
 const App = () => {
   return (
-    <>
+    <BrowserRouter>
       <Switch>
         <Route
           exact={true}
@@ -217,7 +217,7 @@ const App = () => {
         />
         <Route component={NotFound} />
       </Switch>
-    </>
+    </BrowserRouter>
   );
 };
 
