@@ -111,7 +111,10 @@ class HiveEngineBadge extends Component<{
     }
     return (
       <>
-        <Link to={`/@${activeUser.username}/wallet`} className="user-points">
+        <Link
+          to={`/@${activeUser.username}/wallet?token=` + coinName.toLowerCase()}
+          className="user-points"
+        >
           {hasUnclaimedToken && <span className="reward-badge" />}
           {this.props.children}
         </Link>
