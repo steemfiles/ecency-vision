@@ -44,7 +44,7 @@
     "immutability-helper": "^3.0.2",
     "js-cookie": "^2.2.1",
     "medium-zoom": "^1.0.6",
-    "moment": "^2.26.0",
+    "moment": "^2.29.4",
     "mysql": "^2.18.1",
     "node-cache": "^5.1.0",
     "node-sass": "^4.14.1",
@@ -61,6 +61,7 @@
     "react-helmet": "^6.0.0",
     "react-img-webp": "^2.0.2",
     "react-redux": "^7.2.0",
+    "react-router": "5.2.1",
     "react-router-dom": "^5.0.1",
     "react-sortablejs": "^2.0.11",
     "redux": "4.0.5",
@@ -69,7 +70,7 @@
     "serialize-javascript": "^3.1.0",
     "sortablejs": "^1.13.0",
     "speakingurl": "^14.0.1",
-    "sscjs": "^0.0.8",
+    "sscjs": "0.0.9",
     "xss": "^1.0.8"
   },
   "devDependencies": {
@@ -101,8 +102,8 @@
     "typescript": "^3.5.3"
   },
   "resolutions": {
-    "jest": "^24.9.0",
-    "@types/react": "^16.8.23"
+    "react-router": "5.2.1",
+    "react-router-dom": "5.0.0"
   },
   "jest": {
     "transform": {
