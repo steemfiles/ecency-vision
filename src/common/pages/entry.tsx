@@ -82,6 +82,7 @@ import {
   HiveEngineTokenInfo,
   ScotPost,
 } from "../api/hive-engine";
+import { hiveClient } from "../api/hive";
 import {
   LIQUID_TOKEN_UPPERCASE,
   APP_DOMAIN,
@@ -91,6 +92,7 @@ import {
 } from "../../client_config";
 import { setHiveEngineTokensProperties } from "../store/global";
 import formattedNumber from "../util/formatted-number";
+import { validateEntry } from "../store/entries/types";
 
 setProxyBase(defaults.imageServer);
 
@@ -111,6 +113,8 @@ interface State {
   editHistory: boolean;
   showProfileBox: boolean;
   showIfHidden: boolean;
+  timeoutHandle: any;
+  lastBlockHash: string;
 }
 
 class EntryPage extends BaseComponent<Props, State> {
@@ -121,7 +125,73 @@ class EntryPage extends BaseComponent<Props, State> {
     showIfHidden: false,
     editHistory: false,
     showProfileBox: false,
+    timeoutHandle: null,
+    lastBlockHash: "",
   };
+
+  processBlock(block: any) {
+    const { match, addReply, updateEntry } = this.props;
+    const { username, permlink } = match.params;
+    const { dynamicProps } = this.props;
+    const { lastBlockHash, timeoutHandle } = this.state;
+    if (timeoutHandle == null) {
+      return;
+    }
+    try {
+      if (lastBlockHash == block.transaction_merkle_root) {
+        console.error("repeated block to processBlock");
+        return;
+      }
+      console.log(block.transaction_merkle_root);
+      for (const trans of block.transactions) {
+        for (const operation of trans.operations) {
+          const opt = operation[0];
+          if (opt != "vote" && opt != "comment") {
+            continue;
+          }
+          const opd = operation[1] as unknown;
+
+          if (opt == "vote") {
+            const vote = opd as { author: string; permlink: string };
+            if ("@" + vote.author == username && vote.permlink === permlink) {
+              this.ensureEntry();
+              return;
+            }
+          } else {
+            // if (opt == 'comment') {
+            validateEntry(opd);
+            const comment = opd as Entry;
+            if (
+              "@" + comment.parent_author == username &&
+              comment.parent_permlink == permlink
+            ) {
+              const entry = this.getEntry();
+              if (entry) {
+                updateEntry({
+                  ...entry,
+                  children: entry.children + 1,
+                  replies: [comment, ...entry.replies],
+                });
+              } else {
+                this.ensureEntry();
+              }
+              return;
+            }
+          } // if opt ...
+        } // for
+      } // for
+    } catch (e) {
+      console.log(e);
+    } finally {
+      this.setState({ lastBlockHash: block.transaction_merkle_root });
+    }
+  }
+
+  watchBlockchain() {
+    console.log("watching blockchain...");
+    const stream = hiveClient.blockchain.getBlockStream({});
+    stream.on("data", this.processBlock.bind(this));
+  }
 
   viewElement: HTMLDivElement | undefined;
 
@@ -135,6 +205,9 @@ class EntryPage extends BaseComponent<Props, State> {
 
     window.addEventListener("scroll", this.detect);
     window.addEventListener("resize", this.detect);
+
+    const timeoutHandle = setTimeout(this.watchBlockchain.bind(this), 5000);
+    this.setState({ timeoutHandle });
   }
 
   componentDidUpdate(prevProps: Readonly<Props>): void {
@@ -151,6 +224,10 @@ class EntryPage extends BaseComponent<Props, State> {
     const p2 = new Promise((resolve, reject) => {
       resolve(window.removeEventListener("resize", this.detect));
     });
+    if (this.state.timeoutHandle !== null) {
+      clearTimeout(this.state.timeoutHandle);
+      this.setState({ timeoutHandle: null });
+    }
     Promise.all([p1, p2]);
   }
 
@@ -338,7 +415,8 @@ class EntryPage extends BaseComponent<Props, State> {
   };
 
   render() {
-    const { loading, replying, showIfNsfw, editHistory } = this.state;
+    const { loading, replying, showIfNsfw, editHistory, lastBlockHash } =
+      this.state;
     const { global, history } = this.props;
 
     const navBar = global.isElectron
@@ -675,7 +753,10 @@ class EntryPage extends BaseComponent<Props, State> {
                         : "";
                       return (
                         <>
-                          <div className="entry-header">
+                          <div
+                            className="entry-header"
+                            onBlur={this.ensureEntry}
+                          >
                             {isMuted && (
                               <div className="hidden-warning">
                                 <span>
@@ -688,19 +769,17 @@ class EntryPage extends BaseComponent<Props, State> {
                                 </span>
                               </div>
                             )}
-
                             {isHidden && (
                               <div className="hidden-warning">
                                 <span>{_t("entry.hidden-warning")}</span>
                               </div>
                             )}
-
+                            blockchain hash: {lastBlockHash}
                             {isLowReputation && (
                               <div className="hidden-warning">
                                 <span>{_t("entry.lowrep-warning")}</span>
                               </div>
                             )}
-
                             {isComment && (
                               <div className="comment-entry-header">
                                 <div className="comment-entry-header-title">

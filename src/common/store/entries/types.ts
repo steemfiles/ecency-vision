@@ -67,7 +67,12 @@ export interface Entry {
   original_entry?: Entry;
   he?: { [id: string]: ScotPost };
 }
-export function validateEntry(e: { [id: string]: unknown }): void {
+export function validateEntry(ep: unknown): ep is Entry {
+  if (typeof ep != "object") {
+    console.log("Passed value isn't even an object");
+    throw Error("Passed value isn't even an object");
+  }
+  const e = ep as Object;
   let missing_keys: Array<string> = [];
   if (e["active_votes"] === undefined) {
     console.log("Missing key active_votes");
@@ -211,15 +216,6 @@ export function validateEntry(e: { [id: string]: unknown }): void {
   }
   if (missing_keys.length) {
     throw Error("Missing keys: " + JSON.stringify(missing_keys));
-  }
-}
-
-export function notAValidEntry(entry: Entry | any): entry is any {
-  try {
-    validateEntry(entry);
-    return false;
-  } catch (error) {
-    // do nothing...    
   }
   return true;
 }
