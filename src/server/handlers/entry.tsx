@@ -17,6 +17,7 @@ export default async (req: Request, res: Response) => {
     entry = await bridgeApi.getPost(author, permlink);
   } catch (e) {
     console.error(
+      "entry.tsx:",
       `${new Date().toISOString()} ERROR fetching @${author}/${permlink}`
     );
   }

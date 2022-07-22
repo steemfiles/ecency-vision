@@ -149,66 +149,51 @@ export default class EntryListItem extends Component<Props, State> {
       history,
       order,
     } = this.props;
-    const crossPost = !!theEntry.original_entry;
-    const entry = theEntry.original_entry || theEntry;
+    try {
+      const crossPost = !!theEntry.original_entry;
+      const entry = theEntry.original_entry || theEntry;
 
-    const imgGrid: string =
-      (global.canUseWebp
-        ? catchPostImage(entry, 600, 500, "webp")
-        : catchPostImage(entry, 600, 500)) || noImage;
-    const imgRow: string =
-      (global.canUseWebp
-        ? catchPostImage(entry, 260, 200, "webp")
-        : catchPostImage(entry, 260, 200)) || noImage;
-    let svgSizeRow = imgRow === noImage ? "noImage" : "";
-    let svgSizeGrid = imgGrid === noImage ? "172px" : "auto";
+      const imgGrid: string =
+        (global.canUseWebp
+          ? catchPostImage(entry, 600, 500, "webp")
+          : catchPostImage(entry, 600, 500)) || noImage;
+      const imgRow: string =
+        (global.canUseWebp
+          ? catchPostImage(entry, 260, 200, "webp")
+          : catchPostImage(entry, 260, 200)) || noImage;
+      let svgSizeRow = imgRow === noImage ? "noImage" : "";
+      let svgSizeGrid = imgGrid === noImage ? "172px" : "auto";
 
-    const summary: string = postBodySummary(entry, 200);
+      const summary: string = postBodySummary(entry, 200);
 
-    const reputation = accountReputation(entry.author_reputation);
-    const date = moment(parseDate(entry.created));
-    const dateRelative = date.fromNow(true);
-    const dateFormatted = date.format("LLLL");
+      const reputation = accountReputation(entry.author_reputation);
+      const date = moment(parseDate(entry.created));
+      const dateRelative = date.fromNow(true);
+      const dateFormatted = date.format("LLLL");
 
-    const isChild = !!entry.parent_author;
+      const isChild = !!entry.parent_author;
 
-    const title = entry.title;
+      const title = entry.title;
 
-    const isVisited = false;
-    const isPinned = community && !!entry.stats?.is_pinned;
-    const { listStyle, currency } = global;
-    let reBlogged: string | undefined;
-    if (asAuthor && asAuthor !== entry.author && !isChild) {
-      reBlogged = asAuthor;
-    }
+      const isVisited = false;
+      const isPinned = community && !!entry.stats?.is_pinned;
+      const { listStyle, currency } = global;
+      let reBlogged: string | undefined;
+      if (asAuthor && asAuthor !== entry.author && !isChild) {
+        reBlogged = asAuthor;
+      }
 
-    if (entry.reblogged_by && entry.reblogged_by.length > 0) {
-      [reBlogged] = entry.reblogged_by;
-    }
+      if (entry.reblogged_by && entry.reblogged_by.length > 0) {
+        [reBlogged] = entry.reblogged_by;
+      }
 
-    let thumb: JSX.Element | null = null;
-    if (listStyle === "grid") {
-      thumb = (
-        <img
-          src={imgGrid}
-          alt={title}
-          style={{ width: svgSizeGrid }}
-          onError={(e: React.SyntheticEvent) => {
-            const target = e.target as HTMLImageElement;
-            if (target.src != fallbackImage) {
-              target.src = fallbackImage;
-            }
-          }}
-        />
-      );
-    }
-    if (listStyle === "row") {
-      thumb = (
-        <picture>
-          <source srcSet={imgRow} media="(min-width: 576px)" />
+      let thumb: JSX.Element | null = null;
+      if (listStyle === "grid") {
+        thumb = (
           <img
-            srcSet={imgGrid}
+            src={imgGrid}
             alt={title}
+            style={{ width: svgSizeGrid }}
             onError={(e: React.SyntheticEvent) => {
               const target = e.target as HTMLImageElement;
               if (target.src != fallbackImage) {
@@ -216,298 +201,321 @@ export default class EntryListItem extends Component<Props, State> {
               }
             }}
           />
-        </picture>
-      );
-    }
-    const nsfw =
-      entry.json_metadata.tags && entry.json_metadata.tags.includes("nsfw");
-
-    const cls = `entry-list-item ${promoted ? "promoted-item" : ""}`;
-    const self_vote_entry = entry.active_votes.find(
-      (x) => x.voter == entry.author
-    );
-    const self_vote = self_vote_entry ? self_vote_entry.rshares : false;
-    const hp_portion = 100 * (1 - entry.percent_hbd / 20000);
-    const he = entry.he && entry.he[LIQUID_TOKEN_UPPERCASE];
-    const muted = he && he.muted;
-    const pending_token: string = (() => {
-      if (currency == LIQUID_TOKEN_UPPERCASE && he && he.pending_token) {
-        const pending_tokens: number = he.pending_token || 0;
-        return formattedNumber(pending_tokens / 100000000, {
-          suffix: LIQUID_TOKEN_UPPERCASE,
-        });
-      } else {
-        return "";
+        );
       }
-    })();
-    const max_payout: number = parseFloat(entry.max_accepted_payout);
-    return (
-      <div className={_c(cls)}>
-        {(() => {
-          if (crossPost) {
-            return (
-              <div className="cross-item">
-                {ProfileLink({
-                  ...this.props,
-                  username: theEntry.author,
-                  children: (
-                    <a className="cross-item-author notranslate">{`@${theEntry.author}`}</a>
-                  ),
-                })}{" "}
-                {_t("entry-list-item.cross-posted")}{" "}
-                {EntryLink({
-                  ...this.props,
-                  entry: theEntry.original_entry!,
-                  children: (
-                    <a className="cross-item-link">
-                      {truncate(
-                        `@${theEntry.original_entry!.author}/${
-                          theEntry.original_entry!.permlink
-                        }`,
-                        40
-                      )}
-                    </a>
-                  ),
-                })}{" "}
-                {_t("entry-list-item.cross-posted-to")}{" "}
-                {Tag({
-                  ...this.props,
-                  tag:
-                    theEntry.community && theEntry.community_title
-                      ? {
-                          name: theEntry.community,
-                          title: theEntry.community_title,
-                        }
-                      : theEntry.category,
-                  type: "link",
-                  children: (
-                    <a className="community-name">
-                      {theEntry.community_title || theEntry.category}
-                    </a>
-                  ),
-                })}
-              </div>
-            );
-          }
+      if (listStyle === "row") {
+        thumb = (
+          <picture>
+            <source srcSet={imgRow} media="(min-width: 576px)" />
+            <img
+              srcSet={imgGrid}
+              alt={title}
+              onError={(e: React.SyntheticEvent) => {
+                const target = e.target as HTMLImageElement;
+                if (target.src != fallbackImage) {
+                  target.src = fallbackImage;
+                }
+              }}
+            />
+          </picture>
+        );
+      }
+      const nsfw =
+        entry.json_metadata.tags && entry.json_metadata.tags.includes("nsfw");
 
-          return null;
-        })()}
-
-        <div className="item-header">
-          <div className="item-header-main">
-            <div className="author-part">
-              {ProfileLink({
-                ...this.props,
-                username: entry.author,
-                children: (
-                  <a className="author-avatar">
-                    {UserAvatar({
-                      ...this.props,
-                      username: entry.author,
-                      size: "small",
-                    })}
-                  </a>
-                ),
-              })}
-              {ProfileLink({
-                ...this.props,
-                username: entry.author,
-                children: (
-                  <div className="author notranslate">
-                    {entry.author}
-                    <span
-                      className="author-reputation"
-                      title={_t("entry.author-reputation")}
-                    >
-                      {reputation}
-                    </span>
-                  </div>
-                ),
-              })}
-            </div>
-            {Tag({
-              ...this.props,
-              tag:
-                entry.community && entry.community_title
-                  ? { name: entry.community, title: entry.community_title }
-                  : entry.category,
-              type: "link",
-              children: (
-                <a className="category">
-                  {entry.community_title || entry.category}
-                </a>
-              ),
-            })}
-            {!isVisited && <span className="read-mark" />}
-            <span className="date" title={dateFormatted}>
-              {dateRelative}
-            </span>
-            {self_vote && (
-              <div className="post-info">{_t("entry.self_voted")}</div>
-            )}
-            {max_payout > 0 && (
-              <div className="post-info">{hp_portion}% HP</div>
-            )}
-            <div className="post-info">{entry.json_metadata?.app}</div>
-            {max_payout == 0 ? (
-              <div className="post-info">{_t("entry.payment_refused")}</div>
-            ) : (
-              max_payout < 1000 && (
-                <div className="post-info">&le; {max_payout} HBD</div>
-              )
-            )}
-          </div>
-          <div className="item-header-features">
-            {isPinned && (
-              <Tooltip content={_t("entry-list-item.pinned")}>
-                <span className="pinned">{pinSvg}</span>
-              </Tooltip>
-            )}
-            {reBlogged && (
-              <span className="reblogged">
-                {repeatSvg} {_t("entry-list-item.reblogged", { n: reBlogged })}
-              </span>
-            )}
-            {promoted && (
-              <>
-                <span className="flex-spacer" />
-                <div className="promoted">
-                  <a href="/faq#how-promotion-work">
-                    {_t("entry-list-item.promoted")}
-                  </a>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-        <div className="item-body">
+      const cls = `entry-list-item ${promoted ? "promoted-item" : ""}`;
+      const self_vote_entry = entry.active_votes.find(
+        (x) => x.voter == entry.author
+      );
+      const self_vote = self_vote_entry ? self_vote_entry.rshares : false;
+      const hp_portion = 100 * (1 - entry.percent_hbd / 20000);
+      const he = entry.he && entry.he[LIQUID_TOKEN_UPPERCASE];
+      const muted = he && he.muted;
+      const pending_token: string = (() => {
+        if (currency == LIQUID_TOKEN_UPPERCASE && he && he.pending_token) {
+          const pending_tokens: number = he.pending_token || 0;
+          return formattedNumber(pending_tokens / 100000000, {
+            suffix: LIQUID_TOKEN_UPPERCASE,
+          });
+        } else {
+          return "";
+        }
+      })();
+      const max_payout: number = parseFloat(entry.max_accepted_payout);
+      return (
+        <div className={_c(cls)}>
           {(() => {
-            if (nsfw && !this.state.showNsfw && !global.nsfw) {
+            if (crossPost) {
               return (
-                <>
-                  <div className="item-image item-image-nsfw">
-                    <img src={nsfwImage} alt={title} />
-                  </div>
-                  <div className="item-summary">
-                    <div className="item-nsfw">
-                      <span className="nsfw-badge">NSFW</span>
-                    </div>
-                    <div className="item-nsfw-options">
-                      <a
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          this.toggleNsfw();
-                        }}
-                      >
-                        {_t("nsfw.reveal")}
-                      </a>{" "}
-                      {_t("g.or").toLowerCase()}{" "}
-                      {activeUser && (
-                        <>
-                          {_t("nsfw.settings-1")}{" "}
-                          <a
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              history.push(`/@${activeUser.username}/settings`);
-                            }}
-                          >
-                            {_t("nsfw.settings-2")}
-                          </a>
-                          {"."}
-                        </>
-                      )}
-                      {!activeUser && (
-                        <>
-                          <Tsx k="nsfw.signup">
-                            <span />
-                          </Tsx>
-                          {"."}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </>
+                <div className="cross-item">
+                  {ProfileLink({
+                    ...this.props,
+                    username: theEntry.author,
+                    children: (
+                      <a className="cross-item-author notranslate">{`@${theEntry.author}`}</a>
+                    ),
+                  })}{" "}
+                  {_t("entry-list-item.cross-posted")}{" "}
+                  {EntryLink({
+                    ...this.props,
+                    entry: theEntry.original_entry!,
+                    children: (
+                      <a className="cross-item-link">
+                        {truncate(
+                          `@${theEntry.original_entry!.author}/${
+                            theEntry.original_entry!.permlink
+                          }`,
+                          40
+                        )}
+                      </a>
+                    ),
+                  })}{" "}
+                  {_t("entry-list-item.cross-posted-to")}{" "}
+                  {Tag({
+                    ...this.props,
+                    tag:
+                      theEntry.community && theEntry.community_title
+                        ? {
+                            name: theEntry.community,
+                            title: theEntry.community_title,
+                          }
+                        : theEntry.category,
+                    type: "link",
+                    children: (
+                      <a className="community-name">
+                        {theEntry.community_title || theEntry.category}
+                      </a>
+                    ),
+                  })}
+                </div>
               );
             }
 
-            return (
-              <>
-                <div className={"item-image " + svgSizeRow}>
-                  {EntryLink({
-                    ...this.props,
-                    entry: crossPost ? theEntry : entry,
-                    children: <div>{thumb}</div>,
-                  })}
-                </div>
-                <div className="item-summary">
-                  {EntryLink({
-                    ...this.props,
-                    entry: crossPost ? theEntry : entry,
-                    children: <div className="item-title">{title}</div>,
-                  })}
-                  {EntryLink({
-                    ...this.props,
-                    entry: crossPost ? theEntry : entry,
-                    children: <div className="item-body">{summary}</div>,
-                  })}
-                </div>
-              </>
-            );
+            return null;
           })()}
-          <div className="item-controls">
-            {EntryVoteBtn({
-              ...this.props,
-              afterVote: this.afterVote,
-            })}
-            &nbsp;
-            {currency == LIQUID_TOKEN_UPPERCASE ? (
-              <span className="post-info">{pending_token} &nbsp;&nbsp;</span>
-            ) : (
-              EntryPayout({
+
+          <div className="item-header">
+            <div className="item-header-main">
+              <div className="author-part">
+                {ProfileLink({
+                  ...this.props,
+                  username: entry.author,
+                  children: (
+                    <a className="author-avatar">
+                      {UserAvatar({
+                        ...this.props,
+                        username: entry.author,
+                        size: "small",
+                      })}
+                    </a>
+                  ),
+                })}
+                {ProfileLink({
+                  ...this.props,
+                  username: entry.author,
+                  children: (
+                    <div className="author notranslate">
+                      {entry.author}
+                      <span
+                        className="author-reputation"
+                        title={_t("entry.author-reputation")}
+                      >
+                        {reputation}
+                      </span>
+                    </div>
+                  ),
+                })}
+              </div>
+              {Tag({
+                ...this.props,
+                tag:
+                  entry.community && entry.community_title
+                    ? { name: entry.community, title: entry.community_title }
+                    : entry.category,
+                type: "link",
+                children: (
+                  <a className="category">
+                    {entry.community_title || entry.category}
+                  </a>
+                ),
+              })}
+              {!isVisited && <span className="read-mark" />}
+              <span className="date" title={dateFormatted}>
+                {dateRelative}
+              </span>
+              {self_vote && (
+                <div className="post-info">{_t("entry.self_voted")}</div>
+              )}
+              {max_payout > 0 && (
+                <div className="post-info">{hp_portion}% HP</div>
+              )}
+              <div className="post-info">{entry.json_metadata?.app}</div>
+              {max_payout == 0 ? (
+                <div className="post-info">{_t("entry.payment_refused")}</div>
+              ) : (
+                max_payout < 1000 && (
+                  <div className="post-info">&le; {max_payout} HBD</div>
+                )
+              )}
+            </div>
+            <div className="item-header-features">
+              {isPinned && (
+                <Tooltip content={_t("entry-list-item.pinned")}>
+                  <span className="pinned">{pinSvg}</span>
+                </Tooltip>
+              )}
+              {reBlogged && (
+                <span className="reblogged">
+                  {repeatSvg}{" "}
+                  {_t("entry-list-item.reblogged", { n: reBlogged })}
+                </span>
+              )}
+              {promoted && (
+                <>
+                  <span className="flex-spacer" />
+                  <div className="promoted">
+                    <a href="/faq#how-promotion-work">
+                      {_t("entry-list-item.promoted")}
+                    </a>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="item-body">
+            {(() => {
+              if (nsfw && !this.state.showNsfw && !global.nsfw) {
+                return (
+                  <>
+                    <div className="item-image item-image-nsfw">
+                      <img src={nsfwImage} alt={title} />
+                    </div>
+                    <div className="item-summary">
+                      <div className="item-nsfw">
+                        <span className="nsfw-badge">NSFW</span>
+                      </div>
+                      <div className="item-nsfw-options">
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            this.toggleNsfw();
+                          }}
+                        >
+                          {_t("nsfw.reveal")}
+                        </a>{" "}
+                        {_t("g.or").toLowerCase()}{" "}
+                        {activeUser && (
+                          <>
+                            {_t("nsfw.settings-1")}{" "}
+                            <a
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                history.push(
+                                  `/@${activeUser.username}/settings`
+                                );
+                              }}
+                            >
+                              {_t("nsfw.settings-2")}
+                            </a>
+                            {"."}
+                          </>
+                        )}
+                        {!activeUser && (
+                          <>
+                            <Tsx k="nsfw.signup">
+                              <span />
+                            </Tsx>
+                            {"."}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                );
+              }
+
+              return (
+                <>
+                  <div className={"item-image " + svgSizeRow}>
+                    {EntryLink({
+                      ...this.props,
+                      entry: crossPost ? theEntry : entry,
+                      children: <div>{thumb}</div>,
+                    })}
+                  </div>
+                  <div className="item-summary">
+                    {EntryLink({
+                      ...this.props,
+                      entry: crossPost ? theEntry : entry,
+                      children: <div className="item-title">{title}</div>,
+                    })}
+                    {EntryLink({
+                      ...this.props,
+                      entry: crossPost ? theEntry : entry,
+                      children: <div className="item-body">{summary}</div>,
+                    })}
+                  </div>
+                </>
+              );
+            })()}
+            <div className="item-controls">
+              {EntryVoteBtn({
+                ...this.props,
+                afterVote: this.afterVote,
+              })}
+              &nbsp;
+              {currency == LIQUID_TOKEN_UPPERCASE ? (
+                <span className="post-info">{pending_token} &nbsp;&nbsp;</span>
+              ) : (
+                EntryPayout({
+                  ...this.props,
+                  entry,
+                })
+              )}
+              {EntryVotes({
                 ...this.props,
                 entry,
-              })
-            )}
-            {EntryVotes({
-              ...this.props,
-              entry,
-            })}
-            {EntryLink({
-              ...this.props,
-              entry: crossPost ? theEntry : entry,
-              children: (
-                <a className="replies notranslate">
-                  <Tooltip
-                    content={
-                      entry.children > 0
-                        ? entry.children === 1
-                          ? _t("entry-list-item.replies")
-                          : _t("entry-list-item.replies-n", {
-                              n: entry.children,
-                            })
-                        : _t("entry-list-item.no-replies")
-                    }
-                  >
-                    <span className="inner">
-                      {commentSvg} {entry.children}
-                    </span>
-                  </Tooltip>
-                </a>
-              ),
-            })}
-            {EntryReblogBtn({
-              ...this.props,
-            })}
-            {EntryMenu({
-              ...this.props,
-              alignBottom: order >= 1,
-              entry,
-            })}
+              })}
+              {EntryLink({
+                ...this.props,
+                entry: crossPost ? theEntry : entry,
+                children: (
+                  <a className="replies notranslate">
+                    <Tooltip
+                      content={
+                        entry.children > 0
+                          ? entry.children === 1
+                            ? _t("entry-list-item.replies")
+                            : _t("entry-list-item.replies-n", {
+                                n: entry.children,
+                              })
+                          : _t("entry-list-item.no-replies")
+                      }
+                    >
+                      <span className="inner">
+                        {commentSvg} {entry.children}
+                      </span>
+                    </Tooltip>
+                  </a>
+                ),
+              })}
+              {EntryReblogBtn({
+                ...this.props,
+              })}
+              {EntryMenu({
+                ...this.props,
+                alignBottom: order >= 1,
+                entry,
+              })}
+            </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
   }
 }
