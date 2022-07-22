@@ -117,6 +117,16 @@ interface State {
   lastBlockHash: string;
 }
 
+interface raw_comment {
+  author: string;
+  body: string;
+  json_metadata: string;
+  parent_author: string;
+  parent_permlink: string;
+  permlink: string;
+  title: string;
+}
+
 class EntryPage extends BaseComponent<Props, State> {
   state: State = {
     loading: false,
@@ -129,6 +139,9 @@ class EntryPage extends BaseComponent<Props, State> {
     lastBlockHash: "",
   };
 
+  // @ts-ignore
+  stream: undefined|unknown;
+  
   processBlock(block: any) {
     const { match, addReply, updateEntry } = this.props;
     const { username, permlink } = match.params;
@@ -137,20 +150,19 @@ class EntryPage extends BaseComponent<Props, State> {
     if (timeoutHandle == null) {
       return;
     }
-    try {
-      if (lastBlockHash == block.transaction_merkle_root) {
-        console.error("repeated block to processBlock");
-        return;
-      }
-      console.log(block.transaction_merkle_root);
-      for (const trans of block.transactions) {
-        for (const operation of trans.operations) {
-          const opt = operation[0];
-          if (opt != "vote" && opt != "comment") {
-            continue;
-          }
-          const opd = operation[1] as unknown;
-
+    if (lastBlockHash == block.transaction_merkle_root) {
+      console.error("repeated block to processBlock");
+      return;
+    }
+    for (const trans of block.transactions) {
+      for (const operation of trans.operations) {
+        const opt = operation[0];
+        if (opt != "vote" && opt != "comment") {
+          continue;
+        }
+        
+        const opd = operation[1] as unknown;
+        try {
           if (opt == "vote") {
             const vote = opd as { author: string; permlink: string };
             if ("@" + vote.author == username && vote.permlink === permlink) {
@@ -159,18 +171,39 @@ class EntryPage extends BaseComponent<Props, State> {
             }
           } else {
             // if (opt == 'comment') {
-            validateEntry(opd);
-            const comment = opd as Entry;
+            const comment = opd as raw_comment;
             if (
               "@" + comment.parent_author == username &&
               comment.parent_permlink == permlink
             ) {
               const entry = this.getEntry();
               if (entry) {
-                updateEntry({
-                  ...entry,
-                  children: entry.children + 1,
-                  replies: [comment, ...entry.replies],
+                // efficient update
+                
+                bridgeApi
+                .getPost(comment.author, comment.permlink)
+                .then((r) => {
+                  console.log(r);
+                  if (entry.replies) {
+                    // @ts-ignore
+                    const replies_m_r = entry.replies.filter( x => x !== null && (x.permlink !== r.permlink || x.author !== r.author) );
+                    updateEntry({
+                      ...entry,
+                      children: replies_m_r.length + 1,
+                      replies: [r, ...replies_m_r],
+                    });
+                  } else {
+                    updateEntry({
+                      ...entry,
+                      children: 1,
+                      replies: [r],
+                    });
+                  }
+                })
+                .catch((e) => {
+                    console.error(e);
+                    // more tested way to update.
+                    this.ensureEntry();
                 });
               } else {
                 this.ensureEntry();
@@ -178,19 +211,21 @@ class EntryPage extends BaseComponent<Props, State> {
               return;
             }
           } // if opt ...
-        } // for
+        } catch (e) {
+          console.log('Error processing operation:', opd, e);
+        } finally {
+          this.setState({ lastBlockHash: block.transaction_merkle_root });
+        }          
       } // for
-    } catch (e) {
-      console.log(e);
-    } finally {
-      this.setState({ lastBlockHash: block.transaction_merkle_root });
-    }
+    } // for
   }
 
   watchBlockchain() {
     console.log("watching blockchain...");
-    const stream = hiveClient.blockchain.getBlockStream({});
-    stream.on("data", this.processBlock.bind(this));
+    // @ts-ignore
+    this.stream = hiveClient.blockchain.getBlockStream({});
+    // @ts-ignore
+    this.stream.on("data", this.processBlock.bind(this));
   }
 
   viewElement: HTMLDivElement | undefined;
@@ -229,6 +264,8 @@ class EntryPage extends BaseComponent<Props, State> {
       this.setState({ timeoutHandle: null });
     }
     Promise.all([p1, p2]);
+    // @ts-ignore
+    delete this.stream;
   }
 
   // detects distance between title and comments section sets visibility of profile card
