@@ -195,7 +195,9 @@ export default class EntryListItem extends Component<Props, State> {
           style={{ width: svgSizeGrid }}
           onError={(e: React.SyntheticEvent) => {
             const target = e.target as HTMLImageElement;
-            target.src = fallbackImage;
+            if (target.src != fallbackImage) {
+              target.src = fallbackImage;
+            }
           }}
         />
       );
@@ -209,7 +211,9 @@ export default class EntryListItem extends Component<Props, State> {
             alt={title}
             onError={(e: React.SyntheticEvent) => {
               const target = e.target as HTMLImageElement;
-              target.src = fallbackImage;
+              if (target.src != fallbackImage) {
+                target.src = fallbackImage;
+              }
             }}
           />
         </picture>
