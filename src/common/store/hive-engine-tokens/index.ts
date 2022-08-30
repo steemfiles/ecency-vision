@@ -9,12 +9,7 @@ import {
 import { AppState } from "../index";
 import { getDynamicProps, getTrendingTags } from "../../api/hive";
 import { fetchAct, fetchErrorAct } from "../trending-tags";
-import {
-  getPrices,
-  getScotDataAsync,
-  HiveEngineTokenConfig,
-  HiveEngineTokenInfo,
-} from "../../api/hive-engine";
+
 import { LIQUID_TOKEN_UPPERCASE } from "../../../client_config";
 export const initialState: TokenPropertiesMap = {};
 export default (

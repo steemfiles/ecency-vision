@@ -11,12 +11,7 @@ import { makePreloadedState } from "../state";
 import { render } from "../template";
 import { cache } from "../cache";
 import { LIQUID_TOKEN_UPPERCASE } from "../../client_config";
-import {
-  getScotDataAsync,
-  HiveEngineTokenInfo,
-  HiveEngineTokenConfig,
-  getPrices,
-} from "../../common/api/hive-engine";
+
 export default async (req: express.Request, res: express.Response) => {
   const params = filterTagExtract(req.originalUrl.split("?")[0])!;
   const { filter, tag } = params;

@@ -76,10 +76,6 @@ import {
 import defaults from "../constants/site.json";
 import { TokenPropertiesMap } from "../store/hive-engine-tokens/types";
 import {
-  getPrices,
-  getScotDataAsync,
-  HiveEngineTokenConfig,
-  HiveEngineTokenInfo,
   ScotPost,
 } from "../api/hive-engine";
 import { hiveClient } from "../api/hive";

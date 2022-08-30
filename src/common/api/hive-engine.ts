@@ -138,7 +138,7 @@ export async function getPrices(
     }
     return obj;
   } catch (e) {
-    console.log("getPrices are failing:", e.message);
+    console.log("getPrices are failing:", e.message,  e.statusCode);
   }
   return { ...defaultPrices, ...obj };
 }

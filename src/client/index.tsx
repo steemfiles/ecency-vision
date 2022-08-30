@@ -14,12 +14,7 @@ import { AppWindow } from "./window";
 import "../style/theme-day.scss";
 import "../style/theme-night.scss";
 import "./base-handlers";
-import {
-  getPrices,
-  getScotDataAsync,
-  HiveEngineTokenConfig,
-  HiveEngineTokenInfo,
-} from "../common/api/hive-engine";
+
 import { includeInfoConfigsAction } from "../common/store/hive-engine-tokens";
 import { LIQUID_TOKEN_UPPERCASE } from "../client_config";
 declare var window: AppWindow;
