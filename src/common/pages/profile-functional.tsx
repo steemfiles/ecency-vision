@@ -109,13 +109,15 @@ export const Profile = (props: Props) => {
     fetchPoints(username);
 
     const accountUsername = username.replace("@", "");
-    const account = accounts.find((x) => x.name === accountUsername) as FullAccount;
+    const account = accounts.find((x) => x.name === accountUsername);
 
-    setAccount(account);
-    setSection(section || ProfileFilter.blog);
-    setUsername(username.replace("@", ""));
+    if (account) {
+      setAccount(account);
+      setSection(section || ProfileFilter.blog);
+      setUsername(username.replace("@", ""));
 
-    await initPinnedEntry(username.replace("@", ""), account);
+      await initPinnedEntry(username.replace("@", ""), account);
+    }
 
     return () => {
       const { resetTransactions, resetPoints } = props;
