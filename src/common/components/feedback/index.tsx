@@ -7,6 +7,7 @@ import { FeedbackModal } from "../feedback-modal";
 import { ErrorTypes } from "../../enums";
 import { ActiveUser } from "../../store/active-user/types";
 import { _t } from "../../i18n";
+import "./_index.scss";
 
 export const error = (message: string, errorType = ErrorTypes.COMMON) => {
   const detail: ErrorFeedbackObject = {
@@ -74,11 +75,11 @@ export default class Feedback extends BaseComponent<Props, State> {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-
     window.removeEventListener("feedback", this.onFeedback);
   }
 
   onFeedback = (e: Event) => {
+    // mountCheck(true);
     const detail: FeedbackObject = (e as CustomEvent).detail;
 
     const { list } = this.state;
@@ -93,6 +94,7 @@ export default class Feedback extends BaseComponent<Props, State> {
       const { list } = this.state;
       const newList = list.filter((x) => x.id !== detail.id);
       this.stateSet({ list: newList });
+      // mountCheck(false);
     }, 5000);
   };
 
@@ -100,7 +102,7 @@ export default class Feedback extends BaseComponent<Props, State> {
     const { list } = this.state;
     const errorType = (x: FeedbackObject) => (x as ErrorFeedbackObject).errorType;
     return (
-      <div className="feedback-container">
+      <div className={"feedback-container" + (list.length > 0 ? " " + "visible" : "")}>
         {list.map((x) => {
           switch (x.type) {
             case "success":
@@ -116,7 +118,7 @@ export default class Feedback extends BaseComponent<Props, State> {
                   <div className=" d-flex flex-column align-items-start">
                     {x.message}
                     <div className="d-flex">
-                      {errorType(x) !== ErrorTypes.COMMON ? (
+                      {errorType(x) !== ErrorTypes.COMMON && errorType(x) !== ErrorTypes.INFO ? (
                         <Button
                           className="mt-2 details-button px-0 mr-3"
                           variant="link"
@@ -127,18 +129,20 @@ export default class Feedback extends BaseComponent<Props, State> {
                       ) : (
                         <></>
                       )}
-                      <Button
-                        className="mt-2 details-button px-0"
-                        variant="link"
-                        onClick={() =>
-                          window.open(
-                            "mailto:bug@ecency.com?Subject=Reporting issue&Body=Hello team, \n I would like to report issue: \n",
-                            "_blank"
-                          )
-                        }
-                      >
-                        {_t("feedback-modal.report")}
-                      </Button>
+                      {!ErrorTypes.INFO && (
+                        <Button
+                          className="mt-2 details-button px-0"
+                          variant="link"
+                          onClick={() =>
+                            window.open(
+                              "mailto:bug@ecency.com?Subject=Reporting issue&Body=Hello team, \n I would like to report issue: \n",
+                              "_blank"
+                            )
+                          }
+                        >
+                          {_t("feedback-modal.report")}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>

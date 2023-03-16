@@ -390,6 +390,7 @@ class EntryPage extends BaseComponent<Props, State> {
               pending_payout_value: String(newPayout)
             });
           }
+          return;
         })
         .catch((e) => {
           console.log(e);
@@ -588,7 +589,7 @@ class EntryPage extends BaseComponent<Props, State> {
 
     const isComment = !!entry.parent_author;
     const ownEntry = activeUser && activeUser.username === entry.author;
-    const isHidden = entry?.net_rshares < -500000000;
+    const isHidden = entry?.net_rshares < -7000000000 && entry?.active_votes.length > 3; // 1000 HPstat
     const isMuted = entry?.stats?.gray && entry?.net_rshares >= 0 && entry?.author_reputation >= 0;
     const isLowReputation =
       entry?.stats?.gray && entry?.net_rshares >= 0 && entry?.author_reputation < 0;
@@ -634,7 +635,7 @@ class EntryPage extends BaseComponent<Props, State> {
                     username: entry.author,
                     children: (
                       <div className="cross-post-author">
-                        {UserAvatar({ ...this.props, username: entry.author, size: "medium" })}
+                        <UserAvatar username={entry.author} size="medium" />
                         {`@${entry.author}`}
                       </div>
                     )
@@ -752,11 +753,7 @@ class EntryPage extends BaseComponent<Props, State> {
                                   username: originalEntry.author,
                                   children: (
                                     <div className="author-avatar">
-                                      {UserAvatar({
-                                        ...this.props,
-                                        username: originalEntry.author,
-                                        size: "medium"
-                                      })}
+                                      <UserAvatar username={originalEntry.author} size="medium" />
                                     </div>
                                   )
                                 })}
@@ -940,11 +937,7 @@ class EntryPage extends BaseComponent<Props, State> {
                                 username: entry.author,
                                 children: (
                                   <div className="author-avatar">
-                                    {UserAvatar({
-                                      ...this.props,
-                                      username: entry.author,
-                                      size: "medium"
-                                    })}
+                                    <UserAvatar username={entry.author} size="medium" />
                                   </div>
                                 )
                               })}

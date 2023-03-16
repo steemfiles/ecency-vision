@@ -1,3 +1,8 @@
+@import "src/style/colors";
+@import "src/style/variables";
+@import "src/style/bootstrap_vars";
+@import "src/style/mixins";
+
 .scroll-to-top {
   position: fixed;
   right: 20px;
@@ -16,6 +21,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    & ~ .announcement-container {
+      bottom: 6rem;
+    }
   }
 
   svg {

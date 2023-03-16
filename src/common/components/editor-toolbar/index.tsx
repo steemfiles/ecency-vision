@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-
 import isEqual from "react-fast-compare";
+import axios from "axios";
 
 import { ActiveUser } from "../../store/active-user/types";
 import { User } from "../../store/users/types";
@@ -14,20 +14,14 @@ import Fragments from "../fragments";
 import AddImage from "../add-image";
 import AddImageMobile from "../add-image-mobile";
 import AddLink from "../add-link";
-
 import { uploadImage } from "../../api/misc";
-
 import { addImage } from "../../api/private-api";
-
 import { error } from "../feedback";
-
 import { _t } from "../../i18n";
-
 import { insertOrReplace, replace } from "../../util/input-util";
-
 import { getAccessToken } from "../../helper/user-token";
-
 import _c from "../../util/fix-class-names";
+import "./_index.scss";
 
 import {
   formatBoldSvg,
@@ -63,6 +57,16 @@ interface State {
   shGif: boolean;
 }
 
+export const detectEvent = (eventType: string) => {
+  const ev = new Event(eventType);
+  window.dispatchEvent(ev);
+};
+
+export const toolbarEventListener = (event: Event, eventType: string) => {
+  const ev = new CustomEvent("customToolbarEvent", { detail: { event, eventType } });
+  window.dispatchEvent(ev);
+};
+
 export class EditorToolbar extends Component<Props> {
   state: State = {
     gallery: false,
@@ -96,7 +100,7 @@ export class EditorToolbar extends Component<Props> {
     this.setState({ fragments: !fragments });
   };
 
-  toggleImage = (e?: React.MouseEvent<HTMLElement>) => {
+  toggleImage = (e?: React.MouseEvent<HTMLElement> | Event) => {
     if (e) {
       e.stopPropagation();
     }
@@ -112,7 +116,7 @@ export class EditorToolbar extends Component<Props> {
     this.setState({ mobileImage: !mobileImage });
   };
 
-  toggleLink = (e?: React.MouseEvent<HTMLElement>) => {
+  toggleLink = (e?: React.MouseEvent<HTMLElement> | Event) => {
     if (e) {
       e.stopPropagation();
     }
@@ -130,24 +134,41 @@ export class EditorToolbar extends Component<Props> {
   };
 
   componentDidMount() {
-    setTimeout(() => {
-      const el = this.getTargetEl();
-      if (el) {
-        el.addEventListener("dragover", this.onDragOver);
-        el.addEventListener("drop", this.drop);
-        el.addEventListener("paste", this.onPaste);
-      }
-    }, 0);
+    window.addEventListener("bold", this.bold);
+    window.addEventListener("italic", this.italic);
+    window.addEventListener("table", this.table);
+    window.addEventListener("link", this.toggleLink);
+    window.addEventListener("codeBlock", this.code);
+    window.addEventListener("blockquote", this.quote);
+    window.addEventListener("image", this.toggleImage);
+    window.addEventListener("customToolbarEvent", this.handleCustomToolbarEvent);
   }
 
   componentWillUnmount() {
-    const el = this.getTargetEl();
-    if (el) {
-      el.removeEventListener("dragover", this.onDragOver);
-      el.removeEventListener("drop", this.drop);
-      el.removeEventListener("paste", this.onPaste);
-    }
+    window.removeEventListener("bold", this.bold);
+    window.removeEventListener("italic", this.italic);
+    window.removeEventListener("table", this.table);
+    window.removeEventListener("link", this.toggleLink);
+    window.removeEventListener("codeBlock", this.code);
+    window.removeEventListener("blockquote", this.quote);
+    window.removeEventListener("image", this.toggleImage);
+    window.removeEventListener("customToolbarEvent", this.handleCustomToolbarEvent);
   }
+
+  handleCustomToolbarEvent = (e: Event) => {
+    const detail = (e as CustomEvent).detail;
+    switch (detail.eventType) {
+      case "paste":
+        this.onPaste(detail.event);
+        break;
+      case "dragover":
+        this.onDragOver(detail.event);
+        break;
+      case "drop":
+        this.drop(detail.event);
+        break;
+    }
+  };
 
   getTargetEl = (): HTMLInputElement | null => {
     const holder = this.holder.current;
@@ -271,7 +292,7 @@ export class EditorToolbar extends Component<Props> {
     this.insertText(`![${text}`, `](${url})`);
   };
 
-  table = (e: React.MouseEvent<HTMLElement>) => {
+  table = (e: React.MouseEvent<HTMLElement> | Event) => {
     e.stopPropagation();
     const t =
       "\n|\tColumn 1\t|\tColumn 2\t|\tColumn 3\t|\n" +
@@ -349,7 +370,7 @@ export class EditorToolbar extends Component<Props> {
         error(_t("editor-toolbar.image-error-cache"));
       }
     } catch (e) {
-      if (e.response?.status === 413) {
+      if (axios.isAxiosError(e) && e.response?.status === 413) {
         error(_t("editor-toolbar.image-error-size"));
       } else {
         error(_t("editor-toolbar.image-error"));
@@ -546,8 +567,6 @@ export class EditorToolbar extends Component<Props> {
         />
         {gallery && activeUser && (
           <Gallery
-            global={global}
-            activeUser={activeUser}
             onHide={this.toggleGallery}
             onPick={(url: string) => {
               const fileName = "";
@@ -558,7 +577,6 @@ export class EditorToolbar extends Component<Props> {
         )}
         {fragments && activeUser && (
           <Fragments
-            activeUser={activeUser}
             onHide={this.toggleFragments}
             onPick={(body: string) => {
               this.insertText(body);
