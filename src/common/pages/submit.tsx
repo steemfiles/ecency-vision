@@ -469,6 +469,21 @@ class SubmitPage extends BaseComponent<Props, State> {
     }
   };
 
+  editBody = (text: string): string => {
+    return (
+      text
+        // Keep first names, last names and letters after on the same line.
+        .replace(
+          /([A-Z][a-z]+|[0-9,.]|of|the|in|a) ([A-Z][A.Z.a-z0-9,.]+|of|the|in|a) ([A-Z][A.Z.a-z0-9,.]+|of|the|in|a)/,
+          "$1\u00a0$2\u00a0$3"
+        )
+        .replace(
+          /([A-Z][a-z]+|[0-9,.]|of|the|in|a) ([A-Z][A.Z.a-z0-9,.]+|of|the|in|a)/,
+          "$1\u00a0$2"
+        )
+    );
+  };
+
   bodyChanged = (e: React.ChangeEvent<typeof FormControl & HTMLInputElement>): void => {
     const { value: body } = e.target;
     this.stateSet({ body }, () => {
@@ -563,7 +578,10 @@ class SubmitPage extends BaseComponent<Props, State> {
     this._updateTimer = setTimeout(() => {
       const { title, tags, body, editingEntry, description } = this.state;
       const { thumbnails } = extractMetaData(body);
-      this.stateSet({ preview: { title, tags, body, description }, thumbnails: thumbnails || [] });
+      this.stateSet({
+        preview: { title, tags, body: this.editBody(body), description },
+        thumbnails: thumbnails || []
+      });
       if (editingEntry === null) {
         this.saveLocalDraft();
       }
@@ -620,7 +638,7 @@ class SubmitPage extends BaseComponent<Props, State> {
     } = this.state;
 
     // clean body
-    const cbody = body.replace(/[\x00-\x09\x0B-\x0C\x0E-\x1F\x7F-\x9F]/g, "");
+    const cbody = this.editBody(body.replace(/[\x00-\x09\x0B-\x0C\x0E-\x1F\x7F-\x9F]/g, ""));
     const cbodyWithFooter = cbody + (attachFooter ? "\n---\n" + footer : "");
     const bodyWithFooter = body + (attachFooter ? "\n---\n" + footer : "");
 
